@@ -37,6 +37,7 @@ struct Features: Encodable, CustomDebugStringConvertible, ServiceType {
     let signinWithGoogle         = Feature(date: "2018-10-20", version: "1.0")
     let userWelcomePage          = Feature(date: "2018-10-20", version: "1.0")
     let userProfilePage          = Feature(date: "2018-10-20", version: "1.0")
+    let userNickname             = Feature(date: "2019-04-24", version: "1.x")
     let createList               = Feature(date: "2018-10-24", version: "1.0")
     let limitNumberOfLists       = Feature(date: "2018-12-10", version: "1.0")
     let deleteList               = Feature(date: "2018-10-24", version: "1.0")

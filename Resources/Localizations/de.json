@@ -34,6 +34,7 @@
     "none": "Keine",
 
     "profile": "Profil",
+    "nick-name": "Kurzname",
     "first-name": "Vorname",
     "last-name": "Nachname",
     "email": "E-Mail",
@@ -41,6 +42,12 @@
     "first-login": "Erste Anmeldung",
     "last-login": "Letzte Anmeldung",
     "status": "Status",
+    "edit-profile": "Profil bearbeiten",
+    "profile-editing": "Profil bearbeiten",
+    "profile-field-nickname-placeholder": "Kurzname eingeben",
+    "profile-field-nickname-invalid": "Ein eindeutiger Name wird benötigt. Gültige Namen sind mindestens 4 und maximal 100 Zeichen lang und enthalten nur alphanumerische Zeichen.",
+    "profile-field-nickname-duplicate": "Der gewählte Kurzname existiert bereits.",
+    "profile-field-nickname-hint": "Dein Kurzname wird für andere Nutzer sichtbar sein.",
 
     "created-at": "Erstellt am",
     "modified-at": "Geändert am",

@@ -154,6 +154,9 @@ final class ProfileController: ProtectedController, RouteCollection {
         router.get("user", ID.parameter, "edit",
             use: ProfileController.renderFormView
         )
+        router.post("user", ID.parameter,
+            use: ProfileController.dispatch
+        )
     }
 
 }

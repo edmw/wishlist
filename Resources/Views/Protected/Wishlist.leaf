@@ -1,5 +1,5 @@
 #set("id") {wishlist}
-#set("title") {#(page.listName)}
+#set("title") {#L10N("wishlist"){Wishlist}}
 #set("subtitle") {#L10N("someones-wishlist","#(page.ownerName)"){#(page.ownerName)'s Wishlist}}
 #//
 #set("content") {
@@ -16,7 +16,7 @@ you're viewing <strong>#(page.ownerName)'s #(page.listName) Wishlist</strong>. Y
 }
 </div>
 }}
-<h2>#L10N("someones-wishlist","#(page.ownerName)"){#(page.ownerName)'s Wishlist}</h2>
+<h2>#(page.listName)</h2>
 #if(request.parameter.m == "WAR") {
 <div class="alert alert-danger" role="alert">
     #L10N("wishlist-message-war"){The selected wish is already reserved by someone else. May be you would like to choose another gift?}

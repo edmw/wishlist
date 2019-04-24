@@ -27,7 +27,7 @@ struct WishlistPageContext: Encodable {
         self.ownerID = ID(owner.id)
         self.listID = ID(list.id)
 
-        self.ownerName = owner.firstName
+        self.ownerName = owner.nickName ?? owner.firstName
         self.listName = list.name
 
         self.items = items

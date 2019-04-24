@@ -4,8 +4,11 @@
 #set("content") {
 <h2>#(page.userFirstName)</h2>
 <section>
-<h3>#L10N("your-data"){Your Data}</h3>
+<h3>#L10N("your-data"){Your Data} #if(features.userNickname.enabled) {<a class="btn btn-link float-right" href="/user/#(page.userID)/edit#if(location){?p=#(location)}" title="#L10N("edit-profile"){Edit profile}"><svg class="feather"><use xlink:href="/icons/feather.svg#edit-2"/></svg></a>}</h3>
 <table class="profile table">
+#if(features.userNickname.enabled) {
+<tr><th>#L10N("nick-name"){Nickname}</th><td>#(page.userNickName)</td></tr>
+}
 <tr><th>#L10N("first-name"){Firstname}</th><td>#(page.userFirstName)</td></tr>
 <tr><th>#L10N("last-name"){Lastname}</th><td>#(page.userLastName)</td></tr>
 <tr><th>#L10N("email"){Email}</th><td>#(page.userEmail)</td></tr>

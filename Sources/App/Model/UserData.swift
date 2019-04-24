@@ -38,11 +38,9 @@ struct UserData: Content, Validatable, Reflectable {
         var validations = Validations(UserData.self)
         try validations.add(\.nickName,
             (.nil || .empty ||
-                (.count(...User.maximumLengthOfNickName) &&
+                (.count(4...User.maximumLengthOfNickName) &&
                     .characterSet(
-                        .alphanumerics +
-                        .whitespaces +
-                        .punctuationCharacters
+                        .alphanumerics
                     )
                 )
             )

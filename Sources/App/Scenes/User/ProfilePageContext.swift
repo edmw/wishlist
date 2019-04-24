@@ -4,6 +4,7 @@ struct ProfilePageContext: Encodable {
 
     var userID: ID?
 
+    var userNickName: String?
     var userFirstName: String
     var userLastName: String
     var userEmail: String
@@ -26,6 +27,7 @@ struct ProfilePageContext: Encodable {
     ) {
         self.userID = ID(user.id)
 
+        self.userNickName = user.nickName
         self.userFirstName = user.firstName
         self.userLastName = user.lastName
         self.userEmail = user.email
