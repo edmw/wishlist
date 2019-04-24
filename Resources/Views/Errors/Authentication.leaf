@@ -1,0 +1,11 @@
+#set("title") {#L10N("authentication"){Authentication}}
+#//
+#set("content") {
+<h2>#L10N("sorry"){Sorry!}</h2>
+<p>#L10N("message-authentication"){It seems that your authentication could not proceed.}</p>
+<p>#L10N("message-authentication-2"){Unfortunately we usually can not do much about it, please try again later ...}</p>
+<p>#L10N("message-authentication-tips"){"Here are some useful links meanwhile:}</p>
+#embed("Errors/Useful")
+}
+#//
+#embed("Wishlist")

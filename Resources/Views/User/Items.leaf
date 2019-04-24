@@ -1,0 +1,14 @@
+#set("title") {#L10N("items"){Items}}
+#//
+#set("content") {
+<h2>#(page.listName)</h2>
+<h3>#L10N("your-wishes"){Your Wishes} <small class="text-muted">(#count(page.items)/#(page.maximumNumberOfItems))</small></h3>
+#embed("User/Items-Collection")
+<div class="btn-toolbar justify-content-center justify-content-sm-start mt-4 mb-4">
+#if(count(page.items) < page.maximumNumberOfItems) {
+    <a class="nav-link btn btn-secondary mr-3" href="/user/#(page.userID)/list/#(page.listID)/items/create">#L10N("create-item"){Add a new item}</a>
+}
+</div>
+}
+#//
+#embed("Wishlist")

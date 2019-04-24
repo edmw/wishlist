@@ -1,0 +1,20 @@
+#if(site.access == "nobody") {
+<div class="mt-4 alert alert-danger" role="alert">
+#L10N("access-nobody"){Unfortunately we are unable to perform any sign ins at the moment. This is an unexpected condition and we try to restore the service into its normal state as soon as possible.}
+</div>
+}
+#if(site.access == "invited") {
+<div class="mt-4 alert alert-primary" role="alert">
+#L10N("access-invited"){This service is not available to the public for now. If you are interested in using our service we kindly ask you to come back at a later time. If you are a returning user or do have an invitation please continue signing in.}
+</div>
+}
+#if(site.access == "existing") {
+<div class="mt-4 alert alert-warning" role="alert">
+#L10N("access-existing"){Regrettably our service is restricted to returning users at the moment. If you are a not a returning user, but interested in using our service we kindly ask you to come back at a later time.}
+</div>
+}
+#if(site.access != "nobody") {
+<ul id="signin">
+<li><a id="google-signin" class="btn btn-light px-4" href="/google/authenticate#if(page.authenticationParametersQuery){?#(page.authenticationParametersQuery)}" role="button">#L10N("signin-using-google"){Sign in using Google}</a></li>
+</ul>
+}

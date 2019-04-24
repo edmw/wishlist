@@ -1,0 +1,22 @@
+#set("title") {#L10N("profile"){Profile}}
+#//
+#set("location"){/user/#(page.userID)}
+#set("content") {
+<h2>#(page.userFirstName)</h2>
+<section>
+<h3>#L10N("your-data"){Your Data}</h3>
+<table class="profile table">
+<tr><th>#L10N("first-name"){Firstname}</th><td>#(page.userFirstName)</td></tr>
+<tr><th>#L10N("last-name"){Lastname}</th><td>#(page.userLastName)</td></tr>
+<tr><th>#L10N("email"){Email}</th><td>#(page.userEmail)</td></tr>
+<tr><th>#L10N("language"){Language}</th><td>#L10NLocale(page.userLanguage)</td></tr>
+<tr><th>#L10N("first-login"){First login}</th><td>#L10NDate(page.userFirstLogin)</td></tr>
+<tr><th>#L10N("last-login"){Last login}</th><td>#L10NDate(page.userLastLogin)</td></tr>
+</table>
+</section>
+#if(page.showInvitations) {
+#embed("User/Invitations-Section")
+}
+}
+#//
+#embed("Wishlist")

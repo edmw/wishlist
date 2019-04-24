@@ -1,0 +1,15 @@
+#set("title") {#L10N("signin"){Signin}}
+#//
+#set("content") {
+#if(page.invitationCode) {
+<div class="alert alert-primary" role="alert">
+#L10N("login-welcome-stranger","#(page.invitationCode)"){
+<strong>Hello Stranger,</strong><br />
+thank you for your interest in using our service. Your invitation code is <strong>#(page.invitationCode)</strong>. Just continue signing in to redeem your invitation and start using our service.
+}
+</div>
+}
+#embed("Public/Login-Signin")
+}
+#//
+#embed("Wishlist")

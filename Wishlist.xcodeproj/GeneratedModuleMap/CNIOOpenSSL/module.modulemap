@@ -1,0 +1,4 @@
+module CNIOOpenSSL {
+    umbrella "/Users/mib/Webdaten/Dropbox/MiB Wepapp Wishlist/.build/checkouts/swift-nio-ssl.git-5063041929995386080/Sources/CNIOOpenSSL/include"
+    export *
+}

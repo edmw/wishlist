@@ -1,0 +1,36 @@
+<table class="table table-responsive-md wl-invitations">
+#if(count(page.invitations) > 0) {
+    <tr>
+        <th>#L10N("invitation-code"){Code}</th>
+        <th>#L10N("invitation-email"){Email}</th>
+        <th>#L10N("invitation-sent-at"){Sent at}</th>
+        <th>#L10N("status"){Status}</th>
+        <th></th>
+    </tr>
+    #for(invitation in page.invitations) {
+        <tr>
+            <td class="wl-code">
+                #if(invitation.status != "revoked") {
+                <a class="btn btn-link mr-2" href="/signin/?invitation=#(invitation.code)" title="#L10N("invitation-link"){Invitation link}"><svg class="feather"><use xlink:href="/icons/feather.svg#share"/></svg></a>#(invitation.code)</a>
+                } else {
+                    <svg class="feather"><use xlink:href="/icons/feather.svg#share"/></svg>
+                }
+            </td>
+            <td class="wl-email">#(invitation.email)</a></td>
+            <td class="wl-sent-at">#(invitation.sent)</td>
+            <td class="wl-status">#L10N("#(invitation.status)"){}</td>
+            <td class="wl-actions">
+                <div class="btn-group" role="group">
+                    #if(invitation.status == "open") {
+                    <a class="btn btn-link ml-3" href="/user/#(page.userID)/invitation/#(invitation.id)/revoke#if(location){?p=#(location)}" title="#L10N("revoke-invitation"){Revoke invitation}"><svg class="feather"><use xlink:href="/icons/feather.svg#slash"/></svg></a>
+                    }
+                </div>
+            </td>
+        </tr>
+    }
+} else {
+    <tr>
+        <td colspane="1">#L10N("none"){None}</td>
+    </tr>
+}
+</table>

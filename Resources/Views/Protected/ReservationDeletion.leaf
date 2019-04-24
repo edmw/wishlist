@@ -1,0 +1,16 @@
+#set("title") {#L10N("release-wish"){Undo Reservation}}
+#//
+#set("content") {
+<h2>#L10N("sure-to"){Are you sure ...}</h2>
+<h3>#L10N("to-release-wish","#(page.itemName)","#(page.listName)"){... you want to <span class="text-danger">undo</span> the reservation for the wish named <strong>#(page.itemName)</strong> from list #(page.listName)?}</h3>
+<form method="POST" action="/list/#(page.listID)/reservation/#(page.reservationID)" accept-charset="UTF-8" class="mt-4">
+<input type="hidden" name="__method" value="DELETE">
+<input type="hidden" name="itemID" value="#(page.itemID)">
+<div class="form-group form-row">
+<button type="submit" class="btn btn-primary">#L10N("confirm"){Confirm}</button>
+<a class="nav-link btn btn-link ml-3" href="/list/#(page.listID)">#L10N("cancel"){Cancel}</a>
+</div>
+</form>
+}
+#//
+#embed("Wishlist")

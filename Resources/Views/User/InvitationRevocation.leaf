@@ -1,0 +1,17 @@
+#set("title") {#L10N("revoke-invitation"){Revoke an invitation}}
+#//
+#set("content") {
+<h2>#L10N("sure-to"){Are you sure ...}</h2>
+<h3>#L10N("to-revoke-invitation","#(page.invitation.email)"){... you want to <span class="text-danger">revoke</span> the invitation for <strong>#(page.invitation.email)</strong>?}</h3>
+<form method="POST" action="/user/#(page.userID)/invitation/#(page.invitation.id)/#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="mt-4">
+    <input name="__method" type="hidden" value="PATCH">
+    <input name="key" type="hidden" value="status">
+    <input name="value" type="hidden" value="revoked">
+    <div class="form-group form-row">
+    <button type="submit" class="btn btn-primary">#L10N("confirm"){Confirm}</button>
+    <a class="nav-link btn btn-link ml-3" href="#if(request.parameter.p){#(request.parameter.p)}else{/}">#L10N("cancel"){Cancel}</a>
+</div>
+</form>
+}
+#//
+#embed("Wishlist")

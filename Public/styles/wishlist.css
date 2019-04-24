@@ -1,0 +1,444 @@
+/* fonts */
+
+@font-face {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Open Sans Regular'), local('OpenSans-Regular'), url(/fonts/OpenSans-Regular.ttf) format('truetype');
+}
+@font-face {
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 800;
+    src: local('Open Sans ExtraBold'), local('OpenSans-ExtraBold'), url(/fonts/OpenSans-ExtraBold.ttf) format('truetype');
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-size: 100%;
+}
+
+/* banner */
+#banner {
+    position: fixed;
+    z-index: 101;
+    top: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* header */
+header {
+	width: 100%;
+	overflow: hidden;
+	font-family: 'Open Sans', sans-serif;
+	font-size: 1rem;
+	font-weight: 400;
+}
+header .content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 132px;
+}
+@media (min-width: 768px) {
+    header {
+        position: fixed;
+        z-index: 100;
+        top: 0;
+        left: 0;
+    }
+    header .content {
+        height: 120px;
+        flex-direction: row;
+        flex-wrap: nowrap;
+    }
+}
+/* title inside header */
+header #title {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-width: 0;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+header #title h1 {
+    overflow: hidden;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 3rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin: 0;
+    margin-left: -0.13em;
+    margin-bottom: -0.31em;
+    padding: 0;
+}
+header #title h1::first-letter {
+    font-size: 3.75rem;
+}
+@media (min-width: 768px) {
+    header #title {
+        order: 0;
+    }
+    header #title h1 {
+        font-size: 4.5rem;
+    }
+    header #title h1::first-letter {
+        font-size: 5.625rem;
+    }
+}
+/* navbar inside header */
+header .content .nav {
+    margin: 32px 0 0 0;
+    padding: 0;
+    align-self: center;
+    flex-wrap: nowrap;
+}
+@media (min-width: 768px) {
+    header .content .nav {
+        margin: 0 20px 0 0;
+        order: 1;
+    }
+}
+
+/* footer */
+footer {
+    width: 100%;
+    overflow: hidden;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+}
+@media (min-width: 768px) {
+    footer {
+        position: fixed;
+        z-index: 100;
+        bottom: 0;
+        left: 0;
+    }
+}
+
+/* main */
+main {
+    flex: 1;
+    width: 100%;
+    margin: 0;
+    padding: 20px 0 40px 0;
+}
+@media (min-width: 768px) {
+    main {
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin: 120px 0 50px 0;
+        padding: 20px 0 80px 0;
+    }
+}
+main .content {
+	font-family: 'Open Sans', sans-serif;
+	font-size: 1rem;
+	font-weight: 400;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+main .content > h2 {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+main .content > h2::first-letter {
+    font-size: 2.25rem;
+}
+main .content > h3 {
+    font-size: 1.5rem;
+}
+@media (min-width: 768px) {
+    main .content > h2 {
+        font-size: 2.5rem;
+    }
+    main .content > h2::first-letter {
+        font-size: 3.125rem;
+    }
+    main .content > h3 {
+        font-size: 1.75rem;
+    }
+}
+main .content section + section {
+    margin-top: 2em;
+}
+
+/* inline title */
+span.title {
+    display: inline-block;
+    text-transform: uppercase;
+}
+span.title::first-letter {
+    font-size: 125%;
+}
+
+/* table of lists */
+table.wl-lists th {
+    text-align: left;
+}
+table.wl-lists td.wl-info {
+    width: 1%;
+}
+table.wl-lists td.wl-visibility {
+    white-space: nowrap;
+}
+table.wl-lists td.wl-actions {
+    width: 1%;
+}
+
+/* list form */
+form.wl-list {
+    max-width: 720px;
+    margin-right: auto;
+}
+
+/* collection of items */
+div.wl-items {
+}
+div.wl-item {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    perspective: 1000px;
+    -webkit-perspective: 1000px;
+}
+div.wl-item div.wl-item-card {
+    position: relative;
+    width: 100%;
+    background: white;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    transition: all 600ms ease;
+    -webkit-transition: all 600ms ease;
+}
+div.wl-item > div.flipped {
+    transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
+}
+div.wl-item img {
+    width: 100%;
+}
+div.wl-item img.placeholder {
+    opacity: 0.1;
+}
+div.wl-item .inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-size: cover;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+div.wl-item .back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
+}
+div.wl-item .back .text {
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+div.wl-item .cover {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    opacity: 0.85;
+}
+div.wl-item .wl-label {
+}
+div.wl-item .wl-label h5 {
+    overflow: hidden;
+    white-space: nowrap;
+    background-color: rgba(255, 255, 255, 0.75);
+    text-overflow: ellipsis;
+    padding: 0.25rem;
+}
+div.wl-item .wl-label .wl-hearts {
+    display: block;
+    float: left;
+    color: #343a40;
+    background-color: rgba(255, 255, 255, 0.75);
+    font-size: 80%;
+}
+div.wl-item .btn-group {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+div.wl-item .btn-group a {
+    background-color: rgba(108, 117, 125, 0.75);
+    border-radius: 0;
+}
+@media (min-width: 576px) {
+    div.wl-items {
+        display: flex;
+        flex-flow: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+    div.wl-items::after {
+        content: "";
+        flex: auto;
+    }
+    div.wl-items div.wl-item {
+        width: 48%;
+    }
+}
+@media (min-width: 768px) {
+    div.wl-items {
+        display: flex;
+        flex-flow: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+    div.wl-items::after {
+        content: "";
+        flex: auto;
+    }
+    div.wl-items div.wl-item {
+        width: 32%;
+    }
+}
+@media (min-width: 992px) {
+    div.wl-items {
+        display: flex;
+        flex-flow: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+    div.wl-items::after {
+        content: "";
+        flex: auto;
+    }
+    div.wl-items div.wl-item {
+        width: 25%;
+    }
+}
+
+/* table of items */
+table.wl-items th {
+    text-align: left;
+}
+table.wl-items td.wl-info {
+    width: 1%;
+}
+table.wl-items td.wl-actions {
+    width: 1%;
+}
+
+/* item form */
+form.wl-item {
+    max-width: 720px;
+    margin-right: auto;
+}
+
+/* profile */
+
+table.profile th {
+    text-align: right;
+}
+
+/* signins */
+ul#signin {
+	display: flex;
+	flex-direction: row;
+	justify-content: left;
+	list-style: none;
+	margin: 40px 0;
+	padding: 0;
+}
+ul#signin li:not(:last-child) {
+	margin-right: 8px;
+}
+ul#signin button {
+	width: 100%;
+}
+ul#signin #google-signin {
+    color: white;
+    background-color: #4285f4;
+}
+ul#signin #netid-signin {
+    color: white;
+    background-color: #76B82A;
+}
+
+/* bootstrap: headings */
+h2, h3, h4 {
+    line-height: 1.5;
+}
+
+/* bootstrap: button */
+.btn {
+    border: none;
+    border-radius: 50vh;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+}
+/* btn inside table */
+.table .btn {
+    padding: 0;
+}
+
+/* bootstrap: navbar */
+.navbar .navbar-brand {
+    text-transform: uppercase;
+}
+.navbar .navbar-brand::first-letter {
+    font-size: 125%;
+}
+
+/* nav inside table */
+.table .nav-link {
+    padding: 0;
+}
+
+/* boostrap: form */
+.form-group > label,
+.form-group > legend {
+    font-weight: bold;
+}
+
+/* icons: feather */
+.feather {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}

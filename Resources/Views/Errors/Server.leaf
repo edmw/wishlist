@@ -1,0 +1,3 @@
+#set("title") {#(status) #(statusMessage)}
+#//
+#embed("Wishlist")

@@ -1,0 +1,61 @@
+#if(page.list.id == nil) {
+#set("title") {#L10N("list-creation"){Create a List}}
+} else {
+#set("title") {#L10N("list-editing"){Edit a List}}
+}
+#//
+#set("content") {
+#if(page.list.id == nil) {
+#// form action and method to create a new list
+<form method="POST" action="/user/#(page.userID)/lists#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="wl-list">
+} else {
+#// form action and method to update an existing list
+<form method="POST" action="/user/#(page.userID)/list/#(page.list.id)/#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="wl-list">
+<input name="__method" type="hidden" value="PUT">
+}
+    <div class="form-group">
+        <label for="inputName">#L10N("list-name"){Name}</label>
+        <input type="text" class="form-control#if(page.form.invalidName){ is-invalid}" id="inputName" name="inputName"  maxlength="100" placeholder="#L10N("list-field-name-placeholder"){Enter list’s name}" aria-describedby="descriptionName"#if(page.form.data.inputName){ value="#(page.form.data.inputName)"}>
+            <small id="descriptionName" class="form-text text-muted">#if(page.form.invalidName){<span class="text-danger">#L10N("list-field-name-invalid"){A unique name is required. Valid names contain alphabetic characters, whitespace, punctation only and are at least 4 and at most 100 characters long.}</span> }#if(page.form.duplicateName){<span class="text-danger">#L10N("list-field-name-duplicate"){A list with the choosen name already exists. }</span>}</small>
+    </div>
+    #// case ´private´ = 0
+    #// case ´public´ = 1
+    #// case users = 2
+    #// case friends = 3
+    <fieldset class="form-group">
+        <legend class="col-form-label pt-0">#L10N("visibility"){Visibility}</legend>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="inputVisibility" id="inputPrivate" value="0"#if(page.form.data.inputVisibility != 1 && page.form.data.inputVisibility != 2){ checked } aria-describedby="descriptionVisibility">
+            <label class="form-check-label" for="inputPrivate">#L10N("visibility-private"){Only you}</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="inputVisibility" id="inputUsers" value="2"#if(page.form.data.inputVisibility == 2){ checked } aria-describedby="descriptionVisibility">
+            <label class="form-check-label" for="inputUsers">#L10N("visibility-users"){All users}</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="inputVisibility" id="inputPublic" value="1"#if(page.form.data.inputVisibility == 1){ checked } aria-describedby="descriptionVisibility">
+            <label class="form-check-label" for="inputPublic">#L10N("visibility-public"){Public}</label>
+        </div>
+        <small id="descriptionVisibility" class="form-text text-muted">#if(page.form.invalidVisibility){<span class="text-danger">#L10N("list-field-visibility-required"){Visibility setting is required.}</span> }#L10N("list-field-visibility-description"){Visibility setting of the list. Private wishlists are not accessible for anyone but you. Select <i>All users</i> to make your list accessible to all logged-in users of this service. Public wishlists can be viewed by everybody who knows the web address of the wishlist.}</small>
+    </fieldset>
+    <div class="form-group">
+        <label for="inputItemsSorting">#L10N("list-field-sorting"){Display order of wishes}</label>
+        <select class="form-control" id="inputItemsSorting" name="inputItemsSorting">
+            <option value="+name"#if(page.form.data.inputItemsSorting == "+name"){ selected}>#L10N("sorting-name-ascending"){Name (ascending)}</option>
+            <option value="-name"#if(page.form.data.inputItemsSorting == "-name"){ selected}>#L10N("sorting-name-descending"){Name (descending)}</option>
+            <option value="+preference"#if(page.form.data.inputItemsSorting == "+preference"){ selected}>#L10N("sorting-preference-ascending"){Preference (ascending)}</option>
+            <option value="-preference"#if(page.form.data.inputItemsSorting == "-preference"){ selected}>#L10N("sorting-preference-descending"){Preference (descending)}</option>
+            <option value="+createdAt"#if(page.form.data.inputItemsSorting == "+createdAt"){ selected}>#L10N("sorting-created-at-ascending"){Added at (ascending)}</option>
+            <option value="-createdAt"#if(page.form.data.inputItemsSorting == "-createdAt"){ selected}>#L10N("sorting-created-at-descending"){Added at (descending)}</option>
+            <option value="+modifiedAt"#if(page.form.data.inputItemsSorting == "+modifiedAt"){ selected}>#L10N("sorting-modified-at-ascending"){Modified at (ascending)}</option>
+            <option value="-modifiedAt"#if(page.form.data.inputItemsSorting == "-modifiedAt"){ selected}>#L10N("sorting-modified-at-descending"){Modified at (descending)}</option>
+        </select>
+    </div>
+    <div class="form-group form-row mt-4">
+        <button type="submit" class="btn btn-primary">#L10N("save"){Save}</button>
+        <a class="nav-link btn btn-link ml-3" href="#if(request.parameter.p){#(request.parameter.p)}else{/user/#(page.userID)/lists}">#L10N("cancel"){Cancel}</a>
+    </div>
+</form>
+}
+#//
+#embed("Wishlist")

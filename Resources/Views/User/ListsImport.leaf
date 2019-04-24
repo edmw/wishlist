@@ -1,0 +1,16 @@
+#set("title") {#L10N("list-import"){Import a list}}
+#//
+#set("content") {
+<form method="POST" action="/user/#(page.userID)/lists/import#if(request.parameter.p){?p=#(request.parameter.p)}" enctype="multipart/form-data">
+<div class="form-group">
+    <label id="fileUploadLabel" for="fileUpload"><h2>#L10N("list-import-choose"){Please choose file file to import}</h2></label>
+    <input type="file" name="file" class="form-control-file" id="fileUpload" aria-describedby="fileUploadLabel">
+</div>
+<div class="form-group form-row mt-4">
+    <button type="submit" class="btn btn-primary">#L10N("import"){Import}</button>
+    <a class="nav-link btn btn-link ml-3" href="#if(request.parameter.p){#(request.parameter.p)}else{/user/#(page.userID)/lists}">#L10N("cancel"){Cancel}</a>
+</div>
+</form>
+}
+#//
+#embed("Wishlist")

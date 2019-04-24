@@ -1,0 +1,15 @@
+#set("title") {#L10N("welcome"){Welcome}}
+#//
+#set("location"){/}
+#set("content") {
+<h2>#(page.userFirstName)</h2>
+#embed("User/Welcome-Message")
+#if(page.showLists) {
+#embed("User/Lists-Section")
+}
+#if(page.showInvitations) {
+#embed("User/Invitations-Section")
+}
+}
+#//
+#embed("Wishlist")

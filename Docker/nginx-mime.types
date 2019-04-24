@@ -1,0 +1,38 @@
+types {
+
+    text/html                             html;
+    text/javascript                       js;
+    text/css                              css;
+    text/markdown                         md;
+    text/plain                            txt;
+
+    application/json                      json;
+    application/ld+json                   jsonld;
+    application/xml                       xml;
+    application/atom+xml                  atom;
+    application/rss+xml                   rss;
+    application/rdf+xml                   rdf;
+
+    image/svg+xml                         svg;
+    image/png                             png;
+    image/jpeg                            jpg jpeg;
+    image/bmp                             bmp;
+    image/gif                             gif;
+    image/tiff                            tif tiff;
+    image/webp                            webp;
+
+    image/x-icon                          ico;
+
+    font/woff                             woff;
+    font/woff2                            woff2;
+    font/ttf                              ttf;
+    font/collection                       ttc;
+    font/otf                              otf;
+
+    application/pdf                       pdf;
+    application/xhtml+xml                 xhtml;
+    application/xslt+xml                  xsl;
+    application/zip                       zip;
+
+}
+

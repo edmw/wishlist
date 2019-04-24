@@ -1,0 +1,58 @@
+#if(page.item == nil) {
+#set("title") {#L10N("item-creation"){Add Item}}
+} else {
+#set("title") {#L10N("item-editing"){Edit Item}}
+}
+#//
+#set("content") {
+#if(page.item == nil) {
+#// form action and method to create a new item
+<form method="POST" action="/user/#(page.userID)/list/#(page.listID)/items" accept-charset="UTF-8" class="wl-item">
+} else {
+#// form action and method to update an existing item
+<form method="POST" action="/user/#(page.userID)/list/#(page.listID)/item/#(page.item.id)/" accept-charset="UTF-8" class="wl-item">
+<input name="__method" type="hidden" value="PUT">
+}
+    <div class="form-group">
+        <label for="inputName">#L10N("item-name"){Name}</label>
+        <input type="text" class="form-control#if(page.form.invalidName){ is-invalid}" id="inputName" name="inputName" maxlength="100" placeholder="#L10N("item-field-name-placeholder"){Enter item’s name}" aria-describedby="descriptionName"#if(page.form.data.inputName){ value="#(page.form.data.inputName)"}>
+        <small id="descriptionName" class="form-text text-muted">#if(page.form.invalidName){<span class="text-danger">#L10N("item-field-name-invalid"){Valid names contain alphabetic characters, whitespace, punctation only and are at least 4 and at most 100 characters long. }</span> }#if(page.form.duplicateName){<span class="text-danger">#L10N("item-field-name-duplicate"){An item with the given name already exists. }</span> }#L10N("item-field-name-description"){}</small>
+    </div>
+    <div class="form-group">
+        <label for="inputText">#L10N("item-field-description"){Description}</label>
+        <textarea rows="4" class="form-control#if(page.form.invalidText){ is-invalid}" id="inputText" name="inputText" placeholder="#L10N("item-field-description-placeholder"){Enter item’s description}" aria-describedby="descriptionText">#(page.form.data.inputText)</textarea>
+        <small id="descriptionText" class="form-text text-muted">#if(page.form.invalidText){<span class="text-danger">#L10N("item-field-description-invalid"){Valid descriptions contain alphabetic characters, whitespace, punctation only and are at least 4 and at most 2000 characters long.}</span> }#L10N("item-field-description-description"){}</small>
+    </div>
+    <div class="form-group">
+        <label for="inputPreference">#L10N("item-field-preference"){Preference}</label>
+        <select class="form-control" id="inputPreference" name="inputPreference">
+            <option value="-2"#if(page.form.data.inputPreference == "-2"){ selected}>#L10N("item-preference-0"){Not so important}</option>
+            <option value="-1"#if(page.form.data.inputPreference == "-1"){ selected}>#L10N("item-preference-1"){Not so sure}</option>
+            <option value="0"#if(page.form.data.inputPreference == "0"){ selected}>#L10N("item-preference-2"){Would be happy}</option>
+            <option value="1"#if(page.form.data.inputPreference == "1"){ selected}>#L10N("item-preference-3"){Would love to have}</option>
+            <option value="2"#if(page.form.data.inputPreference == "2"){ selected}>#L10N("item-preference-4"){Must have}</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="inputURL">#L10N("item-field-url"){URL}</label>
+        <input type="text" class="form-control#if(page.form.invalidURL){ is-invalid}" id="inputURL" name="inputURL"  maxlength="2000" placeholder="#L10N("item-field-url-placeholder"){Enter url}" aria-describedby="descriptionURL"#if(page.form.data.inputURL){ value="#(page.form.data.inputURL)"}>
+        <small id="descriptionURL" class="form-text text-muted">#if(page.form.invalidURL){<span class="text-danger">#L10N("item-field-url-invalid"){Invalid url.}</span> }#L10N("item-field-url-description"){Optional external URL for the item.}</small>
+    </div>
+    <div class="form-group">
+        <label for="inputImageURL">#L10N("item-field-image-url"){Image URL}</label>
+        <input type="text" class="form-control#if(page.form.invalidImageURL){ is-invalid}" id="inputImageURL"  maxlength="2000" name="inputImageURL" placeholder="#L10N("item-field-image-url-placeholder"){Enter url}" aria-describedby="descriptionImageURL"#if(page.form.data.inputImageURL){ value="#(page.form.data.inputImageURL)"}>
+        <small id="descriptionImageURL" class="form-text text-muted">#if(page.form.invalidImageURL){<span class="text-danger">#L10N("item-field-image-url-invalid"){Invalid image url.}</span> }#L10N("item-field-image-url-description"){Optional URL for the item’s image.}</small>
+    </div>
+    <div class="form-group form-row mt-4">
+        <button type="submit" class="btn btn-primary">#L10N("save"){Save}</button>
+        <a class="nav-link btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/items">#L10N("cancel"){Cancel}</a>
+    </div>
+    #if(page.item.reservationID) {
+    <div class="mt-4 alert alert-warning" role="alert">
+        #L10N("item-editing-reserved"){<strong>Please note:</strong> This item has been <strong>reserved</strong> already. The user who reserved this item will <strong>not</strong> be notified about any change you'll decide to make here!}
+    </div>
+    }
+</form>
+}
+#//
+#embed("Wishlist")

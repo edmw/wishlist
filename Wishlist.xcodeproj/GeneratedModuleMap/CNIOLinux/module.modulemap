@@ -1,0 +1,4 @@
+module CNIOLinux {
+    umbrella header "/Users/Michael/Webdaten/Dropbox/MiB Wepapp Wishlist/.build/checkouts/swift-nio.git--2481707225297366997/Sources/CNIOLinux/include/CNIOLinux.h"
+    export *
+}

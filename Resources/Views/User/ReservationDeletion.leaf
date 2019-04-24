@@ -1,0 +1,18 @@
+#set("title") {#L10N("delete-reservation"){Delete a Reservation}}
+#//
+#set("content") {
+<h2>#L10N("sure-to"){Are you sure ...}</h2>
+<h3>#L10N("to-delete-reservation","#(page.itemName)","#(page.listName)"){... you want to <span class="text-danger">delete</span> the reservation for the wish named <strong>#(page.itemName)</strong> from list #(page.listName)?}</h3>
+<form method="POST" action="/user/#(page.userID)/list/#(page.listID)/item/#(page.itemID)/reservation/#(page.reservationID)#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="mt-4">
+    <input type="hidden" name="__method" value="DELETE">
+    <div class="form-group form-row">
+        <button type="submit" class="btn btn-primary">#L10N("confirm"){Confirm}</button>
+        <a class="nav-link btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/items">#L10N("cancel"){Cancel}</a>
+    </div>
+    <div class="alert alert-warning" role="alert">
+        <strong>Please note:</strong> The user who reserved this item will <strong>not</strong> be notified if you'll decide to delete the reservation!
+    </div>
+</form>
+}
+#//
+#embed("Wishlist")

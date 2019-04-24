@@ -1,0 +1,15 @@
+#set("title") {#L10N("reserve-wish"){Reserve}}
+#//
+#set("content") {
+<h2>#L10N("want-to"){Do you want ...}</h2>
+<h3>#L10N("to-reserve-wish","#(page.itemName)","#(page.listName)"){... to reserve the wish named <strong>#(page.itemName)</strong> from list <strong>#(page.listName)</strong>?}</h3>
+<form method="POST" action="/list/#(page.listID)/reservations" accept-charset="UTF-8" class="mt-4">
+<input type="hidden" name="itemID" value="#(page.itemID)">
+<div class="form-group form-row">
+<button type="submit" class="btn btn-primary">#L10N("confirm"){Confirm}</button>
+<a class="nav-link btn btn-link ml-3" href="/list/#(page.listID)">#L10N("cancel"){Cancel}</a>
+</div>
+</form>
+}
+#//
+#embed("Wishlist")

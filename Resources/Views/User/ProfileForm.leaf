@@ -1,0 +1,19 @@
+#set("title") {#L10N("profile-editing"){Edit your profile}}
+#//
+#set("content") {
+#// form action and method to update an profile
+<form method="POST" action="/user/#(page.userID)/#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="wl-list">
+<input name="__method" type="hidden" value="PUT">
+<div class="form-group">
+<label for="inputNickName">#L10N("profile-nickname"){Nickname}</label>
+<input type="text" class="form-control#if(page.form.invalidNickName){ is-invalid}" id="inputNickName" name="inputNickName" maxlength="100" placeholder="#L10N("profile-field-nickname-placeholder"){Enter your nickname}" aria-describedby="descriptionNickName"#if(page.form.data.inputNickName){ value="#(page.form.data.inputNickName)"}>
+<small id="descriptionNickName" class="form-text text-muted">#if(page.form.invalidNickName){<span class="text-danger">#L10N("profile-field-nickname-invalid"){A unique nickname is required. Valid names contain alphabetic characters, whitespace, punctation only and are at least 4 and at most 100 characters long.}</span> }#if(page.form.duplicateNickName){<span class="text-danger">#L10N("profile-field-nickname-duplicate"){The choosen nickname already exists. }</span>}#L10N("nick-name-hint"){Your nickname will be visible to other users of this service.}</small>
+</div>
+<div class="form-group form-row mt-4">
+<button type="submit" class="btn btn-primary">#L10N("save"){Save}</button>
+<a class="nav-link btn btn-link ml-3" href="#if(request.parameter.p){#(request.parameter.p)}else{/user/#(page.userID)/lists}">#L10N("cancel"){Cancel}</a>
+</div>
+</form>
+}
+#//
+#embed("Wishlist")

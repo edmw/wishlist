@@ -1,0 +1,9 @@
+#set("title") {#L10N("list-import-error"){Import error}}
+#//
+#set("content") {
+<h2>#L10N("sorry"){Sorry!}</h2>
+<p>#L10N("message-list-import-error"){The provided file can not be imported into a new Wishlist.}</p>
+<a class="btn btn-secondary mr-3 px-4" href="#if(request.parameter.p){#(request.parameter.p)}else{/user/#(page.userID)/lists}">#L10N("back"){Back}</a>
+}
+#//
+#embed("Wishlist")

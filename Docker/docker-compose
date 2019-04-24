@@ -1,0 +1,61 @@
+version: "3.3"
+services:
+  web:
+    container_name: wishlist-web
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx-mime.types:/etc/nginx/mime.types
+      - public:/var/www/public
+      - public-images:/var/www/public-images
+    networks:
+      - web
+    ports:
+      - 8080:80
+    depends_on:
+      - app
+  app:
+    container_name: wishlist-app
+    image: "wishlist:${APPVERSION}"
+    command: "--env ${APPENV}"
+    environment:
+      SITE_URL: "${SITE_URL}"
+      SITE_RELEASE: "beta"
+      SITE_ACCESS: "all"
+      DBHOST: "${DBHOST}"
+      DBPORT: "${DBPORT}"
+      DBNAME: "${DBNAME}"
+      DBUSERNAME: "${DBUSERNAME}"
+      DBPASSWORD: "${DBPASSWORD}"
+      GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID}"
+      GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET}"
+      CLOUDIMG_TOKEN: "${CLOUDIMG_TOKEN}"
+    volumes:
+      - public:/app/Public
+      - public-images:/app/Public-Images
+    networks:
+      - web
+    expose:
+      - 12345
+    links:
+      - db
+    depends_on:
+      - db
+  db:
+    container_name: wishlist-db
+    image: mysql:5
+    environment:
+      MYSQL_ROOT_PASSWORD: wishlist
+      MYSQL_USER: wishlist
+      MYSQL_PASSWORD: wishlist
+      MYSQL_DATABASE: wishlist
+    volumes:
+      - database:/var/lib/mysql
+    networks:
+      - web
+volumes:
+  public:
+  public-images:
+  database:
+networks:
+  web:

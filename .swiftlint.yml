@@ -1,0 +1,92 @@
+line_length: 100
+function_parameter_count: 6
+cyclomatic_complexity:
+  ignores_case_statements: true
+disabled_rules:
+  - opening_brace
+  - statement_position
+opt_in_rules:
+  - anyobject_protocol
+  - array_init
+  - attributes
+  - closure_body_length
+  - closure_end_indentation
+  - closure_parameter_position
+  - closure_spacing
+  - collection_alignment
+  - conditional_returns_on_newline
+  - contains_over_first_not_nil
+  - convenience_type
+  - discouraged_object_literal
+  - discouraged_optional_boolean
+  - empty_count
+  - empty_string
+  - fatal_error_message
+  - first_where
+  - force_unwrapping
+  - identical_operands
+  - mark
+  - modifier_order
+  - multiline_function_chains
+  - multiline_literal_brackets
+  - multiline_parameters
+  - multiline_parameters_brackets
+  - no_extension_access_modifier
+  - no_grouping_extension
+  - number_separator
+  - opening_brace
+  - operator_usage_whitespace
+  - overridden_super_call
+  - override_in_extension
+  - pattern_matching_keywords
+  - redundant_type_annotation
+  - redundant_void_return
+  - sorted_first_last
+  - static_operator
+  - toggle_bool
+  - unneeded_parentheses_in_closure_argument
+  - untyped_error_in_catch
+  - unused_import
+  - unused_optional_binding
+  - unused_private_declaration
+  - yoda_condition
+excluded:
+  - Docker
+  - Public
+  - Public-Images
+  - Resources
+  - Tests
+  - Wishlist.xcodeproj
+  - .build
+  - .env
+  - .git
+type_name:
+  excluded:
+    - ID
+    - UID
+identifier_name:
+  min_length:
+    error: 4
+  excluded:
+    - id
+    - uid
+    - key
+    - db
+    - row
+    - url
+    - tag
+    - app
+    - all
+    - any
+    - set
+    - for
+    - on
+    - new
+    - log
+    - low
+    - lhs
+    - rhs
+    - cwd
+    - awd
+
+

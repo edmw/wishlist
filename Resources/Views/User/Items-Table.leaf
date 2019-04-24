@@ -1,0 +1,35 @@
+<table class="table table-responsive-md wl-items">
+#if(count(page.items) > 0) {
+    <tr>
+        <th>#L10N("item-name"){Name}</th>
+        <th></th>
+        <th>#L10N("modified-at"){Modified at}</th>
+        <th>#L10N("created-at"){Created at}</th>
+        <th></th>
+    </tr>
+    #for(item in page.items) {
+        <tr>
+            <td>#(item.name)</td>
+            <td class="wl-actions">
+                <div class="btn-group" role="group">
+                    #if(item.url) {
+                    <a class="btn btn-link ml-3" href="#(item.url)" title="#L10N("open-item-url"){Open external item URL}"><svg class="feather"><use xlink:href="/icons/feather.svg#external-link"/></svg></a>
+                    }
+                </div>
+            </td>
+            <td>#L10NDate(item.modifiedAt)</td>
+            <td>#L10NDate(item.createdAt)</td>
+            <td class="wl-actions">
+                <div class="btn-group" role="group">
+                    <a class="btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/edit" title="#L10N("edit-item"){Edit item}"><svg class="feather"><use xlink:href="/icons/feather.svg#edit"/></svg></a>
+                    <a class="btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/delete" title="#L10N("delete-item"){Delete item}"><svg class="feather"><use xlink:href="/icons/feather.svg#delete"/></svg></a>
+                </div>
+            </td>
+        </tr>
+    }
+} else {
+    <tr>
+        <td colspane="1">#L10N("none"){None}</td>
+    </tr>
+}
+</table>

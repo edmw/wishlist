@@ -1,0 +1,11 @@
+#set("title") {#(status) #(statusMessage)}
+#//
+#set("content") {
+<h2>#L10N("sorry"){Sorry!}</h2>
+<p>#L10N("message401"){It seems that you’re not authorized to see this page.}</p>
+<p>#L10N("message401-tips","#(path)"){Maybe you want to try to <a href="/signin?p=#(path)">authenticate yourself</a> ...}</p>
+<p>#L10N("message401-tips-2"){... or visit some useful links instead:}</p>
+#embed("Errors/Useful")
+}
+#//
+#embed("Wishlist")

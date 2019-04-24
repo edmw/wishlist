@@ -1,0 +1,4 @@
+module CNIOHTTPParser {
+    umbrella header "/Users/Michael/Webdaten/Dropbox/MiB Wepapp Wishlist/.build/checkouts/swift-nio.git--2481707225297366997/Sources/CNIOHTTPParser/include/CNIOHTTPParser.h"
+    export *
+}
