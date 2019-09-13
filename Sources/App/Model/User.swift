@@ -39,6 +39,10 @@ final class User: Entity,
     /// authentication
     var subjectId: String?
 
+    var displayName: String {
+        return nickName ?? firstName
+    }
+
     init(
         id: UUID? = nil,
         email: String,

@@ -13,24 +13,20 @@ final class ReservationController: ProtectedController, RouteCollection {
 
         let identification = try user?.identification ?? requireIdentification(on: request)
 
-        return try requireList(on: request).flatMap { list in
-            // get owner of the found list
-            return list.user.get(on: request)
-                .flatMap { owner in
-                    // check if the found list may be accessed by the given user
-                    // user may be nil indicating this is a anonymous request
-                    try requireAuthorization(on: request, for: list, owner: owner, user: user)
-
-                    return try findItem(in: list, from: request).flatMap { item in
-                        // render the view after authorization
-                        return try render(identification, item, list)
+        return try requireList(on: request)
+            .flatMap { list in
+                // check if the found list may be accessed by the given user
+                // user may be nil indicating this is a anonymous request
+                return try requireAuthorization(on: request, for: list, user: user)
+                    .flatMap { _ in
+                        return try findItem(in: list, from: request)
+                            .flatMap { item in
+                                // render the view after authorization
+                                return try render(identification, item, list)
+                            }
                     }
-                }
-                .catchFlatMap(AuthorizationError.self) { error in
-                    request.logger?.application.debug("\(error)")
-                    throw Abort(.notFound)
-                }
-        }
+                    .handleAuthorizationError(on: request)
+            }
     }
 
     /// Renders a view to confirm the creation of a reservation.
@@ -48,15 +44,20 @@ final class ReservationController: ProtectedController, RouteCollection {
         -> Future<View>
     {
         return try allowView(on: request) { (identification, item, list) throws in
-            return try requireReservation(on: request, for: item).flatMap { reservation in
-                let context = ReservationPageContext(
-                    for: identification,
-                    and: item,
-                    in: list,
-                    with: reservation
-                )
-                return try renderView("Protected/ReservationDeletion", with: context, on: request)
-            }
+            return try requireReservation(on: request, for: item)
+                .flatMap { reservation in
+                    let context = ReservationPageContext(
+                        for: identification,
+                        and: item,
+                        in: list,
+                        with: reservation
+                    )
+                    return try renderView(
+                        "Protected/ReservationDeletion",
+                        with: context,
+                        on: request
+                    )
+                }
         }
     }
 
@@ -66,19 +67,26 @@ final class ReservationController: ProtectedController, RouteCollection {
     {
         let user = try requireAuthenticatedUser(on: request)
 
-        return try requireList(on: request, for: user).flatMap { list in
-            return try requireItem(on: request, for: list).flatMap { item in
-                return try requireReservation(on: request, for: item).flatMap { reservation in
-                    let context = ReservationPageContext(
-                        for: user,
-                        and: item,
-                        in: list,
-                        with: reservation
-                    )
-                    return try renderView("User/ReservationDeletion", with: context, on: request)
-                }
+        return try requireList(on: request, for: user)
+            .flatMap { list in
+                return try requireItem(on: request, for: list)
+                    .flatMap { item in
+                        return try requireReservation(on: request, for: item)
+                            .flatMap { reservation in
+                                let context = ReservationPageContext(
+                                    for: user,
+                                    and: item,
+                                    in: list,
+                                    with: reservation
+                                )
+                                return try renderView(
+                                    "User/ReservationDeletion",
+                                    with: context,
+                                    on: request
+                                )
+                            }
+                    }
             }
-        }
     }
 
     // MARK: - CRUD
@@ -93,22 +101,17 @@ final class ReservationController: ProtectedController, RouteCollection {
         let identification = try user?.identification ?? requireIdentification(on: request)
 
         // get list from request
-        return try requireList(on: request).flatMap { list in
-            // get owner of the found list
-            return list.user.get(on: request)
-                .flatMap { owner in
-                    // check if the found list may be accessed by the given user
-                    // user may be nil indicating this is a anonymous request
-                    try requireAuthorization(on: request, for: list, owner: owner, user: user)
-
-                    // execute the given function after authorization
-                    return try function(identification, list)
-                }
-                .catchFlatMap(AuthorizationError.self) { error in
-                    request.logger?.application.debug("\(error)")
-                    throw Abort(.notFound)
-                }
-        }
+        return try requireList(on: request)
+            .flatMap { list in
+                // check if the found list may be accessed by the given user
+                // user may be nil indicating this is a anonymous request
+                return try requireAuthorization(on: request, for: list, user: user)
+                    .flatMap { _ in
+                        // execute the given function after authorization
+                        return try function(identification, list)
+                    }
+                    .handleAuthorizationError(on: request)
+            }
     }
 
     private static func authorizeReservation(
@@ -118,16 +121,17 @@ final class ReservationController: ProtectedController, RouteCollection {
     ) throws -> Future<Response> {
 
         // get reservation from request
-        return try requireReservation(on: request).flatMap { reservation in
+        return try requireReservation(on: request)
+            .flatMap { reservation in
 
-            // check if the found reservation belongs to the given identification
-            guard reservation.holder == identification else {
-                throw Abort(.notFound)
+                // check if the found reservation belongs to the given identification
+                guard reservation.holder == identification else {
+                    throw Abort(.notFound)
+                }
+
+                // execute the given function after authorization
+                return try function(reservation)
             }
-
-            // execute the given function after authorization
-            return try function(reservation)
-        }
     }
 
     private static func create(on request: Request) throws -> Future<Response> {
@@ -164,31 +168,32 @@ final class ReservationController: ProtectedController, RouteCollection {
     ) throws
         -> Future<Response>
     {
-        return try findItem(in: list, from: request).flatMap { item in
-            let reservationRepository = try request.make(ReservationRepository.self)
-            return try reservationRepository.find(item: item.requireID())
-                .flatMap { result in
-                    guard result == nil else {
-                        // item already reserved (should not happen)
-                        return redirect(
-                            for: list,
-                            parameters: [.value(.wishAlreadyReserved, for: .message)],
-                            on: request
-                        )
-                    }
-                    let entity: Reservation
-                    // create list
-                    entity = try Reservation(item: item, holder: holder)
+        return try findItem(in: list, from: request)
+            .flatMap { item in
+                let reservationRepository = try request.make(ReservationRepository.self)
+                return try reservationRepository.find(item: item.requireID())
+                    .flatMap { result in
+                        guard result == nil else {
+                            // item already reserved (should not happen)
+                            return redirect(
+                                for: list,
+                                parameters: [.value(.wishAlreadyReserved, for: .message)],
+                                on: request
+                            )
+                        }
+                        let entity: Reservation
+                        // create list
+                        entity = try Reservation(item: item, holder: holder)
 
-                    return try reservationRepository
-                        .save(reservation: entity)
-                        .emit(
-                            event: "created for \(holder)",
-                            on: request
-                        )
-                        .transform(to: success(for: list, on: request))
-                }
-        }
+                        return try reservationRepository
+                            .save(reservation: entity)
+                            .emit(
+                                event: "created for \(holder)",
+                                on: request
+                            )
+                            .transform(to: success(for: list, on: request))
+                    }
+            }
     }
 
     // MARK: - RESULT
@@ -214,15 +219,18 @@ final class ReservationController: ProtectedController, RouteCollection {
     private static func deleteForOwner(on request: Request) throws -> Future<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
-        return try requireList(on: request, for: user).flatMap { list in
-            return try requireItem(on: request, for: list).flatMap { item in
-                return try requireReservation(on: request, for: item).flatMap { reservation in
-                    return reservation.delete(on: request).map { _ in
-                        okForOwner(for: user, and: list, on: request)
+        return try requireList(on: request, for: user)
+            .flatMap { list in
+                return try requireItem(on: request, for: list)
+                    .flatMap { item in
+                        return try requireReservation(on: request, for: item)
+                            .flatMap { reservation in
+                                return reservation.delete(on: request).map { _ in
+                                    okForOwner(for: user, and: list, on: request)
+                                }
+                            }
                     }
-                }
             }
-        }
     }
 
     // MARK: - RESULT (Owner)
@@ -244,27 +252,29 @@ final class ReservationController: ProtectedController, RouteCollection {
     // MARK: -
 
     private static func dispatch(on request: Request) throws -> Future<Response> {
-        return try method(of: request).flatMap { method -> Future<Response> in
-            switch method {
-            case .PUT:
-                return try update(on: request)
-            case .DELETE:
-                return try delete(on: request)
-            default:
-                throw Abort(.methodNotAllowed)
+        return try method(of: request)
+            .flatMap { method -> Future<Response> in
+                switch method {
+                case .PUT:
+                    return try update(on: request)
+                case .DELETE:
+                    return try delete(on: request)
+                default:
+                    throw Abort(.methodNotAllowed)
+                }
             }
-        }
     }
 
     private static func dispatchForOwner(on request: Request) throws -> Future<Response> {
-        return try method(of: request).flatMap { method -> Future<Response> in
-            switch method {
-            case .DELETE:
-                return try deleteForOwner(on: request)
-            default:
-                throw Abort(.methodNotAllowed)
+        return try method(of: request)
+            .flatMap { method -> Future<Response> in
+                switch method {
+                case .DELETE:
+                    return try deleteForOwner(on: request)
+                default:
+                    throw Abort(.methodNotAllowed)
+                }
             }
-        }
     }
 
     func boot(router: Router) throws {
@@ -342,7 +352,7 @@ final class ReservationController: ProtectedController, RouteCollection {
     static func findItem(in list: List, from request: Request) throws -> Future<Item> {
         return request.content[ID.self, at: "itemID"]
             .flatMap { itemID in
-                guard let itemID = itemID ?? request.query[ID.self, at: "itemid"] else {
+                guard let itemID = itemID ?? request.query[.itemID] else {
                     throw Abort(.notFound)
                 }
                 return try request.make(ItemRepository.self)

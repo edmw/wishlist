@@ -18,11 +18,8 @@ final class ListController: ProtectedController, RouteCollection {
             return try renderView("User/List", with: context, on: request)
         }
         else {
-            let listID = try request.parameters.next(ID.self)
             // render form to edit list
-            return try request.make(ListRepository.self)
-                .find(by: listID.uuid, for: user)
-                .unwrap(or: Abort(.noContent))
+            return try requireList(on: request, for: user)
                 .flatMap { list in
                     let data = ListPageFormData(from: list)
                     let context = ListPageContext(
@@ -32,7 +29,7 @@ final class ListController: ProtectedController, RouteCollection {
                     )
                     return try renderView("User/List", with: context, on: request)
                 }
-                // malformed parameter errors yield internal server errors
+            // malformed parameter errors yield internal server errors
         }
     }
 
@@ -62,10 +59,7 @@ final class ListController: ProtectedController, RouteCollection {
     private static func update(on request: Request) throws -> Future<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
-        let listID = try request.parameters.next(ID.self)
-        return try request.make(ListRepository.self)
-            .find(by: listID.uuid, for: user)
-            .unwrap(or: Abort(.badRequest))
+        return try requireList(on: request, for: user)
             .flatMap { list in
                 return try save(from: request, for: user, this: list)
             }
@@ -74,10 +68,7 @@ final class ListController: ProtectedController, RouteCollection {
     private static func delete(on request: Request) throws -> Future<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
-        let listID = try request.parameters.next(ID.self)
-        return try request.make(ListRepository.self)
-            .find(by: listID.uuid, for: user)
-            .unwrap(or: Abort(.badRequest))
+        return try requireList(on: request, for: user)
             .delete(on: request)
             .emit(
                 event: "deleted for \(user)",
@@ -186,10 +177,7 @@ final class ListController: ProtectedController, RouteCollection {
     private static func export(on request: Request) throws -> Future<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
-        let listID = try request.parameters.next(ID.self)
-        return try request.make(ListRepository.self)
-            .find(by: listID.uuid, for: user)
-            .unwrap(or: Abort(.badRequest))
+        return try requireList(on: request, for: user)
             .flatMap { list in
                 return try request.make(ItemRepository.self)
                     .all(for: list)
@@ -200,9 +188,7 @@ final class ListController: ProtectedController, RouteCollection {
                         ])
                         return ListData(list, items)
                             .encode(status: .ok, headers: headers, for: request)
-
-                    }
-                )
+                    })
             }
     }
 
@@ -240,16 +226,17 @@ final class ListController: ProtectedController, RouteCollection {
     // MARK: -
 
     private static func dispatch(on request: Request) throws -> Future<Response> {
-        return try method(of: request).flatMap { method -> Future<Response> in
-            switch method {
-            case .PUT:
-                return try update(on: request)
-            case .DELETE:
-                return try delete(on: request)
-            default:
-                throw Abort(.methodNotAllowed)
+        return try method(of: request)
+            .flatMap { method -> Future<Response> in
+                switch method {
+                case .PUT:
+                    return try update(on: request)
+                case .DELETE:
+                    return try delete(on: request)
+                default:
+                    throw Abort(.methodNotAllowed)
+                }
             }
-        }
     }
 
     func boot(router: Router) throws {

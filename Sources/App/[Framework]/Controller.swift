@@ -17,6 +17,8 @@ class Controller {
                 .map { methodString in
                     let method: HTTPMethod
                     switch methodString {
+                    case .none:
+                        method = .POST
                     case .some("GET"):
                         method = .GET
                     case .some("POST"):

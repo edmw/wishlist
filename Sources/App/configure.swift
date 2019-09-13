@@ -132,11 +132,13 @@ public func configure(
     services.register(MySQLUserRepository.self)
     services.register(MySQLListRepository.self)
     services.register(MySQLItemRepository.self)
+    services.register(MySQLFavoritesRepository.self)
     services.register(MySQLReservationRepository.self)
     services.register(MySQLInvitationRepository.self)
     config.prefer(MySQLUserRepository.self, for: UserRepository.self)
     config.prefer(MySQLListRepository.self, for: ListRepository.self)
     config.prefer(MySQLItemRepository.self, for: ItemRepository.self)
+    config.prefer(MySQLFavoritesRepository.self, for: FavoritesRepository.self)
     config.prefer(MySQLReservationRepository.self, for: ReservationRepository.self)
     config.prefer(MySQLInvitationRepository.self, for: InvitationRepository.self)
 

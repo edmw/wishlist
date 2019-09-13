@@ -52,6 +52,8 @@ func routes(
     try user.register(collection: ItemsController())
     try user.register(collection: ItemController())
 
+    try user.register(collection: FavoriteController())
+
     try user.register(collection: InvitationController())
 
     // protected routes

@@ -152,23 +152,28 @@ main .content {
     margin: 0 auto;
     padding: 0 20px;
 }
-main .content > h2 {
+main .content > .h2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+main .content > h2, main .content > .h2 > h2 {
     font-family: 'Open Sans', sans-serif;
     font-size: 1.8rem;
     font-weight: 800;
     text-transform: uppercase;
 }
-main .content > h2::first-letter {
+main .content > h2::first-letter, main .content > .h2 > h2::first-letter {
     font-size: 2.25rem;
 }
 main .content > h3 {
     font-size: 1.5rem;
 }
 @media (min-width: 768px) {
-    main .content > h2 {
+    main .content > h2, main .content > .h2 > h2 {
         font-size: 2.5rem;
     }
-    main .content > h2::first-letter {
+    main .content > h2::first-letter, main .content > .h2 > h2::first-letter {
         font-size: 3.125rem;
     }
     main .content > h3 {
@@ -189,17 +194,17 @@ span.title::first-letter {
 }
 
 /* table of lists */
+table.wl-lists {
+    table-layout: fixed;
+}
 table.wl-lists th {
     text-align: left;
-}
-table.wl-lists td.wl-info {
-    width: 1%;
 }
 table.wl-lists td.wl-visibility {
     white-space: nowrap;
 }
 table.wl-lists td.wl-actions {
-    width: 1%;
+    text-align: right;
 }
 
 /* list form */
@@ -221,7 +226,7 @@ div.wl-item {
 div.wl-item div.wl-item-card {
     position: relative;
     width: 100%;
-    background: white;
+    background: transparent;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     transform-style: preserve-3d;
     -webkit-transform-style: preserve-3d;
@@ -234,6 +239,8 @@ div.wl-item > div.flipped {
 }
 div.wl-item img {
     width: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 div.wl-item img.placeholder {
     opacity: 0.1;
@@ -244,7 +251,16 @@ div.wl-item .inner {
     left: 0;
     right: 0;
     bottom: 0;
+    z-index: 1;
+    background-color: transparent;
     background-size: cover;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+div.wl-item .inner > * {
+    z-index: 2;
+}
+div.wl-item .inner .btn-group a {
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
 }
@@ -254,19 +270,22 @@ div.wl-item .back {
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 20;
+    z-index: 3;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     transform: rotateY(180deg);
     -webkit-transform: rotateY(180deg);
 }
+div.wl-item .back > * {
+    z-index: 4;
+}
 div.wl-item .back .text {
     height: 100%;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: scroll;
 }
 div.wl-item .cover {
-    display: flex;
+    display: block;
     position: absolute;
     top: 0;
     left: 0;
@@ -351,11 +370,14 @@ div.wl-item .btn-group a {
 table.wl-items th {
     text-align: left;
 }
-table.wl-items td.wl-info {
-    width: 1%;
+table.wl-items td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-table.wl-items td.wl-actions {
-    width: 1%;
+table.wl-items td.wl-description {
+    width: 100%;
+    max-width: 0;
 }
 
 /* item form */
@@ -395,7 +417,7 @@ ul#signin #netid-signin {
 }
 
 /* bootstrap: headings */
-h2, h3, h4 {
+h2, .h2, h3, h4 {
     line-height: 1.5;
 }
 
@@ -404,9 +426,20 @@ h2, h3, h4 {
     border: none;
     border-radius: 50vh;
     font-family: 'Open Sans', sans-serif;
-    font-size: 1rem;
+    font-size: 1.0rem;
     font-weight: 400;
     letter-spacing: 0.5px;
+}
+.btn-link .btn-label {
+    font-size: 1.0rem;
+    font-weight: 400;
+    text-transform: initial;
+}
+.btn-link .btn-label + svg {
+    margin-left: 0.5ex;
+}
+.btn-link svg + .btn-label {
+    margin-left: 0.5ex;
 }
 /* btn inside table */
 .table .btn {
@@ -436,6 +469,17 @@ h2, h3, h4 {
 .feather {
     width: 24px;
     height: 24px;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+
+/* icons: feather */
+.feather-large {
+    width: 32px;
+    height: 32px;
     stroke: currentColor;
     stroke-width: 2;
     stroke-linecap: round;

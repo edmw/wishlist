@@ -20,9 +20,9 @@ final class WelcomeController: Controller, RouteCollection {
         }
 
         let lists = try ListsController.buildContexts(for: user, on: request)
-
-        return lists.flatMap { lists in
-            let context = WelcomePageContext(for: user, lists: lists)
+        let favorites = try FavoritesController.buildContexts(for: user, on: request)
+        return flatMap(lists, favorites) { lists, favorites in
+            let context = WelcomePageContext(for: user, lists: lists, favorites: favorites)
             return try renderView("User/Welcome", with: context, on: request)
         }
     }

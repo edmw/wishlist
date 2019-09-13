@@ -15,6 +15,8 @@ struct WishlistPageContext: Encodable {
     var userName: String?
     var userFirstName: String?
 
+    var userFavorsList: Bool
+
     var identification: ID?
 
     init(
@@ -27,7 +29,7 @@ struct WishlistPageContext: Encodable {
         self.ownerID = ID(owner.id)
         self.listID = ID(list.id)
 
-        self.ownerName = owner.nickName ?? owner.firstName
+        self.ownerName = owner.displayName
         self.listName = list.name
 
         self.items = items
@@ -36,6 +38,7 @@ struct WishlistPageContext: Encodable {
 
         self.userName = user?.name
         self.userFirstName = user?.firstName
+        self.userFavorsList = false
 
         self.identification = ID(identification)
     }

@@ -11,8 +11,21 @@ extension ProtectedController {
         for viewable: V,
         owner: User,
         user: User?
-    ) throws {
+    ) throws -> Authorization<V> {
         try request.checkAccess(for: viewable, owner: owner, user: user)
+        return Authorization(resource: viewable, owner: owner, subject: user)
+    }
+
+    static func requireAuthorization(
+        on request: Request,
+        for list: List,
+        user: User?
+    ) throws -> Future<Authorization<List>> {
+        // check if the list may be accessed by the given user
+        // user may be nil indicating this is a anonymous request
+        return list.user.get(on: request).map { owner in
+            return try requireAuthorization(on: request, for: list, owner: owner, user: user)
+        }
     }
 
 }

@@ -1,7 +1,7 @@
 import Vapor
 import Fluent
 
-final class ListsController: ProtectedController, SortingController, RouteCollection {
+final class FavoritesController: ProtectedController, SortingController, RouteCollection {
     typealias Sorting = ListsSorting
 
     static func buildContexts(for user: User, on request: Request) throws
@@ -14,17 +14,18 @@ final class ListsController: ProtectedController, SortingController, RouteCollec
         // Then, we flatten the array of context futures to a future of an array of contexts.
         // Now, we map the future of an array of contexts to the actual array of contexts.
         // (better would be: use a join on the database)
-        return try request.make(ListRepository.self)
-            .all(for: user, sort: sorting)
+        return try request.make(FavoritesRepository.self)
+            .favorites(for: user, sort: sorting)
             .flatMap { lists in
                 return try lists.map { list in
                     var context = ListContext(for: list)
-                    return try request.make(ItemRepository.self)
-                        .count(on: list)
-                        .map { count in
-                            context.itemsCount = count
-                            return context
-                        }
+                    let owner = list.user.get(on: request)
+                    let itemsCount = try request.make(ItemRepository.self).count(on: list)
+                    return flatMap(owner, itemsCount) { owner, itemsCount in
+                        context.ownerName = owner.displayName
+                        context.itemsCount = itemsCount
+                        return request.future(context)
+                    }
                 }
                 .flatten(on: request)
             }
@@ -35,18 +36,18 @@ final class ListsController: ProtectedController, SortingController, RouteCollec
     private static func renderView(on request: Request) throws -> Future<View> {
         let user = try requireAuthenticatedUser(on: request)
 
-        return try ListsController.buildContexts(for: user, on: request)
+        return try FavoritesController.buildContexts(for: user, on: request)
             .flatMap {
                 let context = ListsPageContext(for: user, with: $0)
-                return try renderView("User/Lists", with: context, on: request)
+                return try renderView("User/Favorites", with: context, on: request)
             }
     }
 
     // MARK: -
 
     func boot(router: Router) throws {
-        router.get("user", ID.parameter, "lists",
-            use: ListsController.renderView
+        router.get("user", ID.parameter, "favorites",
+            use: FavoritesController.renderView
         )
     }
 

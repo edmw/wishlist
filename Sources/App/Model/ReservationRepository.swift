@@ -53,14 +53,15 @@ final class MySQLReservationRepository: ReservationRepository, MySQLModelReposit
 
     func transfer(from source: Identification, to target: Identification) -> Future<Void> {
         return db.withConnection { connection in
-            return self.all(for: source).flatMap { reservations in
-                let updates = reservations
-                    .map { reservation -> Future<Reservation> in
-                        reservation.holder = target
-                        return reservation.update(on: connection)
-                    }
-                return Future.andAll(updates, eventLoop: connection.eventLoop)
-            }
+            return self.all(for: source)
+                .flatMap { reservations in
+                    let updates = reservations
+                        .map { reservation -> Future<Reservation> in
+                            reservation.holder = target
+                            return reservation.update(on: connection)
+                        }
+                    return Future.andAll(updates, eventLoop: connection.eventLoop)
+                }
         }
     }
 

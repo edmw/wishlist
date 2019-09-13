@@ -12,10 +12,7 @@ final class ItemController: ProtectedController, RouteCollection {
     {
         let user = try requireAuthenticatedUser(on: request)
 
-        let listID = try request.parameters.next(ID.self)
-        return try request.make(ListRepository.self)
-            .find(by: listID.uuid, for: user)
-            .unwrap(or: Abort(.badRequest))
+        return try requireList(on: request, for: user)
             .flatMap { list in
                 if request.parameters.values.isEmpty {
                     // render form to create new item
@@ -81,10 +78,7 @@ final class ItemController: ProtectedController, RouteCollection {
 
         return try requireList(on: request, for: user)
             .flatMap { list in
-                let itemID = try request.parameters.next(ID.self)
-                return try request.make(ItemRepository.self)
-                    .find(by: itemID.uuid, in: list)
-                    .unwrap(or: Abort(.badRequest))
+                return try requireItem(on: request, for: list)
                     .flatMap { item in
                         return try save(from: request, for: user, and: list, this: item)
                     }
@@ -241,16 +235,17 @@ final class ItemController: ProtectedController, RouteCollection {
     // MARK: -
 
     private static func dispatch(on request: Request) throws -> Future<Response> {
-        return try method(of: request).flatMap { method -> Future<Response> in
-            switch method {
-            case .PUT:
-                return try update(on: request)
-            case .DELETE:
-                return try delete(on: request)
-            default:
-                throw Abort(.methodNotAllowed)
+        return try method(of: request)
+            .flatMap { method -> Future<Response> in
+                switch method {
+                case .PUT:
+                    return try update(on: request)
+                case .DELETE:
+                    return try delete(on: request)
+                default:
+                    throw Abort(.methodNotAllowed)
+                }
             }
-        }
     }
 
     func boot(router: Router) throws {

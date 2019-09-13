@@ -1,0 +1,8 @@
+#set("title") {#L10N("favorites"){Favorites}}
+#//
+#set("content") {
+<h2>#(page.userName)</h2>
+#embed("User/Favorites-Section")
+}
+#//
+#embed("Wishlist")

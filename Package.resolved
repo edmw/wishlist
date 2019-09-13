@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/vapor/auth.git",
         "state": {
           "branch": null,
-          "revision": "ed402783942af1d40b5c9e537e956aea51618f0e",
-          "version": "2.0.3"
+          "revision": "e6f61b403727ec124214beb3e57deff579f31d00",
+          "version": "2.0.4"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/vapor/core.git",
         "state": {
           "branch": null,
-          "revision": "2731f8ba0cf274a61c9bd6ab43550f692ffaf879",
-          "version": "3.9.0"
+          "revision": "c64f63cb21631010952f7abfef719d376ab6a441",
+          "version": "3.9.1"
         }
       },
       {
@@ -78,8 +78,8 @@
         "repositoryURL": "https://github.com/vapor/http.git",
         "state": {
           "branch": null,
-          "revision": "254a0a0cbf22a02b697a075a0d2ddbb448bb7c87",
-          "version": "3.2.0"
+          "revision": "3808ed0401379b6e9f4a053f03090ea9d658caa9",
+          "version": "3.2.1"
         }
       },
       {
@@ -87,8 +87,8 @@
         "repositoryURL": "https://github.com/vapor-community/Imperial.git",
         "state": {
           "branch": null,
-          "revision": "a73e3274032d295b406b4e9700e8a571a5fea041",
-          "version": "0.12.0"
+          "revision": "1ad6a9b6ac6a1f6c41c386e8fc0f62715235bb5a",
+          "version": "0.13.1"
         }
       },
       {
@@ -132,8 +132,8 @@
         "repositoryURL": "https://github.com/vapor/mysql.git",
         "state": {
           "branch": null,
-          "revision": "d1561ae722220cafe0ef4b51549f87aebc70ddb1",
-          "version": "3.2.4"
+          "revision": "6e86ff53e18f02faf26c2cbea1c1fb466bff6866",
+          "version": "3.2.6"
         }
       },
       {
@@ -141,8 +141,8 @@
         "repositoryURL": "https://github.com/vapor/routing.git",
         "state": {
           "branch": null,
-          "revision": "626190ddd2bd9f967743b60ba6adaf90bbd2651c",
-          "version": "3.0.2"
+          "revision": "d76f339c9716785e5079af9d7075d28ff7da3d92",
+          "version": "3.1.0"
         }
       },
       {
@@ -222,8 +222,8 @@
         "repositoryURL": "https://github.com/vapor/template-kit.git",
         "state": {
           "branch": null,
-          "revision": "4b1073d74be9f5c6a5bc63a07a84e83efec26229",
-          "version": "1.1.2"
+          "revision": "51405c83e95e8adb09565278a5e9b959c605e56c",
+          "version": "1.4.0"
         }
       },
       {

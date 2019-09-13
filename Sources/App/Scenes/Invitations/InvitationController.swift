@@ -35,13 +35,14 @@ final class InvitationController: ProtectedController, RouteCollection {
         -> Future<View>
     {
         return try allowView(on: request) { (user) throws in
-            return try requireInvitation(on: request).flatMap { invitation in
-                let context = InvitationPageContext(
-                    for: user,
-                    with: invitation
-                )
-                return try renderView("User/InvitationRevocation", with: context, on: request)
-            }
+            return try requireInvitation(on: request)
+                .flatMap { invitation in
+                    let context = InvitationPageContext(
+                        for: user,
+                        with: invitation
+                    )
+                    return try renderView("User/InvitationRevocation", with: context, on: request)
+                }
         }
     }
 
@@ -67,16 +68,17 @@ final class InvitationController: ProtectedController, RouteCollection {
     ) throws -> Future<Response> {
 
         // get invitation from request
-        return try requireInvitation(on: request).flatMap { invitation in
+        return try requireInvitation(on: request)
+            .flatMap { invitation in
 
-            // check if the found invitation belongs to the given user
-            guard invitation.userID == user.id else {
-                throw Abort(.notFound)
+                // check if the found invitation belongs to the given user
+                guard invitation.userID == user.id else {
+                    throw Abort(.notFound)
+                }
+
+                // execute the given function after authorization
+                return try function(invitation)
             }
-
-            // execute the given function after authorization
-            return try function(invitation)
-        }
     }
 
     private static func create(on request: Request) throws -> Future<Response> {
@@ -92,19 +94,20 @@ final class InvitationController: ProtectedController, RouteCollection {
                     let key: String
                     let value: String
                 }
-                return try request.content.decode(Patch.self).flatMap { patch in
-                    switch patch.key {
-                    case "status":
-                        guard let status = Invitation.Status(string: patch.value) else {
+                return try request.content.decode(Patch.self)
+                    .flatMap { patch in
+                        switch patch.key {
+                        case "status":
+                            guard let status = Invitation.Status(string: patch.value) else {
+                                throw Abort(.badRequest)
+                            }
+                            return try invitation
+                                .update(status: status, in: request.make(InvitationRepository.self))
+                                .transform(to: success(for: user, on: request))
+                        default:
                             throw Abort(.badRequest)
                         }
-                        return try invitation
-                            .update(status: status, in: request.make(InvitationRepository.self))
-                            .transform(to: success(for: user, on: request))
-                    default:
-                        throw Abort(.badRequest)
                     }
-                }
             }
         }
     }
@@ -211,14 +214,15 @@ final class InvitationController: ProtectedController, RouteCollection {
     // MARK: -
 
     private static func dispatch(on request: Request) throws -> Future<Response> {
-        return try method(of: request).flatMap { method -> Future<Response> in
-            switch method {
-            case .PATCH:
-                return try patch(on: request)
-            default:
-                throw Abort(.methodNotAllowed)
+        return try method(of: request)
+            .flatMap { method -> Future<Response> in
+                switch method {
+                case .PATCH:
+                    return try patch(on: request)
+                default:
+                    throw Abort(.methodNotAllowed)
+                }
             }
-        }
     }
 
     func boot(router: Router) throws {
@@ -259,7 +263,7 @@ final class InvitationController: ProtectedController, RouteCollection {
     static func findItem(in list: List, from request: Request) throws -> Future<Item> {
         return request.content[ID.self, at: "itemID"]
             .flatMap { itemID in
-                guard let itemID = itemID ?? request.query[ID.self, at: "itemid"] else {
+                guard let itemID = itemID ?? request.query[.itemID] else {
                     throw Abort(.notFound)
                 }
                 return try request.make(ItemRepository.self)

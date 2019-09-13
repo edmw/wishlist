@@ -11,6 +11,8 @@ struct ListContext: Encodable {
     var createdAt: Date
     var modifiedAt: Date
 
+    var ownerName: String?
+
     var itemsCount: Int?
 
     init(for list: List) {

@@ -42,9 +42,10 @@ final class LoginController: Controller, RouteCollection {
             guard try request.isAuthenticated(User.self) == false else {
                 return LoginController.redirect(to: "/", on: request)
             }
-            return try LoginController.renderView(on: request).flatMap { view in
-                return try view.encode(for: request)
-            }
+            return try LoginController.renderView(on: request)
+                .flatMap { view in
+                    return try view.encode(for: request)
+                }
         }
     }
 

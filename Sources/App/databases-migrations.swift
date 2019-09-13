@@ -33,8 +33,10 @@ func databasesMigrations(
     logger: Logger? = nil
 ) throws {
     config.add(model: User.self, database: .mysql)
+    config.add(migration: AddUserNickName.self, database: .mysql)
     config.add(model: List.self, database: .mysql)
     config.add(model: Item.self, database: .mysql)
+    config.add(model: Favorite.self, database: .mysql)
     config.add(model: Reservation.self, database: .mysql)
     config.add(model: Invitation.self, database: .mysql)
 }

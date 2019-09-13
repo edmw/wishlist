@@ -31,26 +31,44 @@ final class WishlistController: ProtectedController, SortingController, RouteCol
         // get all items and their reservations and render page
         return try request.make(ItemRepository.self)
             .allAndReservations(for: list, sort: list.itemsSorting ?? sorting)
-            .flatMap(to: View.self, { results in
+            .map(to: WishlistPageContext.self) { results in
                 let itemContexts
                     = results.map { result -> ItemContext in
                         let (item, reservation) = result
                         return ItemContext(for: item, with: reservation)
                     }
-                let context
-                    = WishlistPageContext(
-                        for: list,
-                        of: owner,
-                        with: itemContexts,
-                        user: user,
-                        identification: identification
-                    )
+                return WishlistPageContext(
+                    for: list,
+                    of: owner,
+                    with: itemContexts,
+                    user: user,
+                    identification: identification
+                )
+            }
+            .flatMap(to: WishlistPageContext.self) { context in
+                // if user is present check if list is a favorite list
+                if let user = user {
+                    return try request.make(FavoritesRepository.self)
+                        .find(favorite: list, for: user)
+                        .map { favorite in
+                            // modify context
+                            var newContext = context
+                            newContext.userFavorsList = favorite != nil
+                            return newContext
+                        }
+                }
+                else {
+                    // pass on unmodified context
+                    return request.future(context)
+                }
+            }
+            .flatMap(to: View.self) { context in
                 return try renderView(
                     "Protected/Wishlist",
                     with: context,
                     on: request
                 )
-            })
+            }
     }
 
     /// Renders the view for a wishlist.
@@ -60,37 +78,22 @@ final class WishlistController: ProtectedController, SortingController, RouteCol
         let identification = try user?.identification ?? requireIdentification(on: request)
 
         // find list for the given list id
-        let listID = try request.parameters.next(ID.self)
-        return try request.make(ListRepository.self)
-            .find(by: listID.uuid)
-            .unwrap(or: Abort(.notFound))
+        return try requireList(on: request)
             .flatMap { list in
-
-                // get owner of the found list
-                return list.user.get(on: request)
-                    .flatMap { owner in
-                        // check if the found list may be accessed by the given user
-                        // user may be nil indicating this is a anonymous request
-                        try requireAuthorization(on: request, for: list, owner: owner, user: user)
-
+                // check if the found list may be accessed by the given user
+                // user may be nil indicating this is a anonymous request
+                return try requireAuthorization(on: request, for: list, user: user)
+                    .flatMap { authorization in
                         // get all items and their reservations and render page
                         return try renderView(
-                            for: list,
-                            of: owner,
+                            for: authorization.resource,
+                            of: authorization.owner,
                             identification: identification,
-                            user: user,
+                            user: authorization.subject,
                             on: request
                         )
                     }
-                    .catchFlatMap(AuthorizationError.self) { error in
-                        request.logger?.application.debug("\(error)")
-                        switch error {
-                        case .authenticationRequired:
-                            throw Abort(.unauthorized)
-                        default:
-                            throw Abort(.notFound)
-                        }
-                    }
+                    .handleAuthorizationError(on: request)
             }
     }
 

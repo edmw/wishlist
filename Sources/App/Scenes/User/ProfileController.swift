@@ -133,14 +133,15 @@ final class ProfileController: ProtectedController, RouteCollection {
     // MARK: -
 
     private static func dispatch(on request: Request) throws -> Future<Response> {
-        return try method(of: request).flatMap { method -> Future<Response> in
-            switch method {
-            case .PUT:
-                return try update(on: request)
-            default:
-                throw Abort(.methodNotAllowed)
+        return try method(of: request)
+            .flatMap { method -> Future<Response> in
+                switch method {
+                case .PUT:
+                    return try update(on: request)
+                default:
+                    throw Abort(.methodNotAllowed)
+                }
             }
-        }
     }
 
     func boot(router: Router) throws {

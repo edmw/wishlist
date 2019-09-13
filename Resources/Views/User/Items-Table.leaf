@@ -3,8 +3,8 @@
     <tr>
         <th>#L10N("item-name"){Name}</th>
         <th></th>
-        <th>#L10N("modified-at"){Modified at}</th>
-        <th>#L10N("created-at"){Created at}</th>
+        <th>#L10N("item-description"){Description}</th>
+        <th>#L10N("item-preference"){Preference}</th>
         <th></th>
     </tr>
     #for(item in page.items) {
@@ -17,8 +17,8 @@
                     }
                 </div>
             </td>
-            <td>#L10NDate(item.modifiedAt)</td>
-            <td>#L10NDate(item.createdAt)</td>
+            <td class="wl-description">#(item.text)</td>
+            <td>#L10N("item-preference-#(item.preference + 2)"){?}</option></td>
             <td class="wl-actions">
                 <div class="btn-group" role="group">
                     <a class="btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/edit" title="#L10N("edit-item"){Edit item}"><svg class="feather"><use xlink:href="/icons/feather.svg#edit"/></svg></a>
