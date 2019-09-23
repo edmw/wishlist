@@ -7,7 +7,7 @@ struct ItemPageContext: Encodable {
 
     var item: ItemContext?
 
-    var listName: String
+    var listTitle: String
 
     var form: ItemPageFormContext
 
@@ -28,7 +28,7 @@ struct ItemPageContext: Encodable {
             self.item = nil
         }
 
-        self.listName = list.name
+        self.listTitle = list.title
 
         self.form = ItemPageFormContext(from: data)
     }

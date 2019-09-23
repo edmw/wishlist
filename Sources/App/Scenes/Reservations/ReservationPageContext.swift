@@ -12,9 +12,9 @@ struct ReservationPageContext: Encodable {
 
     var listID: ID?
 
-    var itemName: String
+    var itemTitle: String
 
-    var listName: String
+    var listTitle: String
 
     init(
         for identification: Identification,
@@ -30,9 +30,9 @@ struct ReservationPageContext: Encodable {
 
         self.listID = ID(list.id)
 
-        self.itemName = item.name
+        self.itemTitle = item.title
 
-        self.listName = list.name
+        self.listTitle = list.title
     }
 
     init(
@@ -49,9 +49,9 @@ struct ReservationPageContext: Encodable {
 
         self.listID = ID(list.id)
 
-        self.itemName = item.name
+        self.itemTitle = item.title
 
-        self.listName = list.name
+        self.listTitle = list.title
     }
 
 }

@@ -21,7 +21,7 @@ extension User {
         self.init(
             id: nil,
             email: userInfo.email,
-            name: userInfo.name,
+            fullName: userInfo.name,
             firstName: userInfo.givenName,
             lastName: userInfo.familyName
         )
@@ -32,7 +32,7 @@ extension User {
 
     func update(_ userInfo: AuthenticationUserInfo) {
         self.email = userInfo.email
-        self.name = userInfo.name
+        self.fullName = userInfo.name
         self.firstName = userInfo.givenName
         self.lastName = userInfo.familyName
         self.language = userInfo.language

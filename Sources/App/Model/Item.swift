@@ -15,8 +15,8 @@ final class Item: Entity, EntityReflectable, Content, Imageable, CustomStringCon
     // this is a hard limit (application can have soft limits, too)
     static let maximumNumberOfItemsPerList = 1_000
 
-    static let minimumLengthOfName = 4
-    static let maximumLengthOfName = 100
+    static let minimumLengthOfTitle = 4
+    static let maximumLengthOfTitle = 100
 
     static let maximumLengthOfText = 2_000
 
@@ -24,7 +24,7 @@ final class Item: Entity, EntityReflectable, Content, Imageable, CustomStringCon
 
     var id: UUID?
 
-    var name: String
+    var title: String
     var text: String
     var preference: Preference
     var url: URL?
@@ -39,7 +39,7 @@ final class Item: Entity, EntityReflectable, Content, Imageable, CustomStringCon
 
     init(
         id: UUID? = nil,
-        name: String,
+        title: String,
         text: String,
         preference: Preference? = nil,
         url: URL? = nil,
@@ -48,7 +48,7 @@ final class Item: Entity, EntityReflectable, Content, Imageable, CustomStringCon
     ) throws {
         self.id = id
 
-        self.name = name
+        self.title = title
         self.text = text
         self.preference = preference ?? .normal
         self.url = url
@@ -61,11 +61,11 @@ final class Item: Entity, EntityReflectable, Content, Imageable, CustomStringCon
 
     convenience init(
         id: UUID? = nil,
-        name: String,
+        title: String,
         text: String,
         list: List
     ) throws {
-        try self.init(id: id, name: name, text: text, listID: list.requireID())
+        try self.init(id: id, title: title, text: text, listID: list.requireID())
     }
 
     // MARK: Imagable
@@ -86,7 +86,7 @@ final class Item: Entity, EntityReflectable, Content, Imageable, CustomStringCon
 
     static var properties: [PartialKeyPath<Item>] = [
         \Item.id,
-        \Item.name,
+        \Item.title,
         \Item.text,
         \Item.preference,
         \Item.url,
@@ -100,7 +100,7 @@ final class Item: Entity, EntityReflectable, Content, Imageable, CustomStringCon
     static func propertyName(forKey keyPath: PartialKeyPath<Item>) -> String? {
         switch keyPath {
         case \Item.id: return "id"
-        case \Item.name: return "name"
+        case \Item.title: return "title"
         case \Item.text: return "text"
         case \Item.preference: return "preference"
         case \Item.url: return "url"
@@ -116,7 +116,7 @@ final class Item: Entity, EntityReflectable, Content, Imageable, CustomStringCon
     // MARK: CustomStringConvertible
 
     var description: String {
-        return "Item[\(id ??? "???")](\(name))"
+        return "Item[\(id ??? "???")](\(title))"
     }
 
     // MARK: -

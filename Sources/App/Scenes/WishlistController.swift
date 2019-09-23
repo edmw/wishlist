@@ -27,7 +27,7 @@ final class WishlistController: ProtectedController, SortingController, RouteCol
         user: User?,
         on request: Request
     ) throws -> Future<View> {
-        let sorting = getSorting(on: request) ?? .ascending(by: \Item.name)
+        let sorting = getSorting(on: request) ?? .ascending(by: \Item.title)
         // get all items and their reservations and render page
         return try request.make(ItemRepository.self)
             .allAndReservations(for: list, sort: list.itemsSorting ?? sorting)

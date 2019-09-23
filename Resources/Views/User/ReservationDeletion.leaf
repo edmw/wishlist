@@ -2,7 +2,7 @@
 #//
 #set("content") {
 <h2>#L10N("sure-to"){Are you sure ...}</h2>
-<h3>#L10N("to-delete-reservation","#(page.itemName)","#(page.listName)"){... you want to <span class="text-danger">delete</span> the reservation for the wish named <strong>#(page.itemName)</strong> from list #(page.listName)?}</h3>
+<h3>#L10N("to-delete-reservation","#(page.itemTitle)","#(page.listTitle)"){... you want to <span class="text-danger">delete</span> the reservation for the wish named <strong>#(page.itemTitle)</strong> from list #(page.listTitle)?}</h3>
 <form method="POST" action="/user/#(page.userID)/list/#(page.listID)/item/#(page.itemID)/reservation/#(page.reservationID)#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="mt-4">
     <input type="hidden" name="__method" value="DELETE">
     <div class="form-group form-row">

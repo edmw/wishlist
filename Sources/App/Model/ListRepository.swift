@@ -11,8 +11,8 @@ protocol ListRepository: EntityRepository {
 
     func find(by id: List.ID) -> Future<List?>
     func find(by id: List.ID, for user: User) throws -> Future<List?>
-    func find(name: String) -> Future<List?>
-    func find(name: String, for user: User) throws -> Future<List?>
+    func find(title: String) -> Future<List?>
+    func find(title: String, for user: User) throws -> Future<List?>
 
     func all() -> Future<[List]>
     func all(for user: User) throws -> Future<[List]>
@@ -22,8 +22,8 @@ protocol ListRepository: EntityRepository {
 
     func save(list: List) -> Future<List>
 
-    // Returns an available list name for a user based on the specified name.
-    func available(name: String, for user: User) throws -> Future<String?>
+    // Returns an available list title for a user based on the specified title.
+    func available(title: String, for user: User) throws -> Future<String?>
 }
 
 final class MySQLListRepository: ListRepository, MySQLModelRepository {
@@ -36,7 +36,7 @@ final class MySQLListRepository: ListRepository, MySQLModelRepository {
     }
 
     // default sort order
-    static let orderByNameKeyPath = \List.name
+    static let orderByNameKeyPath = \List.title
     static let orderByNameDirection = ModelQuerySortingDirection.ascending
     static let orderByName = ListsSorting(orderByNameKeyPath, orderByNameDirection)
     static let orderByNameSql = MySQLDatabase.querySort(
@@ -56,21 +56,21 @@ final class MySQLListRepository: ListRepository, MySQLModelRepository {
         }
     }
 
-    func find(name: String) -> Future<List?> {
+    func find(title: String) -> Future<List?> {
         return db.withConnection { connection in
-            return List.query(on: connection).filter(\.name == name).first()
+            return List.query(on: connection).filter(\.title == title).first()
         }
     }
 
-    func find(name: String, for user: User) throws -> Future<List?> {
+    func find(title: String, for user: User) throws -> Future<List?> {
         return db.withConnection { connection in
-            return try user.lists.query(on: connection).filter(\.name == name).first()
+            return try user.lists.query(on: connection).filter(\.title == title).first()
         }
     }
 
     func all() -> Future<[List]> {
         return db.withConnection { connection in
-            return List.query(on: connection).sort(\.name, .ascending).all()
+            return List.query(on: connection).sort(\.title, .ascending).all()
         }
     }
 
@@ -87,7 +87,7 @@ final class MySQLListRepository: ListRepository, MySQLModelRepository {
             return try user.lists
                 .query(on: connection)
                 .sort(orderBy)
-                .sort(\.name, .ascending)
+                .sort(\.title, .ascending)
                 .all()
         }
     }
@@ -121,26 +121,26 @@ final class MySQLListRepository: ListRepository, MySQLModelRepository {
         }
     }
 
-    // Returns an available list name for a user based on the specified name
+    // Returns an available list title for a user based on the specified title
     // by appending an increasing counter to it.
-    func available(name string: String, for user: User) throws -> Future<String?> {
+    func available(title string: String, for user: User) throws -> Future<String?> {
         return try all(for: user)
             .map { lists in
-                var name = string
+                var title = string
 
-                // build list of existing names
-                let names = lists.map { list in list.name }
+                // build list of existing titles
+                let titles = lists.map { list in list.title }
 
-                if names.contains(name) {
-                    let prefix = String(name.prefix(List.maximumLengthOfName - 4))
+                if titles.contains(title) {
+                    let prefix = String(title.prefix(List.maximumLengthOfTitle - 4))
 
-                    // append increasing number to name until unique name is found
+                    // append increasing number to title until unique title is found
                     // (counts up to 99)
                     var counter = 0
                     repeat {
                         counter += 1
-                        name = "\(prefix)_\(counter)"
-                    } while names.contains(name) && counter < 4
+                        title = "\(prefix)_\(counter)"
+                    } while titles.contains(title) && counter < 4
 
                     guard counter < 4 else {
                         // counter outrun (no unique name found)
@@ -148,7 +148,7 @@ final class MySQLListRepository: ListRepository, MySQLModelRepository {
                     }
                 }
 
-                return name
+                return title
             }
     }
 

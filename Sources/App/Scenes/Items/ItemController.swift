@@ -142,7 +142,7 @@ final class ItemController: ProtectedController, RouteCollection {
                     .catchFlatMap(EntityError<Item>.self) { error in
                         switch error {
                         case .validationFailed(let properties, _):
-                            context.form.invalidName = properties.contains(\Item.name)
+                            context.form.invalidTitle = properties.contains(\Item.title)
                             context.form.invalidText = properties.contains(\Item.text)
                             context.form.invalidURL = properties.contains(\Item.url)
                             context.form.invalidImageURL = properties.contains(\Item.imageURL)

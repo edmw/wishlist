@@ -6,8 +6,7 @@ import Vapor
 struct UserData: Content, Validatable, Reflectable {
 
     var email: String
-    var name: String
-
+    var fullName: String
     var firstName: String
     var lastName: String
     var nickName: String?
@@ -21,7 +20,7 @@ struct UserData: Content, Validatable, Reflectable {
 
     init(_ user: User) {
         self.email = user.email
-        self.name = user.name
+        self.fullName = user.fullName
         self.firstName = user.firstName
         self.lastName = user.lastName
         self.nickName = user.nickName
@@ -32,7 +31,7 @@ struct UserData: Content, Validatable, Reflectable {
         self.lastLogin = user.lastLogin
     }
 
-    // MARK: Validatable {
+    // MARK: Validatable
 
     static func validations() throws -> Validations<UserData> {
         var validations = Validations(UserData.self)
@@ -51,9 +50,7 @@ struct UserData: Content, Validatable, Reflectable {
     /// Validates the given user data on conformance to the constraints of the model.
     /// - Values must validate (see Validatable)
     /// - Nickname must be unique
-    func validate(
-        using repository: UserRepository
-    ) throws -> Future<UserData> {
+    func validate(using repository: UserRepository) throws -> Future<UserData> {
         do {
             try validate()
         }
@@ -89,7 +86,7 @@ extension User {
     convenience init(from data: UserData) throws {
         self.init(
             email: data.email,
-            name: data.name,
+            fullName: data.fullName,
             firstName: data.firstName,
             lastName: data.lastName
         )
@@ -103,7 +100,7 @@ extension User {
 
     func update(from data: UserData) throws {
         self.email = data.email
-        self.name = data.name
+        self.fullName = data.fullName
         self.firstName = data.firstName
         self.lastName = data.lastName
         self.confidant = data.confidant

@@ -1,0 +1,31 @@
+#set("title") {#L10N("settings-editing"){Settings}}
+#//
+#set("content") {
+#// form action and method to update a users settings
+<form method="POST" action="/user/#(page.userID)/settings#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="wl-list">
+<input name="__method" type="hidden" value="PUT">
+#if(features.userNotifications.enabled) {
+<div class="form-group">
+<label>#L10N("settings-notifications-services"){Notification Services}</label>
+<div class="row">
+    <div class="col-md-4 my-auto">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="true" id="inputPushover" name="inputPushover"#if(page.form.data.inputPushover){ checked } aria-describedby="descriptionPushover">
+            <label class="form-check-label" for="inputPushover">#L10N("settings-field-enable-pushover"){Enable Pushover}</label>
+        </div>
+    </div>
+    <div class="col-md-8 my-auto pt-2 pl-4 pt-md-0 pl-md-0">
+        <input type="text" class="form-control#if(page.form.invalidPushoverKey == true || page.form.missingPushoverKey == true){ is-invalid}" id="inputPushoverKey" name="inputPushoverKey" maxlength="100" placeholder="#L10N("settings-field-pushoverkey-placeholder"){Enter your User key for Pushover Service}" aria-describedby="descriptionPushoverKey"#if(page.form.data.inputPushoverKey){ value="#(page.form.data.inputPushoverKey)"}>
+    </div>
+</div>
+<small id="descriptionPushoverKey" class="form-text text-muted">#if(page.form.missingPushoverKey){<span class="text-danger">#L10N("settings-field-pushoverkey-missing"){Pushover User key is required.} </span>}#if(page.form.invalidPushoverKey){<span class="text-danger">#L10N("settings-field-pushoverkey-invalid"){Not a valid Pushover User key.} </span>}#L10N("settings-field-pushover-hint"){Pushover is a service to receive instant push notifications on your phone or tablet. After creating a Pushover account and registering a device with the Pushover service enter your User Key to start receiving notifications.}</small>
+</div>
+}
+<div class="form-group form-row mt-4">
+<button type="submit" class="btn btn-primary">#L10N("save"){Save}</button>
+<a class="nav-link btn btn-link ml-3" href="#if(request.parameter.p){#(request.parameter.p)}else{/user/#(page.userID)}">#L10N("cancel"){Cancel}</a>
+</div>
+</form>
+}
+#//
+#embed("Wishlist")

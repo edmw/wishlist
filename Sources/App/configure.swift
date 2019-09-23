@@ -67,6 +67,10 @@ public func configure(
     services.register(RequestLanguageService.self)
     services.register(ImageProxyService.self)
 
+    // register Provider
+
+    try services.register(NotificationProvider())
+
     // register Middlewares
 
     services.register(FileMiddleware.self)

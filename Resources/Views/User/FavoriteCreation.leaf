@@ -2,7 +2,7 @@
 #//
 #set("content") {
 <h2>#L10N("want-to"){Do you want ...}</h2>
-<h3>#L10N("to-add-favorite","#(page.list.name)"){... to add the wish list named <strong>#(page.list.name)</strong> to your favorite wish lists?}</h3>
+<h3>#L10N("to-add-favorite","#(page.list.title)"){... to add the wish list named <strong>#(page.list.title)</strong> to your favorite wish lists?}</h3>
 <form method="POST" action="/user/#(page.userID)/favorites#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="mt-4">
 <input type="hidden" name="listID" value="#(page.list.id)">
 <div class="form-group form-row">

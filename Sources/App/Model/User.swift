@@ -24,7 +24,7 @@ final class User: Entity,
     var identification: Identification
 
     var email: String
-    var name: String
+    var fullName: String
     var firstName: String
     var lastName: String
     var nickName: String?
@@ -32,6 +32,8 @@ final class User: Entity,
     var picture: URL?
 
     var confidant: Bool
+
+    var settings: UserSettings
 
     var firstLogin: Date?
     var lastLogin: Date?
@@ -46,7 +48,7 @@ final class User: Entity,
     init(
         id: UUID? = nil,
         email: String,
-        name: String,
+        fullName: String,
         firstName: String,
         lastName: String
     ) {
@@ -55,11 +57,13 @@ final class User: Entity,
         self.identification = Identification()
 
         self.email = email
-        self.name = name
+        self.fullName = fullName
         self.firstName = firstName
         self.lastName = lastName
 
         self.confidant = false
+
+        self.settings = UserSettings()
     }
 
     // MARK: EntityReflectable
@@ -68,13 +72,14 @@ final class User: Entity,
         \User.id,
         \User.identification,
         \User.email,
-        \User.name,
+        \User.fullName,
         \User.firstName,
         \User.lastName,
         \User.nickName,
         \User.language,
         \User.picture,
         \User.confidant,
+        \User.settings,
         \User.firstLogin,
         \User.lastLogin,
         \User.subjectId
@@ -85,13 +90,14 @@ final class User: Entity,
         case \User.id: return "id"
         case \User.identification: return "identification"
         case \User.email: return "email"
-        case \User.name: return "name"
+        case \User.fullName: return "fullName"
         case \User.firstName: return "firstName"
         case \User.lastName: return "lastName"
         case \User.nickName: return "nickName"
         case \User.language: return "language"
         case \User.picture: return "picture"
         case \User.confidant: return "confidant"
+        case \User.settings: return "settings"
         case \User.firstLogin: return "firstLogin"
         case \User.lastLogin: return "lastLogin"
         case \User.subjectId: return "subjectId"
@@ -102,7 +108,7 @@ final class User: Entity,
     // MARK: CustomStringConvertible
 
     var description: String {
-        return "User[\(id ??? "???")][\(identification)](\(email), \(name))"
+        return "User[\(id ??? "???")][\(identification)](\(email), \(fullName))"
     }
 
 }

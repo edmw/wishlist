@@ -14,10 +14,11 @@ final class List: Entity, EntityReflectable, Content, Viewable, CustomStringConv
 
     var id: UUID?
 
-    var name: String
+    var title: String
     var visibility: Visibility
     var createdAt: Date
     var modifiedAt: Date
+    var options: List.Options
 
     var itemsSorting: ItemsSorting?
 
@@ -26,16 +27,17 @@ final class List: Entity, EntityReflectable, Content, Viewable, CustomStringConv
 
     init(
         id: UUID? = nil,
-        name: String,
+        title: String,
         visibility: Visibility,
         user: User
     ) throws {
         self.id = id
 
-        self.name = name
+        self.title = title
         self.visibility = visibility
         self.createdAt = Date()
         self.modifiedAt = self.createdAt
+        self.options = []
 
         self.userID = try user.requireID()
     }
@@ -44,17 +46,18 @@ final class List: Entity, EntityReflectable, Content, Viewable, CustomStringConv
     // this is a hard limit (application can have soft limits, too)
     static let maximumNumberOfListsPerUser = 1_000
 
-    static let minimumLengthOfName = 4
-    static let maximumLengthOfName = 100
+    static let minimumLengthOfTitle = 4
+    static let maximumLengthOfTitle = 100
 
     // MARK: EntityReflectable
 
     static var properties: [PartialKeyPath<List>] = [
         \List.id,
-        \List.name,
+        \List.title,
         \List.visibility,
         \List.createdAt,
         \List.modifiedAt,
+        \List.options,
         \List.itemsSorting,
         \List.userID
     ]
@@ -62,10 +65,11 @@ final class List: Entity, EntityReflectable, Content, Viewable, CustomStringConv
     static func propertyName(forKey keyPath: PartialKeyPath<List>) -> String? {
         switch keyPath {
         case \List.id: return "id"
-        case \List.name: return "name"
+        case \List.title: return "title"
         case \List.visibility: return "visibility"
         case \List.createdAt: return "createdAt"
         case \List.modifiedAt: return "modifiedAt"
+        case \List.options: return "options"
         case \List.items: return "itemsSorting"
         case \List.userID: return "userID"
         default: return nil
@@ -75,7 +79,15 @@ final class List: Entity, EntityReflectable, Content, Viewable, CustomStringConv
     // MARK: CustomStringConvertible
 
     var description: String {
-        return "List[\(id ??? "???")](\(name))"
+        return "List[\(id ??? "???")](\(title))"
+    }
+
+    // MARK: -
+
+    struct Options: OptionSet, Codable {
+        let rawValue: Int16
+
+        static let maskReservations = List.Options(rawValue: 1 << 0)
     }
 
 }

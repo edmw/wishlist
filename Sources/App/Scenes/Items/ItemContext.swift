@@ -4,7 +4,7 @@ struct ItemContext: Encodable {
 
     var id: ID?
 
-    var name: String
+    var title: String
     var text: String
     var preference: Int
     var createdAt: Date
@@ -19,7 +19,7 @@ struct ItemContext: Encodable {
     init(for item: Item, with reservation: Reservation? = nil) {
         self.id = ID(item.id)
 
-        self.name = item.name ??? "�"
+        self.title = item.title ??? "�"
         self.text = item.text ??? "�"
         self.preference = item.preference.rawValue
         self.createdAt = item.createdAt

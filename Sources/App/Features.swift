@@ -36,17 +36,23 @@ struct Features: Encodable, CustomDebugStringConvertible, ServiceType {
     let limitNumberOfInvitations = Feature(date: "2018-12-10", version: "1.0")
     let signinWithGoogle         = Feature(date: "2018-10-20", version: "1.0")
     let userWelcomePage          = Feature(date: "2018-10-20", version: "1.0")
+    let userSettings             = Feature.inDevelopment(false)
+    let userNotifications        = Feature.inDevelopment(false)
+    // users
     let userProfilePage          = Feature(date: "2018-10-20", version: "1.0")
     let userNickname             = Feature(date: "2019-04-24", version: "1.1")
+    // lists
     let createList               = Feature(date: "2018-10-24", version: "1.0")
     let limitNumberOfLists       = Feature(date: "2018-12-10", version: "1.0")
     let deleteList               = Feature(date: "2018-10-24", version: "1.0")
     let showLists                = Feature(date: "2018-10-24", version: "1.0")
+    let maskReservationsOnList   = Feature(date: "2019-09-17", version: "1.2")
     let sortOrderForLists        = Feature(date: "2019-04-21", version: "1.0")
     let editList                 = Feature(date: "2018-10-26", version: "1.0")
     let favorList                = Feature(date: "2019-09-13", version: "1.1")
     let exportList               = Feature(date: "2019-03-26", version: "1.0")
     let importList               = Feature(date: "2019-03-26", version: "1.0")
+    // items
     let createItem               = Feature(date: "2018-10-29", version: "1.0")
     let limitNumberOfItems       = Feature(date: "2018-12-10", version: "1.0")
     let deleteItem               = Feature(date: "2018-10-29", version: "1.0")
@@ -56,9 +62,11 @@ struct Features: Encodable, CustomDebugStringConvertible, ServiceType {
     let itemImage                = Feature(date: "2018-11-03", version: "1.0")
     let itemDescription          = Feature(date: "2018-11-06", version: "1.0")
     let itemPreference           = Feature(date: "2019-04-23", version: "1.0")
-    let showWishlist             = Feature(date: "2018-11-19", version: "1.0")
+    // reservations
     let makeReservation          = Feature(date: "2018-11-19", version: "1.0")
     let undoReservation          = Feature(date: "2018-11-19", version: "1.0")
+    // presentation
+    let showWishlist             = Feature(date: "2018-11-19", version: "1.0")
     // technical
     let localization             = Feature(date: "2018-11-28", version: "1.0")
     let preventCSRF              = Feature(date: "2018-11-20", version: "1.0")

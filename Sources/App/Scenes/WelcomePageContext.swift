@@ -4,7 +4,7 @@ struct WelcomePageContext: Encodable {
 
     var userID: ID?
 
-    var userName: String
+    var userFullName: String
     var userFirstName: String
 
     var showLists: Bool
@@ -27,7 +27,7 @@ struct WelcomePageContext: Encodable {
     ) {
         self.userID = ID(user.id)
 
-        self.userName = user.name
+        self.userFullName = user.fullName
         self.userFirstName = user.firstName
 
         self.showLists = true

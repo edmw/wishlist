@@ -1,4 +1,4 @@
 module CCryptoOpenSSL {
-    umbrella "/Users/Michael/Webdaten/Dropbox/MiB Wepapp Wishlist/.build/checkouts/crypto.git-3164636903427471245/Sources/CCryptoOpenSSL/include"
+    umbrella "/Users/mib/Webdaten/Dropbox/MiB Wepapp Wishlist/.build/checkouts/crypto.git-3164636903427471245/Sources/CCryptoOpenSSL/include"
     export *
 }

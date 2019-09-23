@@ -107,7 +107,7 @@ final class ListController: ProtectedController, RouteCollection {
                     .catchFlatMap(EntityError<List>.self) { error in
                         switch error {
                         case .validationFailed(let properties, _):
-                            context.form.invalidName = properties.contains(\List.name)
+                            context.form.invalidTitle = properties.contains(\List.title)
                             context.form.invalidVisibility = properties.contains(\List.visibility)
                         case .uniquenessViolated:
                             // a list with the given name already exists
@@ -164,11 +164,11 @@ final class ListController: ProtectedController, RouteCollection {
     // MARK: - EXTRA
 
     private static func exportFilename(for list: List) -> String {
-        let listname = list.name.slugify()
+        let listtitle = list.title.slugify()
         let datestamp = Date().exportDatestamp()
         var components = ["wishlist"]
-        if let listname = listname {
-            components.append(listname)
+        if let listtitle = listtitle {
+            components.append(listtitle)
         }
         components.append(datestamp)
         return components.joined(separator: "-")

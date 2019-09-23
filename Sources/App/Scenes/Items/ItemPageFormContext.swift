@@ -4,7 +4,7 @@ struct ItemPageFormContext: Encodable {
 
     var data: ItemPageFormData?
 
-    var invalidName: Bool
+    var invalidTitle: Bool
     var invalidText: Bool
     var invalidURL: Bool
     var invalidImageURL: Bool
@@ -12,7 +12,7 @@ struct ItemPageFormContext: Encodable {
     init(from data: ItemPageFormData?) {
         self.data = data
 
-        invalidName = false
+        invalidTitle = false
         invalidText = false
         invalidURL = false
         invalidImageURL = false

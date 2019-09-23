@@ -6,13 +6,13 @@ struct WishlistPageContext: Encodable {
     var listID: ID?
 
     var ownerName: String
-    var listName: String
+    var listTitle: String
 
     var items: [ItemContext]?
 
     var userID: ID?
 
-    var userName: String?
+    var userFullName: String?
     var userFirstName: String?
 
     var userFavorsList: Bool
@@ -30,13 +30,13 @@ struct WishlistPageContext: Encodable {
         self.listID = ID(list.id)
 
         self.ownerName = owner.displayName
-        self.listName = list.name
+        self.listTitle = list.title
 
         self.items = items
 
         self.userID = ID(user?.id)
 
-        self.userName = user?.name
+        self.userFullName = user?.fullName
         self.userFirstName = user?.firstName
         self.userFavorsList = false
 

@@ -206,6 +206,40 @@ table.wl-lists td.wl-visibility {
 table.wl-lists td.wl-actions {
     text-align: right;
 }
+@media only screen and (max-width: 575px) {
+
+    table.wl-lists {
+        display: table;
+    }
+    table.wl-lists thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        clip: rect(0 0 0 0);
+        overflow: hidden;
+    }
+    table.wl-lists tr {
+        display: block;
+        width: 100%;
+        border-bottom: 1px solid #dee2e6;
+    }
+    table.wl-lists td {
+        display: block;
+        width: 100%;
+        border: none;
+        text-align: right;
+    }
+    table.wl-lists td:before {
+        content: attr(data-label);
+        display: inline-block;
+        float: left;
+        padding-right: 1rem;
+        font-weight: bold;
+    }
+    table.wl-lists tr + tr {
+        margin-top: 1rem;
+    }
+}
 
 /* list form */
 form.wl-list {
@@ -379,6 +413,42 @@ table.wl-items td.wl-description {
     width: 100%;
     max-width: 0;
 }
+@media only screen and (max-width: 575px) {
+
+    table.wl-items {
+        display: table;
+    }
+    table.wl-items thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        clip: rect(0 0 0 0);
+        overflow: hidden;
+    }
+    table.wl-items tr {
+        display: block;
+        width: 100%;
+        border-bottom: 1px solid #dee2e6;
+    }
+    table.wl-items td {
+        display: block;
+        width: 100%;
+        border: none;
+        text-align: right;
+        max-width: initial !important;
+        white-space: initial !important;
+    }
+    table.wl-items td:before {
+        content: attr(data-label);
+        display: inline-block;
+        float: left;
+        padding-right: 1rem;
+        font-weight: bold;
+    }
+    table.wl-items tr + tr {
+        margin-top: 1rem;
+    }
+}
 
 /* item form */
 form.wl-item {
@@ -389,6 +459,12 @@ form.wl-item {
 /* profile */
 
 table.profile th {
+    text-align: right;
+}
+
+/* settings */
+
+table.settings th {
     text-align: right;
 }
 
@@ -429,6 +505,9 @@ h2, .h2, h3, h4 {
     font-size: 1.0rem;
     font-weight: 400;
     letter-spacing: 0.5px;
+}
+.btn-sm {
+    padding: .25rem .75rem;
 }
 .btn-link .btn-label {
     font-size: 1.0rem;
@@ -486,3 +565,29 @@ h2, .h2, h3, h4 {
     stroke-linejoin: round;
     fill: none;
 }
+
+/* bootstrap: grid */
+.container-fluid.keys-values .row {
+    border-top: 1px solid #dee2e6;
+}
+
+.container-fluid.keys-values .value {
+    padding: 0.75rem;
+    vertical-align: top;
+    font-weight: normal;
+}
+
+.container-fluid.keys-values .key {
+    padding: 0.75rem;
+    padding-bottom: 0;
+    vertical-align: top;
+    font-weight: bold;
+    text-align: left;
+}
+@media (min-width: 576px) {
+    .container-fluid.keys-values .key {
+        text-align: right;
+        padding-bottom: 0.75rem;
+    }
+}
+

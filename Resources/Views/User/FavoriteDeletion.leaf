@@ -2,7 +2,7 @@
 #//
 #set("content") {
 <h2>#L10N("sure-to"){Are you sure ...}</h2>
-<h3>#L10N("to-remove-favorite","#(page.list.name)"){... you want to remove the wish list named <strong>#(page.list.name)</strong> from your favorite wish lists?}</h3>
+<h3>#L10N("to-remove-favorite","#(page.list.title)"){... you want to remove the wish list named <strong>#(page.list.title)</strong> from your favorite wish lists?}</h3>
 <form method="POST" action="/user/#(page.userID)/favorites/delete#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="mt-4">
 <input type="hidden" name="__method" value="DELETE">
 <input type="hidden" name="listID" value="#(page.list.id)">

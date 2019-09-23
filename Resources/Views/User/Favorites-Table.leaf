@@ -1,17 +1,20 @@
-<table class="table table-responsive-md wl-lists">
+<div class="table-responsive">
+<table class="table wl-lists">
 #if(count(page.favorites) > 0) {
+    <thead>
     <tr>
-        <th>#L10N("list-name"){Name}</th>
+        <th>#L10N("list-title"){Name}</th>
         <th>#L10N("list-items"){Items}</th>
         <th>#L10N("list-owner"){Owner}</th>
         <th></th>
     </tr>
+    </thead>
     #for(list in page.favorites) {
         <tr>
-            <td class="wl-name"><a class="nav-link" href="/list/#(list.id)">#(list.name)</a></td>
-            <td>#(list.itemsCount)</td>
-            <td class="wl-owner">#(list.ownerName)</td>
-            <td class="wl-actions">
+            <td class="wl-title" data-label="#L10N("list-title"){Name}"><a class="nav-link" href="/list/#(list.id)">#(list.title)</a></td>
+            <td class="wl-count" data-label="#L10N("list-items"){Items}">#(list.itemsCount)</td>
+            <td class="wl-owner" data-label="#L10N("list-owner"){Owner}">#(list.ownerName)</td>
+            <td class="wl-actions" data-label="">
                 <div class="btn-group" role="group">
                     <a class="btn btn-link ml-3" href="/user/#(page.userID)/favorites/delete?listid=#(list.id)#if(location){&p=#(location)}" title="#L10N("delete-favorite"){Remove favorite}"><svg class="feather"><use xlink:href="/icons/feather.svg#x-circle"/></svg></a>
                 </div>
@@ -24,3 +27,5 @@
     </tr>
 }
 </table>
+</div>
+

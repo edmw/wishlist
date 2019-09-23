@@ -20,7 +20,9 @@ let package = Package(
         .package(url: "https://github.com/vapor-community/Imperial.git", from: "0.7.1"),
         .package(url: "https://github.com/miroslavkovac/Lingo.git", from: "3.0.5"),
         .package(url: "https://github.com/malcommac/SwiftDate.git", from: "5.0.0"),
-        .package(url: "https://github.com/LiveUI/VaporTestTools.git", from: "0.1.7")
+        .package(url: "https://github.com/LiveUI/VaporTestTools.git", from: "0.1.7"),
+        .package(url: "https://github.com/IBM-Swift/LoggerAPI.git", .exact("1.8.0")),
+        .package(url: "https://github.com/IBM-Swift/Swift-SMTP", .exact("5.1.0"))
     ],
     targets: [
         .target(name: "App", dependencies: [
@@ -32,7 +34,8 @@ let package = Package(
             "FluentMySQL",
             "Imperial",
             "Lingo",
-            "SwiftDate"
+            "SwiftDate",
+            "SwiftSMTP"
         ]),
         .target(name: "Run", dependencies: ["App"]),
         .testTarget(name: "AppTests", dependencies: ["App", "VaporTestTools"])

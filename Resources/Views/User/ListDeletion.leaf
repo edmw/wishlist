@@ -2,7 +2,7 @@
 #//
 #set("content") {
 <h2>#L10N("sure-to"){Are you sure ...}</h2>
-<h3>#L10N("to-delete-list","#(page.list.name)"){... you want to <span class="text-danger">delete</span> the list named <strong>#(page.list.name)</strong>?}</h3>
+<h3>#L10N("to-delete-list","#(page.list.title)"){... you want to <span class="text-danger">delete</span> the list named <strong>#(page.list.title)</strong>?}</h3>
 <form method="POST" action="/user/#(page.userID)/list/#(page.list.id)/#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="mt-4">
     <input name="__method" type="hidden" value="DELETE">
     <div class="form-group form-row">

@@ -41,7 +41,7 @@ final class MySQLItemRepository: ItemRepository, MySQLModelRepository {
     }
 
     // default sort order
-    static let orderByNameKeyPath = \Item.name
+    static let orderByNameKeyPath = \Item.title
     static let orderByNameDirection = ModelQuerySortingDirection.ascending
     static let orderByName = ItemsSorting(orderByNameKeyPath, orderByNameDirection)
     static let orderByNameSql = MySQLDatabase.querySort(
@@ -94,7 +94,7 @@ final class MySQLItemRepository: ItemRepository, MySQLModelRepository {
             return try list.items
                 .query(on: connection)
                 .sort(orderBy)
-                .sort(\.name, .ascending)
+                .sort(\.title, .ascending)
                 .all()
         }
     }
@@ -107,7 +107,7 @@ final class MySQLItemRepository: ItemRepository, MySQLModelRepository {
                 .query(on: connection)
                 .join(\Reservation.id, to: \Item.id)
                 .filter(filterReserved)
-                .sort(\.name, .ascending)
+                .sort(\.title, .ascending)
                 .all()
         }
     }
@@ -142,7 +142,7 @@ final class MySQLItemRepository: ItemRepository, MySQLModelRepository {
                 .query(on: connection)
                 .join(\Reservation.itemID, to: \Item.id, method: .left)
                 .sort(orderBy)
-                .sort(\.name, .ascending)
+                .sort(\.title, .ascending)
                 .decodeRaw()
                 .all()
                 .flatMap { results -> Future<[(Item, Reservation?)]> in

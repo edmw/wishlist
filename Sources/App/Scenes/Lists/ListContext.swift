@@ -6,7 +6,7 @@ struct ListContext: Encodable {
 
     var id: ID?
 
-    var name: String
+    var title: String
     var visibility: String
     var createdAt: Date
     var modifiedAt: Date
@@ -18,7 +18,7 @@ struct ListContext: Encodable {
     init(for list: List) {
         self.id = ID(list.id)
 
-        self.name = list.name ??? "�"
+        self.title = list.title ??? "�"
         self.visibility = String(describing: list.visibility)
         self.createdAt = list.createdAt
         self.modifiedAt = list.modifiedAt

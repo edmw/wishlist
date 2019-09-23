@@ -1,17 +1,20 @@
-<table class="table table-responsive-md wl-lists">
+<div class="table-responsive">
+<table class="table wl-lists">
 #if(count(page.lists) > 0) {
+    <thead>
     <tr>
-        <th>#L10N("list-name"){Name}</th>
+        <th>#L10N("list-title"){Name}</th>
         <th>#L10N("list-items"){Items}</th>
         <th>#L10N("visibility"){Visibility}</th>
         <th></th>
     </tr>
+    </thead>
     #for(list in page.lists) {
         <tr>
-            <td class="wl-name"><a class="nav-link" href="/list/#(list.id)">#(list.name)</a></td>
-            <td><a class="btn btn-link mr-2" href="/user/#(page.userID)/list/#(list.id)/items" title="#L10N("edit-list-wishes"){Edit Wishes}"><svg class="feather"><use xlink:href="/icons/feather.svg#edit-2"/></svg></a>#(list.itemsCount)</td>
-            <td class="wl-visibility">#L10N("visibility-#(list.visibility)"){}</td>
-            <td class="wl-actions">
+            <td class="wl-title" data-label="#L10N("list-title"){Name}"><a class="nav-link" href="/list/#(list.id)">#(list.title)</a></td>
+            <td class="wl-items" data-label="#L10N("list-items"){Items}"><a class="btn btn-link mr-2" href="/user/#(page.userID)/list/#(list.id)/items" title="#L10N("edit-list-wishes"){Edit Wishes}"><svg class="feather"><use xlink:href="/icons/feather.svg#edit-2"/></svg></a>#(list.itemsCount)</td>
+            <td class="wl-visibility" data-label="#L10N("visibility"){Visibility}">#L10N("visibility-#(list.visibility)"){}</td>
+            <td class="wl-actions" data-label="">
                 <div class="btn-group" role="group">
                     <a class="btn btn-link ml-3" href="/user/#(page.userID)/list/#(list.id)/export#if(location){?p=#(location)}" title="#L10N("export-list"){Export list}"><svg class="feather"><use xlink:href="/icons/feather.svg#download"/></svg></a>                    
                     <a class="btn btn-link ml-3" href="/user/#(page.userID)/list/#(list.id)/edit#if(location){?p=#(location)}" title="#L10N("edit-list"){Edit list}"><svg class="feather"><use xlink:href="/icons/feather.svg#edit"/></svg></a>
@@ -26,3 +29,4 @@
     </tr>
 }
 </table>
+</div>

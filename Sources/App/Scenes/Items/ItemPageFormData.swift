@@ -4,14 +4,14 @@ import Vapor
 /// In contrast to `ItemData` this contains only editable properties.
 struct ItemPageFormData: Content {
 
-    let inputName: String
+    let inputTitle: String
     let inputText: String
     let inputPreference: Item.Preference
     let inputURL: String
     let inputImageURL: String
 
     init() {
-        self.inputName = ""
+        self.inputTitle = ""
         self.inputText = ""
         self.inputPreference = .normal
         self.inputURL = ""
@@ -19,7 +19,7 @@ struct ItemPageFormData: Content {
     }
 
     init(from item: Item) {
-        self.inputName = item.name
+        self.inputTitle = item.title
         self.inputText = item.text
         self.inputPreference = item.preference
         self.inputURL = item.url ??? ""
@@ -31,7 +31,7 @@ struct ItemPageFormData: Content {
 extension ItemData {
 
     init(from formdata: ItemPageFormData) {
-        self.name = formdata.inputName
+        self.title = formdata.inputTitle
         self.text = formdata.inputText
         self.preference = formdata.inputPreference
         self.url = formdata.inputURL

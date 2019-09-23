@@ -12,6 +12,8 @@ struct ProfilePageContext: Encodable {
     var userFirstLogin: Date?
     var userLastLogin: Date?
 
+    var userSettings: UserSettings
+
     var showInvitations: Bool
 
     var maximumNumberOfInvitations: Int
@@ -34,6 +36,8 @@ struct ProfilePageContext: Encodable {
         self.userLanguage = user.language
         self.userFirstLogin = user.firstLogin
         self.userLastLogin = user.lastLogin
+
+        self.userSettings = user.settings
 
         self.showInvitations = invitations != nil && user.confidant
 

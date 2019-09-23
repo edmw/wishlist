@@ -9,7 +9,7 @@ final class ItemsController: ProtectedController, SortingController, RouteCollec
     private static func renderView(on request: Request) throws -> Future<View> {
         let user = try requireAuthenticatedUser(on: request)
 
-        let sorting = getSorting(on: request) ?? .ascending(by: \Item.name)
+        let sorting = getSorting(on: request) ?? .ascending(by: \Item.title)
         return try requireList(on: request, for: user)
             .flatMap { list in
                 return try request.make(ItemRepository.self)

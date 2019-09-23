@@ -7,7 +7,7 @@ final class FavoritesController: ProtectedController, SortingController, RouteCo
     static func buildContexts(for user: User, on request: Request) throws
         -> Future<[ListContext]>
     {
-        let sorting = getSorting(on: request) ?? .ascending(by: \List.name)
+        let sorting = getSorting(on: request) ?? .ascending(by: \List.title)
         // First, we query all lists of the user.
         // Next, we map every list to a future of a context.
         // Meanwhile, we query the number of items for every list and add it to each context.

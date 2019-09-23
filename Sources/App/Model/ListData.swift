@@ -5,20 +5,22 @@ import Vapor
 /// Used for validation, importing and exporting.
 struct ListData: Content, Validatable, Reflectable {
 
-    let name: String
+    let title: String
     let visibility: Visibility
     let createdAt: Date?
     let modifiedAt: Date?
+    let options: List.Options
 
     let itemsSorting: ItemsSorting?
 
     let items: [ItemData]?
 
     init(_ list: List, _ items: [Item]) {
-        self.name = list.name
+        self.title = list.title
         self.visibility = list.visibility
         self.createdAt = list.createdAt
         self.modifiedAt = list.modifiedAt
+        self.options = list.options
 
         self.itemsSorting = list.itemsSorting
 
@@ -26,27 +28,30 @@ struct ListData: Content, Validatable, Reflectable {
     }
 
     init(
-        name: String,
+        title: String,
         visibility: Visibility,
         createdAt: Date?,
         modifiedAt: Date?,
+        options: List.Options,
         itemsSorting: ItemsSorting? = nil,
         items: [ItemData]?
     ) {
-        self.name = name
+        self.title = title
         self.visibility = visibility
         self.createdAt = createdAt
         self.modifiedAt = modifiedAt
+        self.options = options
         self.itemsSorting = itemsSorting
         self.items = items
     }
 
-    func with(name: String? = nil, visibility: Visibility? = nil) -> ListData {
+    func with(title: String? = nil, visibility: Visibility? = nil) -> ListData {
         return ListData(
-            name: name ?? self.name,
+            title: title ?? self.title,
             visibility: visibility ?? self.visibility,
             createdAt: self.createdAt,
             modifiedAt: self.modifiedAt,
+            options: self.options,
             items: self.items
         )
     }
@@ -55,8 +60,8 @@ struct ListData: Content, Validatable, Reflectable {
 
     static func validations() throws -> Validations<ListData> {
         var validations = Validations(ListData.self)
-        try validations.add(\.name,
-            .count(List.minimumLengthOfName...List.maximumLengthOfName) &&
+        try validations.add(\.title,
+            .count(List.minimumLengthOfTitle...List.maximumLengthOfTitle) &&
             .characterSet(
                 .alphanumerics +
                 .whitespaces +
@@ -83,8 +88,8 @@ struct ListData: Content, Validatable, Reflectable {
             // WORKAROUND: See https://github.com/vapor/validation/issues/26
             // This is a hack which parses the textual reason for an validation error.
             let reason = error.reason
-            if reason.contains("'name'") {
-                properties.append(\List.name)
+            if reason.contains("'title'") {
+                properties.append(\List.title)
             }
             if reason.contains("'visibility'") {
                 properties.append(\List.visibility)
@@ -104,10 +109,10 @@ struct ListData: Content, Validatable, Reflectable {
         }
         else {
             // validate for new list:
-            // list name must be unique
+            // list title must be unique
             return try repository
-                .find(name: name, for: user)
-                .nil(or: EntityError<List>.uniquenessViolated(for: \List.name))
+                .find(title: title, for: user)
+                .nil(or: EntityError<List>.uniquenessViolated(for: \List.title))
                 .transform(to: self)
         }
     }
@@ -119,15 +124,16 @@ struct ListData: Content, Validatable, Reflectable {
 extension List {
 
     convenience init(for user: User, from data: ListData) throws {
-        try self.init(name: data.name, visibility: data.visibility, user: user)
+        try self.init(title: data.title, visibility: data.visibility, user: user)
     }
 
     func update(for user: User, from data: ListData) throws {
         guard userID == user.id else {
             throw ModelError<User>.requiredIDMismatch
         }
-        name = data.name
+        title = data.title
         visibility = data.visibility
+        options = data.options
         itemsSorting = data.itemsSorting
     }
 

@@ -1,7 +1,7 @@
 #set("title") {#L10N("items"){Items}}
 #//
 #set("content") {
-<h2>#(page.listName)</h2>
+<h2>#(page.listTitle)</h2>
 <h3>#L10N("your-wishes"){Your Wishes} <small class="text-muted">(#count(page.items)/#(page.maximumNumberOfItems))</small></h3>
 #if(count(page.items) > 0 && count(page.items) < page.maximumNumberOfItems) {
 <div class="btn-toolbar justify-content-center justify-content-sm-start mt-4 mb-4">

@@ -15,7 +15,7 @@ final class ProfileController: ProtectedController, RouteCollection {
         }
     }
 
-    /// Renders a form view for creating or updating a list.
+    /// Renders a form view for creating or updating the profile.
     /// This is only accessible for an authenticated user.
     private static func renderFormView(on request: Request) throws
         -> Future<View>
@@ -23,10 +23,7 @@ final class ProfileController: ProtectedController, RouteCollection {
         let user = try requireAuthenticatedUser(on: request)
 
         let data = ProfilePageFormData(from: user)
-        let context = ProfilePageContext(
-            for: user,
-            from: data
-        )
+        let context = ProfilePageContext(for: user, from: data)
         return try renderView("User/ProfileForm", with: context, on: request)
     }
 

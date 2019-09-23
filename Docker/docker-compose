@@ -30,6 +30,7 @@ services:
       GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID}"
       GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET}"
       CLOUDIMG_TOKEN: "${CLOUDIMG_TOKEN}"
+      PUSHOVER_APPLICATION_TOKEN: "${PUSHOVER_APPLICATION_TOKEN}"
     volumes:
       - public:/app/Public
       - public-images:/app/Public-Images

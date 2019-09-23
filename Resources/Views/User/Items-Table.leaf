@@ -1,25 +1,30 @@
-<table class="table table-responsive-md wl-items">
+<div class="table-responsive">
+<table class="table wl-items">
 #if(count(page.items) > 0) {
+    <thead>
     <tr>
-        <th>#L10N("item-name"){Name}</th>
+        <th>#L10N("item-title"){Name}</th>
         <th></th>
         <th>#L10N("item-description"){Description}</th>
         <th>#L10N("item-preference"){Preference}</th>
+        <th>#L10N("item-state"){Status}</th>
         <th></th>
     </tr>
+    </thead>
     #for(item in page.items) {
         <tr>
-            <td>#(item.name)</td>
-            <td class="wl-actions">
+            <td class="wl-title" data-label="#L10N("item-title"){Name}">#(item.title)</td>
+            <td class="wl-actions" data-label="">
                 <div class="btn-group" role="group">
                     #if(item.url) {
                     <a class="btn btn-link ml-3" href="#(item.url)" title="#L10N("open-item-url"){Open external item URL}"><svg class="feather"><use xlink:href="/icons/feather.svg#external-link"/></svg></a>
                     }
                 </div>
             </td>
-            <td class="wl-description">#(item.text)</td>
-            <td>#L10N("item-preference-#(item.preference + 2)"){?}</option></td>
-            <td class="wl-actions">
+            <td class="wl-description" data-label="#L10N("item-description"){Description}">#(item.text)</td>
+            <td data-label="#L10N("item-preference"){Preference}">#L10N("item-preference-#(item.preference + 2)"){?}</option></td>
+            <td data-label="#L10N("item-state"){Status}">#if(page.maskReservations) {???} else {#if(item.reservationHolderID) {#L10N("item-reserved"){reserved}} else {#L10N("item-wanted"){wanted}}}</td>
+            <td class="wl-actions" data-label="">
                 <div class="btn-group" role="group">
                     <a class="btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/edit" title="#L10N("edit-item"){Edit item}"><svg class="feather"><use xlink:href="/icons/feather.svg#edit"/></svg></a>
                     <a class="btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/delete" title="#L10N("delete-item"){Delete item}"><svg class="feather"><use xlink:href="/icons/feather.svg#delete"/></svg></a>
@@ -33,3 +38,4 @@
     </tr>
 }
 </table>
+</div>

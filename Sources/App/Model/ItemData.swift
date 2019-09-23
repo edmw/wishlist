@@ -5,7 +5,7 @@ import Vapor
 /// Used for validation, importing and exporting.
 struct ItemData: Content, Validatable, Reflectable {
 
-    let name: String
+    let title: String
     let text: String
     let preference: Item.Preference
     let url: String?
@@ -14,7 +14,7 @@ struct ItemData: Content, Validatable, Reflectable {
     let modifiedAt: Date?
 
     init(_ item: Item) {
-        self.name = item.name
+        self.title = item.title
         self.text = item.text
         self.preference = item.preference
         self.url = item.url?.absoluteString
@@ -24,7 +24,7 @@ struct ItemData: Content, Validatable, Reflectable {
     }
 
     init(
-        name: String,
+        title: String,
         text: String,
         preference: Item.Preference,
         url: String?,
@@ -32,7 +32,7 @@ struct ItemData: Content, Validatable, Reflectable {
         createdAt: Date?,
         modifiedAt: Date?
     ) {
-        self.name = name
+        self.title = title
         self.text = text
         self.preference = preference
         self.url = url
@@ -41,9 +41,9 @@ struct ItemData: Content, Validatable, Reflectable {
         self.modifiedAt = modifiedAt
     }
 
-    func with(name: String? = nil, text: String? = nil) -> ItemData {
+    func with(title: String? = nil, text: String? = nil) -> ItemData {
         return ItemData(
-            name: name ?? self.name,
+            title: title ?? self.title,
             text: text ?? self.text,
             preference: self.preference,
             url: self.url,
@@ -57,8 +57,8 @@ struct ItemData: Content, Validatable, Reflectable {
 
     static func validations() throws -> Validations<ItemData> {
         var validations = Validations(ItemData.self)
-        try validations.add(\.name,
-            .count(Item.minimumLengthOfName...Item.maximumLengthOfName) &&
+        try validations.add(\.title,
+            .count(Item.minimumLengthOfTitle...Item.maximumLengthOfTitle) &&
             .characterSet(
                 .alphanumerics +
                 .whitespaces +
@@ -93,8 +93,8 @@ struct ItemData: Content, Validatable, Reflectable {
             // WORKAROUND: See https://github.com/vapor/validation/issues/26
             // This is a hack which parses the textual reason for an validation error.
             let reason = error.reason
-            if reason.contains("'name'") {
-                properties.append(\Item.name)
+            if reason.contains("'title'") {
+                properties.append(\Item.title)
             }
             if reason.contains("'text'") {
                 properties.append(\Item.text)
@@ -132,7 +132,7 @@ struct ItemData: Content, Validatable, Reflectable {
 extension Item {
 
     convenience init(for list: List, from data: ItemData) throws {
-        try self.init(name: data.name, text: data.text, list: list)
+        try self.init(title: data.title, text: data.text, list: list)
         self.url = URL(string: data.url)
         self.imageURL = URL(string: data.imageURL)
     }
@@ -141,7 +141,7 @@ extension Item {
         guard listID == list.id else {
             throw ModelError<List>.requiredIDMismatch
         }
-        name = data.name
+        title = data.title
         text = data.text
         preference = data.preference
         url = URL(string: data.url)

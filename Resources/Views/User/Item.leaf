@@ -14,9 +14,9 @@
 <input name="__method" type="hidden" value="PUT">
 }
     <div class="form-group">
-        <label for="inputName">#L10N("item-name"){Name}</label>
-        <input type="text" class="form-control#if(page.form.invalidName){ is-invalid}" id="inputName" name="inputName" maxlength="100" placeholder="#L10N("item-field-name-placeholder"){Enter item’s name}" aria-describedby="descriptionName"#if(page.form.data.inputName){ value="#(page.form.data.inputName)"}>
-        <small id="descriptionName" class="form-text text-muted">#if(page.form.invalidName){<span class="text-danger">#L10N("item-field-name-invalid"){Valid names contain alphabetic characters, whitespace, punctation only and are at least 4 and at most 100 characters long. }</span> }#if(page.form.duplicateName){<span class="text-danger">#L10N("item-field-name-duplicate"){An item with the given name already exists. }</span> }#L10N("item-field-name-description"){}</small>
+        <label for="inputTitle">#L10N("item-title"){Name}</label>
+        <input type="text" class="form-control#if(page.form.invalidTitle){ is-invalid}" id="inputTitle" name="inputTitle" maxlength="100" placeholder="#L10N("item-field-title-placeholder"){Enter item’s name}" aria-describedby="descriptionName"#if(page.form.data.inputTitle){ value="#(page.form.data.inputTitle)"}>
+        <small id="descriptionName" class="form-text text-muted">#if(page.form.invalidTitle){<span class="text-danger">#L10N("item-field-title-invalid"){Valid names contain alphabetic characters, whitespace, punctation only and are at least 4 and at most 100 characters long. }</span> }#if(page.form.duplicateName){<span class="text-danger">#L10N("item-field-title-duplicate"){An item with the given name already exists. }</span> }#L10N("item-field-title-description"){}</small>
     </div>
     <div class="form-group">
         <label for="inputText">#L10N("item-field-description"){Description}</label>

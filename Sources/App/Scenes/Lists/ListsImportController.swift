@@ -33,13 +33,13 @@ final class ListsImportController: ProtectedController, RouteCollection {
                 let data = try decoder.decode(ListData.self, from: json)
 
                 return try request.make(ListRepository.self)
-                    .available(name: data.name, for: user)
+                    .available(title: data.title, for: user)
                     .unwrap(
                         or: Abort(.badRequest, reason: "no available list name")
                     )
-                    .flatMap { name in
+                    .flatMap { title in
                         return try ListController
-                            .store(data.with(name: name), for: user, on: request)
+                            .store(data.with(title: title), for: user, on: request)
                             .emit(
                                 event: "created for \(user)",
                                 on: request

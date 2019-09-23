@@ -1,0 +1,19 @@
+#set("title") {#L10N("settings-notifications-test"){Notifications}}
+#//
+#set("content") {
+<h3>#L10N("settings-notifications-test-results"){Test Results}</h3>
+<section>
+<div class="container-fluid keys-values">
+#if(count(page.results) > 0) {
+#for(result in page.results) {
+<div class="row"><div class="col-sm-6 key">#L10N("settings-notifications-#(result.service)"){#(result.service)}</div><div class="col-sm-6 value">#if(result.success){<span class="text-success">#L10N("settings-notifications-test-success"){Successfully sent}</span>}else{<span class="text-danger">#L10N("settings-notifications-test-failure"){Failure} (#(result.status))</span>}</div></div>
+}
+}
+</div>
+<div class="form-group form-row">
+<a class="nav-link btn btn-link ml-3" href="#if(request.parameter.p){#(request.parameter.p)}else{/user/#(page.userID)}">#L10N("back"){Zurück}</a>
+</div>
+</section>
+}
+#//
+#embed("Wishlist")

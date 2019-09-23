@@ -71,7 +71,7 @@ final class MySQLFavoritesRepository: FavoritesRepository, MySQLModelRepository 
             return try user.favorites
                 .query(on: connection)
                 .sort(orderBy)
-                .sort(\.name, .ascending)
+                .sort(\.title, .ascending)
                 .all()
         }
     }

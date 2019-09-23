@@ -4,19 +4,20 @@
 #set("content") {
 <h2>#(page.userFirstName)</h2>
 <section>
-<h3>#L10N("your-data"){Your Data} #if(features.userNickname.enabled) {<a class="btn btn-link d-flex float-right" href="/user/#(page.userID)/edit#if(location){?p=#(location)}" title="#L10N("edit-profile"){Edit profile}"><span class="btn-label">#L10N("edit"){Edit}</span><svg class="feather"><use xlink:href="/icons/feather.svg#edit-2"/></svg></a>}</h3>
-<table class="profile table">
-#if(features.userNickname.enabled) {
-<tr><th>#L10N("nick-name"){Nickname}</th><td>#(page.userNickName)</td></tr>
-}
-<tr><th>#L10N("first-name"){Firstname}</th><td>#(page.userFirstName)</td></tr>
-<tr><th>#L10N("last-name"){Lastname}</th><td>#(page.userLastName)</td></tr>
-<tr><th>#L10N("email"){Email}</th><td>#(page.userEmail)</td></tr>
-<tr><th>#L10N("language"){Language}</th><td>#L10NLocale(page.userLanguage)</td></tr>
-<tr><th>#L10N("first-login"){First login}</th><td>#L10NDate(page.userFirstLogin)</td></tr>
-<tr><th>#L10N("last-login"){Last login}</th><td>#L10NDate(page.userLastLogin)</td></tr>
-</table>
+<h3 class="clearfix">#L10N("your-data"){Your Data} <a class="btn btn-link d-flex  float-sm-right" href="/user/#(page.userID)/edit#if(location){?p=#(location)}" title="#L10N("edit-profile"){Edit profile}"><span class="btn-label">#L10N("edit"){Edit}</span><svg class="feather"><use xlink:href="/icons/feather.svg#edit-2"/></svg></a></h3>
+<div class="profile container-fluid keys-values">
+    <div class="row"><div class="col-sm-6 key">#L10N("nick-name"){Nickname}</div><div class="col-sm-6 value">#(page.userNickName)</div></div>
+    <div class="row"><div class="col-sm-6 key">#L10N("first-name"){Firstname}</div><div class="col-sm-6 value">#(page.userFirstName)</div></div>
+    <div class="row"><div class="col-sm-6 key">#L10N("last-name"){Lastname}</div><div class="col-sm-6 value">#(page.userLastName)</div></div>
+    <div class="row"><div class="col-sm-6 key">#L10N("email"){Email}</div><div class="col-sm-6 value">#(page.userEmail)</div></div>
+    <div class="row"><div class="col-sm-6 key">#L10N("language"){Language}</div><div class="col-sm-6 value">#L10NLocale(page.userLanguage)</div></div>
+    <div class="row"><div class="col-sm-6 key">#L10N("first-login"){First login}</div><div class="col-sm-6 value">#L10NDate(page.userFirstLogin)</div></div>
+    <div class="row"><div class="col-sm-6 key">#L10N("last-login"){Last login}</div><div class="col-sm-6 value">#L10NDate(page.userLastLogin)</div></div>
+</div>
 </section>
+#if(features.userSettings.enabled) {
+#embed("User/Settings-Section")
+}
 #if(page.showInvitations) {
 #embed("User/Invitations-Section")
 }

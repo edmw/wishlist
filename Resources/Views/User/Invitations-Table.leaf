@@ -1,4 +1,5 @@
-<table class="table table-responsive-md wl-invitations">
+<div class="table-responsive">
+<table class="table wl-invitations">
 #if(count(page.invitations) > 0) {
     <tr>
         <th>#L10N("invitation-code"){Code}</th>
@@ -34,3 +35,4 @@
     </tr>
 }
 </table>
+</div>

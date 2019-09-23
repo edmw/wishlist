@@ -44,7 +44,10 @@ func routes(
     try user.register(collection: LoginController())
     try user.register(collection: LogoutController())
     try user.register(collection: ProfileController())
-
+    if features.userSettings.enabled {
+        try user.register(collection: SettingsController())
+    }
+    
     try user.register(collection: ListsController())
     try user.register(collection: ListsImportController())
     try user.register(collection: ListController())

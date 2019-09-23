@@ -33,15 +33,51 @@ func databasesMigrations(
     logger: Logger? = nil
 ) throws {
     config.add(model: User.self, database: .mysql)
-    config.add(migration: AddUserNickName.self, database: .mysql)
+    config.add(migration: AddUserSettings.self, database: .mysql)
+    config.add(migration: RenameUserName.self, database: .mysql)
     config.add(model: List.self, database: .mysql)
+    config.add(migration: AddListOptions.self, database: .mysql)
+    config.add(migration: RenameListName.self, database: .mysql)
     config.add(model: Item.self, database: .mysql)
+    config.add(migration: RenameItemName.self, database: .mysql)
     config.add(model: Favorite.self, database: .mysql)
     config.add(model: Reservation.self, database: .mysql)
     config.add(model: Invitation.self, database: .mysql)
 }
 
 // MARK: - User
+
+struct RenameUserName: MySQLMigration {
+
+    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+        return connection
+            .raw("ALTER TABLE User CHANGE COLUMN name fullName VARCHAR(255) NOT NULL")
+            .run()
+    }
+
+    static func revert(on connection: MySQLConnection) -> Future<Void> {
+        return connection
+            .raw("ALTER TABLE User CHANGE COLUMN fullName name VARCHAR(255) NOT NULL")
+            .run()
+    }
+
+}
+
+struct AddUserSettings: MySQLMigration {
+
+    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+        return Database.update(User.self, on: connection) { builder in
+            builder.field(for: \.settings)
+        }
+    }
+
+    static func revert(on connection: MySQLConnection) -> Future<Void> {
+        return Database.update(User.self, on: connection) { builder in
+            builder.deleteField(for: \.settings)
+        }
+    }
+
+}
 
 struct AddUserNickName: MySQLMigration {
 
@@ -92,6 +128,38 @@ struct AddUserIdentificationIndex: MySQLMigration {
 }
 
 // MARK: - List
+
+struct RenameListName: MySQLMigration {
+
+    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+        return connection
+            .raw("ALTER TABLE List CHANGE COLUMN name title VARCHAR(255) NOT NULL")
+            .run()
+    }
+
+    static func revert(on connection: MySQLConnection) -> Future<Void> {
+        return connection
+            .raw("ALTER TABLE List CHANGE COLUMN title name VARCHAR(255) NOT NULL")
+            .run()
+    }
+
+}
+
+struct AddListOptions: MySQLMigration {
+
+    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+        return Database.update(List.self, on: connection) { builder in
+            builder.field(for: \.options)
+        }
+    }
+
+    static func revert(on connection: MySQLConnection) -> Future<Void> {
+        return Database.update(List.self, on: connection) { builder in
+            builder.deleteField(for: \.options)
+        }
+    }
+
+}
 
 struct AddListItemsSorting: MySQLMigration {
 
@@ -158,6 +226,22 @@ struct AddListForeignKeyConstraint: MySQLMigration {
 }
 
 // MARK: - Item
+
+struct RenameItemName: MySQLMigration {
+
+    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+        return connection
+            .raw("ALTER TABLE Item CHANGE COLUMN name title VARCHAR(255) NOT NULL")
+            .run()
+    }
+
+    static func revert(on connection: MySQLConnection) -> Future<Void> {
+        return connection
+            .raw("ALTER TABLE Item CHANGE COLUMN title name VARCHAR(255) NOT NULL")
+            .run()
+    }
+
+}
 
 struct AddItemPreference: MySQLMigration {
 

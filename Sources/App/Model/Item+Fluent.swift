@@ -23,7 +23,7 @@ extension Item: Migration {
     static func prepare(on connection: Database.Connection) -> Future<Void> {
         return Database.create(self, on: connection) { builder in
             builder.field(for: \.id)
-            builder.field(for: \.name, type: .varchar(255))
+            builder.field(for: \.title, type: .varchar(255))
             builder.field(for: \.text, type: .longtext)
             builder.field(for: \.preference, type: .tinyint)
             builder.field(for: \.url)
