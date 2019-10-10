@@ -91,49 +91,6 @@ final class ReservationController: ProtectedController, RouteCollection {
 
     // MARK: - CRUD
 
-    private static func authorizeList(
-        on request: Request,
-        _ function: @escaping (Identification, List) throws -> Future<Response>
-    ) throws -> Future<Response> {
-
-        let user = try getAuthenticatedUser(on: request)
-
-        let identification = try user?.identification ?? requireIdentification(on: request)
-
-        // get list from request
-        return try requireList(on: request)
-            .flatMap { list in
-                // check if the found list may be accessed by the given user
-                // user may be nil indicating this is a anonymous request
-                return try requireAuthorization(on: request, for: list, user: user)
-                    .flatMap { _ in
-                        // execute the given function after authorization
-                        return try function(identification, list)
-                    }
-                    .handleAuthorizationError(on: request)
-            }
-    }
-
-    private static func authorizeReservation(
-        on request: Request,
-        with identification: Identification,
-        _ function: @escaping (Reservation) throws -> Future<Response>
-    ) throws -> Future<Response> {
-
-        // get reservation from request
-        return try requireReservation(on: request)
-            .flatMap { reservation in
-
-                // check if the found reservation belongs to the given identification
-                guard reservation.holder == identification else {
-                    throw Abort(.notFound)
-                }
-
-                // execute the given function after authorization
-                return try function(reservation)
-            }
-    }
-
     private static func create(on request: Request) throws -> Future<Response> {
         return try authorizeList(on: request) { (identification, list) throws in
             return try save(from: request, in: list, for: identification)
@@ -149,10 +106,7 @@ final class ReservationController: ProtectedController, RouteCollection {
             return try authorizeReservation(on: request, with: identification) { reservation in
                 return try reservation
                     .delete(on: request)
-                    .emit(
-                        event: "deleted for \(identification)",
-                        on: request
-                    )
+                    .emitEvent("deleted for \(identification)", on: request)
                     .transform(to: success(for: list, on: request))
             }
         }
@@ -170,8 +124,8 @@ final class ReservationController: ProtectedController, RouteCollection {
     {
         return try findItem(in: list, from: request)
             .flatMap { item in
-                let reservationRepository = try request.make(ReservationRepository.self)
-                return try reservationRepository.find(item: item.requireID())
+                return try request.make(ReservationRepository.self)
+                    .find(item: item.requireID())
                     .flatMap { result in
                         guard result == nil else {
                             // item already reserved (should not happen)
@@ -181,19 +135,32 @@ final class ReservationController: ProtectedController, RouteCollection {
                                 on: request
                             )
                         }
-                        let entity: Reservation
-                        // create list
-                        entity = try Reservation(item: item, holder: holder)
-
-                        return try reservationRepository
-                            .save(reservation: entity)
-                            .emit(
-                                event: "created for \(holder)",
-                                on: request
-                            )
-                            .transform(to: success(for: list, on: request))
+                        return try save(on: item, in: list, for: holder, on: request)
                     }
             }
+    }
+
+    /// Saves a reservation for the specified item and list.
+    private static func save(
+        on item: Item,
+        in list: List,
+        for holder: Identification,
+        on request: Request
+    ) throws
+        -> Future<Response>
+    {
+        let entity: Reservation
+        // create reservation
+        entity = try Reservation(item: item, holder: holder)
+
+        return try request.make(ReservationRepository.self)
+            .save(reservation: entity)
+            .emitEvent("created for \(holder)", on: request)
+            .dispatchNotification(on: request) { request in
+                return list.user.get(on: request)
+                    .map { owner in ReservationCreateNotification(for: owner, on: item, in: list) }
+            }
+            .transform(to: success(for: list, on: request))
     }
 
     // MARK: - RESULT
@@ -290,12 +257,10 @@ final class ReservationController: ProtectedController, RouteCollection {
 
         // reservation handling
 
-        router.get(
-            "list", ID.parameter, "reservation", ID.parameter, "delete",
+        router.get("list", ID.parameter, "reservation", ID.parameter, "delete",
             use: ReservationController.renderDeleteView
         )
-        router.post(
-            "list", ID.parameter, "reservation", ID.parameter,
+        router.post("list", ID.parameter, "reservation", ID.parameter,
             use: ReservationController.dispatch
         )
 

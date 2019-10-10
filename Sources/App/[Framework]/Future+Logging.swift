@@ -2,6 +2,7 @@ import Vapor
 
 extension Future {
 
+    // log a message together with a description of this future’s expectation 
     func log(
         logger: Logger,
         level: LogLevel = .error,

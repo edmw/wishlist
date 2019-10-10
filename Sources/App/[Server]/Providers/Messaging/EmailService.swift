@@ -1,6 +1,6 @@
 import Vapor
 
-final class EmailNotifications: Service {
+final class EmailService: Service {
 
     private let hostname: String
     private let username: String
@@ -12,19 +12,19 @@ final class EmailNotifications: Service {
         self.password = password
     }
 
-    func emit(
-        _ message: String,
+    func send(
+        _ text: String,
         _ subject: String,
         for addresses: [String],
-        on request: Request
+        on container: Container
     ) throws
         -> EventLoopFuture<Void>
     {
         guard addresses.count <= 50 else {
-            throw NotificationError.tooManyRecipients
+            throw MessagingError.tooManyRecipients
         }
 
-        return request.future(())
+        return container.future(())
     }
 
 }

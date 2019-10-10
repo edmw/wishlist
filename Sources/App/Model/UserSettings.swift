@@ -5,9 +5,9 @@ import Foundation
 /// This type represents a users settings.
 struct UserSettings: Content, Validatable, Reflectable, Codable, Equatable {
 
-    var notificationServices: UserSettings.NotificationServices
+    var notifications: UserSettings.Notifications
 
-    struct NotificationServices: Codable, Equatable {
+    struct Notifications: Codable, Equatable {
 
         var pushoverEnabled: Bool = false
         var pushoverKey: String = ""
@@ -15,7 +15,7 @@ struct UserSettings: Content, Validatable, Reflectable, Codable, Equatable {
     }
 
     init() {
-        notificationServices = NotificationServices()
+        notifications = Notifications()
     }
 
     // MARK: Validatable
@@ -23,12 +23,12 @@ struct UserSettings: Content, Validatable, Reflectable, Codable, Equatable {
     static func validations() throws -> Validations<UserSettings> {
         var validations = Validations(UserSettings.self)
         validations.add("pushoverkey not set while pushover enabled") { settings in
-            guard !settings.notificationServices.pushoverEnabled
-                || !settings.notificationServices.pushoverKey.isEmpty else {
+            guard !settings.notifications.pushoverEnabled
+                || !settings.notifications.pushoverKey.isEmpty else {
                 throw BasicValidationError("'pushoverkey' missing")
             }
         }
-        try validations.add(\.notificationServices.pushoverKey, .empty || .count(3...100))
+        try validations.add(\.notifications.pushoverKey, .empty || .count(3...100))
         return validations
     }
 

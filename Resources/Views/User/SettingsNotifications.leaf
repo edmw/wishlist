@@ -3,6 +3,9 @@
 #set("content") {
 <h3>#L10N("settings-notifications-test-results"){Test Results}</h3>
 <section>
+<p>
+#if(page.success){#L10N("settings-notifications-test-succeeded"){Message was sucessfully sent to at least one Notification Service.}}else{<span class="text-danger">#L10N("settings-notifications-test-failed"){Unable to sent message to any Notification Service.}</span>}
+</p>
 <div class="container-fluid keys-values">
 #if(count(page.results) > 0) {
 #for(result in page.results) {

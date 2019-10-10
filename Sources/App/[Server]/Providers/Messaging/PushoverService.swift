@@ -1,6 +1,11 @@
 import Vapor
 
-final class PushoverNotifications: Service {
+// Pushover -- https://pushover.net/
+//
+// Limitations:
+// Messages are currently limited to 1024 4-byte UTF-8 characters, with a title of up to 250
+// characters. Supplementary URLs are limited to 512 characters, and URL titles to 100 characters.
+final class PushoverService: Service {
 
     private let token: String
 
@@ -13,6 +18,7 @@ final class PushoverNotifications: Service {
         let user: String
         let message: String
         let title: String
+        let html: Int
     }
 
     private struct ResponseMessage: Content {
@@ -33,15 +39,15 @@ final class PushoverNotifications: Service {
     // (with no spaces) of user keys as the user parameter. These requests are currently limited to
     // 50 users in a single request.
     // If the POST request was valid, a HTTP 200 (OK) status will be sent. If any input was invalid,
-    // a HTTP 4xx status will sent.
+    // a HTTP 4xx status will be sent.
     // (Note: if a notification can be sent to at least one user there will be no error. Even if
     // other user keys are invalid.)
     // @see https://pushover.net/api
-    func emit(_ message: String, _ title: String, for users: [String], on request: Request) throws
+    func send(_ text: String, _ title: String, for users: [String], on container: Container) throws
         -> EventLoopFuture<Void>
     {
         guard users.count <= 50 else {
-            throw NotificationError.tooManyRecipients
+            throw MessagingError.tooManyRecipients
         }
 
         let messagesUrl = "https://api.pushover.net/1/messages.json"
@@ -49,20 +55,21 @@ final class PushoverNotifications: Service {
         let messagesData = PushMessage(
             token: token,
             user: users.joined(separator: ","),
-            message: message,
-            title: title
+            message: text,
+            title: title,
+            html: 1
         )
 
-        return try request.client()
+        return try container.client()
             .post(messagesUrl) { messagesRequest in
                 try messagesRequest.content.encode(messagesData)
             }
             .flatMap { response in
                 guard response.http.status == .ok else {
-                    request.requireLogger().error(
+                    container.requireLogger().error(
                         "Pushover service returned non-ok status \(response.http.status)"
                     )
-                    return request.future(error: Abort(response.http.status))
+                    return container.future(error: Abort(response.http.status))
                 }
                 return try response.content.decode(ResponseMessage.self)
                      .transform(to: ())

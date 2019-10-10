@@ -1,18 +1,18 @@
 import Vapor
 
-struct NotificationProvider: Provider {
+struct MessagingProvider: Provider {
 
     init() {
     }
 
     func register(_ services: inout Services) throws {
         if let pushoverApplicationToken = Environment.get(.pushoverApplicationToken) {
-            services.register(PushoverNotifications.self) { _ in
-                return PushoverNotifications(token: pushoverApplicationToken)
+            services.register(PushoverService.self) { _ in
+                return PushoverService(token: pushoverApplicationToken)
             }
         }
-        services.register(NotificationService.self) { _ in
-            return NotificationService()
+        services.register(MessagingService.self) { _ in
+            return MessagingService()
         }
     }
 

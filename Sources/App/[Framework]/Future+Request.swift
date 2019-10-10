@@ -3,8 +3,8 @@ import Vapor
 extension Future {
 
     /// emits a business event to the business logger
-    func emit(
-        event message: String,
+    func emitEvent(
+        _ message: String,
         on request: Request,
         when condition: ((Expectation) -> Bool)? = nil,
         file: String = #file,

@@ -50,7 +50,7 @@ final class SettingsController: ProtectedController, RouteCollection {
                         }
                         else {
                             context.form.invalidPushoverKey =
-                                reason.contains("'notificationServices.pushoverKey'")
+                                reason.contains("'notifications.pushoverKey'")
                         }
                         return try failure(on: request, with: context)
                     }
@@ -105,7 +105,7 @@ final class SettingsController: ProtectedController, RouteCollection {
         with context: SettingsPageContext
     ) throws -> Future<Response> {
         // to add real REST support, check the accept header for json and output a json response
-        return try renderView("User/SettingsForm", with: context, on: request)
+        return try renderView("User/Settings", with: context, on: request)
             .flatMap { view in
                 return try view.encode(for: request)
             }

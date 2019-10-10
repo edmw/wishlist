@@ -14,7 +14,7 @@ final class FavoritesController: ProtectedController, SortingController, RouteCo
         // Then, we flatten the array of context futures to a future of an array of contexts.
         // Now, we map the future of an array of contexts to the actual array of contexts.
         // (better would be: use a join on the database)
-        return try request.make(FavoritesRepository.self)
+        return try request.make(FavoriteRepository.self)
             .favorites(for: user, sort: sorting)
             .flatMap { lists in
                 return try lists.map { list in

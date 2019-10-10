@@ -4,6 +4,8 @@ import Foundation
 
 import Lingo
 
+/// Leaf template tag to render localized date:
+/// Language used for localization will be detected from request.
 final class LocalizationDateTag: TagRenderer {
 
     init() {
@@ -13,18 +15,24 @@ final class LocalizationDateTag: TagRenderer {
         try tag.requireParameterCount(1)
         let interval = tag.parameters[0].double
 
-        let localized: String
+        var localized: String?
 
-        if let interval = interval, let request = tag.container as? Request {
-            let l10n = try request.make(LocalizationService.self)
+        if let interval = interval {
+            let l10n = try tag.container.make(LocalizationService.self)
             let date = Date(timeIntervalSince1970: interval)
-            localized = try l10n.localize(date: date, on: request) ?? "�"
-        }
-        else {
-            localized = "�"
+
+            if let language = tag.context.userInfo["language"] as? String {
+                localized = l10n.localize(date: date, for: language)
+            }
+            else {
+                if let request = tag.container as? Request {
+                    localized = try l10n.localize(date: date, on: request)
+                }
+            }
         }
 
-        return Future.map(on: tag) { .string(localized) }
+        let string = localized ?? "�"
+        return Future.map(on: tag) { .string(string) }
     }
 
 }

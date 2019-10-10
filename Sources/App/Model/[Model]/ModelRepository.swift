@@ -2,6 +2,8 @@ import Vapor
 
 import Foundation
 
+// MARK: ModelRepository
+
 protocol ModelRepository: ServiceType {
 
     /// Creates a new, succeeded `Future` from the db worker's event loop with a `Void` value.

@@ -68,6 +68,7 @@ final class ItemController: ProtectedController, RouteCollection {
         return try requireList(on: request, for: user)
             .flatMap { list in
                 return try save(from: request, for: user, and: list)
+                // FIXME: add notification here?
             }
     }
 
@@ -106,10 +107,7 @@ final class ItemController: ProtectedController, RouteCollection {
                     }
                     .cleanup(on: request)
                     .delete(on: request)
-                    .emit(
-                        event: "deleted for \(user)",
-                        on: request
-                    )
+                    .emitEvent("deleted for \(user)", on: request)
                     .transform(to: success(for: user, and: list, on: request))
             }
     }
@@ -188,8 +186,7 @@ final class ItemController: ProtectedController, RouteCollection {
                 return try itemRepository
                     .save(item: entity)
                     .setup(on: request)
-                    .emit(
-                        event: "created for \(user)",
+                    .emitEvent("created for \(user)",
                         on: request,
                         when: { $0.modifiedAt == $0.createdAt }
                     )

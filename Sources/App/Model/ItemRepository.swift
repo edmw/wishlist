@@ -28,10 +28,10 @@ protocol ItemRepository: EntityRepository {
     func count(on list: List) throws -> Future<Int>
 
     func save(item: Item) -> Future<Item>
-
 }
 
 final class MySQLItemRepository: ItemRepository, MySQLModelRepository {
+
     // swiftlint:disable first_where
 
     let db: MySQLDatabase.ConnectionPool

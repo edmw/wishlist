@@ -3,6 +3,8 @@ import Fluent
 
 import Foundation
 
+// MARK: ModelError
+
 enum ModelError<M: Model>: Error, CustomStringConvertible {
 
     // IDs

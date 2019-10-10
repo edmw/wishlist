@@ -58,7 +58,7 @@ final class FavoriteController: ProtectedController, RouteCollection {
                 // user may be nil indicating this is a anonymous request
                 return try requireAuthorization(on: request, for: list, user: user)
                     .flatMap { _ in
-                        return try request.make(FavoritesRepository.self)
+                        return try request.make(FavoriteRepository.self)
                             .addFavorite(list, for: user)
                             .transform(to: success(for: user, on: request))
                     }
@@ -72,10 +72,7 @@ final class FavoriteController: ProtectedController, RouteCollection {
 
         return try requireFavorite(on: request, for: user)
             .delete(on: request)
-            .emit(
-                event: "deleted for \(user)",
-                on: request
-            )
+            .emitEvent("deleted for \(user)", on: request)
             .transform(to: success(for: user, on: request))
     }
 
@@ -85,14 +82,11 @@ final class FavoriteController: ProtectedController, RouteCollection {
 
         return try findList(from: request)
             .flatMap { list in
-                return try request.make(FavoritesRepository.self)
+                return try request.make(FavoriteRepository.self)
                     .find(favorite: list, for: user)
                     .unwrap(or: Abort(.notFound))
                     .delete(on: request)
-                    .emit(
-                        event: "deleted for \(user)",
-                        on: request
-                    )
+                    .emitEvent("deleted for \(user)", on: request)
                     .transform(to: success(for: user, on: request))
             }
     }

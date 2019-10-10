@@ -76,6 +76,7 @@ identifier_name:
     - url
     - tag
     - app
+    - job
     - all
     - any
     - set

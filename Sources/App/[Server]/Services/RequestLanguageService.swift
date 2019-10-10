@@ -32,7 +32,7 @@ final class RequestLanguageService: ServiceType {
 
     var cache: (String, [RequestLanguage])?
 
-    func parse(on request: Request) throws -> [RequestLanguage] {
+    fileprivate func parse(on request: Request) throws -> [RequestLanguage] {
         guard let header = request.http.headers[.acceptLanguage].first else {
             return []
         }
@@ -70,13 +70,50 @@ final class RequestLanguageService: ServiceType {
                 }
                 return RequestLanguage(language, region, script, quality)
             }
-            .sorted(by: { lhs, rhs -> Bool in
-                lhs.quality > rhs.quality
-            })
+            .sorted(by: { lhs, rhs -> Bool in lhs.quality > rhs.quality })
 
         self.cache = (header, languages)
 
         return languages
+    }
+
+    fileprivate func pick(
+        from languageCodes: [String],
+        on request: Request,
+        fallback: String
+    ) throws -> String {
+        guard !languageCodes.isEmpty else {
+            return fallback
+        }
+
+        let languages = try parse(on: request)
+        guard !languages.isEmpty else {
+            return fallback
+        }
+
+        for language in languages {
+            if languageCodes.contains(
+                where: { $0.caseInsensitiveCompare(language.code) == .orderedSame }
+            ) {
+                return language.code
+            }
+        }
+
+        return fallback
+    }
+
+}
+
+extension Request {
+
+    func parseLanguages() throws -> [RequestLanguage] {
+        return try self.privateContainer.make(RequestLanguageService.self)
+            .parse(on: self)
+    }
+
+    func pickLanguage(from languageCodes: [String], fallback: String) throws -> String {
+        return try self.privateContainer.make(RequestLanguageService.self)
+            .pick(from: languageCodes, on: self, fallback: fallback)
     }
 
 }

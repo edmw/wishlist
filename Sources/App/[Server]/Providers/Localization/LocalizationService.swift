@@ -4,94 +4,95 @@ import Lingo
 
 public class LocalizationService: Service {
 
+    let config: LocalizationConfig
+
     let languageCodes: [String]
 
-    init(_ lingo: Lingo) throws {
+    init(_ config: LocalizationConfig, _ lingo: Lingo) throws {
+        self.config = config
         self.languageCodes = try lingo.dataSource.availableLanguageCodes()
     }
 
     func locale(on request: Request) throws -> Locale {
-        let lingo = try request.make(Lingo.self)
+        let requestLanguageCode
+            = try request.pickLanguage(from: languageCodes, fallback: config.defaultLanguageCode)
+                .lowercased()
 
-        var languageCode = lingo.defaultLanguageCode
-
-        if let user = try request.authenticated(User.self), let userLanguage = user.language {
-            languageCode = userLanguage.lowercased()
+        let languageCode: String
+        if let resolver = config.requestResolver {
+            languageCode = try resolver(requestLanguageCode, request)
         }
         else {
-            let requestLanguage = try request.privateContainer.make(RequestLanguageService.self)
-                .pick(
-                    from: languageCodes,
-                    on: request,
-                    fallback: languageCode
-                )
-            languageCode = requestLanguage.lowercased()
+            languageCode = requestLanguageCode
         }
+
         return Locale(identifier: languageCode)
     }
 
-    func localize(key: String, values: [String] = [], on request: Request) throws -> String? {
-        let lingo = try request.make(Lingo.self)
-        let languageCode = try locale(on: request).languageCode
+    func localize(
+        _ key: String,
+        values: [String] = [],
+        for languageCode: String?,
+        on container: Container
+    ) throws -> String? {
+        let lingo: Lingo = try container.make()
 
         let interploations = values.reduce(into: [String: Any]()) { dictionary, value in
             dictionary["value" + String(dictionary.count + 1)] = value
         }
 
-        let localized
-            = lingo.localize(key, languageCode: languageCode, interpolations: interploations)
+        let code = (languageCode ?? config.defaultLanguageCode).lowercased()
+        let localized = lingo.localize(key, languageCode: code, interpolations: interploations)
 
         return localized != key ? localized : nil
     }
 
+    func localize(
+        _ key: String,
+        values: [String] = [],
+        on request: Request
+    ) throws -> String? {
+        let languageCode = try locale(on: request).languageCode
+        return try localize(key, values: values, for: languageCode, on: request)
+    }
+
     // MARK: Date
 
-    func localize(date: Date, on request: Request) throws -> String? {
+    func localize(date: Date, for locale: Locale) -> String? {
         let dateFormatter = DateFormatter()
-        dateFormatter.locale = try locale(on: request)
+        dateFormatter.locale = locale
         dateFormatter.dateStyle = .medium
         dateFormatter.timeStyle = .short
         return dateFormatter.string(from: date)
     }
 
+    func localize(date: Date, for localeLanguageCode: String?) -> String? {
+        let code = (localeLanguageCode ?? config.defaultLanguageCode).lowercased()
+        return localize(date: date, for: Locale(identifier: code))
+    }
+
+    func localize(date: Date, on request: Request) throws -> String? {
+        return try localize(date: date, for: locale(on: request))
+    }
+
     // MARK: Locale
 
+    func localize(languageCode: String, for locale: Locale) -> String? {
+        return locale.localizedString(forLanguageCode: languageCode)
+    }
+
+    func localize(languageCode: String, for localeLanguageCode: String?) -> String? {
+        let code = (localeLanguageCode ?? config.defaultLanguageCode).lowercased()
+        return localize(languageCode: languageCode, for: Locale(identifier: code))
+    }
+
     func localize(languageCode: String, on request: Request) throws -> String? {
-        return try locale(on: request).localizedString(forLanguageCode: languageCode)
+        return try localize(languageCode: languageCode, for: locale(on: request))
     }
 
 }
 
 // MARK: -
-
-extension RequestLanguageService {
-
-    func pick(
-        from languageCodes: [String],
-        on request: Request,
-        fallback: String
-    ) throws -> String {
-        guard !languageCodes.isEmpty else {
-            return fallback
-        }
-
-        let languages = try parse(on: request)
-        guard !languages.isEmpty else {
-            return fallback
-        }
-
-        for language in languages {
-            if languageCodes.contains(
-                where: { $0.caseInsensitiveCompare(language.code) == .orderedSame }
-            ) {
-                return language.code
-            }
-        }
-
-        return fallback
-    }
-
-}
 
 extension Lingo {
 

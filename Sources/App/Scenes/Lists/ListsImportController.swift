@@ -40,10 +40,7 @@ final class ListsImportController: ProtectedController, RouteCollection {
                     .flatMap { title in
                         return try ListController
                             .store(data.with(title: title), for: user, on: request)
-                            .emit(
-                                event: "created for \(user)",
-                                on: request
-                            )
+                            .emitEvent("created for \(user)", on: request)
                             .transform(to: success(for: user, on: request))
                     }
             }

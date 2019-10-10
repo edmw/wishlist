@@ -38,7 +38,7 @@ class ProtectedController: Controller {
     /// The favorite must be owned by the specified user.
     static func requireFavorite(on request: Request, for user: User) throws -> Future<Favorite> {
         let favoriteID = try request.parameters.next(ID.self)
-        return try request.make(FavoritesRepository.self)
+        return try request.make(FavoriteRepository.self)
             .find(by: favoriteID.uuid, for: user)
             .unwrap(or: Abort(.notFound))
     }

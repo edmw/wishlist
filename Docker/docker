@@ -1,4 +1,4 @@
-FROM swift:4.2 AS builder
+FROM swift:5.1 AS builder
 RUN apt-get -qq update && apt-get -q -y install \
   tzdata \
   && rm -r /var/lib/apt/lists/*

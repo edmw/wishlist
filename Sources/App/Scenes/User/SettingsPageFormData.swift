@@ -2,6 +2,7 @@ import Vapor
 
 /// This structures holds all the input given by the user into the settings form.
 struct SettingsPageFormData: Content {
+    // swiftlint:disable discouraged_optional_boolean
 
     let inputPushover: Bool?
     let inputPushoverKey: String?
@@ -12,8 +13,8 @@ struct SettingsPageFormData: Content {
     }
 
     init(from user: User) {
-        self.inputPushover = user.settings.notificationServices.pushoverEnabled
-        self.inputPushoverKey = user.settings.notificationServices.pushoverKey
+        self.inputPushover = user.settings.notifications.pushoverEnabled
+        self.inputPushoverKey = user.settings.notifications.pushoverKey
     }
 
 }
@@ -21,8 +22,8 @@ struct SettingsPageFormData: Content {
 extension UserSettings {
 
     mutating func update(from formdata: SettingsPageFormData) {
-        self.notificationServices.pushoverEnabled = formdata.inputPushover ?? false
-        self.notificationServices.pushoverKey = formdata.inputPushoverKey ?? ""
+        self.notifications.pushoverEnabled = formdata.inputPushover ?? false
+        self.notifications.pushoverKey = formdata.inputPushoverKey ?? ""
     }
 
 }

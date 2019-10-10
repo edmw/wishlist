@@ -5,8 +5,16 @@ import Foundation
 extension Environment {
 
     /// Loads environment variables from .env files.
+    /// Files named '.env.<HOSTNAME>' take precedence over '.env'.
     public static func dotenv(filename: String = ".env") {
-        guard let path = FileManager.default.absolutePathInWorkDir(for: filename) else {
+        var filepath: String?
+        if let hostname = Host.current().localizedName {
+            filepath = FileManager.default.absolutePathInWorkDir(for: "\(filename).\(hostname)")
+        }
+        if filepath == nil {
+            filepath = FileManager.default.absolutePathInWorkDir(for: filename)
+        }
+        guard let path = filepath else {
             return
         }
 

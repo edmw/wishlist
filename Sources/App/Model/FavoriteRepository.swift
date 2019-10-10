@@ -5,7 +5,7 @@ import FluentMySQL
 
 import Foundation
 
-protocol FavoritesRepository: ModelRepository {
+protocol FavoriteRepository: ModelRepository {
 
     func find(by id: Favorite.ID, for user: User) throws -> Future<Favorite?>
     func find(favorite list: List, for user: User) throws -> Future<Favorite?>
@@ -17,7 +17,7 @@ protocol FavoritesRepository: ModelRepository {
 
 }
 
-final class MySQLFavoritesRepository: FavoritesRepository, MySQLModelRepository {
+final class MySQLFavoriteRepository: FavoriteRepository, MySQLModelRepository {
     // swiftlint:disable first_where
 
     let db: MySQLDatabase.ConnectionPool
@@ -102,7 +102,7 @@ final class MySQLFavoritesRepository: FavoritesRepository, MySQLModelRepository 
 
     // MARK: Service
 
-    static let serviceSupports: [Any.Type] = [FavoritesRepository.self]
+    static let serviceSupports: [Any.Type] = [FavoriteRepository.self]
 
     static func makeService(for worker: Container) throws -> Self {
         return .init(try worker.connectionPool(to: .mysql))

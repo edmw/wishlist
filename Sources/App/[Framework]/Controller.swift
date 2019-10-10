@@ -173,7 +173,9 @@ class Controller {
         let features = try request.make(Features.self)
         let context = RenderContext(pageContext, site: site, features: features)
         context.request += request.queryDictionary
-        return try request.view().render(templateName, context)
+        let locale = try request.make(LocalizationService.self).locale(on: request)
+        return try request.view()
+            .render(templateName, context, userInfo: ["language": locale.identifier])
     }
 
     static func renderView(

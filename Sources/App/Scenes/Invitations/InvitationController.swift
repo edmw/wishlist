@@ -172,10 +172,7 @@ final class InvitationController: ProtectedController, RouteCollection {
 
                 return try invitationRepository
                     .save(invitation: entity)
-                    .emit(
-                        event: "created for \(user)",
-                        on: request
-                    )
+                    .emitEvent("created for \(user)", on: request)
                     .transform(to: success(for: user, on: request))
             }
     }

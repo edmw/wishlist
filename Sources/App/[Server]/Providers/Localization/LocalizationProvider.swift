@@ -5,22 +5,22 @@ import Lingo
 
 struct LocalizationProvider: Provider {
 
-    let defaultLocale: String
-    let rootPath: String
+    let config: LocalizationConfig
 
-    init(defaultLocale: String, localizationsDir: String = "Resources/Localizations") {
-        self.defaultLocale = defaultLocale
-        self.rootPath = DirectoryConfig.detect().workDir + localizationsDir
+    init(_ config: LocalizationConfig) {
+        self.config = config
     }
 
     func register(_ services: inout Services) throws {
+        let defaultLanguageCode = config.defaultLanguageCode
+        let localizationsDir = config.localizationsDir
         // register Lingo as a service
         services.register(Lingo.self) { _ -> Lingo in
-            return try Lingo(rootPath: self.rootPath, defaultLocale: self.defaultLocale)
+            return try Lingo(rootPath: localizationsDir, defaultLocale: defaultLanguageCode)
         }
         // register Localization as a service
         services.register { container -> LocalizationService in
-            return try LocalizationService(container.make(Lingo.self))
+            return try LocalizationService(self.config, container.make())
         }
     }
 

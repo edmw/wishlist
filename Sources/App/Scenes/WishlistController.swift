@@ -48,7 +48,7 @@ final class WishlistController: ProtectedController, SortingController, RouteCol
             .flatMap(to: WishlistPageContext.self) { context in
                 // if user is present check if list is a favorite list
                 if let user = user {
-                    return try request.make(FavoritesRepository.self)
+                    return try request.make(FavoriteRepository.self)
                         .find(favorite: list, for: user)
                         .map { favorite in
                             // modify context

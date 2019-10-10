@@ -17,19 +17,21 @@ extension UserSettings: MySQLType, ReflectionDecodable {
 
     /// Read JSON from the database.
     static func convertFromMySQLData(_ data: MySQLData) throws -> UserSettings {
-        guard let value = data.data(), !value.isEmpty else {
-            // return default settings if no value stored in database
+        // convert data to json, return default settings if no value
+        do {
+            return try data.json(UserSettings.self) ?? UserSettings()
+        }
+        catch is DecodingError {
+            // better return default settings than run into an error
             return UserSettings()
         }
-        // convert data to json, return default settings if no value
-        return try data.json(UserSettings.self) ?? UserSettings()
     }
 
     /// This is needed for fluent. It's necessary to return two arbitrary but distinct values.
     /// I don't know what this does and how this works.
     static func reflectDecoded() throws -> (UserSettings, UserSettings) {
         var userSettings = UserSettings()
-        userSettings.notificationServices.pushoverEnabled = true
+        userSettings.notifications.pushoverEnabled = true
         return (UserSettings(), userSettings)
     }
 

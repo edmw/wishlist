@@ -199,20 +199,6 @@ extension HTTPStatus {
 
 // MARK: -
 
-private struct AnyEncodable: Encodable {
-
-    let value: Encodable
-
-    init(_ value: Encodable) {
-        self.value = value
-    }
-
-    func encode(to encoder: Encoder) throws {
-        try value.encode(to: encoder)
-    }
-
-}
-
 extension Dictionary where Key == String, Value == AnyEncodable {
 
     fileprivate func updating(_ other: [String: String]) -> [String: AnyEncodable] {

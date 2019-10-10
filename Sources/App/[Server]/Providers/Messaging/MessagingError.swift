@@ -1,4 +1,4 @@
-public enum NotificationError: Error {
+public enum MessagingError: Error {
     case response(status: UInt)
     case tooManyRecipients
 }

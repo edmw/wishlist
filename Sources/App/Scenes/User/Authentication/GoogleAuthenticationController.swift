@@ -2,10 +2,6 @@ import Vapor
 import Imperial
 import FluentSQLite
 
-extension ControllerParameterKeys {
-    static let authenticationState = ControllerParameterKey<AuthenticationState>("state")
-}
-
 final class GoogleAuthenticatorController: AuthenticationController, RouteCollection {
 
     var google: Imperial.Google?
@@ -44,9 +40,6 @@ final class GoogleAuthenticatorController: AuthenticationController, RouteCollec
         userInfoURLComponents.scheme = "https"
         userInfoURLComponents.host = "www.googleapis.com"
         userInfoURLComponents.path = "/oauth2/v2/userinfo"
-        userInfoURLComponents.queryItems = [
-            URLQueryItem(name: "oauth_token", value: token)
-        ]
 
         guard let userInfoURLComponentsURL = userInfoURLComponents.url else {
             throw Abort(.internalServerError,
@@ -54,10 +47,15 @@ final class GoogleAuthenticatorController: AuthenticationController, RouteCollec
             )
         }
 
+        var userInfoHttpRequest = HTTPRequest(method: .GET, url: userInfoURLComponentsURL)
+        userInfoHttpRequest.headers.bearerAuthorization = BearerAuthorization(token: token)
+
+        let userInfoRequest = Request(http: userInfoHttpRequest, using: request)
+
         // perform http request to get userinfo from google
         return try request
             .client()
-            .get(userInfoURLComponentsURL)
+            .send(userInfoRequest)
             .flatMap { response -> Future<GoogleAuthenticationUserInfo> in
                 // decode user info from request data
                 try response.content.decode(GoogleAuthenticationUserInfo.self)

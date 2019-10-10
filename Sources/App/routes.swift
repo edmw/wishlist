@@ -47,7 +47,7 @@ func routes(
     if features.userSettings.enabled {
         try user.register(collection: SettingsController())
     }
-    
+
     try user.register(collection: ListsController())
     try user.register(collection: ListsImportController())
     try user.register(collection: ListController())
@@ -90,6 +90,15 @@ func routes(
             logger: logger
         )
     )
+    if features.signinWithNetID.enabled {
+        try services.register(collection:
+            NetIDAuthenticatorController(
+                authenticationSuccessPath: "/",
+                authenticationErrorPath: "/authentication-error",
+                logger: logger
+            )
+        )
+    }
 
     // error routes
 

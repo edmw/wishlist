@@ -70,10 +70,7 @@ final class ListController: ProtectedController, RouteCollection {
 
         return try requireList(on: request, for: user)
             .delete(on: request)
-            .emit(
-                event: "deleted for \(user)",
-                on: request
-            )
+            .emitEvent("deleted for \(user)", on: request)
             .transform(to: success(for: user, on: request))
     }
 
@@ -152,8 +149,7 @@ final class ListController: ProtectedController, RouteCollection {
                 }
                 return try listRepository
                     .save(list: entity)
-                    .emit(
-                        event: "created for \(user)",
+                    .emitEvent("created for \(user)",
                         on: request,
                         when: { $0.modifiedAt == $0.createdAt }
                     )

@@ -8,7 +8,7 @@ protocol AuthenticationUserInfo {
     var name: String { get }
     var givenName: String { get }
     var familyName: String { get }
-    var picture: URL { get }
+    var picture: URL? { get }
     var language: String? { get }
 
     func validate() throws

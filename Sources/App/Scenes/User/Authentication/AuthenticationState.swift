@@ -1,6 +1,10 @@
 import Vapor
 import Random
 
+extension ControllerParameterKeys {
+    static let authenticationState = ControllerParameterKey<AuthenticationState>("state")
+}
+
 struct AuthenticationState: ControllerParameterValue,
     Codable
 {

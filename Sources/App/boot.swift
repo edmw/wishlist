@@ -33,6 +33,8 @@ public func boot(_ app: Application) throws {
     logger.application.info("SITE:\n\(String(reflecting: site))\n")
     let features = try app.features()
     logger.application.info("FEATURES:\n\(String(reflecting: features))\n")
+
+    try app.make(DispatchingService.self).start()
 }
 
 extension Environment: CustomDebugStringConvertible {

@@ -35,17 +35,22 @@ public func configure(
     _ services: inout Services
 ) throws {
 
-    // Server configuration
+    // MARK: Server configuration
     var serverConfig = NIOServerConfig.default()
     serverConfig.maxBodySize = 1_000_000
     serverConfig.supportCompression = false
     services.register(serverConfig)
 
-    // Site configuration
+    // MARK: Site configuration
     var site = try Site.detect()
     services.register(site)
 
-    // setup logger
+    // MARK: Application Features
+
+    let features = Features()
+    services.register(features)
+
+    // MARK: Logger
 
     let loggingProvider = LoggingProvider(logLevel: environment.isRelease ? .error : .debug)
     try services.register(loggingProvider)
@@ -57,21 +62,52 @@ public func configure(
         tag: "CONFIG"
     )
 
-    // register features
+    // MARK: Database
 
-    let features = Features()
-    services.register(features)
+    try services.register(FluentMySQLProvider())
 
-    // register Services
+    var databasesConfig = DatabasesConfig()
+    try databases(
+        config: &databasesConfig,
+        siteConfig: &site,
+        environment: &environment,
+        logger: logger
+    )
+    services.register(databasesConfig)
+
+    var databasesMigrationsConfig = MigrationConfig()
+    try databasesMigrations(
+        config: &databasesMigrationsConfig,
+        siteConfig: &site,
+        environment: &environment,
+        logger: logger
+    )
+    services.register(databasesMigrationsConfig)
+
+    services.register(MySQLUserRepository.self)
+    services.register(MySQLListRepository.self)
+    services.register(MySQLItemRepository.self)
+    services.register(MySQLFavoriteRepository.self)
+    services.register(MySQLReservationRepository.self)
+    services.register(MySQLInvitationRepository.self)
+    config.prefer(MySQLUserRepository.self, for: UserRepository.self)
+    config.prefer(MySQLListRepository.self, for: ListRepository.self)
+    config.prefer(MySQLItemRepository.self, for: ItemRepository.self)
+    config.prefer(MySQLFavoriteRepository.self, for: FavoriteRepository.self)
+    config.prefer(MySQLReservationRepository.self, for: ReservationRepository.self)
+    config.prefer(MySQLInvitationRepository.self, for: InvitationRepository.self)
+
+    // MARK: register Services
 
     services.register(RequestLanguageService.self)
     services.register(ImageProxyService.self)
 
-    // register Provider
+    // MARK: register Providers
 
-    try services.register(NotificationProvider())
+    try services.register(DispatchingProvider())
+    try services.register(MessagingProvider())
 
-    // register Middlewares
+    // MARK: register Middlewares
 
     services.register(FileMiddleware.self)
     services.register(ImageFileMiddleware.self) { container -> ImageFileMiddleware in
@@ -111,42 +147,7 @@ public func configure(
     )
     services.register(middlewaresConfig)
 
-    // Database
-
-    try services.register(FluentMySQLProvider())
-
-    var databasesConfig = DatabasesConfig()
-    try databases(
-        config: &databasesConfig,
-        siteConfig: &site,
-        environment: &environment,
-        logger: logger
-    )
-    services.register(databasesConfig)
-
-    var databasesMigrationsConfig = MigrationConfig()
-    try databasesMigrations(
-        config: &databasesMigrationsConfig,
-        siteConfig: &site,
-        environment: &environment,
-        logger: logger
-    )
-    services.register(databasesMigrationsConfig)
-
-    services.register(MySQLUserRepository.self)
-    services.register(MySQLListRepository.self)
-    services.register(MySQLItemRepository.self)
-    services.register(MySQLFavoritesRepository.self)
-    services.register(MySQLReservationRepository.self)
-    services.register(MySQLInvitationRepository.self)
-    config.prefer(MySQLUserRepository.self, for: UserRepository.self)
-    config.prefer(MySQLListRepository.self, for: ListRepository.self)
-    config.prefer(MySQLItemRepository.self, for: ItemRepository.self)
-    config.prefer(MySQLFavoritesRepository.self, for: FavoritesRepository.self)
-    config.prefer(MySQLReservationRepository.self, for: ReservationRepository.self)
-    config.prefer(MySQLInvitationRepository.self, for: InvitationRepository.self)
-
-    // Routes
+    // MARK: Routes
 
     try services.register(AuthenticationProvider())
 
@@ -154,9 +155,18 @@ public func configure(
     try routes(router, features, logger: logger)
     services.register(router, as: Router.self)
 
-    // Views
+    // MARK: Localization
 
-    try services.register(LocalizationProvider(defaultLocale: "en"))
+    var localizationConfig = LocalizationConfig(defaultLanguage: "en")
+    localizationConfig.setRequestResolver { requestLanguageCode, request in
+        if let user = try request.authenticated(User.self), let userLanguage = user.language {
+            return userLanguage.lowercased()
+        }
+        return requestLanguageCode
+    }
+    try services.register(LocalizationProvider(localizationConfig))
+
+    // MARK: Views
 
     try services.register(LeafProvider())
     config.prefer(LeafRenderer.self, for: ViewRenderer.self)
@@ -166,6 +176,10 @@ public func configure(
     leafTagConfig.use(LocalizationDateTag(), as: "L10NDate")
     leafTagConfig.use(LocalizationLocaleTag(), as: "L10NLocale")
     services.register(leafTagConfig)
+
+    // MARK: Managers
+
+    services.register(NotificationManager.self)
 
     //
 

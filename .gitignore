@@ -20,4 +20,5 @@ xcuserdata/
 *.private.md
 
 .env
-
+.env.*
+~nginx/

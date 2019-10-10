@@ -35,6 +35,7 @@ struct Features: Encodable, CustomDebugStringConvertible, ServiceType {
     let signupInvitations        = Feature(date: "2018-12-08", version: "1.0")
     let limitNumberOfInvitations = Feature(date: "2018-12-10", version: "1.0")
     let signinWithGoogle         = Feature(date: "2018-10-20", version: "1.0")
+    let signinWithNetID          = Feature(date: "2019-10-10", version: "1.2")
     let userWelcomePage          = Feature(date: "2018-10-20", version: "1.0")
     let userSettings             = Feature.inDevelopment(false)
     let userNotifications        = Feature.inDevelopment(false)
@@ -62,6 +63,8 @@ struct Features: Encodable, CustomDebugStringConvertible, ServiceType {
     let itemImage                = Feature(date: "2018-11-03", version: "1.0")
     let itemDescription          = Feature(date: "2018-11-06", version: "1.0")
     let itemPreference           = Feature(date: "2019-04-23", version: "1.0")
+    let itemPrice                = Feature.inPlanning(.low)
+    let archiveItems             = Feature.inPlanning(.normal)
     // reservations
     let makeReservation          = Feature(date: "2018-11-19", version: "1.0")
     let undoReservation          = Feature(date: "2018-11-19", version: "1.0")
@@ -70,6 +73,7 @@ struct Features: Encodable, CustomDebugStringConvertible, ServiceType {
     // technical
     let localization             = Feature(date: "2018-11-28", version: "1.0")
     let preventCSRF              = Feature(date: "2018-11-20", version: "1.0")
+    let rateLimitNotifications   = Feature.inPlanning(.normal)
 
     // MARK: CustomDebugStringConvertible
 

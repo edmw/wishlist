@@ -1,9 +1,9 @@
-public enum Notification {
+public enum Message {
 
     case email(message: String, subject: String, addresses: [String])
     case pushover(message: String, title: String, users: [String])
 
-    var serviceType: NotificationServiceType {
+    var serviceType: MessagingServiceType {
         switch self {
         case .email:
             return .email
