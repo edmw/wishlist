@@ -6,13 +6,13 @@ public class MessagingService: Service {
         -> EventLoopFuture<MessagingResult>
     {
         switch message {
-        case let .email(text, subject, addresses):
+        case let .email(html, subject, addresses):
             return try container.make(EmailService.self)
-                .send(text, subject, for: addresses, on: container)
+                .send(html: html, subject: subject, for: addresses, on: container)
                 .transform(to: .success(message))
-        case let .pushover(text, title, users):
+        case let .pushover(simpleHtml, title, users):
             return try container.make(PushoverService.self)
-                .send(text, title, for: users, on: container)
+                .send(text: simpleHtml, title: title, for: users, on: container)
                 .transform(to: .success(message))
                 .catchMap { error in
                     if let error = error as? MessagingError {

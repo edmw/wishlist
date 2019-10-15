@@ -1,14 +1,14 @@
 import Vapor
 
-final class ReservationCreateNotification: Notification {
+final class ReservationDeleteNotification: Notification {
 
     init(for user: User, on item: Item, in list: List) {
         super.init(
             for: user,
-            titleKey: "reservations-notifications-create-title",
-            templateName: "User/ReservationCreateNotification",
+            titleKey: "reservations-notifications-delete-title",
+            templateName: "User/ReservationDeleteNotification",
             templateContext: ["itemTitle": item.title, "listTitle": list.title],
-            htmlTemplateName: "User/ReservationCreateNotification.html",
+            htmlTemplateName: "User/ReservationDeleteNotification.html",
             htmlTemplateContext: ["itemTitle": item.title, "listTitle": list.title]
         )
     }

@@ -87,9 +87,13 @@
     "settings-notifications-test-success": "Erfolgreich versendet",
     "settings-notifications-test-failure": "Nicht erfolgreich",
     "settings-editing": "Einstellungen",
+    "settings-field-enable-email": "E-Mail aktivieren",
+    "settings-field-email-hint": "Benachrichtigungen werden an die E-Mail-Adresse aus deinem Profil gesendet.",
     "settings-field-enable-pushover": "Pushover aktivieren",
     "settings-field-pushoverkey-placeholder": "Benutzerschlüssel für Pushover-Dienst eingeben",
-    "settings-field-pushover-hint": "Pushover ist ein Dienst mit dessen Hilfe du Push-Mitteilungen auf deinem Handy oder Tablet empfangen kannst. Nachdem du ein Benutzerkonto bei Pushover angelegt und ein Gerät bei dem Dienst registriert hast, kannst du hier deinen Benutzerschlüssel eintragen um Benachrichtigungen empfangen zu können.",
+    "settings-field-pushover-hint": "Pushover ist ein Dienst mit dessen Hilfe du Push-Mitteilungen auf deinem Handy oder Tablet empfangen kannst. Nachdem du ein Benutzerkonto bei Pushover angelegt und ein Gerät bei dem Dienst registriert hast, kannst du hier deinen Benutzerschlüssel eintragen um Benachrichtigungen zu empfangen.",
+    "settings-field-pushoverkey-missing": "Ein gültiger Pushover-Benutzerschlüssel wird benötigt!",
+    "settings-field-pushoverkey-invalid": "Kein gültiger Pushover-Benutzerschlüssel!",
 
     "//": "List pages",
 
@@ -179,7 +183,12 @@
     "delete-reservation": "Reservierung löschen",
     "//": "1: item’s name, 2: list’s name",
     "to-delete-reservation": ".... daß du die Reservierung für den Wunsch <strong>%{value1}</strong> von der Liste <strong>%{value2}</strong> <span class='text-danger'>löschen</span> möchtest?",
-    
+
+    "reservations-notifications-create-title": "🎁 Wunsch reserviert",
+    "reservations-notifications-create-message": "Auf der Liste <b>%{value2}</b> wurde der Wunsch <b>%{value1}</b> reserviert.",
+    "reservations-notifications-delete-title": "🎁 Reservierung freigegeben",
+    "reservations-notifications-delete-message": "Auf der Liste <b>%{value2}</b> wurde der Wunsch <b>%{value1}</b> freigegeben.",
+
     "//": "Page Wishlist",
 
     "//": "1: user’s name, 2: owner’s name, 3: list’s name",
@@ -225,6 +234,10 @@
     "declined": "abgelehnt",
     "revoked": "zurückgenommen",
 
+    "//": "Notification messages",
+    
+    "notification-html-footer": "Dies ist eine automatisch erzeugte Benachrichtigungs-E-Mail. Bitte antworte nicht auf diese E-Mail.</p>",
+    
     "//": "Error pages",
 
     "oops": "Hoppla!",

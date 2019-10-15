@@ -37,8 +37,8 @@ struct Features: Encodable, CustomDebugStringConvertible, ServiceType {
     let signinWithGoogle         = Feature(date: "2018-10-20", version: "1.0")
     let signinWithNetID          = Feature(date: "2019-10-10", version: "1.2")
     let userWelcomePage          = Feature(date: "2018-10-20", version: "1.0")
-    let userSettings             = Feature.inDevelopment(false)
-    let userNotifications        = Feature.inDevelopment(false)
+    let userSettings             = Feature(date: "2019-10-15", version: "1.3")
+    let userNotifications        = Feature(date: "2019-10-15", version: "1.3")
     // users
     let userProfilePage          = Feature(date: "2018-10-20", version: "1.0")
     let userNickname             = Feature(date: "2019-04-24", version: "1.1")
@@ -68,11 +68,16 @@ struct Features: Encodable, CustomDebugStringConvertible, ServiceType {
     // reservations
     let makeReservation          = Feature(date: "2018-11-19", version: "1.0")
     let undoReservation          = Feature(date: "2018-11-19", version: "1.0")
+    let notifyCreateReservation  = Feature(date: "2019-10-15", version: "1.3")
+    let notifyDeleteReservation  = Feature(date: "2019-10-15", version: "1.3")
     // presentation
     let showWishlist             = Feature(date: "2018-11-19", version: "1.0")
     // technical
     let localization             = Feature(date: "2018-11-28", version: "1.0")
     let preventCSRF              = Feature(date: "2018-11-20", version: "1.0")
+    let dispatchableJobs         = Feature(date: "2019-10-15", version: "1.3")
+    let emailMessaging           = Feature(date: "2019-10-15", version: "1.3")
+    let pushoverMessaging        = Feature(date: "2019-10-15", version: "1.3")
     let rateLimitNotifications   = Feature.inPlanning(.normal)
 
     // MARK: CustomDebugStringConvertible
@@ -123,7 +128,11 @@ struct Features: Encodable, CustomDebugStringConvertible, ServiceType {
 
 extension Container {
 
-    func features() throws -> Features {
+    var features: Features? {
+        return try? make()
+    }
+
+    func makeFeatures() throws -> Features {
         return try make()
     }
 

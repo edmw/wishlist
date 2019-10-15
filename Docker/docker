@@ -1,15 +1,15 @@
-FROM swift:5.1 AS builder
+FROM swift:4.2.4 AS builder
 RUN apt-get -qq update && apt-get -q -y install \
-  tzdata \
+  openssl libssl-dev zlib1g-dev tzdata \
   && rm -r /var/lib/apt/lists/*
 WORKDIR /app
 COPY . .
 RUN mkdir -p /build/lib && cp -R /usr/lib/swift/linux/*.so /build/lib
-RUN swift build --product "Wishlist" -c release && mv `swift build -c release --show-bin-path` /build/bin
+RUN swift build -Xswiftc -suppress-warnings --product "Wishlist" -c release && mv `swift build -c release --show-bin-path` /build/bin
 
 FROM ubuntu:16.04
 RUN apt-get -qq update && apt-get install -y \
-  libicu55 libxml2 libbsd0 libcurl3 libatomic1 \
+  libicu55 libxml2 libbsd0 libcurl3 libatomic1 openssl libssl-dev \
   tzdata \
   && rm -r /var/lib/apt/lists/*
 WORKDIR /app

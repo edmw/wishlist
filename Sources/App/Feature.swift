@@ -26,6 +26,8 @@ import Vapor
 import Foundation
 import SwiftDate
 
+// MARK: Feature
+
 enum Feature: Codable, Equatable, Comparable, CustomStringConvertible {
 
     case inPlanning(Priority)
@@ -185,9 +187,9 @@ enum Feature: Codable, Equatable, Comparable, CustomStringConvertible {
 
 }
 
-// MARK: -
+// MARK: - Priority
 
-enum Priority: Int, Equatable, Comparable, Codable {
+enum Priority: Int, Codable, Equatable, Comparable, CustomStringConvertible {
 
     case low = 0
     case normal = 50
@@ -199,9 +201,23 @@ enum Priority: Int, Equatable, Comparable, Codable {
         return lhs.rawValue < rhs.rawValue
     }
 
+    // MARK: CustomStringConvertible
+
+    var description: String {
+        switch self {
+        case .low:
+             return "low (\(self.rawValue))"
+        case .normal:
+             return "normal (\(self.rawValue))"
+        case .high:
+             return "high (\(self.rawValue))"
+        }
+
+    }
+
 }
 
-// MARK: -
+// MARK: - Version
 
 struct Version: Codable, Equatable, ExpressibleByStringLiteral, CustomStringConvertible {
 

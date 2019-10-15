@@ -139,7 +139,7 @@ final class SettingsController: ProtectedController, RouteCollection {
         // notifications handling
         router.get("user", ID.parameter, "settings", "notifications", "test")
             { request -> Future<View> in
-                guard try request.features().userNotifications.enabled else {
+                guard try request.makeFeatures().userNotifications.enabled else {
                     throw Abort(.badRequest)
                 }
                 return try SettingsNotificationsController.testNotifications(on: request)

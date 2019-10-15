@@ -21,7 +21,7 @@ final class NotificationManager: ServiceType {
     }
 
     func send(_ notification: Notification) throws -> EventLoopFuture<Void> {
-        guard try container.features().userNotifications.enabled else {
+        guard try container.makeFeatures().userNotifications.enabled else {
             return container.future(())
         }
         return try notification.dispatchSend(on: container)
@@ -46,14 +46,17 @@ extension Future {
         }
     }
 
-    /// sends a notification build in the given closure
+    /// sends a notification which is build in the given closure
     func dispatchNotification(
         on request: Request,
-        _ notificationBuilder: @escaping (Request) -> EventLoopFuture<Notification>
+        _ notificationBuilder: @escaping (Request) -> EventLoopFuture<Notification?>
     ) throws -> Future<Expectation> {
         return self.flatMap(to: Expectation.self) { value in
             return notificationBuilder(request)
                 .flatMap { notification in
+                    guard let notification = notification else {
+                        return request.future(value)
+                    }
                     return try request.make(NotificationManager.self)
                         .send(notification)
                         .transform(to: value)

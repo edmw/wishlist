@@ -105,6 +105,8 @@ public func configure(
     // MARK: register Providers
 
     try services.register(DispatchingProvider())
+    try services.register(EmailConfiguration())
+    try services.register(PushoverConfiguration())
     try services.register(MessagingProvider())
 
     // MARK: register Middlewares

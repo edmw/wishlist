@@ -10,4 +10,8 @@
     "item-preference-4": "Must have",
 
     "settings-notifications-test-title": "🎁 Notification",
+
+    "reservations-notifications-create-title": "🎁 Wish reserved",
+    "reservations-notifications-delete-title": "🎁 Reservation released",
+
 }

@@ -26,6 +26,8 @@ import Vapor
 import Routing
 import Imperial
 
+// swiftlint:disable function_body_length
+
 func routes(
     _ router: Router,
     _ features: Features,

@@ -7,10 +7,10 @@ import Vapor
 // characters. Supplementary URLs are limited to 512 characters, and URL titles to 100 characters.
 final class PushoverService: Service {
 
-    private let token: String
+    private let configuration: PushoverConfiguration
 
-    init(token: String) {
-        self.token = token
+    init(configuration: PushoverConfiguration) {
+        self.configuration = configuration
     }
 
     private struct PushMessage: Content {
@@ -43,9 +43,12 @@ final class PushoverService: Service {
     // (Note: if a notification can be sent to at least one user there will be no error. Even if
     // other user keys are invalid.)
     // @see https://pushover.net/api
-    func send(_ text: String, _ title: String, for users: [String], on container: Container) throws
+    func send(text: String, title: String, for users: [String], on container: Container) throws
         -> EventLoopFuture<Void>
     {
+        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw MessagingError.emptyMessage
+        }
         guard users.count <= 50 else {
             throw MessagingError.tooManyRecipients
         }
@@ -53,7 +56,7 @@ final class PushoverService: Service {
         let messagesUrl = "https://api.pushover.net/1/messages.json"
 
         let messagesData = PushMessage(
-            token: token,
+            token: configuration.applicationToken,
             user: users.joined(separator: ","),
             message: text,
             title: title,
@@ -76,8 +79,4 @@ final class PushoverService: Service {
             }
     }
 
-}
-
-extension EnvironmentKeys {
-    static let pushoverApplicationToken = EnvironmentKey<String>("PUSHOVER_APPLICATION_TOKEN")
 }

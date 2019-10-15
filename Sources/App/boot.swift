@@ -31,7 +31,7 @@ public func boot(_ app: Application) throws {
     logger.application.info("ENVIRONMENT:\n\(String(reflecting: environment))\n")
     let site = try app.site()
     logger.application.info("SITE:\n\(String(reflecting: site))\n")
-    let features = try app.features()
+    let features = try app.makeFeatures()
     logger.application.info("FEATURES:\n\(String(reflecting: features))\n")
 
     try app.make(DispatchingService.self).start()

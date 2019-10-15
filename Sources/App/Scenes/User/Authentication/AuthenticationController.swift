@@ -71,6 +71,23 @@ class AuthenticationController: ProtectedController {
         return stateString
     }
 
+    static func verifyState(_ stateString: String, on request: Request) throws -> Bool {
+        guard let stateData = stateString.data(using: .utf8) else {
+            return false
+        }
+
+        let decoder = try request.make(ContentCoders.self).requireDataDecoder(for: .json)
+        let authenticationState = try decoder.decode(AuthenticationState.self, from: stateData)
+
+        guard let authenticationToken = try request.session().getAuthenticationToken() else {
+            return false
+        }
+        guard authenticationState.token == authenticationToken else {
+            return false
+        }
+        return true
+    }
+
     private static func getState(on request: Request) throws -> AuthenticationState? {
         // get state string from request query
         let stateString = try request.query.get(String.self, at: "state")

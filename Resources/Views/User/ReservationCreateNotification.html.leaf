@@ -1,0 +1,5 @@
+<html>
+<p>#L10N("reservations-notifications-create-message","#(itemTitle)","#(listTitle)"){Wish <b>#(itemTitle)</b> was reserved on list <b>#(listTitle).</b>}</p>
+<hr>
+<p>#L10N("notification-html-footer"){This is an automatically generated notification email – please do not reply to it.}</p>
+</html>

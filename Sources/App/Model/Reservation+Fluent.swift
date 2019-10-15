@@ -9,6 +9,11 @@ extension Reservation: Model {
     typealias ID = UUID
     static let idKey: IDKey = \.id
 
+    /// Parent relation: Item
+    var item: Parent<Reservation, Item> {
+        return parent(\.itemID)
+    }
+
 }
 
 // MARK: Migration

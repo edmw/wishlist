@@ -50,9 +50,11 @@ func databasesMigrations(
 struct RenameUserName: MySQLMigration {
 
     static func prepare(on connection: MySQLConnection) -> Future<Void> {
-        return connection
-            .raw("ALTER TABLE User CHANGE COLUMN name fullName VARCHAR(255) NOT NULL")
-            .run()
+        return connection.assertFieldMustNotExist(\User.fullName) {
+            return connection
+                .raw("ALTER TABLE User CHANGE COLUMN name fullName VARCHAR(255) NOT NULL")
+                .run()
+        }
     }
 
     static func revert(on connection: MySQLConnection) -> Future<Void> {
@@ -66,9 +68,12 @@ struct RenameUserName: MySQLMigration {
 struct AddUserSettings: MySQLMigration {
 
     static func prepare(on connection: MySQLConnection) -> Future<Void> {
-        return Database.update(User.self, on: connection) { builder in
-            builder.field(for: \.settings)
-        }
+        return connection
+            .assertFieldMustNotExist(\User.settings) {
+                return Database.update(User.self, on: connection) { builder in
+                    builder.field(for: \.settings)
+                }
+            }
     }
 
     static func revert(on connection: MySQLConnection) -> Future<Void> {
@@ -132,9 +137,11 @@ struct AddUserIdentificationIndex: MySQLMigration {
 struct RenameListName: MySQLMigration {
 
     static func prepare(on connection: MySQLConnection) -> Future<Void> {
-        return connection
-            .raw("ALTER TABLE List CHANGE COLUMN name title VARCHAR(255) NOT NULL")
-            .run()
+        return connection.assertFieldMustNotExist(\List.title) {
+            return connection
+                .raw("ALTER TABLE List CHANGE COLUMN name title VARCHAR(255) NOT NULL")
+                .run()
+        }
     }
 
     static func revert(on connection: MySQLConnection) -> Future<Void> {
@@ -148,8 +155,10 @@ struct RenameListName: MySQLMigration {
 struct AddListOptions: MySQLMigration {
 
     static func prepare(on connection: MySQLConnection) -> Future<Void> {
-        return Database.update(List.self, on: connection) { builder in
-            builder.field(for: \.options)
+        return connection.assertFieldMustNotExist(\List.options) {
+            return Database.update(List.self, on: connection) { builder in
+                builder.field(for: \.options)
+            }
         }
     }
 
@@ -230,9 +239,11 @@ struct AddListForeignKeyConstraint: MySQLMigration {
 struct RenameItemName: MySQLMigration {
 
     static func prepare(on connection: MySQLConnection) -> Future<Void> {
-        return connection
-            .raw("ALTER TABLE Item CHANGE COLUMN name title VARCHAR(255) NOT NULL")
-            .run()
+        return connection.assertFieldMustNotExist(\Item.title) {
+            return connection
+                .raw("ALTER TABLE Item CHANGE COLUMN name title VARCHAR(255) NOT NULL")
+                .run()
+        }
     }
 
     static func revert(on connection: MySQLConnection) -> Future<Void> {
@@ -355,6 +366,30 @@ struct AddReservationForeignKeyConstraint: MySQLMigration {
         return Database.update(Reservation.self, on: connection) { builder in
             builder.deleteReference(from: \.itemID, to: \Item.id)
         }
+    }
+
+}
+
+// MARK: - MySQLConnection Extension
+
+extension MySQLConnection {
+
+    /// Executes the given closure when the specified field does not exist only.
+    func assertFieldMustNotExist<R: Model, V>(
+        _ keypath: KeyPath<R, V>,
+        closure: @escaping () throws -> EventLoopFuture<Void>
+    ) -> EventLoopFuture<Void> where R.Database == MySQLDatabase {
+        let table = R.self.entity
+        let column = R.self.Database.queryField(.keyPath(keypath))
+        return self
+            .raw("SHOW COLUMNS FROM `\(table)` LIKE '\(column.identifier.string)';")
+            .first()
+            .flatMap { column in
+                guard column == nil else {
+                    return self.future(())
+                }
+                return try closure()
+            }
     }
 
 }

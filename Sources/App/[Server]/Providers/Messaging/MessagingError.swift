@@ -1,4 +1,5 @@
 public enum MessagingError: Error {
-    case response(status: UInt)
+    case emptyMessage
     case tooManyRecipients
+    case response(status: UInt)
 }

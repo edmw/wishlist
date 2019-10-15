@@ -18,7 +18,7 @@ let package = Package(
         .package(url: "https://github.com/vapor/fluent-sqlite.git", from: "3.0.0"),
         .package(url: "https://github.com/vapor/fluent-mysql.git", from: "3.0.1"),
         //.package(url: "https://github.com/vapor-community/Imperial.git", from: "0.7.1"),
-        .package(url: "https://github.com/edmw/Imperial.git", .branch("netid")),
+        .package(url: "https://github.com/edmw/Imperial.git", .branch("netid-fix-1")),
         .package(url: "https://github.com/miroslavkovac/Lingo.git", from: "3.0.5"),
         .package(url: "https://github.com/malcommac/SwiftDate.git", from: "5.0.0"),
         .package(url: "https://github.com/LiveUI/VaporTestTools.git", from: "0.1.7"),
@@ -39,6 +39,6 @@ let package = Package(
             "SwiftSMTP"
         ]),
         .target(name: "Run", dependencies: ["App"]),
-        .testTarget(name: "AppTests", dependencies: ["App", "VaporTestTools"])
+        .testTarget(name: "AppTests", dependencies: ["App", "VaporTestTools", "LoggerAPI"])
     ]
 )

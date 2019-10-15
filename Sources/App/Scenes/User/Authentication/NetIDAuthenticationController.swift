@@ -80,6 +80,9 @@ final class NetIDAuthenticatorController: AuthenticationController, RouteCollect
                     throw Abort(.internalServerError)
                 }
                 return state
+            },
+            stateVerify: { request, state in
+                return try AuthenticationController.verifyState(state, on: request)
             }
         )
         try Imperial.NetID(router: router, config: config, completion: signin)

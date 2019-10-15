@@ -11,7 +11,7 @@ final class SettingsNotificationsNotification: Notification {
         )
     }
 
-    func dispatchSend(on request: Request) throws -> EventLoopFuture<SendNotificationResult> {
+    func dispatchSend(on request: Request) throws -> EventLoopFuture<Void> {
         return try super.dispatchSend(on: request, before: Date(timeIntervalSinceNow: 10))
     }
 

@@ -6,10 +6,11 @@ struct MessagingProvider: Provider {
     }
 
     func register(_ services: inout Services) throws {
-        if let pushoverApplicationToken = Environment.get(.pushoverApplicationToken) {
-            services.register(PushoverService.self) { _ in
-                return PushoverService(token: pushoverApplicationToken)
-            }
+        services.register(EmailService.self) { container in
+            return try EmailService(configuration: container.make())
+        }
+        services.register(PushoverService.self) { container in
+            return try PushoverService(configuration: container.make())
         }
         services.register(MessagingService.self) { _ in
             return MessagingService()

@@ -7,7 +7,7 @@ final class SettingsNotificationsController: ProtectedController, RouteCollectio
     static func testNotifications(on request: Request) throws -> Future<View> {
         let user = try requireAuthenticatedUser(on: request)
 
-        return try SettingsNotificationsNotification(for: user).dispatchSend(on: request)
+        return try SettingsNotificationsNotification(for: user).send(on: request)
             .flatMap { sendResult -> Future<View> in
                 let context = SettingsNotificationsPageContext(sendResult, for: user)
                 return try renderView("User/SettingsNotifications", with: context, on: request)

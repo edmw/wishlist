@@ -68,7 +68,6 @@ final class ItemController: ProtectedController, RouteCollection {
         return try requireList(on: request, for: user)
             .flatMap { list in
                 return try save(from: request, for: user, and: list)
-                // FIXME: add notification here?
             }
     }
 

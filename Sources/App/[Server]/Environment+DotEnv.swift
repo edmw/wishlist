@@ -33,7 +33,7 @@ extension Environment {
                 continue
             }
 
-            let parts = string.components(separatedBy: "=")
+            let parts = string.split(separator: "=", maxSplits: 1).map(String.init)
 
             guard parts.count == 2 else {
                 continue

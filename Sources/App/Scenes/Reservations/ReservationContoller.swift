@@ -107,6 +107,19 @@ final class ReservationController: ProtectedController, RouteCollection {
                 return try reservation
                     .delete(on: request)
                     .emitEvent("deleted for \(identification)", on: request)
+                    .dispatchNotification(on: request) { request in
+                        guard request.features?.notifyDeleteReservation.enabled ?? false else {
+                            return request.future(nil)
+                        }
+                        return flatMap(
+                            list.user.get(on: request),
+                            reservation.item.get(on: request)
+                        ) { owner, item in
+                            return request.future(
+                                ReservationDeleteNotification(for: owner, on: item, in: list)
+                            )
+                        }
+                    }
                     .transform(to: success(for: list, on: request))
             }
         }
@@ -157,6 +170,9 @@ final class ReservationController: ProtectedController, RouteCollection {
             .save(reservation: entity)
             .emitEvent("created for \(holder)", on: request)
             .dispatchNotification(on: request) { request in
+                guard request.features?.notifyCreateReservation.enabled ?? false else {
+                    return request.future(nil)
+                }
                 return list.user.get(on: request)
                     .map { owner in ReservationCreateNotification(for: owner, on: item, in: list) }
             }
