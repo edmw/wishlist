@@ -11,6 +11,8 @@
 
     "settings-notifications-test-title": "🎁 Notification",
 
+    "notification-html-footer": "This is an automatically generated notification email – please do not reply to it.",
+    
     "reservations-notifications-create-title": "🎁 Wish reserved",
     "reservations-notifications-delete-title": "🎁 Reservation released",
 

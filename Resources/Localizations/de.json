@@ -1,11 +1,14 @@
 {
     "app-title": "Wunschzettel",
     "home": "Startseite",
-    "about": "Über",
-    "contact": "Kontakt",
+    "germany": "Deutschland",
     "signin": "Anmelden",
     "logout": "Abmelden",
     "profile": "Profil",
+    "contact": "Kontakt",
+    "about-site": "Über diese Seite",
+    "legal-notice": "Impressum",
+    "privacy-policy": "Datenschutzerklärung",
     "welcome": "Willkommen",
     "welcome-catchline": "Wunschzettel einfach gemacht!",
     "welcome-catchline-2": "Erstelle einfach und mit Spaß einen Wunschzettel und teile ihn mit Freunden, Bekannten und Verwandten.",
@@ -186,8 +189,10 @@
 
     "reservations-notifications-create-title": "🎁 Wunsch reserviert",
     "reservations-notifications-create-message": "Auf der Liste <b>%{value2}</b> wurde der Wunsch <b>%{value1}</b> reserviert.",
+    "reservations-notifications-create-message-masked": "Auf der Liste <b>%{value2}</b> wurde ein Wunsch reserviert.",
     "reservations-notifications-delete-title": "🎁 Reservierung freigegeben",
     "reservations-notifications-delete-message": "Auf der Liste <b>%{value2}</b> wurde der Wunsch <b>%{value1}</b> freigegeben.",
+    "reservations-notifications-delete-message-masked": "Auf der Liste <b>%{value2}</b> wurde ein Wunsch freigegeben.",
 
     "//": "Page Wishlist",
 

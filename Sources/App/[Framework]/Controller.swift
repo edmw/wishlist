@@ -178,11 +178,45 @@ class Controller {
             .render(templateName, context, userInfo: ["language": locale.identifier])
     }
 
+    /// Renders a view with the specified template and an empty page context on the
+    /// specified request.
     static func renderView(
         _ templateName: String,
         on request: Request
     ) throws -> Future<View> {
         return try renderView(templateName, with: [String: String](), on: request)
+    }
+
+    /// Renders a localized view with the specified template and the specified page context on the
+    /// specified request.
+    /// Appends the template‘s base name with the user‘s language code separated by a dot.
+    /// If the user‘s language code is not in the list of supported codes the default language code
+    /// will be used.
+    static func renderLocalizedView<E>(
+        _ templateBaseName: String,
+        with pageContext: E,
+        on request: Request
+    ) throws -> Future<View> where E: Encodable {
+        let templateName: String
+        let localization = try request.make(LocalizationService.self)
+        let locale = try localization.locale(on: request)
+        if let code = locale.languageCode, localization.languageCodes.contains(code) {
+            templateName = "\(templateBaseName).\(code)"
+        }
+        else {
+            let code = localization.defaultLanguageCode
+            templateName = "\(templateBaseName).\(code)"
+        }
+        return try renderView(templateName, with: pageContext, on: request)
+    }
+
+    /// Renders a localized view with the specified template and an empty page context on the
+    /// specified request.
+    static func renderLocalizedView(
+        _ templateBaseName: String,
+        on request: Request
+    ) throws -> Future<View> {
+        return try renderLocalizedView(templateBaseName, with: [String: String](), on: request)
     }
 
 }

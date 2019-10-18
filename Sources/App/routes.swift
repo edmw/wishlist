@@ -78,7 +78,8 @@ func routes(
         CachingHeadersMiddleware.noCachingMiddleware()
     )
 
-    try publicRoutes.register(collection: AboutController())
+    try publicRoutes.register(collection: LegalNoticeController())
+    try publicRoutes.register(collection: PrivacyPolicyController())
 
     // services routes
 

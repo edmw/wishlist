@@ -1,6 +1,6 @@
 import Foundation
 
-struct AboutPageContext: Encodable {
+struct LegalNoticePageContext: Encodable {
 
     let userID: ID?
 

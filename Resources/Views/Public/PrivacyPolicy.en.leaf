@@ -1,0 +1,8 @@
+#set("title") {#L10N("privacy-policy"){Privacy policy}}
+#//
+#set("content") {
+<section>
+</section>
+}
+#//
+#embed("Wishlist")

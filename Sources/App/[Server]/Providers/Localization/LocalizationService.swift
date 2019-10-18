@@ -6,6 +6,10 @@ public class LocalizationService: Service {
 
     let config: LocalizationConfig
 
+    var defaultLanguageCode: String {
+        return self.config.defaultLanguageCode
+    }
+
     let languageCodes: [String]
 
     init(_ config: LocalizationConfig, _ lingo: Lingo) throws {

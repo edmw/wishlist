@@ -161,6 +161,9 @@ public func configure(
 
     var localizationConfig = LocalizationConfig(defaultLanguage: "en")
     localizationConfig.setRequestResolver { requestLanguageCode, request in
+        if let queryLanguage: String = request.query["lang"] {
+            return queryLanguage.lowercased()
+        }
         if let user = try request.authenticated(User.self), let userLanguage = user.language {
             return userLanguage.lowercased()
         }

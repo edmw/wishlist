@@ -6,7 +6,7 @@ final class SettingsNotificationsNotification: Notification {
         super.init(
             for: user,
             titleKey: "settings-notifications-test-title",
-            templateName: "User/SettingsNotificationsNotification",
+            templateName: "User/Notifications/SettingsNotifications",
             templateContext: ["userName": user.fullName]
         )
     }

@@ -2,9 +2,13 @@
 
 🎁 flags a functional feature
 🛠️ flags a technical feature
+☘ flags a fix
 
 [] unreleased
 [x.y.z] released version x.y.z
+
+## [1.3.1]
+☘ fix option "Don't spoil my surprises" on lists for notifications
 
 ## [1.3.0]
 🎁 Add settings for user in profile

@@ -556,6 +556,17 @@ h2, .h2, h3, h4 {
     fill: none;
 }
 
+/* icons: feather-inline */
+.feather-inline {
+    width: 1.2em;
+    height: 1.2em;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+
 /* icons: feather */
 .feather-large {
     width: 32px;

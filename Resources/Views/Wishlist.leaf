@@ -68,7 +68,10 @@
     </ul>
     <ul class="navbar-nav">
       <li class="nav-item active">
-        <a class="nav-link" href="/about">#L10N("about"){About}</a>
+        <a class="nav-link" href="/privacy-policy">#L10N("privacy-policy"){Privacy policy}</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="/legal-notice">#L10N("legal-notice"){Legal notice}</a>
       </li>
     </ul>
   </div>

@@ -1,4 +1,4 @@
-#set("title") {#L10N("about"){About}}
+#set("title") {#L10N("legal-notice"){Legal notice}}
 #//
 #set("content") {
 <p>#L10N("about-intro"){<span class="title">Wishlist</span> is an easy to use web-based application that will help you to collect, organize and keep track of things you want. It also makes it easy to share your wishes with friends and family.}</p>
