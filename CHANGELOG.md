@@ -10,6 +10,10 @@
 ## [..]
 🎁 Add functionality to move items between wishlists
 
+## [1.3.3]
+☘ fix link to about page
+🛠️ Add favicon
+
 ## [1.3.2]
 🎁 Add pages for legal notice and privacy policy
 

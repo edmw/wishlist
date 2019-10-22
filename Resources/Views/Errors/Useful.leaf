@@ -1,4 +1,4 @@
 <ul>
 <li><a href="/">#L10N("home"){Home}</a> — #L10N("useful-home"){Use this to start over ...}
-<li><a href="/about">#L10N("about"){About}</a> — #L10N("useful-about"){Use this if you want to tell someone about your misery ...}
+<li><a href="/legal-notice">#L10N("contact"){Contact}</a> — #L10N("useful-contact"){Use this if you want to tell someone about your misery ...}
 </ul>

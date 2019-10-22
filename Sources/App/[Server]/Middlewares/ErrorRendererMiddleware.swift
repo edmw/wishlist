@@ -61,7 +61,7 @@ final class ErrorRendererMiddleware: Middleware, ServiceType {
         for request: Request,
         status: HTTPStatus
     ) throws -> Future<Response> {
-        request.requireLogger().warning(
+        request.requireLogger().info(
             "Render error page for status: \(status.code), path: \(request.http.url)"
         )
         let renderer = try request.make(ViewRenderer.self)

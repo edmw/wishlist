@@ -253,7 +253,7 @@
     "message401-tips": "Vielleicht möchtest du versuchen, dich <a href='/signin?p=%{value1}'>anzumelden</a> ...",
     "message401-tips-2": "... oder stattdessen einige nützliche Links besuchen:",
     "useful-home": "Verwende dies, um von vorne zu beginnen ...",
-    "useful-about": "Verwende dies, wenn du jemandem von deinem Elend erzählen möchtest ...",
+    "useful-contact": "Verwende dies, wenn du jemandem von deinem Elend erzählen möchtest ...",
     "authentication": "Authentifizierung",
     "message-authentication": "Es scheint, dass deine Authentifizierung nicht fortgesetzt werden konnte.",
     "message-authentication-2": "Leider können wir normalerweise nicht viel dagegen tun, bitte versuche es später noch einmal ...",
