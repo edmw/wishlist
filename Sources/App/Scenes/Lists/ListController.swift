@@ -19,16 +19,15 @@ final class ListController: ProtectedController, RouteCollection {
         }
         else {
             // render form to edit list
-            return try requireList(on: request, for: user)
-                .flatMap { list in
-                    let data = ListPageFormData(from: list)
-                    let context = ListPageContext(
-                        for: user,
-                        with: list,
-                        from: data
-                    )
-                    return try renderView("User/List", with: context, on: request)
-                }
+            return try requireList(on: request, for: user).flatMap { list in
+                let data = ListPageFormData(from: list)
+                let context = ListPageContext(
+                    for: user,
+                    with: list,
+                    from: data
+                )
+                return try renderView("User/List", with: context, on: request)
+            }
             // malformed parameter errors yield internal server errors
         }
     }
@@ -40,11 +39,10 @@ final class ListController: ProtectedController, RouteCollection {
     {
         let user = try requireAuthenticatedUser(on: request)
 
-        return try requireList(on: request, for: user)
-            .flatMap { list in
-                let context = ListPageContext(for: user, with: list)
-                return try renderView("User/ListDeletion", with: context, on: request)
-            }
+        return try requireList(on: request, for: user).flatMap { list in
+            let context = ListPageContext(for: user, with: list)
+            return try renderView("User/ListDeletion", with: context, on: request)
+        }
     }
 
     // MARK: - CRUD

@@ -12,33 +12,32 @@ final class ItemController: ProtectedController, RouteCollection {
     {
         let user = try requireAuthenticatedUser(on: request)
 
-        return try requireList(on: request, for: user)
-            .flatMap { list in
-                if request.parameters.values.isEmpty {
-                    // render form to create new item
-                    let context = ItemPageContext(for: user, and: list)
-                    return try renderView("User/Item", with: context, on: request)
-                }
-                else {
-                    let itemID = try request.parameters.next(ID.self)
-                    // render form to edit item
-                    return try request.make(ItemRepository.self)
-                        .findWithReservation(by: itemID.uuid, in: list)
-                        .unwrap(or: Abort(.noContent))
-                        .flatMap { item, reservation in
-                            let data = ItemPageFormData(from: item)
-                            let context = ItemPageContext(
-                                for: user,
-                                and: list,
-                                with: item,
-                                and: reservation,
-                                from: data
-                            )
-                            return try renderView("User/Item", with: context, on: request)
-                        }
-                    // malformed parameter errors yield internal server errors
-                }
+        return try requireList(on: request, for: user).flatMap { list in
+            let contextBuilder = ItemPageContextBuilder().forUser(user).forList(list)
+
+            if request.parameters.values.isEmpty {
+                // render form to create new item
+                let context = try contextBuilder.build()
+                return try renderView("User/Item", with: context, on: request)
             }
+            else {
+                let itemID = try request.parameters.next(ID.self)
+                // render form to edit item
+                return try request.make(ItemRepository.self)
+                    .findWithReservation(by: itemID.uuid, in: list)
+                    .unwrap(or: Abort(.noContent))
+                    .flatMap { item, reservation in
+                        let data = ItemPageFormData(from: item)
+                        let context = try contextBuilder
+                            .withItem(item)
+                            .withReservation(reservation)
+                            .withFormData(data)
+                            .build()
+                        return try renderView("User/Item", with: context, on: request)
+                    }
+                // malformed parameter errors yield internal server errors
+            }
+        }
     }
 
     /// Renders a view to confirm the deletion of an item.
@@ -48,14 +47,42 @@ final class ItemController: ProtectedController, RouteCollection {
     {
         let user = try requireAuthenticatedUser(on: request)
 
-        return try requireList(on: request, for: user)
-            .flatMap { list in
-                return try requireItem(on: request, for: list)
-                    .flatMap { item in
-                        let context = ItemPageContext(for: user, and: list, with: item)
-                        return try renderView("User/ItemDeletion", with: context, on: request)
+        return try requireList(on: request, for: user).flatMap { list in
+            return try requireItem(on: request, for: list).flatMap { item in
+                let context = try ItemPageContextBuilder()
+                    .forUser(user)
+                    .forList(list)
+                    .withItem(item)
+                    .build()
+                return try renderView("User/ItemDeletion", with: context, on: request)
+            }
+        }
+    }
+
+    /// Renders a view to select the target list to move an item to.
+    /// This is only accessible for an authenticated user who owns the affected item.
+    private static func renderMoveView(on request: Request) throws
+        -> Future<View>
+    {
+        let user = try requireAuthenticatedUser(on: request)
+
+        return try requireList(on: request, for: user).flatMap { list in
+            return try requireItem(on: request, for: list).flatMap { item in
+                let listContextsBuilder = ListContextsBuilder()
+                    .forUser(user)
+                    .filter { $0.id != list.id }
+                return try listContextsBuilder.build(on: request)
+                    .flatMap { listsContexts in
+                        var context = try ItemPageContextBuilder()
+                            .forUser(user)
+                            .forList(list)
+                            .withItem(item)
+                            .build()
+                        context.userLists = listsContexts
+                        return try renderView("User/ItemMove", with: context, on: request)
                     }
             }
+        }
     }
 
     // MARK: - CRUD
@@ -128,7 +155,12 @@ final class ItemController: ProtectedController, RouteCollection {
         return try request.content
             .decode(ItemPageFormData.self)
             .flatMap { formdata in
-                var context = ItemPageContext(for: user, and: list, with: item, from: formdata)
+                var context = try ItemPageContextBuilder()
+                    .forUser(user)
+                    .forList(list)
+                    .withItem(item)
+                    .withFormData(formdata)
+                    .build()
 
                 return request.future()
                     .flatMap {_ in
@@ -264,6 +296,10 @@ final class ItemController: ProtectedController, RouteCollection {
         router.get(
             "user", ID.parameter, "list", ID.parameter, "item", ID.parameter, "delete",
                 use: ItemController.renderDeleteView
+        )
+        router.get(
+            "user", ID.parameter, "list", ID.parameter, "item", ID.parameter, "move",
+                use: ItemController.renderMoveView
         )
         router.post(
             "user", ID.parameter, "list", ID.parameter, "item", ID.parameter,

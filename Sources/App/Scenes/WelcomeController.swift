@@ -19,10 +19,16 @@ final class WelcomeController: Controller, RouteCollection {
             return try WelcomeController.renderView("Public/Welcome", on: request)
         }
 
-        let lists = try ListsController.buildContexts(for: user, on: request)
-        let favorites = try FavoritesController.buildContexts(for: user, on: request)
-        return flatMap(lists, favorites) { lists, favorites in
-            let context = WelcomePageContext(for: user, lists: lists, favorites: favorites)
+        let listContextsBuilder = ListContextsBuilder().forUser(user).countItems(true)
+        let listContexts = try listContextsBuilder.build(on: request)
+        let favoriteContextsBuilder = FavoriteContextsBuilder().forUser(user).countItems(true)
+        let favoriteContexts = try favoriteContextsBuilder.build(on: request)
+        return flatMap(listContexts, favoriteContexts) { listContexts, favoriteContexts in
+            let context = WelcomePageContext(
+                for: user,
+                lists: listContexts,
+                favorites: favoriteContexts
+            )
             return try renderView("User/Welcome", with: context, on: request)
         }
     }

@@ -10,22 +10,22 @@ final class ItemsController: ProtectedController, SortingController, RouteCollec
         let user = try requireAuthenticatedUser(on: request)
 
         let sorting = getSorting(on: request) ?? .ascending(by: \Item.title)
-        return try requireList(on: request, for: user)
-            .flatMap { list in
-                return try request.make(ItemRepository.self)
-                    .allAndReservations(for: list, sort: list.itemsSorting ?? sorting)
-                    .flatMap(to: View.self, { items in
-                        let context = ItemsPageContext(
-                            for: user,
-                            and: list,
-                            with: items.map { item, reservation in
-                                return ItemContext(for: item, with: reservation)
-                            }
-                        )
-                        return try renderView("User/Items", with: context, on: request)
+        return try requireList(on: request, for: user).flatMap { list in
+            return try request.make(ItemRepository.self)
+                .allAndReservations(for: list, sort: list.itemsSorting ?? sorting)
+                .flatMap(to: View.self, { itemsAndReservations in
+                    let itemContexts = itemsAndReservations.map { item, reservation in
+                        ItemContext(for: item, with: reservation)
                     }
-                )
-            }
+                    let context = try ItemsPageContextBuilder()
+                        .forUser(user)
+                        .forList(list)
+                        .withItemContexts(itemContexts)
+                        .build()
+                    return try renderView("User/Items", with: context, on: request)
+                }
+            )
+        }
     }
 
     // MARK: -

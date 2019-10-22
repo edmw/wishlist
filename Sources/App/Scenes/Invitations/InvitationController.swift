@@ -24,7 +24,7 @@ final class InvitationController: ProtectedController, RouteCollection {
         -> Future<View>
     {
         return try allowView(on: request) { (user) throws in
-            let context = InvitationPageContext(for: user)
+            let context = try InvitationPageContextBuilder().forUser(user).build()
             return try renderView("User/Invitation", with: context, on: request)
         }
     }
@@ -37,10 +37,10 @@ final class InvitationController: ProtectedController, RouteCollection {
         return try allowView(on: request) { (user) throws in
             return try requireInvitation(on: request)
                 .flatMap { invitation in
-                    let context = InvitationPageContext(
-                        for: user,
-                        with: invitation
-                    )
+                    let context = try InvitationPageContextBuilder()
+                        .forUser(user)
+                        .forInvitation(invitation)
+                        .build()
                     return try renderView("User/InvitationRevocation", with: context, on: request)
                 }
         }
@@ -127,7 +127,10 @@ final class InvitationController: ProtectedController, RouteCollection {
         return try request.content
             .decode(InvitationPageFormData.self)
             .flatMap { formdata in
-                var context = InvitationPageContext(for: user, from: formdata)
+                var context = try InvitationPageContextBuilder()
+                    .forUser(user)
+                    .withFormData(formdata)
+                    .build()
 
                 return request.future()
                     .flatMap {

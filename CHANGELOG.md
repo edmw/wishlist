@@ -7,6 +7,12 @@
 [] unreleased
 [x.y.z] released version x.y.z
 
+## [..]
+🎁 Add functionality to move items between wishlists
+
+## [1.3.2]
+🎁 Add pages for legal notice and privacy policy
+
 ## [1.3.1]
 ☘ fix option "Don't spoil my surprises" on lists for notifications
 

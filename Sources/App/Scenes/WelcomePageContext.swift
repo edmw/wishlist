@@ -16,13 +16,13 @@ struct WelcomePageContext: Encodable {
     var maximumNumberOfInvitations: Int
 
     var lists: [ListContext]?
-    var favorites: [ListContext]?
+    var favorites: [FavoriteContext]?
     var invitations: [InvitationContext]?
 
     init(
         for user: User,
         lists: [ListContext]? = nil,
-        favorites: [ListContext]? = nil,
+        favorites: [FavoriteContext]? = nil,
         invitations: [InvitationContext]? = nil
     ) {
         self.userID = ID(user.id)

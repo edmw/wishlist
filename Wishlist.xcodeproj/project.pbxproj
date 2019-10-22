@@ -34,6 +34,10 @@
 /* Begin PBXBuildFile section */
 		4C151D41235903FC00FBF29A /* PrivacyPolicyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C151D40235903FC00FBF29A /* PrivacyPolicyController.swift */; };
 		4C151D432359044600FBF29A /* PrivacyPolicyPageContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C151D422359044600FBF29A /* PrivacyPolicyPageContext.swift */; };
+		4C84EC87235F9FBB00044B40 /* FavoritesPageContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C84EC84235F9FBA00044B40 /* FavoritesPageContext.swift */; };
+		4C84EC88235F9FBB00044B40 /* FavoriteContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C84EC85235F9FBA00044B40 /* FavoriteContext.swift */; };
+		4C84EC89235F9FBB00044B40 /* FavoriteContextsBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C84EC86235F9FBB00044B40 /* FavoriteContextsBuilder.swift */; };
+		4C84EC8B235F9FCC00044B40 /* ListContextsBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C84EC8A235F9FCC00044B40 /* ListContextsBuilder.swift */; };
 		OBJ_1826 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* NotificationManager.swift */; };
 		OBJ_1827 /* Feature.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* Feature.swift */; };
 		OBJ_1828 /* Features.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* Features.swift */; };
@@ -7833,6 +7837,10 @@
 /* Begin PBXFileReference section */
 		4C151D40235903FC00FBF29A /* PrivacyPolicyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyController.swift; sourceTree = "<group>"; };
 		4C151D422359044600FBF29A /* PrivacyPolicyPageContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyPageContext.swift; sourceTree = "<group>"; };
+		4C84EC84235F9FBA00044B40 /* FavoritesPageContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoritesPageContext.swift; sourceTree = "<group>"; };
+		4C84EC85235F9FBA00044B40 /* FavoriteContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoriteContext.swift; sourceTree = "<group>"; };
+		4C84EC86235F9FBB00044B40 /* FavoriteContextsBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoriteContextsBuilder.swift; sourceTree = "<group>"; };
+		4C84EC8A235F9FCC00044B40 /* ListContextsBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListContextsBuilder.swift; sourceTree = "<group>"; };
 		"Auth::Authentication::Product" /* Authentication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Authentication.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Console::Command::Product" /* Command.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Command.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Console::Console::Product" /* Console.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Console.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -13352,7 +13360,7 @@
 			path = Groups;
 			sourceTree = "<group>";
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -13371,7 +13379,6 @@
 				OBJ_1819 /* update.sh */,
 				OBJ_1820 /* update.rb */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_504 /* Lingo 3.0.5 */ = {
@@ -13631,6 +13638,9 @@
 		OBJ_61 /* Favorites */ = {
 			isa = PBXGroup;
 			children = (
+				4C84EC85235F9FBA00044B40 /* FavoriteContext.swift */,
+				4C84EC86235F9FBB00044B40 /* FavoriteContextsBuilder.swift */,
+				4C84EC84235F9FBA00044B40 /* FavoritesPageContext.swift */,
 				OBJ_62 /* FavoriteController.swift */,
 				OBJ_63 /* FavoritesController.swift */,
 			);
@@ -13976,6 +13986,7 @@
 		OBJ_79 /* Lists */ = {
 			isa = PBXGroup;
 			children = (
+				4C84EC8A235F9FCC00044B40 /* ListContextsBuilder.swift */,
 				OBJ_80 /* ListContext.swift */,
 				OBJ_81 /* ListController.swift */,
 				OBJ_82 /* ListPageContext.swift */,
@@ -16864,7 +16875,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_1750 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -17115,6 +17126,7 @@
 				OBJ_1943 /* Controller.swift in Sources */,
 				OBJ_1944 /* ControllerParameter+ID.swift in Sources */,
 				OBJ_1945 /* ControllerParameter+Locator.swift in Sources */,
+				4C84EC87235F9FBB00044B40 /* FavoritesPageContext.swift in Sources */,
 				OBJ_1946 /* ControllerParameter.swift in Sources */,
 				OBJ_1947 /* Future+Logging.swift in Sources */,
 				OBJ_1948 /* Future+Map.swift in Sources */,
@@ -17134,6 +17146,7 @@
 				OBJ_1962 /* RenderParameters.swift in Sources */,
 				OBJ_1963 /* Session+Locator.swift in Sources */,
 				OBJ_1964 /* ID.swift in Sources */,
+				4C84EC88235F9FBB00044B40 /* FavoriteContext.swift in Sources */,
 				OBJ_1965 /* Locator.swift in Sources */,
 				OBJ_1966 /* AnyEncodable.swift in Sources */,
 				OBJ_1967 /* Array.swift in Sources */,
@@ -17151,11 +17164,13 @@
 				OBJ_1979 /* CSRFMiddleware.swift in Sources */,
 				OBJ_1980 /* CachingHeadersMiddleware.swift in Sources */,
 				OBJ_1981 /* ErrorRendererMiddleware.swift in Sources */,
+				4C84EC8B235F9FCC00044B40 /* ListContextsBuilder.swift in Sources */,
 				OBJ_1982 /* ImageFileMiddleware.swift in Sources */,
 				OBJ_1983 /* ImageFileMiddlewareError.swift in Sources */,
 				OBJ_1984 /* SecurityHeadersConfiguration.swift in Sources */,
 				OBJ_1985 /* SecurityHeadersMiddleware.swift in Sources */,
 				OBJ_1986 /* DispatchableJob.swift in Sources */,
+				4C84EC89235F9FBB00044B40 /* FavoriteContextsBuilder.swift in Sources */,
 				OBJ_1987 /* DispatchingError.swift in Sources */,
 				OBJ_1988 /* DispatchingProvider.swift in Sources */,
 				OBJ_1989 /* DispatchingQueue.swift in Sources */,
