@@ -30,7 +30,11 @@
                     <a class="btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/move" title="#L10N("move-item"){Move item}"><svg class="feather"><use xlink:href="/icons/feather.svg#clipboard"/></svg></a>
                     }
                     <a class="btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/edit" title="#L10N("edit-item"){Edit item}"><svg class="feather"><use xlink:href="/icons/feather.svg#edit"/></svg></a>
+                    #if(item.reservationID) {
+                    <a class="btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/reservation/#(item.reservationID)/delete" title="#L10N("release-item"){Release item}"><svg class="feather"><use xlink:href="/icons/feather.svg#x-circle"/></svg></a>
+                    } else {
                     <a class="btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/delete" title="#L10N("delete-item"){Delete item}"><svg class="feather"><use xlink:href="/icons/feather.svg#delete"/></svg></a>
+                    }
                 </div>
             </td>
         </tr>

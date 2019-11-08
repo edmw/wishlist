@@ -10,7 +10,7 @@ class ListContextsBuilder {
 
     var isIncluded: ((List) -> Bool)?
 
-    var countItems: Bool = false
+    var includeItemsCount: Bool = false
 
     @discardableResult
     func forUser(_ user: User) -> Self {
@@ -31,12 +31,12 @@ class ListContextsBuilder {
     }
 
     @discardableResult
-    func countItems(_ countItems: Bool) -> Self {
-        self.countItems = countItems
+    func includeItemsCount(_ includeItemsCount: Bool) -> Self {
+        self.includeItemsCount = includeItemsCount
         return self
     }
 
-    func build(on request: Request) throws -> Future<[ListContext]> {
+    func build(on request: Request) throws -> EventLoopFuture<[ListContext]> {
         guard let user = user else {
             throw ListContextsBuilderError.missingRequiredUser
         }
@@ -59,7 +59,7 @@ class ListContextsBuilder {
                 }
                 return try lists.map { list in
                     var context = ListContext(for: list)
-                    if self.countItems {
+                    if self.includeItemsCount {
                         return try request.make(ItemRepository.self)
                             .count(on: list)
                             .map { count in

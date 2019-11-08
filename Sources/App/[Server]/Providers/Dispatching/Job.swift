@@ -30,10 +30,9 @@ protocol Job {
     /// to wait for the result of a job.
     func run(_ context: JobContext) -> EventLoopFuture<ResultType>
 
-    /// This will be called if the job is overdue.
+    /// This will be called to cancel the job.
     /// - parameter context context in which the job will be executed
-    /// Note: Usually this method should cancel the job.
-    func overdue(_ context: JobContext) -> EventLoopFuture<Void>
+    func cancel(_ context: JobContext) -> EventLoopFuture<Void>
 
     /// This will be called after the job was sucessfully executed.
     /// - parameter context context in which the job will be executed
@@ -44,6 +43,10 @@ protocol Job {
     /// - parameter context context in which the job will be executed
     /// - parameter error error which occured while executing the job
     func failure(_ context: JobContext, _ error: Error) -> EventLoopFuture<Void>
+
+    /// This will be called if the job is overdue.
+    /// - parameter context context in which the job will be executed
+    func overdue(_ context: JobContext) -> EventLoopFuture<Void>
 
 }
 
@@ -63,7 +66,7 @@ private class AnyJobBase: Job {
         fatalError("abstract")
     }
 
-    func overdue(_ context: JobContext) -> EventLoopFuture<Void> {
+    func cancel(_ context: JobContext) -> EventLoopFuture<Void> {
         fatalError("abstract")
     }
 
@@ -75,6 +78,10 @@ private class AnyJobBase: Job {
     }
 
     func failure(_ context: JobContext, _ error: Error) -> EventLoopFuture<Void> {
+        fatalError("abstract")
+    }
+
+    func overdue(_ context: JobContext) -> EventLoopFuture<Void> {
         fatalError("abstract")
     }
 
@@ -110,8 +117,8 @@ fileprivate final class AnyJobBox<Concrete: Job>: AnyJobBase
         return concrete.run(context).map { return SomeJobResult($0) }
     }
 
-    override func overdue(_ context: JobContext) -> EventLoopFuture<Void> {
-        return concrete.overdue(context)
+    override func cancel(_ context: JobContext) -> EventLoopFuture<Void> {
+        return concrete.cancel(context)
     }
 
     override func success(
@@ -126,6 +133,10 @@ fileprivate final class AnyJobBox<Concrete: Job>: AnyJobBase
 
     override func failure(_ context: JobContext, _ error: Error) -> EventLoopFuture<Void> {
         return concrete.failure(context, error)
+    }
+
+    override func overdue(_ context: JobContext) -> EventLoopFuture<Void> {
+        return concrete.overdue(context)
     }
 
     override func equal(to base: AnyJobBase) -> Bool {
@@ -171,8 +182,8 @@ final class AnyJob: Job, Equatable, CustomStringConvertible {
         return anybox.run(context)
     }
 
-    func overdue(_ context: JobContext) -> EventLoopFuture<Void> {
-        return anybox.overdue(context)
+    func cancel(_ context: JobContext) -> EventLoopFuture<Void> {
+        return anybox.cancel(context)
     }
 
     func success(
@@ -184,6 +195,10 @@ final class AnyJob: Job, Equatable, CustomStringConvertible {
 
     func failure(_ context: JobContext, _ error: Error) -> EventLoopFuture<Void> {
         return anybox.failure(context, error)
+    }
+
+    func overdue(_ context: JobContext) -> EventLoopFuture<Void> {
+        return anybox.overdue(context)
     }
 
     static func == (lhs: AnyJob, rhs: AnyJob) -> Bool {

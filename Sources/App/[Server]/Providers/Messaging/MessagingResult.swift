@@ -1,4 +1,4 @@
 public enum MessagingResult {
-    case success(_ message: Message)
-    case failure(_ message: Message, error: MessagingError)
+    case success(_ messaging: Messaging)
+    case failure(_ messaging: Messaging, error: MessagingError)
 }

@@ -4,25 +4,25 @@ final class SettingsNotificationsController: ProtectedController, RouteCollectio
 
     // MARK: - VIEWS
 
-    static func testNotifications(on request: Request) throws -> Future<View> {
+    static func testNotifications(on request: Request) throws -> EventLoopFuture<View> {
         let user = try requireAuthenticatedUser(on: request)
 
         return try SettingsNotificationsNotification(for: user).send(on: request)
-            .flatMap { sendResult -> Future<View> in
+            .flatMap { sendResult -> EventLoopFuture<View> in
                 let context = SettingsNotificationsPageContext(sendResult, for: user)
-                return try renderView("User/SettingsNotifications", with: context, on: request)
+                return try renderView("User/SettingsNotificationsSent", with: context, on: request)
             }
-            .catchFlatMap(DispatchingError.self) { _ -> Future<View> in
+            .catchFlatMap(DispatchingError.self) { _ -> EventLoopFuture<View> in
                 let context = SettingsNotificationsPageContext(for: user)
-                return try renderView("User/SettingsNotifications", with: context, on: request)
+                return try renderView("User/SettingsNotificationsSent", with: context, on: request)
             }
     }
 
     // MARK: -
 
-    private static func dispatch(on request: Request) throws -> Future<Response> {
+    private static func dispatch(on request: Request) throws -> EventLoopFuture<Response> {
         return try method(of: request)
-            .flatMap { method -> Future<Response> in
+            .flatMap { method -> EventLoopFuture<Response> in
                 switch method {
                 default:
                     throw Abort(.methodNotAllowed)

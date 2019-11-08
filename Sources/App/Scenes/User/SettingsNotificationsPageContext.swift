@@ -30,21 +30,21 @@ struct SettingsNotificationsPageContext: Encodable {
         self.results = []
     }
 
-    init(_ result: SendNotificationResult, for user: User) {
+    init(_ result: SendMessageResult, for user: User) {
         self.userID = ID(user.id)
 
         self.success = result.success
 
         self.results = result.messaging.map { result -> NotificationResultContext in
             switch result {
-            case let .success(message):
-                return .init(message.serviceType, true, 0)
-            case let .failure(message, error):
+            case let .success(messaging):
+                return .init(messaging.serviceType, true, 0)
+            case let .failure(messaging, error):
                 switch error {
                 case let .response(status):
-                    return .init(message.serviceType, false, status)
+                    return .init(messaging.serviceType, false, status)
                 default:
-                    return .init(message.serviceType, false, 500)
+                    return .init(messaging.serviceType, false, 500)
                 }
             }
         }

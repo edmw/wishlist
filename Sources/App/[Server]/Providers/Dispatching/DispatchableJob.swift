@@ -30,9 +30,8 @@ class DispatchableJob<R: JobResult>: Job, Equatable, CustomStringConvertible {
         return context.eventLoop.future(error: DispatchingError.noWork)
     }
 
-    func overdue(_ context: JobContext) -> EventLoopFuture<Void> {
+    func cancel(_ context: JobContext) -> EventLoopFuture<Void> {
         self.cancelled = true
-        completedPromise.fail(error: DispatchingError.overdue)
         return context.eventLoop.future(())
     }
 
@@ -43,6 +42,11 @@ class DispatchableJob<R: JobResult>: Job, Equatable, CustomStringConvertible {
 
     func failure(_ context: JobContext, _ error: Error) -> EventLoopFuture<Void> {
         completedPromise.fail(error: error)
+        return context.eventLoop.future(())
+    }
+
+    func overdue(_ context: JobContext) -> EventLoopFuture<Void> {
+        completedPromise.fail(error: DispatchingError.overdue)
         return context.eventLoop.future(())
     }
 

@@ -27,6 +27,7 @@ import Vapor
 struct Site: Codable, CustomDebugStringConvertible, ServiceType {
 
     let url: URL
+    let urlComponents: URLComponents
 
     let release: SiteRelease
 
@@ -38,6 +39,24 @@ struct Site: Codable, CustomDebugStringConvertible, ServiceType {
             release: Environment.require(.siteRelease),
             access: Environment.require(.siteAccess)
         )
+    }
+
+    private init(url: URL, release: SiteRelease, access: SiteAccess) {
+        self.url = url
+        guard let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
+            // fail early
+            fatalError("Invalid site URL '\(url)'")
+        }
+        self.urlComponents = urlComponents
+        self.release = release
+        self.access = access
+    }
+
+    func url(withPath path: String, andQueryItems items: [String: String] = [:]) -> URL? {
+        var urlComponents = self.urlComponents
+        urlComponents.path = path
+        urlComponents.appendQueryItems(items)
+        return urlComponents.url
     }
 
     // MARK: - CustomDebugStringConvertible

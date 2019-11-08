@@ -26,7 +26,7 @@ final class WishlistController: ProtectedController, SortingController, RouteCol
         identification: Identification,
         user: User?,
         on request: Request
-    ) throws -> Future<View> {
+    ) throws -> EventLoopFuture<View> {
         let sorting = getSorting(on: request) ?? .ascending(by: \Item.title)
         // get all items and their reservations and render page
         return try request.make(ItemRepository.self)
@@ -37,13 +37,15 @@ final class WishlistController: ProtectedController, SortingController, RouteCol
                         let (item, reservation) = result
                         return ItemContext(for: item, with: reservation)
                     }
-                return WishlistPageContext(
-                    for: list,
-                    of: owner,
-                    with: itemContexts,
-                    user: user,
-                    identification: identification
-                )
+                var contextBuilder = WishlistPageContextBuilder()
+                    .forList(list)
+                    .forOwner(owner)
+                    .withItems(itemContexts)
+                    .forIdentification(identification)
+                if let user = user {
+                    contextBuilder = contextBuilder.withUser(user)
+                }
+                return try contextBuilder.build()
             }
             .flatMap(to: WishlistPageContext.self) { context in
                 // if user is present check if list is a favorite list
@@ -72,7 +74,7 @@ final class WishlistController: ProtectedController, SortingController, RouteCol
     }
 
     /// Renders the view for a wishlist.
-    private static func renderView(on request: Request) throws -> Future<View> {
+    private static func renderView(on request: Request) throws -> EventLoopFuture<View> {
         let user = try getAuthenticatedUser(on: request)
 
         let identification = try user?.identification ?? requireIdentification(on: request)

@@ -61,6 +61,8 @@ func routes(
 
     try user.register(collection: InvitationController())
 
+    try user.register(collection: ReservationControllerForOwner())
+
     // protected routes
 
     let protectedRoutes = router.grouped(

@@ -1,8 +1,10 @@
 import Vapor
 
-extension Future {
+extension EventLoopFuture {
 
-    public func handleAuthorizationError(on request: Request) throws -> Future<Expectation> {
+    public func handleAuthorizationError(on request: Request)
+        throws -> EventLoopFuture<Expectation>
+    {
         return catchFlatMap(AuthorizationError.self) { error in
             request.logger?.application.debug("\(error)")
             switch error {

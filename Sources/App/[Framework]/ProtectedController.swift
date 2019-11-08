@@ -6,7 +6,7 @@ class ProtectedController: Controller {
 
     /// Returns the list specified by the list id given in the request’s route.
     /// Asumes that the list’s id is the next routing parameter!
-    static func requireList(on request: Request) throws -> Future<List> {
+    static func requireList(on request: Request) throws -> EventLoopFuture<List> {
         let listID = try request.parameters.next(ID.self)
         return try request.make(ListRepository.self)
             .find(by: listID.uuid)
@@ -16,7 +16,7 @@ class ProtectedController: Controller {
     /// Returns the list specified by the list id given in the request’s route.
     /// Asumes that the list’s id is the next routing parameter!
     /// The list must be owned by the specified user.
-    static func requireList(on request: Request, for user: User) throws -> Future<List> {
+    static func requireList(on request: Request, for user: User) throws -> EventLoopFuture<List> {
         let listID = try request.parameters.next(ID.self)
         return try request.make(ListRepository.self)
             .find(by: listID.uuid, for: user)
@@ -26,7 +26,7 @@ class ProtectedController: Controller {
     /// Returns the item specified by the item id given in the request’s route.
     /// Asumes that the item’s id is the next routing parameter!
     /// The item must part of the specified list.
-    static func requireItem(on request: Request, for list: List) throws -> Future<Item> {
+    static func requireItem(on request: Request, for list: List) throws -> EventLoopFuture<Item> {
         let itemID = try request.parameters.next(ID.self)
         return try request.make(ItemRepository.self)
             .find(by: itemID.uuid, in: list)
@@ -36,7 +36,9 @@ class ProtectedController: Controller {
     /// Returns the favorite specified by the favorite id given in the request’s route.
     /// Asumes that the favorite id is the next routing parameter!
     /// The favorite must be owned by the specified user.
-    static func requireFavorite(on request: Request, for user: User) throws -> Future<Favorite> {
+    static func requireFavorite(on request: Request, for user: User)
+        throws -> EventLoopFuture<Favorite>
+    {
         let favoriteID = try request.parameters.next(ID.self)
         return try request.make(FavoriteRepository.self)
             .find(by: favoriteID.uuid, for: user)

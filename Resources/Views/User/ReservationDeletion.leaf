@@ -10,7 +10,7 @@
         <a class="nav-link btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/items">#L10N("cancel"){Cancel}</a>
     </div>
     <div class="alert alert-warning" role="alert">
-        <strong>Please note:</strong> The user who reserved this item will <strong>not</strong> be notified if you'll decide to delete the reservation!
+        #L10N("delete-reservation-warning"){<strong>Please note:</strong> The user who reserved this item will <strong>not</strong> be notified if you'll decide to delete the reservation!}
     </div>
 </form>
 }

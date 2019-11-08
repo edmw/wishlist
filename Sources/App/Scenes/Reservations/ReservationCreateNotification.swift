@@ -1,6 +1,6 @@
 import Vapor
 
-final class ReservationCreateNotification: Notification {
+final class ReservationCreateNotification: UserNotification {
 
     init(for user: User, on item: Item, in list: List) {
         let template: String

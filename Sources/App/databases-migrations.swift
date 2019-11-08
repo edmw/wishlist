@@ -49,7 +49,7 @@ func databasesMigrations(
 
 struct RenameUserName: MySQLMigration {
 
-    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection.assertFieldMustNotExist(\User.fullName) {
             return connection
                 .raw("ALTER TABLE User CHANGE COLUMN name fullName VARCHAR(255) NOT NULL")
@@ -57,7 +57,7 @@ struct RenameUserName: MySQLMigration {
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> Future<Void> {
+    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
             .raw("ALTER TABLE User CHANGE COLUMN fullName name VARCHAR(255) NOT NULL")
             .run()
@@ -67,7 +67,7 @@ struct RenameUserName: MySQLMigration {
 
 struct AddUserSettings: MySQLMigration {
 
-    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
             .assertFieldMustNotExist(\User.settings) {
                 return Database.update(User.self, on: connection) { builder in
@@ -76,7 +76,7 @@ struct AddUserSettings: MySQLMigration {
             }
     }
 
-    static func revert(on connection: MySQLConnection) -> Future<Void> {
+    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(User.self, on: connection) { builder in
             builder.deleteField(for: \.settings)
         }
@@ -86,13 +86,13 @@ struct AddUserSettings: MySQLMigration {
 
 struct AddUserNickName: MySQLMigration {
 
-    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(User.self, on: connection) { builder in
             builder.field(for: \.nickName)
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> Future<Void> {
+    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(User.self, on: connection) { builder in
             builder.deleteField(for: \.nickName)
         }
@@ -102,13 +102,13 @@ struct AddUserNickName: MySQLMigration {
 
 struct AddUserConfidant: MySQLMigration {
 
-    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(User.self, on: connection) { builder in
             builder.field(for: \.confidant)
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> Future<Void> {
+    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(User.self, on: connection) { builder in
             builder.deleteField(for: \.confidant)
         }
@@ -118,13 +118,13 @@ struct AddUserConfidant: MySQLMigration {
 
 struct AddUserIdentificationIndex: MySQLMigration {
 
-    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(User.self, on: connection) { builder in
             builder.unique(on: \.identification)
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> Future<Void> {
+    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(User.self, on: connection) { builder in
             builder.deleteUnique(from: \.identification)
         }
@@ -136,7 +136,7 @@ struct AddUserIdentificationIndex: MySQLMigration {
 
 struct RenameListName: MySQLMigration {
 
-    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection.assertFieldMustNotExist(\List.title) {
             return connection
                 .raw("ALTER TABLE List CHANGE COLUMN name title VARCHAR(255) NOT NULL")
@@ -144,7 +144,7 @@ struct RenameListName: MySQLMigration {
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> Future<Void> {
+    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
             .raw("ALTER TABLE List CHANGE COLUMN title name VARCHAR(255) NOT NULL")
             .run()
@@ -154,7 +154,7 @@ struct RenameListName: MySQLMigration {
 
 struct AddListOptions: MySQLMigration {
 
-    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection.assertFieldMustNotExist(\List.options) {
             return Database.update(List.self, on: connection) { builder in
                 builder.field(for: \.options)
@@ -162,7 +162,7 @@ struct AddListOptions: MySQLMigration {
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> Future<Void> {
+    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(List.self, on: connection) { builder in
             builder.deleteField(for: \.options)
         }
@@ -172,13 +172,13 @@ struct AddListOptions: MySQLMigration {
 
 struct AddListItemsSorting: MySQLMigration {
 
-    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(List.self, on: connection) { builder in
             builder.field(for: \.itemsSorting)
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> Future<Void> {
+    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(List.self, on: connection) { builder in
             builder.deleteField(for: \.itemsSorting)
         }
@@ -188,13 +188,13 @@ struct AddListItemsSorting: MySQLMigration {
 
 struct RenameListModifiedOnColumn: MySQLMigration {
 
-    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
             .raw("ALTER TABLE List CHANGE modifiedOn modifiedAt DATETIME(6) NOT NULL")
             .run()
     }
 
-    static func revert(on connection: MySQLConnection) -> Future<Void> {
+    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
             .raw("ALTER TABLE List CHANGE modifiedAt modifiedOn DATETIME(6) NOT NULL")
             .run()
@@ -204,13 +204,13 @@ struct RenameListModifiedOnColumn: MySQLMigration {
 
 struct RenameListCreatedOnColumn: MySQLMigration {
 
-    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
             .raw("ALTER TABLE List CHANGE createdOn createdAt DATETIME(6) NOT NULL")
             .run()
     }
 
-    static func revert(on connection: MySQLConnection) -> Future<Void> {
+    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
             .raw("ALTER TABLE List CHANGE createdAt createdOn DATETIME(6) NOT NULL")
             .run()
@@ -220,13 +220,13 @@ struct RenameListCreatedOnColumn: MySQLMigration {
 
 struct AddListForeignKeyConstraint: MySQLMigration {
 
-    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(List.self, on: connection) { builder in
             builder.reference(from: \.userID, to: \User.id, onDelete: .cascade)
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> Future<Void> {
+    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(List.self, on: connection) { builder in
             builder.deleteReference(from: \.userID, to: \User.id)
         }
@@ -238,7 +238,7 @@ struct AddListForeignKeyConstraint: MySQLMigration {
 
 struct RenameItemName: MySQLMigration {
 
-    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection.assertFieldMustNotExist(\Item.title) {
             return connection
                 .raw("ALTER TABLE Item CHANGE COLUMN name title VARCHAR(255) NOT NULL")
@@ -246,7 +246,7 @@ struct RenameItemName: MySQLMigration {
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> Future<Void> {
+    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
             .raw("ALTER TABLE Item CHANGE COLUMN title name VARCHAR(255) NOT NULL")
             .run()
@@ -256,13 +256,13 @@ struct RenameItemName: MySQLMigration {
 
 struct AddItemPreference: MySQLMigration {
 
-    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(Item.self, on: connection) { builder in
             builder.field(for: \.preference, type: .tinyint, .default(0))
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> Future<Void> {
+    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(Item.self, on: connection) { builder in
             builder.deleteField(for: \.preference)
         }
@@ -272,13 +272,13 @@ struct AddItemPreference: MySQLMigration {
 
 struct RenameItemModifiedOnColumn: MySQLMigration {
 
-    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
             .raw("ALTER TABLE Item CHANGE modifiedOn modifiedAt DATETIME(6) NOT NULL")
             .run()
     }
 
-    static func revert(on connection: MySQLConnection) -> Future<Void> {
+    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
             .raw("ALTER TABLE Item CHANGE modifiedAt modifiedOn DATETIME(6) NOT NULL")
             .run()
@@ -288,13 +288,13 @@ struct RenameItemModifiedOnColumn: MySQLMigration {
 
 struct RenameItemCreatedOnColumn: MySQLMigration {
 
-    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
             .raw("ALTER TABLE Item CHANGE createdOn createdAt DATETIME(6) NOT NULL")
             .run()
     }
 
-    static func revert(on connection: MySQLConnection) -> Future<Void> {
+    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
             .raw("ALTER TABLE Item CHANGE createdAt createdOn DATETIME(6) NOT NULL")
             .run()
@@ -304,13 +304,13 @@ struct RenameItemCreatedOnColumn: MySQLMigration {
 
 struct AddItemForeignKeyConstraint: MySQLMigration {
 
-    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(Item.self, on: connection) { builder in
             builder.reference(from: \.listID, to: \List.id, onDelete: .cascade)
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> Future<Void> {
+    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(Item.self, on: connection) { builder in
             builder.deleteReference(from: \.listID, to: \List.id)
         }
@@ -322,13 +322,13 @@ struct AddItemForeignKeyConstraint: MySQLMigration {
 
 struct AddInvitationInvitee: MySQLMigration {
 
-    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(Invitation.self, on: connection) { builder in
             builder.field(for: \.invitee)
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> Future<Void> {
+    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(Invitation.self, on: connection) { builder in
             builder.deleteField(for: \.invitee)
         }
@@ -340,13 +340,13 @@ struct AddInvitationInvitee: MySQLMigration {
 
 struct RenameReservationCreatedOnColumn: MySQLMigration {
 
-    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
             .raw("ALTER TABLE Reservation CHANGE createdOn createdAt DATETIME(6) NOT NULL")
             .run()
     }
 
-    static func revert(on connection: MySQLConnection) -> Future<Void> {
+    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
             .raw("ALTER TABLE Reservation CHANGE createdAt createdOn DATETIME(6) NOT NULL")
             .run()
@@ -356,13 +356,13 @@ struct RenameReservationCreatedOnColumn: MySQLMigration {
 
 struct AddReservationForeignKeyConstraint: MySQLMigration {
 
-    static func prepare(on connection: MySQLConnection) -> Future<Void> {
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(Reservation.self, on: connection) { builder in
             builder.reference(from: \.itemID, to: \Item.id, onDelete: .cascade)
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> Future<Void> {
+    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(Reservation.self, on: connection) { builder in
             builder.deleteReference(from: \.itemID, to: \Item.id)
         }

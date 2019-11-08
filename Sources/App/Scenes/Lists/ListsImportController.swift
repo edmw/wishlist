@@ -9,7 +9,7 @@ final class ListsImportController: ProtectedController, RouteCollection {
 
     // MARK: - VIEWS
 
-    private static func renderImportView(on request: Request) throws -> Future<View> {
+    private static func renderImportView(on request: Request) throws -> EventLoopFuture<View> {
         let user = try requireAuthenticatedUser(on: request)
 
         let context = ListsPageContext(for: user)
@@ -18,7 +18,7 @@ final class ListsImportController: ProtectedController, RouteCollection {
 
     // MARK: - EXTRA
 
-    private static func importList(on request: Request) throws -> Future<Response> {
+    private static func importList(on request: Request) throws -> EventLoopFuture<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
         return try request.content.decode(ListFileUpload.self)
@@ -41,6 +41,7 @@ final class ListsImportController: ProtectedController, RouteCollection {
                         return try ListController
                             .store(data.with(title: title), for: user, on: request)
                             .emitEvent("created for \(user)", on: request)
+                            .logMessage("created for \(user)", on: request)
                             .transform(to: success(for: user, on: request))
                     }
             }
@@ -62,7 +63,7 @@ final class ListsImportController: ProtectedController, RouteCollection {
 
     /// Returns a sucess response on an import request.
     /// Not implemented yet: REST response
-    private static func success(for user: User, on request: Request) -> Future<Response> {
+    private static func success(for user: User, on request: Request) -> EventLoopFuture<Response> {
         // to add real REST support, check the accept header for json and output a json response
         if let locator = request.query.getLocator(is: .local) {
             return request.eventLoop.newSucceededFuture(
@@ -82,7 +83,7 @@ final class ListsImportController: ProtectedController, RouteCollection {
         on request: Request,
         with context: ListsPageContext
     ) throws
-        -> Future<Response>
+        -> EventLoopFuture<Response>
     {
         // to add real REST support, check the accept header for json and output a json response
         return try renderView("User/ListsImportError", with: context, on: request)

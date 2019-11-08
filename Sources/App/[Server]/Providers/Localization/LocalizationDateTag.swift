@@ -11,7 +11,7 @@ final class LocalizationDateTag: TagRenderer {
     init() {
     }
 
-    func render(tag: TagContext) throws -> Future<TemplateData> {
+    func render(tag: TagContext) throws -> EventLoopFuture<TemplateData> {
         try tag.requireParameterCount(1)
         let interval = tag.parameters[0].double
 
@@ -32,7 +32,7 @@ final class LocalizationDateTag: TagRenderer {
         }
 
         let string = localized ?? "�"
-        return Future.map(on: tag) { .string(string) }
+        return EventLoopFuture.map(on: tag) { .string(string) }
     }
 
 }

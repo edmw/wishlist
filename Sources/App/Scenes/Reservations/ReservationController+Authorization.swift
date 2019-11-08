@@ -6,8 +6,8 @@ extension ReservationController {
 
     static func authorizeList(
         on request: Request,
-        _ function: @escaping (Identification, List) throws -> Future<Response>
-    ) throws -> Future<Response> {
+        _ function: @escaping (Identification, List) throws -> EventLoopFuture<Response>
+    ) throws -> EventLoopFuture<Response> {
 
         let user = try getAuthenticatedUser(on: request)
 
@@ -30,8 +30,8 @@ extension ReservationController {
     static func authorizeReservation(
         on request: Request,
         with identification: Identification,
-        _ function: @escaping (Reservation) throws -> Future<Response>
-    ) throws -> Future<Response> {
+        _ function: @escaping (Reservation) throws -> EventLoopFuture<Response>
+    ) throws -> EventLoopFuture<Response> {
 
         // get reservation from request
         return try requireReservation(on: request)

@@ -4,11 +4,11 @@ import Fluent
 final class InvitationsController: ProtectedController, RouteCollection {
 
     static func buildContexts(for user: User, on request: Request) throws
-        -> Future<[InvitationContext]>
+        -> EventLoopFuture<[InvitationContext]>
     {
         return try request.make(InvitationRepository.self)
             .all(for: user)
-            .flatMap { (invitations) throws -> Future<[InvitationContext]> in
+            .flatMap { (invitations) throws -> EventLoopFuture<[InvitationContext]> in
                 let contexts = try invitations.map { (invitation) throws -> InvitationContext in
                     InvitationContext(for: invitation)
                 }

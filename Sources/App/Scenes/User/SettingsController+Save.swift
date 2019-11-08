@@ -1,0 +1,75 @@
+import Vapor
+import Fluent
+
+extension SettingsController {
+
+    // MARK: Save
+
+    // MARK: Save
+
+    enum SaveResult {
+        case success(settings: UserSettings)
+        case failure(context: SettingsPageContext)
+    }
+
+    /// Saves settings for the specified user from the request’s data.
+    /// Validates the data contained in the request and updates the user.
+    static func save(
+        from request: Request,
+        for user: User
+    ) throws
+        -> EventLoopFuture<SaveResult>
+    {
+        return try request.content
+            .decode(SettingsPageFormData.self)
+            .flatMap { formdata in
+                var context = try SettingsPageContextBuilder()
+                    .forUser(user)
+                    .withFormData(formdata)
+                    .build()
+
+                return request.future()
+                    .flatMap {
+                        return try save(from: formdata, for: user, on: request)
+                            .map { settings in .success(settings: settings) }
+                    }
+                    .catchMap(ValidationError.self) { error in
+                        // WORKAROUND: See https://github.com/vapor/validation/issues/26
+                        // This is a hack which parses the textual reason for an validation error.
+                        let reason = error.reason
+                        if reason.contains("'pushoverkey' missing") {
+                            context.form.missingPushoverKey = true
+                        }
+                        else {
+                            context.form.invalidPushoverKey =
+                                reason.contains("'notifications.pushoverKey'")
+                        }
+                        return .failure(context: context)
+                    }
+            }
+    }
+
+    /// Saves settings from the given form data.
+    /// Validates the data, checks the constraints required for an updated user and updates an
+    /// existing user.
+    ///
+    /// Throws `EntityError`s for invalid data or violated constraints.
+    private static func save(
+        from formdata: SettingsPageFormData,
+        for user: User,
+        on request: Request
+    ) throws
+        -> EventLoopFuture<UserSettings>
+    {
+        let userRepository = try request.make(UserRepository.self)
+
+        var settings = user.settings
+        settings.update(from: formdata)
+        try settings.validate()
+        user.settings = settings
+        return userRepository
+            .save(user: user)
+            .transform(to: settings)
+    }
+
+}

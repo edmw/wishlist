@@ -2,7 +2,7 @@ import Vapor
 
 protocol SortingController {
 
-    associatedtype Sorting: ModelQuerySorting
+    associatedtype Sorting: AnyEntitySorting
 
     static func getSorting(on request: Request) -> Sorting?
 

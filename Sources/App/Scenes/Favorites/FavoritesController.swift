@@ -6,13 +6,13 @@ final class FavoritesController: ProtectedController, SortingController, RouteCo
 
     // MARK: - VIEWS
 
-    private static func renderView(on request: Request) throws -> Future<View> {
+    private static func renderView(on request: Request) throws -> EventLoopFuture<View> {
         let user = try requireAuthenticatedUser(on: request)
 
         let favoriteContextsBuilder = FavoriteContextsBuilder()
             .forUser(user)
             .withSorting(getSorting(on: request) ?? .ascending(by: \List.title))
-            .countItems(true)
+            .includeItemsCount(true)
         return try favoriteContextsBuilder.build(on: request)
             .flatMap {
                 let context = FavoritesPageContext(for: user, with: $0)

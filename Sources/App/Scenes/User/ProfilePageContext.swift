@@ -22,7 +22,7 @@ struct ProfilePageContext: Encodable {
 
     var form: ProfilePageFormContext
 
-    init(
+    fileprivate init(
         for user: User,
         invitations: [InvitationContext]? = nil,
         from data: ProfilePageFormData? = nil
@@ -46,6 +46,50 @@ struct ProfilePageContext: Encodable {
         self.invitations = invitations
 
         self.form = ProfilePageFormContext(from: data)
+    }
+
+}
+
+// MARK: - Builder
+
+enum ProfilePageContextBuilderError: Error {
+    case missingRequiredUser
+}
+
+class ProfilePageContextBuilder {
+
+    var user: User?
+    var invitations: [InvitationContext]?
+
+    var formData: ProfilePageFormData?
+
+    @discardableResult
+    func forUser(_ user: User) -> Self {
+        self.user = user
+        return self
+    }
+
+    @discardableResult
+    func withInvitations(_ invitations: [InvitationContext]) -> Self {
+        self.invitations = invitations
+        return self
+    }
+
+    @discardableResult
+    func withFormData(_ formData: ProfilePageFormData?) -> Self {
+        self.formData = formData
+        return self
+    }
+
+    func build() throws -> ProfilePageContext {
+        guard let user = user else {
+            throw ProfilePageContextBuilderError.missingRequiredUser
+        }
+        return ProfilePageContext(
+            for: user,
+            invitations: invitations,
+            from: formData
+        )
     }
 
 }

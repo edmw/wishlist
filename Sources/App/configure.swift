@@ -58,7 +58,7 @@ public func configure(
 
     // logger which can be used while configuring
     let logger = BasicLogger(
-        level: environment.isRelease ? .error : .verbose,
+        level: environment.isRelease ? .error : .debug,
         tag: "CONFIG"
     )
 
@@ -184,7 +184,7 @@ public func configure(
 
     // MARK: Managers
 
-    services.register(NotificationManager.self)
+    services.register(UserNotificationManager.self)
 
     //
 

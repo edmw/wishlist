@@ -26,8 +26,8 @@ final class ErrorRendererMiddleware: Middleware, ServiceType {
     func respond(
         to request: Request,
         chainingTo next: Responder
-    ) throws -> Future<Response> {
-        let response: Future<Response>
+    ) throws -> EventLoopFuture<Response> {
+        let response: EventLoopFuture<Response>
         do {
             // get response from next responder
             response = try next.respond(to: request)
@@ -40,7 +40,7 @@ final class ErrorRendererMiddleware: Middleware, ServiceType {
             return try self.renderError(for: request, status: HTTPStatus(for: error))
         }
         return response
-            .flatMap { response -> Future<Response> in
+            .flatMap { response -> EventLoopFuture<Response> in
                 // handle response
                 // if status code indicates an error render it
                 guard response.http.status.code < HTTPResponseStatus.badRequest.code else {
@@ -48,7 +48,7 @@ final class ErrorRendererMiddleware: Middleware, ServiceType {
                 }
                 return try response.encode(for: request)
             }
-            .catchFlatMap { error -> Future<Response> in
+            .catchFlatMap { error -> EventLoopFuture<Response> in
                 // handle failed response
                 request.requireLogger().error(
                     "Error while processing request: \(error), path: \(request.http.url)"
@@ -60,7 +60,7 @@ final class ErrorRendererMiddleware: Middleware, ServiceType {
     private func renderError(
         for request: Request,
         status: HTTPStatus
-    ) throws -> Future<Response> {
+    ) throws -> EventLoopFuture<Response> {
         request.requireLogger().info(
             "Render error page for status: \(status.code), path: \(request.http.url)"
         )
@@ -72,7 +72,7 @@ final class ErrorRendererMiddleware: Middleware, ServiceType {
         for request: Request,
         with status: HTTPStatus,
         on renderer: ViewRenderer
-    ) throws -> Future<Response> {
+    ) throws -> EventLoopFuture<Response> {
         let logger = request.requireLogger()
 
         if status == .notFound {
@@ -83,7 +83,7 @@ final class ErrorRendererMiddleware: Middleware, ServiceType {
                     response.http.status = status
                     return response
                 }
-                .catchFlatMap { error -> Future<Response> in
+                .catchFlatMap { error -> EventLoopFuture<Response> in
                     logger.error("Failed to render 404 error page - \(error)")
                     return try self.renderServerErrorPage(
                         for: request, with: status, on: renderer
@@ -98,7 +98,7 @@ final class ErrorRendererMiddleware: Middleware, ServiceType {
                     response.http.status = status
                     return response
                 }
-                .catchFlatMap { error -> Future<Response> in
+                .catchFlatMap { error -> EventLoopFuture<Response> in
                     logger.error("Failed to render 401 error page - \(error)")
                     return try self.renderServerErrorPage(
                         for: request, with: status, on: renderer
@@ -114,7 +114,7 @@ final class ErrorRendererMiddleware: Middleware, ServiceType {
         for request: Request,
         with status: HTTPStatus,
         on renderer: ViewRenderer
-    ) throws -> Future<Response> {
+    ) throws -> EventLoopFuture<Response> {
         let logger = request.requireLogger()
 
         return try renderer
@@ -124,7 +124,7 @@ final class ErrorRendererMiddleware: Middleware, ServiceType {
                 response.http.status = status
                 return response
             }
-            .catchFlatMap { error -> Future<Response> in
+            .catchFlatMap { error -> EventLoopFuture<Response> in
                 logger.error("Failed to render server error page - \(error)")
 
                 let body = "<h1>Internal Error</h1><p>There was an internal error." +
@@ -171,7 +171,7 @@ extension ViewRenderer {
         _ context: [String: AnyEncodable],
         request: Request,
         status: HTTPStatus
-    ) -> Future<View> {
+    ) -> EventLoopFuture<View> {
         return render(template, context.updating([
             "error": "\(status.code)",
             "status": status.code.description,

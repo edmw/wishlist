@@ -161,11 +161,11 @@ final class DispatchingService: Service {
             // overdue job
             logger.error("Dispatching: Job \(job) overdue")
             futures.append(
-                job.overdue(context)
-                    .map { _ in
-                        return self.queue.dequeue(job)
+                job.cancel(context).flatMap { _ in
+                    return job.overdue(context).map { _ in
+                        self.queue.dequeue(job)
                     }
-                    .transform(to: ())
+                }
             )
         }
 

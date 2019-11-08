@@ -8,7 +8,7 @@ final class ItemController: ProtectedController, RouteCollection {
     /// Renders a form view for creating or updating an item.
     /// This is only accessible for an authenticated user who owns the selected list.
     private static func renderFormView(on request: Request) throws
-        -> Future<View>
+        -> EventLoopFuture<View>
     {
         let user = try requireAuthenticatedUser(on: request)
 
@@ -43,7 +43,7 @@ final class ItemController: ProtectedController, RouteCollection {
     /// Renders a view to confirm the deletion of an item.
     /// This is only accessible for an authenticated user who owns the affected item.
     private static func renderDeleteView(on request: Request) throws
-        -> Future<View>
+        -> EventLoopFuture<View>
     {
         let user = try requireAuthenticatedUser(on: request)
 
@@ -62,7 +62,7 @@ final class ItemController: ProtectedController, RouteCollection {
     /// Renders a view to select the target list to move an item to.
     /// This is only accessible for an authenticated user who owns the affected item.
     private static func renderMoveView(on request: Request) throws
-        -> Future<View>
+        -> EventLoopFuture<View>
     {
         let user = try requireAuthenticatedUser(on: request)
 
@@ -89,18 +89,30 @@ final class ItemController: ProtectedController, RouteCollection {
 
     // Creates an item with the given data. The item will be part of the specified list.
     // The list must belong to the authenticated user.
-    private static func create(on request: Request) throws -> Future<Response> {
+    private static func create(on request: Request) throws -> EventLoopFuture<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
         return try requireList(on: request, for: user)
             .flatMap { list in
                 return try save(from: request, for: user, and: list)
+                    .flatMap { result in
+                        switch result {
+                        case let .success(item, list):
+                            return try request.future(item)
+                                .setup(on: request)
+                                .emitEvent("created for \(user)", on: request)
+                                .logMessage("created for \(user)", on: request)
+                                .transform(to: success(for: user, and: list, on: request))
+                        case .failure(let context):
+                            return try failure(on: request, with: context)
+                        }
+                    }
             }
     }
 
     // Updates the specified item with the given data. The item must be part of the specified list.
     // The list must belong to the authenticated user.
-    private static func update(on request: Request) throws -> Future<Response> {
+    private static func update(on request: Request) throws -> EventLoopFuture<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
         return try requireList(on: request, for: user)
@@ -108,6 +120,17 @@ final class ItemController: ProtectedController, RouteCollection {
                 return try requireItem(on: request, for: list)
                     .flatMap { item in
                         return try save(from: request, for: user, and: list, this: item)
+                            .flatMap { result in
+                                switch result {
+                                case let .success(item, list):
+                                    return request.future(item)
+                                        .setup(on: request)
+                                        .logMessage("updated for \(user)", on: request)
+                                        .transform(to: success(for: user, and: list, on: request))
+                                case .failure(let context):
+                                    return try failure(on: request, with: context)
+                                }
+                            }
                     }
             }
     }
@@ -116,7 +139,7 @@ final class ItemController: ProtectedController, RouteCollection {
     // belong to the authenticated user.
     // Performs a cleanup for the item to be deleted which includes removal of attached images.
     // Items with existing reservations can not be deleted and result in a 409 conflict error.
-    private static func delete(on request: Request) throws -> Future<Response> {
+    private static func delete(on request: Request) throws -> EventLoopFuture<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
         return try requireList(on: request, for: user)
@@ -132,95 +155,9 @@ final class ItemController: ProtectedController, RouteCollection {
                         return item
                     }
                     .cleanup(on: request)
-                    .delete(on: request)
+                    .deleteModel(on: request)
                     .emitEvent("deleted for \(user)", on: request)
-                    .transform(to: success(for: user, and: list, on: request))
-            }
-    }
-
-    /// Saves an item for the specified user and list from the request’s data.
-    /// Validates the data contained in the request and
-    /// creates a new item or updates an existing item if given.
-    ///
-    /// This function handles thrown `EntityError`s by rendering the form page again while adding
-    /// the corresponding error flags to the page context.
-    private static func save(
-        from request: Request,
-        for user: User,
-        and list: List,
-        this item: Item? = nil
-    ) throws
-        -> Future<Response>
-    {
-        return try request.content
-            .decode(ItemPageFormData.self)
-            .flatMap { formdata in
-                var context = try ItemPageContextBuilder()
-                    .forUser(user)
-                    .forList(list)
-                    .withItem(item)
-                    .withFormData(formdata)
-                    .build()
-
-                return request.future()
-                    .flatMap {_ in
-                        return try save(
-                            from: formdata, for: user, and: list, this: item, on: request
-                        )
-                    }
-                    .catchFlatMap(EntityError<Item>.self) { error in
-                        switch error {
-                        case .validationFailed(let properties, _):
-                            context.form.invalidTitle = properties.contains(\Item.title)
-                            context.form.invalidText = properties.contains(\Item.text)
-                            context.form.invalidURL = properties.contains(\Item.url)
-                            context.form.invalidImageURL = properties.contains(\Item.imageURL)
-                        default:
-                            throw error
-                        }
-                        return try failure(on: request, with: context)
-                    }
-            }
-    }
-
-    /// Saves an item for the specified user from the given form data.
-    /// Validates the data, checks the constraints required for a new or updated item and creates
-    /// a new item or updates an existing item if given.
-    ///
-    /// Throws `EntityError`s for invalid data or violated constraints.
-    private static func save(
-        from formdata: ItemPageFormData,
-        for user: User,
-        and list: List,
-        this item: Item? = nil,
-        on request: Request
-    ) throws
-        -> Future<Response>
-    {
-        let itemRepository = try request.make(ItemRepository.self)
-
-        return try ItemData(from: formdata)
-            .validate(for: list, this: item, using: itemRepository)
-            .flatMap { data in
-                // save item
-                let entity: Item
-                if let item = item {
-                    // update item
-                    entity = item
-                    try entity.update(for: list, from: data)
-                    entity.modifiedAt = Date()
-                }
-                else {
-                    // create item
-                    entity = try Item(for: list, from: data)
-                }
-                return try itemRepository
-                    .save(item: entity)
-                    .setup(on: request)
-                    .emitEvent("created for \(user)",
-                        on: request,
-                        when: { $0.modifiedAt == $0.createdAt }
-                    )
+                    .logMessage("deleted for \(user)", on: request)
                     .transform(to: success(for: user, and: list, on: request))
             }
     }
@@ -233,7 +170,7 @@ final class ItemController: ProtectedController, RouteCollection {
         for user: User,
         and list: List,
         on request: Request
-    ) -> Future<Response> {
+    ) -> EventLoopFuture<Response> {
         // to add real REST support, check the accept header for json and output a json response
         if let locator = request.query.getLocator(is: .local) {
             return request.eventLoop.newSucceededFuture(
@@ -252,7 +189,7 @@ final class ItemController: ProtectedController, RouteCollection {
     private static func failure(
         on request: Request,
         with context: ItemPageContext
-    ) throws -> Future<Response> {
+    ) throws -> EventLoopFuture<Response> {
         // to add real REST support, check the accept header for json and output a json response
         return try renderView("User/Item", with: context, on: request)
             .flatMap { view in
@@ -262,9 +199,9 @@ final class ItemController: ProtectedController, RouteCollection {
 
     // MARK: -
 
-    private static func dispatch(on request: Request) throws -> Future<Response> {
+    private static func dispatch(on request: Request) throws -> EventLoopFuture<Response> {
         return try method(of: request)
-            .flatMap { method -> Future<Response> in
+            .flatMap { method -> EventLoopFuture<Response> in
                 switch method {
                 case .PUT:
                     return try update(on: request)
@@ -315,10 +252,10 @@ final class ItemController: ProtectedController, RouteCollection {
         _ itemdata: ItemData,
         for list: List,
         on request: Request
-    ) throws -> Future<Item> {
+    ) throws -> EventLoopFuture<Item> {
         let itemRepository = try request.make(ItemRepository.self)
 
-        return try itemdata.validate(for: list, using: itemRepository)
+        return try itemdata.validate(for: list, using: itemRepository, on: request)
             .flatMap { itemdata in
                 // create item
                 let item = try Item(for: list, from: itemdata)
@@ -333,9 +270,9 @@ final class ItemController: ProtectedController, RouteCollection {
 
 // MARK: -
 
-extension Future where Expectation == Item {
+extension EventLoopFuture where Expectation == Item {
 
-    fileprivate func setup(on request: Request) -> Future<Item> {
+    fileprivate func setup(on request: Request) -> EventLoopFuture<Item> {
         return self.flatMap(to: Item.self) { item in
             guard let imageURL = item.imageURL else {
                 return request.future(item)
@@ -358,7 +295,7 @@ extension Future where Expectation == Item {
         }
     }
 
-    fileprivate func cleanup(on request: Request) -> Future<Item> {
+    fileprivate func cleanup(on request: Request) -> EventLoopFuture<Item> {
         return self.flatMap(to: Item.self) { item in
             try item.removeImages(on: request)
             return request.future(item)

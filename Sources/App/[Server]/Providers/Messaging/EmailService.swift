@@ -13,7 +13,7 @@ final class EmailService: Service {
     func send(
         html: String,
         subject: String,
-        for addresses: [String],
+        for addresses: [EmailAddress],
         on container: Container
     ) throws
         -> EventLoopFuture<Void>
@@ -31,8 +31,11 @@ final class EmailService: Service {
             password: configuration.password
         )
 
-        let sender = Mail.User(name: configuration.senderName, email: configuration.senderAddress)
-        let recipients = addresses.map { Mail.User(email: $0) }
+        let sender = Mail.User(
+            name: configuration.senderName,
+            email: configuration.senderAddress
+        )
+        let recipients = addresses.map { Mail.User( name: $0.name, email: $0.identifier) }
 
         let mail = Mail(
             from: sender,

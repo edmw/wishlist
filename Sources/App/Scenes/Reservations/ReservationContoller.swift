@@ -3,12 +3,10 @@ import Fluent
 
 final class ReservationController: ProtectedController, RouteCollection {
 
-    // MARK: - VIEWS
-
     private static func allowView(
         on request: Request,
-        _ render: @escaping (Identification, Item, List) throws -> Future<View>
-    ) throws -> Future<View> {
+        _ render: @escaping (Identification, Item, List) throws -> EventLoopFuture<View>
+    ) throws -> EventLoopFuture<View> {
         let user = try getAuthenticatedUser(on: request)
 
         let identification = try user?.identification ?? requireIdentification(on: request)
@@ -29,29 +27,35 @@ final class ReservationController: ProtectedController, RouteCollection {
             }
     }
 
+    // MARK: - VIEWS
+
     /// Renders a view to confirm the creation of a reservation.
     private static func renderCreateView(on request: Request) throws
-        -> Future<View>
+        -> EventLoopFuture<View>
     {
         return try allowView(on: request) { (identification, item, list) throws in
-            let context = ReservationPageContext(for: identification, and: item, in: list)
+            let context = try ReservationPageContextBuilder()
+                .forIdentification(identification)
+                .forItem(item)
+                .forList(list)
+                .build()
             return try renderView("Protected/ReservationCreation", with: context, on: request)
         }
     }
 
     /// Renders a view to confirm the deletion of a reservation.
     private static func renderDeleteView(on request: Request) throws
-        -> Future<View>
+        -> EventLoopFuture<View>
     {
         return try allowView(on: request) { (identification, item, list) throws in
             return try requireReservation(on: request, for: item)
                 .flatMap { reservation in
-                    let context = ReservationPageContext(
-                        for: identification,
-                        and: item,
-                        in: list,
-                        with: reservation
-                    )
+                    let context = try ReservationPageContextBuilder()
+                        .forIdentification(identification)
+                        .forItem(item)
+                        .forList(list)
+                        .withReservation(reservation)
+                        .build()
                     return try renderView(
                         "Protected/ReservationDeletion",
                         with: context,
@@ -61,68 +65,63 @@ final class ReservationController: ProtectedController, RouteCollection {
         }
     }
 
-    /// Renders a view to confirm the deletion of a reservation.
-    private static func renderDeleteViewForOwner(on request: Request) throws
-        -> Future<View>
-    {
-        let user = try requireAuthenticatedUser(on: request)
-
-        return try requireList(on: request, for: user)
-            .flatMap { list in
-                return try requireItem(on: request, for: list)
-                    .flatMap { item in
-                        return try requireReservation(on: request, for: item)
-                            .flatMap { reservation in
-                                let context = ReservationPageContext(
-                                    for: user,
-                                    and: item,
-                                    in: list,
-                                    with: reservation
-                                )
-                                return try renderView(
-                                    "User/ReservationDeletion",
-                                    with: context,
-                                    on: request
-                                )
-                            }
-                    }
-            }
-    }
-
     // MARK: - CRUD
 
-    private static func create(on request: Request) throws -> Future<Response> {
+    private static func create(on request: Request) throws -> EventLoopFuture<Response> {
         return try authorizeList(on: request) { (identification, list) throws in
-            return try save(from: request, in: list, for: identification)
+            return try save(from: request, in: list, for: identification).flatMap { result in
+                switch result {
+                case let .success(reservation, item):
+                    return try request.future(reservation)
+                        .dispatchNotification(on: request) { request, _ in
+                            list.user.get(on: request).map { owner in
+                                return ReservationCreateNotification(for: owner, on: item, in: list)
+                            }
+                        }
+                        .emitEvent("created on \(item) for \(identification)", on: request)
+                        .logMessage("created on \(item) for \(identification)", on: request)
+                        .transform(to: success(for: list, on: request))
+                case .failureItemReserved:
+                    return redirect(
+                        for: list,
+                        parameters: [.value(.wishAlreadyReserved, for: .message)],
+                        on: request
+                    )
+                }
+            }
         }
     }
 
-    private static func update(on request: Request) throws -> Future<Response> {
+    private static func update(on request: Request) throws -> EventLoopFuture<Response> {
         throw Abort(.notImplemented)
     }
 
-    private static func delete(on request: Request) throws -> Future<Response> {
-        return try authorizeList(on: request) { (identification, list) throws in
+    private static func delete(on request: Request) throws -> EventLoopFuture<Response> {
+        return try authorizeList(on: request) { identification, list throws in
             return try authorizeReservation(on: request, with: identification) { reservation in
-                return try reservation
-                    .delete(on: request)
+                return try request.future(reservation)
+                    .deleteModel(on: request)
                     .emitEvent("deleted for \(identification)", on: request)
-                    .dispatchNotification(on: request) { request in
-                        guard request.features?.notifyDeleteReservation.enabled ?? false else {
-                            return request.future(nil)
-                        }
-                        return flatMap(
-                            list.user.get(on: request),
-                            reservation.item.get(on: request)
-                        ) { owner, item in
-                            return request.future(
-                                ReservationDeleteNotification(for: owner, on: item, in: list)
+                    .logMessage("deleted for \(identification)", on: request)
+                    .dispatchNotification(on: request) { request, reservation in
+                        list.user.get(on: request)
+                            .and(
+                                reservation.item.get(on: request)
                             )
-                        }
+                            .map { owner, item in
+                                return ReservationDeleteNotification(for: owner, on: item, in: list)
+                            }
                     }
                     .transform(to: success(for: list, on: request))
             }
         }
+    }
+
+    // MARK: Save
+
+    enum SaveResult {
+        case success(reservation: Reservation, item: Item)
+        case failureItemReserved
     }
 
     /// Saves a reservation for the specified list from the request’s data.
@@ -133,7 +132,7 @@ final class ReservationController: ProtectedController, RouteCollection {
         in list: List,
         for holder: Identification
     ) throws
-        -> Future<Response>
+        -> EventLoopFuture<SaveResult>
     {
         return try findItem(in: list, from: request)
             .flatMap { item in
@@ -142,13 +141,10 @@ final class ReservationController: ProtectedController, RouteCollection {
                     .flatMap { result in
                         guard result == nil else {
                             // item already reserved (should not happen)
-                            return redirect(
-                                for: list,
-                                parameters: [.value(.wishAlreadyReserved, for: .message)],
-                                on: request
-                            )
+                            return request.future(.failureItemReserved)
                         }
                         return try save(on: item, in: list, for: holder, on: request)
+                            .map { reservation in .success(reservation: reservation, item: item) }
                     }
             }
     }
@@ -160,30 +156,20 @@ final class ReservationController: ProtectedController, RouteCollection {
         for holder: Identification,
         on request: Request
     ) throws
-        -> Future<Response>
+        -> EventLoopFuture<Reservation>
     {
         let entity: Reservation
         // create reservation
         entity = try Reservation(item: item, holder: holder)
 
-        return try request.make(ReservationRepository.self)
-            .save(reservation: entity)
-            .emitEvent("created for \(holder)", on: request)
-            .dispatchNotification(on: request) { request in
-                guard request.features?.notifyCreateReservation.enabled ?? false else {
-                    return request.future(nil)
-                }
-                return list.user.get(on: request)
-                    .map { owner in ReservationCreateNotification(for: owner, on: item, in: list) }
-            }
-            .transform(to: success(for: list, on: request))
+        return try request.make(ReservationRepository.self).save(reservation: entity)
     }
 
     // MARK: - RESULT
 
     /// Returns a sucess response on a CRUD request.
     /// Not implemented yet: REST response
-    private static func success(for list: List, on request: Request) -> Future<Response> {
+    private static func success(for list: List, on request: Request) -> EventLoopFuture<Response> {
         // to add real REST support, check the accept header for json and output a json response
         if let locator = request.query.getLocator(is: .local) {
             return request.eventLoop.newSucceededFuture(
@@ -197,63 +183,16 @@ final class ReservationController: ProtectedController, RouteCollection {
         }
     }
 
-    // MARK: - CRUD (Owner)
+    // MARK: - Routing
 
-    private static func deleteForOwner(on request: Request) throws -> Future<Response> {
-        let user = try requireAuthenticatedUser(on: request)
-
-        return try requireList(on: request, for: user)
-            .flatMap { list in
-                return try requireItem(on: request, for: list)
-                    .flatMap { item in
-                        return try requireReservation(on: request, for: item)
-                            .flatMap { reservation in
-                                return reservation.delete(on: request).map { _ in
-                                    okForOwner(for: user, and: list, on: request)
-                                }
-                            }
-                    }
-            }
-    }
-
-    // MARK: - RESULT (Owner)
-
-    /// Returns a sucess response on a CRUD request.
-    /// Not implemented yet: REST response
-    private static func okForOwner(for user: User, and list: List, on request: Request)
-        -> Response
-    {
-        // to add real REST support, check the accept header for json and output a json response
-        if let locator = request.query.getLocator(is: .local) {
-            return redirect(to: locator.locationString, on: request)
-        }
-        else {
-            return redirect(for: user, and: list, to: "items", on: request)
-        }
-    }
-
-    // MARK: -
-
-    private static func dispatch(on request: Request) throws -> Future<Response> {
+    private static func dispatch(on request: Request) throws -> EventLoopFuture<Response> {
         return try method(of: request)
-            .flatMap { method -> Future<Response> in
+            .flatMap { method -> EventLoopFuture<Response> in
                 switch method {
                 case .PUT:
                     return try update(on: request)
                 case .DELETE:
                     return try delete(on: request)
-                default:
-                    throw Abort(.methodNotAllowed)
-                }
-            }
-    }
-
-    private static func dispatchForOwner(on request: Request) throws -> Future<Response> {
-        return try method(of: request)
-            .flatMap { method -> Future<Response> in
-                switch method {
-                case .DELETE:
-                    return try deleteForOwner(on: request)
                 default:
                     throw Abort(.methodNotAllowed)
                 }
@@ -280,66 +219,6 @@ final class ReservationController: ProtectedController, RouteCollection {
             use: ReservationController.dispatch
         )
 
-        // reservation handling (for owners)
-
-        router.get(
-            "user", ID.parameter,
-            "list", ID.parameter,
-            "item", ID.parameter,
-            "reservation", ID.parameter,
-            "delete",
-            use: ReservationController.renderDeleteViewForOwner
-        )
-        router.post(
-            "user", ID.parameter,
-            "list", ID.parameter,
-            "item", ID.parameter,
-            "reservation", ID.parameter,
-            use: ReservationController.dispatchForOwner
-        )
-
-    }
-
-    // MARK: -
-
-    /// Returns the reservation specified by the reservation id given in the request’s route.
-    /// Asumes that the reservation’s id is the next routing parameter!
-    static func requireReservation(on request: Request) throws -> Future<Reservation> {
-        let reservationID = try request.parameters.next(ID.self)
-        return try request.make(ReservationRepository.self)
-            .find(by: reservationID.uuid)
-            .unwrap(or: Abort(.noContent))
-    }
-
-    /// Returns the reservation specified by the reservation id given in the request’s route.
-    /// Asumes that the reservation’s id is the next routing parameter!
-    static func requireReservation(
-        on request: Request,
-        for item: Item
-    ) throws -> Future<Reservation> {
-        let reservationID = try request.parameters.next(ID.self)
-        return try request.make(ReservationRepository.self)
-            .find(by: reservationID.uuid)
-            .unwrap(or: Abort(.noContent))
-            .map { reservation in
-                guard reservation.itemID == item.id else {
-                    throw Abort(.noContent)
-                }
-                return reservation
-            }
-    }
-
-    /// Returns the item specified by an item id given in the request’s body or query.
-    static func findItem(in list: List, from request: Request) throws -> Future<Item> {
-        return request.content[ID.self, at: "itemID"]
-            .flatMap { itemID in
-                guard let itemID = itemID ?? request.query[.itemID] else {
-                    throw Abort(.notFound)
-                }
-                return try request.make(ItemRepository.self)
-                    .find(by: itemID.uuid, in: list)
-                    .unwrap(or: Abort(.noContent))
-            }
     }
 
 }

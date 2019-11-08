@@ -20,7 +20,7 @@ final class ImageProxyService: ServiceType {
     }
 
     func get(url: URL, width: Int, height: Int, on request: Request) throws
-        -> Future<Response>
+        -> EventLoopFuture<Response>
     {
         let url = "https://\(token).cloudimg.io/" +
             "crop/\(width)x\(height)/" +

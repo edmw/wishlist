@@ -9,6 +9,9 @@
 
 ## [..]
 🎁 Add functionality to move items between wishlists
+🎁 Add invitation emails
+☘ fix link to fav icon
+☘ fix deletion of reservation for list owner
 
 ## [1.3.3]
 ☘ fix link to about page

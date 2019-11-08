@@ -1,0 +1,6 @@
+<html>
+<p>#L10N("invitation-mail-message","#(userFullName)"){ #(userFullName) invited you to participate in the Wishlist web application.}</p>
+<p>#L10N("invitation-mail-message-link","#(invitationLink)"){ Please click <a href="#(invitationLink)">#(invitationLink)</a> or copy and paste this link into your favorite browser.}</p>
+<hr>
+<p>#L10N("about-intro"){...}</p>
+</html>

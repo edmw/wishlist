@@ -18,7 +18,7 @@ final class ImageFileMiddleware: Middleware, ServiceType {
     }
 
     func respond(to request: Request, chainingTo next: Responder) throws
-        -> Future<Response>
+        -> EventLoopFuture<Response>
     {
         var path = request.http.url.path
 
@@ -55,7 +55,7 @@ final class ImageFileMiddleware: Middleware, ServiceType {
         key: String,
         groupkey: String,
         on request: Request
-    ) throws -> Future<URL?> {
+    ) throws -> EventLoopFuture<URL?> {
 
         let fileName = try SHA1.hash(url.absoluteString).base32EncodedString()
 
@@ -212,7 +212,7 @@ final class ImageFileMiddleware: Middleware, ServiceType {
     /// Writes the data from the response’s body to the specified file URL.
     /// The given file URL must point to a file inside the images directory.
     private func writeData(from response: Response, to url: URL, on request: Request) throws
-        -> Future<Bool>
+        -> EventLoopFuture<Bool>
     {
         guard url.path.hasPrefix(self.imagesDirectoryURL.path) else {
             throw ImageFileMiddlewareError.invalidFileURL(url)

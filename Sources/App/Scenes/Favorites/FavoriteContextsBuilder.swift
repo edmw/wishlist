@@ -1,6 +1,6 @@
 import Vapor
 
-// MARK: ListContextsBuilder
+// MARK: FavoriteContextsBuilder
 
 class FavoriteContextsBuilder {
 
@@ -8,7 +8,7 @@ class FavoriteContextsBuilder {
 
     var sorting = ListsSorting.ascending(by: \List.title)
 
-    var countItems: Bool = false
+    var includeItemsCount: Bool = false
 
     @discardableResult
     func forUser(_ user: User) -> Self {
@@ -23,12 +23,12 @@ class FavoriteContextsBuilder {
     }
 
     @discardableResult
-    func countItems(_ countItems: Bool) -> Self {
-        self.countItems = countItems
+    func includeItemsCount(_ countItems: Bool) -> Self {
+        self.includeItemsCount = includeItemsCount
         return self
     }
 
-    func build(on request: Request) throws -> Future<[FavoriteContext]> {
+    func build(on request: Request) throws -> EventLoopFuture<[FavoriteContext]> {
         guard let user = user else {
             throw FavoriteContextsBuilderError.missingRequiredUser
         }
@@ -46,7 +46,7 @@ class FavoriteContextsBuilder {
                     var context = FavoriteContext(for: list)
                     return list.user.get(on: request).flatMap { owner in
                         context.list.ownerName = owner.displayName
-                        if self.countItems {
+                        if self.includeItemsCount {
                             return try request.make(ItemRepository.self)
                                 .count(on: list)
                                 .map { itemsCount in

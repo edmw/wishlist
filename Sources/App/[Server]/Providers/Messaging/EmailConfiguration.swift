@@ -1,6 +1,6 @@
 import Vapor
 
-struct EmailConfiguration: Service {
+public struct EmailConfiguration: Service {
 
     let hostname: String
     let username: String

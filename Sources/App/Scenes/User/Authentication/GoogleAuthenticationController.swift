@@ -56,7 +56,7 @@ final class GoogleAuthenticatorController: AuthenticationController, RouteCollec
         return try request
             .client()
             .send(userInfoRequest)
-            .flatMap { response -> Future<GoogleAuthenticationUserInfo> in
+            .flatMap { response -> EventLoopFuture<GoogleAuthenticationUserInfo> in
                 // decode user info from request data
                 try response.content.decode(GoogleAuthenticationUserInfo.self)
             }
@@ -71,7 +71,7 @@ final class GoogleAuthenticatorController: AuthenticationController, RouteCollec
             }
     }
 
-    func authenticate(on request: Request) throws -> Future<Response> {
+    func authenticate(on request: Request) throws -> EventLoopFuture<Response> {
         guard let googleRouterAuthenticationURL = try google?.router.authURL(request) else {
             throw Abort(.internalServerError)
         }

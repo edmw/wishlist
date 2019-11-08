@@ -54,7 +54,7 @@ final class NetIDAuthenticatorController: AuthenticationController, RouteCollect
         return try request
             .client()
             .send(userInfoRequest)
-            .flatMap { response -> Future<NetIDAuthenticationUserInfo> in
+            .flatMap { response -> EventLoopFuture<NetIDAuthenticationUserInfo> in
                 // decode user info from request data
                 try response.content.decode(NetIDAuthenticationUserInfo.self)
             }

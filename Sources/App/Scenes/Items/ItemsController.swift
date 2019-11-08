@@ -6,7 +6,7 @@ final class ItemsController: ProtectedController, SortingController, RouteCollec
 
     // MARK: - VIEWS
 
-    private static func renderView(on request: Request) throws -> Future<View> {
+    private static func renderView(on request: Request) throws -> EventLoopFuture<View> {
         let user = try requireAuthenticatedUser(on: request)
 
         let sorting = getSorting(on: request) ?? .ascending(by: \Item.title)

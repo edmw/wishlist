@@ -8,7 +8,7 @@ final class FavoriteController: ProtectedController, RouteCollection {
     /// Renders a view to confirm the creation of a favorite.
     /// This is only accessible for an authenticated user who owns the affected item.
     private static func renderCreationView(on request: Request) throws
-        -> Future<View>
+        -> EventLoopFuture<View>
     {
         let user = try requireAuthenticatedUser(on: request)
 
@@ -28,7 +28,7 @@ final class FavoriteController: ProtectedController, RouteCollection {
     /// Renders a view to confirm the deletion of a favorite.
     /// This is only accessible for an authenticated user who owns the affected item.
     private static func renderDeletionView(on request: Request) throws
-        -> Future<View>
+        -> EventLoopFuture<View>
     {
         let user = try requireAuthenticatedUser(on: request)
 
@@ -48,7 +48,7 @@ final class FavoriteController: ProtectedController, RouteCollection {
     // MARK: - CRUD
 
     // Creates a favorite with the given data.
-    private static func create(on request: Request) throws -> Future<Response> {
+    private static func create(on request: Request) throws -> EventLoopFuture<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
         // get list to create favorite for
@@ -60,6 +60,8 @@ final class FavoriteController: ProtectedController, RouteCollection {
                     .flatMap { _ in
                         return try request.make(FavoriteRepository.self)
                             .addFavorite(list, for: user)
+                            .emitEvent("created for \(user)", on: request)
+                            .logMessage("created for \(user)", on: request)
                             .transform(to: success(for: user, on: request))
                     }
                     .handleAuthorizationError(on: request)
@@ -67,17 +69,18 @@ final class FavoriteController: ProtectedController, RouteCollection {
     }
 
     // Deletes a favorite with the given data.
-    private static func delete(on request: Request) throws -> Future<Response> {
+    private static func delete(on request: Request) throws -> EventLoopFuture<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
         return try requireFavorite(on: request, for: user)
-            .delete(on: request)
+            .deleteModel(on: request)
             .emitEvent("deleted for \(user)", on: request)
+            .logMessage("deleted for \(user)", on: request)
             .transform(to: success(for: user, on: request))
     }
 
     // Deletes a favorite with the given listid.
-    private static func deleteWithListID(on request: Request) throws -> Future<Response> {
+    private static func deleteWithListID(on request: Request) throws -> EventLoopFuture<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
         return try findList(from: request)
@@ -85,8 +88,9 @@ final class FavoriteController: ProtectedController, RouteCollection {
                 return try request.make(FavoriteRepository.self)
                     .find(favorite: list, for: user)
                     .unwrap(or: Abort(.notFound))
-                    .delete(on: request)
+                    .deleteModel(on: request)
                     .emitEvent("deleted for \(user)", on: request)
+                    .logMessage("deleted for \(user)", on: request)
                     .transform(to: success(for: user, on: request))
             }
     }
@@ -95,7 +99,7 @@ final class FavoriteController: ProtectedController, RouteCollection {
 
     /// Returns a sucess response on a CRUD request.
     /// Not implemented yet: REST response
-    private static func success(for user: User, on request: Request) -> Future<Response> {
+    private static func success(for user: User, on request: Request) -> EventLoopFuture<Response> {
         // to add real REST support, check the accept header for json and output a json response
         if let locator = request.query.getLocator(is: .local) {
             return request.eventLoop.newSucceededFuture(
@@ -109,11 +113,11 @@ final class FavoriteController: ProtectedController, RouteCollection {
         }
     }
 
-    // MARK: -
+    // MARK: - Routing
 
-    private static func dispatch(on request: Request) throws -> Future<Response> {
+    private static func dispatch(on request: Request) throws -> EventLoopFuture<Response> {
         return try method(of: request)
-            .flatMap { method -> Future<Response> in
+            .flatMap { method -> EventLoopFuture<Response> in
                 switch method {
                 case .DELETE:
                     return try delete(on: request)
@@ -152,7 +156,7 @@ final class FavoriteController: ProtectedController, RouteCollection {
     // MARK: -
 
     /// Returns the list specified by an list id given in the request’s body or query.
-    static func findList(from request: Request) throws -> Future<List> {
+    static func findList(from request: Request) throws -> EventLoopFuture<List> {
         return request.content[ID.self, at: "listID"]
             .flatMap { listID in
                 guard let listID = listID ?? request.query[.listID] else {

@@ -5,7 +5,7 @@ final class CachingHeadersMiddleware: Middleware, ServiceType {
 
     func respond(
         to request: Request, chainingTo next: Responder
-    ) throws -> Future<Response> {
+    ) throws -> EventLoopFuture<Response> {
         let response = try next.respond(to: request)
 
         return response.map(to: Response.self) { response in

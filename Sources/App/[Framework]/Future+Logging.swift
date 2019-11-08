@@ -1,6 +1,6 @@
 import Vapor
 
-extension Future {
+extension EventLoopFuture {
 
     // log a message together with a description of this future’s expectation 
     func log(
@@ -12,7 +12,7 @@ extension Future {
         function: String = #function,
         line: UInt = #line,
         column: UInt = #column
-    ) -> Future<Expectation> {
+    ) -> EventLoopFuture<Expectation> {
         return self.map(to: Expectation.self) { value in
             let log: Bool
             if let condition = condition {
@@ -36,7 +36,7 @@ extension Future {
         }
     }
 
-    func info(
+    func log(
         _ message: String,
         to logger: Logger,
         when condition: ((Expectation) -> Bool)? = nil,
@@ -44,9 +44,31 @@ extension Future {
         function: String = #function,
         line: UInt = #line,
         column: UInt = #column
-    ) -> Future<Expectation> {
+    ) -> EventLoopFuture<Expectation> {
         return self.log(
             logger: logger,
+            level: .info,
+            message: message,
+            when: condition,
+            file: file,
+            function: function,
+            line: line,
+            column: column
+        )
+    }
+
+    func logMessage(
+        _ message: String,
+        on request: Request,
+        to logger: Logger? = nil,
+        when condition: ((Expectation) -> Bool)? = nil,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line,
+        column: UInt = #column
+    ) -> EventLoopFuture<Expectation> {
+        return self.log(
+            logger: logger ?? request.requireLogger().application,
             level: .info,
             message: message,
             when: condition,

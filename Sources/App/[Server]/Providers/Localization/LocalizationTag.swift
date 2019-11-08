@@ -18,7 +18,7 @@ final class LocalizationTag: TagRenderer {
     init() {
     }
 
-    func render(tag: TagContext) throws -> Future<TemplateData> {
+    func render(tag: TagContext) throws -> EventLoopFuture<TemplateData> {
         let body = try tag.requireBody()
         let key = tag.parameters[0].string
         let values = tag.parameters.count > 1 ? tag.parameters[1...].map { $0.string ?? "�" } : []
@@ -39,7 +39,7 @@ final class LocalizationTag: TagRenderer {
         }
 
         if let localized = localized {
-            return Future.map(on: tag) { .string(localized) }
+            return EventLoopFuture.map(on: tag) { .string(localized) }
         }
         else {
             return tag.serializer.serialize(ast: body)

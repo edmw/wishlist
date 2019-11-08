@@ -31,7 +31,7 @@ extension Request {
         state: AuthenticationState,
         access: SiteAccess
     ) throws
-        -> Future<User>
+        -> EventLoopFuture<User>
     {
         // get identification from request or session
         let requestIdentification = try self.requireIdentification()
@@ -42,7 +42,7 @@ extension Request {
 
         let invitationRepository = try make(InvitationRepository.self)
         // future to find an open invitation (if invitation code is given)
-        let findInvitation: Future<Invitation?>
+        let findInvitation: EventLoopFuture<Invitation?>
         if let invitationCode = state.invitationCode {
             findInvitation = invitationRepository.find(by: invitationCode)
         }
@@ -55,7 +55,8 @@ extension Request {
         // - check access for the new or existing user with the possible invitation
         // - invalidate the possible invitation
         // returns the user (created or updated)
-        return flatMap(checkUser, findInvitation) { userExists, invitation -> Future<User> in
+        return flatMap(checkUser, findInvitation) { userExists, invitation
+            -> EventLoopFuture<User> in
 
             // check access for user (throws on access violation)
             switch access {
@@ -108,7 +109,7 @@ extension Request {
         // - do business events
         // - handle reservations made anonymously
         // returns the user
-        .flatMap { user -> Future<User> in
+        .flatMap { user -> EventLoopFuture<User> in
             if let firstLogin = user.firstLogin, firstLogin == user.lastLogin {
                 // new user, emit business log event
                 self.logger?.business.info("\(user) created at \(firstLogin)")
@@ -118,7 +119,7 @@ extension Request {
             return userRepository
                 .find(identification: requestIdentification)
                 .flatMap { result in
-                    let transferReservations: Future<Void>
+                    let transferReservations: EventLoopFuture<Void>
                     if result == nil {
                         // identification from request is not attached to another user,
                         // transfer (maybe existing) reservations
@@ -144,9 +145,7 @@ extension Request {
             // attach user to session
             try self.authenticateSession(user)
 
-            self.logger?.application.info(
-                "Sucessfully authenticated \(user)"
-            )
+            self.logger?.application.info("Sucessfully authenticated \(user)")
 
             return user
         }
@@ -158,21 +157,21 @@ extension UserRepository {
 
     /// checks if a user for the specified user info exists
     func checkUser(using userInfo: AuthenticationUserInfo) throws
-        -> Future<Bool>
+        -> EventLoopFuture<Bool>
     {
         try userInfo.validate()
         return find(subjectId: userInfo.subjectId).map { $0 != nil }
     }
 
     func realizeUser(using userInfo: AuthenticationUserInfo) throws
-        -> Future<User>
+        -> EventLoopFuture<User>
     {
         try userInfo.validate()
 
         // lookup user in database and update if found, create if not
         let subjectId = userInfo.subjectId
         return find(subjectId: subjectId)
-            .flatMap { result -> Future<User> in
+            .flatMap { result -> EventLoopFuture<User> in
                 let user: User
                 if let result = result {
                     // update existing user
@@ -195,7 +194,7 @@ extension UserRepository {
 extension InvitationRepository {
 
     func accept(_ invitation: Invitation, for user: User) throws
-        -> Future<Invitation>
+        -> EventLoopFuture<Invitation>
     {
         return try invitation.update(status: .accepted, in: self)
             .flatMap { invitation in

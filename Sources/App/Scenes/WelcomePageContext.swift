@@ -19,7 +19,7 @@ struct WelcomePageContext: Encodable {
     var favorites: [FavoriteContext]?
     var invitations: [InvitationContext]?
 
-    init(
+    fileprivate init(
         for user: User,
         lists: [ListContext]? = nil,
         favorites: [FavoriteContext]? = nil,
@@ -41,6 +41,58 @@ struct WelcomePageContext: Encodable {
         self.lists = lists
         self.favorites = favorites
         self.invitations = invitations
+    }
+
+}
+
+// MARK: - Builder
+
+enum WelcomePageContextBuilderError: Error {
+    case missingRequiredUser
+}
+
+class WelcomePageContextBuilder {
+
+    var user: User?
+
+    var lists: [ListContext]?
+    var favorites: [FavoriteContext]?
+    var invitations: [InvitationContext]?
+
+    @discardableResult
+    func forUser(_ user: User) -> Self {
+        self.user = user
+        return self
+    }
+
+    @discardableResult
+    func withLists(_ lists: [ListContext]) -> Self {
+        self.lists = lists
+        return self
+    }
+
+    @discardableResult
+    func withFavorites(_ favorites: [FavoriteContext]) -> Self {
+        self.favorites = favorites
+        return self
+    }
+
+    @discardableResult
+    func withInvitations(_ invitations: [InvitationContext]) -> Self {
+        self.invitations = invitations
+        return self
+    }
+
+    func build() throws -> WelcomePageContext {
+        guard let user = user else {
+            throw WelcomePageContextBuilderError.missingRequiredUser
+        }
+        return WelcomePageContext(
+            for: user,
+            lists: lists,
+            favorites: favorites,
+            invitations: invitations
+        )
     }
 
 }

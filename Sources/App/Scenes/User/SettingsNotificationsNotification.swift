@@ -1,6 +1,6 @@
 import Vapor
 
-final class SettingsNotificationsNotification: Notification {
+final class SettingsNotificationsNotification: UserNotification {
 
     init(for user: User) {
         super.init(

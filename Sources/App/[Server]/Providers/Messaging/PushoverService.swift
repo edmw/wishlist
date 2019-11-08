@@ -43,9 +43,12 @@ final class PushoverService: Service {
     // (Note: if a notification can be sent to at least one user there will be no error. Even if
     // other user keys are invalid.)
     // @see https://pushover.net/api
-    func send(text: String, title: String, for users: [String], on container: Container) throws
-        -> EventLoopFuture<Void>
-    {
+    func send(
+        text: String,
+        title: String,
+        for users: [PushoverUser],
+        on container: Container
+    ) throws -> EventLoopFuture<Void> {
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw MessagingError.emptyMessage
         }
@@ -57,7 +60,7 @@ final class PushoverService: Service {
 
         let messagesData = PushMessage(
             token: configuration.applicationToken,
-            user: users.joined(separator: ","),
+            user: users.joined(),
             message: text,
             title: title,
             html: 1

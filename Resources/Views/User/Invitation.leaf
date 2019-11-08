@@ -8,8 +8,15 @@
         <input type="text" class="form-control#if(page.form.invalidEmail){ is-invalid}" id="inputEmail" name="inputEmail" maxlength="254" placeholder="#L10N("invitation-field-email-placeholder"){Enter invitee’s email}" aria-describedby="descriptionEmail"#if(page.form.data.inputEmail){ value="#(page.form.data.inputEmail)"}>
         <small id="descriptionEmail" class="form-text text-muted">#if(page.form.invalidEmail){<span class="text-danger">#L10N("invitation-field-email-invalid"){A valid email is required.}</span> }</small>
     </div>
+    <div class="form-group">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="true" id="inputSendEmail" name="inputSendEmail"#if(page.form.data.inputSendEmail){ checked } aria-describedby="descriptionSendEmail">
+                <label class="form-check-label" for="inputSendEmail">#L10N("invitation-field-sendemail"){Send invitation email}</label>
+        </div>
+        <small id="descriptionSendEmail" class="form-text text-muted">#L10N("invitation-field-sendemail-description"){Check this option if you want the system to send an invitation email. Please note: The invitation email sent will be an automated email which is possibly rejected by the recipient’s email system. Alternatively, you can use the generated invitation link to send a personal email by yourself.}</small>
+    </div>
     <div class="form-group form-row mt-4">
-        <button type="submit" class="btn btn-primary">#L10N("send"){Send}</button>
+        <button type="submit" class="btn btn-primary">#L10N("invite"){Invite}</button>
         <a class="nav-link btn btn-link ml-3" href="#if(request.parameter.p){#(request.parameter.p)}else{/}">#L10N("cancel"){Cancel}</a>
     </div>
 </form>

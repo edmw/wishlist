@@ -3,12 +3,10 @@ import Fluent
 
 final class InvitationController: ProtectedController, RouteCollection {
 
-    // MARK: - VIEWS
-
-    private static func allowView(
+    private static func authorizeUser<R>(
         on request: Request,
-        _ render: @escaping (User) throws -> Future<View>
-    ) throws -> Future<View> {
+        _ render: @escaping (User) throws -> EventLoopFuture<R>
+    ) throws -> EventLoopFuture<R> {
         let user = try requireAuthenticatedUser(on: request)
 
         guard user.confidant else {
@@ -18,54 +16,11 @@ final class InvitationController: ProtectedController, RouteCollection {
         return try render(user)
     }
 
-    /// Renders a form view for creating an invitation.
-    /// This is only accessible for an authenticated user.
-    private static func renderCreateView(on request: Request) throws
-        -> Future<View>
-    {
-        return try allowView(on: request) { (user) throws in
-            let context = try InvitationPageContextBuilder().forUser(user).build()
-            return try renderView("User/Invitation", with: context, on: request)
-        }
-    }
-
-    /// Renders a view to confirm the deletion of an invitation.
-    /// This is only accessible for an authenticated user.
-    private static func renderRevokeView(on request: Request) throws
-        -> Future<View>
-    {
-        return try allowView(on: request) { (user) throws in
-            return try requireInvitation(on: request)
-                .flatMap { invitation in
-                    let context = try InvitationPageContextBuilder()
-                        .forUser(user)
-                        .forInvitation(invitation)
-                        .build()
-                    return try renderView("User/InvitationRevocation", with: context, on: request)
-                }
-        }
-    }
-
-    // MARK: - CRUD
-
-    private static func authorizeUser(
-        on request: Request,
-        _ function: @escaping (User) throws -> Future<Response>
-    ) throws -> Future<Response> {
-        let user = try requireAuthenticatedUser(on: request)
-
-        guard user.confidant else {
-            throw Abort(.unauthorized)
-        }
-
-        return try function(user)
-    }
-
     private static func authorizeInvitation(
         on request: Request,
         with user: User,
-        _ function: @escaping (Invitation) throws -> Future<Response>
-    ) throws -> Future<Response> {
+        _ function: @escaping (Invitation) throws -> EventLoopFuture<Response>
+    ) throws -> EventLoopFuture<Response> {
 
         // get invitation from request
         return try requireInvitation(on: request)
@@ -81,14 +36,62 @@ final class InvitationController: ProtectedController, RouteCollection {
             }
     }
 
-    private static func create(on request: Request) throws -> Future<Response> {
-        return try authorizeUser(on: request) { (user) throws in
-            return try save(from: request, for: user)
+    // MARK: - VIEWS
+
+    /// Renders a form view for creating an invitation.
+    /// This is only accessible for an authenticated user.
+    private static func renderCreateView(on request: Request) throws
+        -> EventLoopFuture<View>
+    {
+        return try authorizeUser(on: request) { user in
+            let context = try InvitationPageContextBuilder().forUser(user).build()
+            return try renderView("User/Invitation", with: context, on: request)
         }
     }
 
-    private static func patch(on request: Request) throws -> Future<Response> {
-        return try authorizeUser(on: request) { (user) throws in
+    /// Renders a view to confirm the deletion of an invitation.
+    /// This is only accessible for an authenticated user.
+    private static func renderRevokeView(on request: Request) throws
+        -> EventLoopFuture<View>
+    {
+        return try authorizeUser(on: request) { user in
+            return try requireInvitation(on: request)
+                .flatMap { invitation in
+                    let context = try InvitationPageContextBuilder()
+                        .forUser(user)
+                        .forInvitation(invitation)
+                        .build()
+                    return try renderView("User/InvitationRevocation", with: context, on: request)
+                }
+        }
+    }
+
+    // MARK: - CRUD
+
+    private static func create(on request: Request) throws -> EventLoopFuture<Response> {
+        return try authorizeUser(on: request) { user in
+            return try save(from: request, for: user)
+                .caseSuccess { invitation, thenSendMail in
+                    let result = try request.future(invitation)
+                        .emitEvent("created for \(user)", on: request)
+                        .logMessage("created for \(user)", on: request)
+                    if thenSendMail {
+                        return result
+                            .sendInvitation(on: request)
+                            .transform(to: success(for: user, on: request))
+                    }
+                    else {
+                        return result.transform(to: success(for: user, on: request))
+                    }
+                }
+                .caseFailure { context in
+                    return try failure(on: request, with: context)
+                }
+        }
+    }
+
+    private static func patch(on request: Request) throws -> EventLoopFuture<Response> {
+        return try authorizeUser(on: request) { user in
             return try authorizeInvitation(on: request, with: user) { invitation in
                 struct Patch: Decodable {
                     let key: String
@@ -103,6 +106,7 @@ final class InvitationController: ProtectedController, RouteCollection {
                             }
                             return try invitation
                                 .update(status: status, in: request.make(InvitationRepository.self))
+                                .logMessage("updated for \(user)", on: request)
                                 .transform(to: success(for: user, on: request))
                         default:
                             throw Abort(.badRequest)
@@ -112,79 +116,24 @@ final class InvitationController: ProtectedController, RouteCollection {
         }
     }
 
-    /// Saves an invitation for the specified user from the request’s data.
-    /// Validates the data contained in the request, checks the constraints required for a new
-    /// invitation and creates a new invitation.
-    ///
-    /// This function handles thrown `EntityError`s by rendering the form page again while adding
-    /// the corresponding error flags to the page context.
-    private static func save(
-        from request: Request,
-        for user: User
-    ) throws
-        -> Future<Response>
+    // MARK: - ACTIONS
+
+    /// Sends an invitation.
+    /// This is only accessible for an authenticated user.
+    private static func sendInvitation(on request: Request) throws
+        -> EventLoopFuture<Response>
     {
-        return try request.content
-            .decode(InvitationPageFormData.self)
-            .flatMap { formdata in
-                var context = try InvitationPageContextBuilder()
-                    .forUser(user)
-                    .withFormData(formdata)
-                    .build()
-
-                return request.future()
-                    .flatMap {
-                        return try save(
-                            from: formdata,
-                            for: user,
-                            on: request
-                        )
-                    }
-                    .catchFlatMap(EntityError<Invitation>.self) { error in
-                        switch error {
-                        case .validationFailed(let properties, _):
-                            context.form.invalidEmail = properties.contains(\Invitation.email)
-                        default:
-                            throw error
-                        }
-                        return try failure(on: request, with: context)
-                    }
-            }
-    }
-
-    /// Saves an invitation for the specified user from the given form data.
-    /// Validates the data, checks the constraints required for a new invitation and creates
-    /// a new invitation.
-    ///
-    /// Throws `EntityError`s for invalid data or violated constraints.
-    private static func save(
-        from formdata: InvitationPageFormData,
-        for user: User,
-        on request: Request
-    ) throws
-        -> Future<Response>
-    {
-        let invitationRepository = try request.make(InvitationRepository.self)
-
-        return try InvitationData(from: formdata)
-            .validate(for: user, using: invitationRepository)
-            .flatMap { data in
-                let entity: Invitation
-                // create invitation
-                entity = try Invitation(for: user, from: data)
-
-                return try invitationRepository
-                    .save(invitation: entity)
-                    .emitEvent("created for \(user)", on: request)
-                    .transform(to: success(for: user, on: request))
-            }
+        return try authorizeUser(on: request) { user in
+            return try requireInvitation(on: request, status: .open).sendInvitation(on: request)
+                .transform(to: success(for: user, on: request))
+        }
     }
 
     // MARK: - RESULT
 
     /// Returns a sucess response on a CRUD request.
     /// Not implemented yet: REST response
-    private static func success(for user: User, on request: Request) -> Future<Response> {
+    private static func success(for user: User, on request: Request) -> EventLoopFuture<Response> {
         // to add real REST support, check the accept header for json and output a json response
         if let locator = request.query.getLocator(is: .local) {
             return request.eventLoop.newSucceededFuture(
@@ -203,7 +152,7 @@ final class InvitationController: ProtectedController, RouteCollection {
     private static func failure(
         on request: Request,
         with context: InvitationPageContext
-    ) throws -> Future<Response> {
+    ) throws -> EventLoopFuture<Response> {
         // to add real REST support, check the accept header for json and output a json response
         return try renderView("User/Invitation", with: context, on: request)
             .flatMap { view in
@@ -213,9 +162,9 @@ final class InvitationController: ProtectedController, RouteCollection {
 
     // MARK: -
 
-    private static func dispatch(on request: Request) throws -> Future<Response> {
+    private static func dispatch(on request: Request) throws -> EventLoopFuture<Response> {
         return try method(of: request)
-            .flatMap { method -> Future<Response> in
+            .flatMap { method -> EventLoopFuture<Response> in
                 switch method {
                 case .PATCH:
                     return try patch(on: request)
@@ -246,21 +195,36 @@ final class InvitationController: ProtectedController, RouteCollection {
             "user", ID.parameter, "invitation", ID.parameter,
             use: InvitationController.dispatch
         )
+        // action
+        router.post(
+            "user", ID.parameter, "invitation", ID.parameter, "send",
+            use: InvitationController.sendInvitation
+        )
     }
 
     // MARK: -
 
     /// Returns the invitation specified by the invitation id given in the request’s route.
     /// Asumes that the invitation id is the next routing parameter!
-    static func requireInvitation(on request: Request) throws -> Future<Invitation> {
+    /// If a status is specified requires the invitation to conform to the given status,
+    /// throws `.badRequest` if status’ differ.
+    static func requireInvitation(on request: Request, status: Invitation.Status? = nil)
+        throws -> EventLoopFuture<Invitation>
+    {
         let invitationID = try request.parameters.next(ID.self)
         return try request.make(InvitationRepository.self)
             .find(by: invitationID.uuid)
             .unwrap(or: Abort(.noContent))
+            .map { invitation in
+                guard status == nil || invitation.status == status else {
+                    throw Abort(.badRequest)
+                }
+                return invitation
+            }
     }
 
     /// Returns the item specified by an item id given in the request’s body or query.
-    static func findItem(in list: List, from request: Request) throws -> Future<Item> {
+    static func findItem(in list: List, from request: Request) throws -> EventLoopFuture<Item> {
         return request.content[ID.self, at: "itemID"]
             .flatMap { itemID in
                 guard let itemID = itemID ?? request.query[.itemID] else {
@@ -270,6 +234,27 @@ final class InvitationController: ProtectedController, RouteCollection {
                     .find(by: itemID.uuid, in: list)
                     .unwrap(or: Abort(.noContent))
             }
+    }
+
+}
+
+// MARK: Future
+
+extension EventLoopFuture where Expectation == Invitation {
+
+    /// Sends an invitation mail and updates sent date of invitation on succes.
+    func sendInvitation(on request: Request) -> EventLoopFuture<(Invitation, SendMessageResult)> {
+        return self.flatMap { invitation in
+            return try InvitationMail(invitation).send(on: request).flatMap { sendResult in
+                if sendResult.success {
+                    invitation.sentAt = Date()
+                    return invitation
+                        .save(on: request)
+                        .transform(to: (invitation, sendResult))
+                }
+                return request.future((invitation, sendResult))
+            }
+        }
     }
 
 }

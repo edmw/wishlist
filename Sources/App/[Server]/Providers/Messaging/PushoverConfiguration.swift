@@ -1,6 +1,6 @@
 import Vapor
 
-struct PushoverConfiguration: Service {
+public struct PushoverConfiguration: Service {
 
     let applicationToken: String
 

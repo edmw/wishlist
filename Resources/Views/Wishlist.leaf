@@ -82,8 +82,8 @@
     <meta name="viewport" content="initial-scale=1">
 
     <link rel="shortcut icon" href="/images/icon.ico">
-    <link rel="icon" type="image/png" href="/images/icon-32x32.svg" sizes="32x32">
-    <link rel="icon" type="image/png" href="/images/icon-96x96.svg" sizes="96x96">
+    <link rel="icon" type="image/png" href="/images/icon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/images/icon-96x96.png" sizes="96x96">
     <link rel="icon" type="image/svg+xml" href="/images/icon.svg" sizes="any">
 
     <link rel="stylesheet" media="all" href="/styles/wishlist.css">

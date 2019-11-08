@@ -8,7 +8,7 @@ final class ListController: ProtectedController, RouteCollection {
     /// Renders a form view for creating or updating a list.
     /// This is only accessible for an authenticated user.
     private static func renderFormView(on request: Request) throws
-        -> Future<View>
+        -> EventLoopFuture<View>
     {
         let user = try requireAuthenticatedUser(on: request)
 
@@ -35,7 +35,7 @@ final class ListController: ProtectedController, RouteCollection {
     /// Renders a view to confirm the deletion of a list.
     /// This is only accessible for an authenticated user who owns the affected item.
     private static func renderDeleteView(on request: Request) throws
-        -> Future<View>
+        -> EventLoopFuture<View>
     {
         let user = try requireAuthenticatedUser(on: request)
 
@@ -48,111 +48,50 @@ final class ListController: ProtectedController, RouteCollection {
     // MARK: - CRUD
 
     // Creates a list with the given data.
-    private static func create(on request: Request) throws -> Future<Response> {
+    private static func create(on request: Request) throws -> EventLoopFuture<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
         return try save(from: request, for: user)
+            .flatMap { result in
+                switch result {
+                case let .success(list):
+                    return try request.future(list)
+                        .emitEvent("created for \(user)", on: request)
+                        .logMessage("created for \(user)", on: request)
+                        .transform(to: success(for: user, on: request))
+                case .failure(let context):
+                    return try failure(on: request, with: context)
+                }
+            }
     }
 
-    private static func update(on request: Request) throws -> Future<Response> {
+    private static func update(on request: Request) throws -> EventLoopFuture<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
         return try requireList(on: request, for: user)
             .flatMap { list in
                 return try save(from: request, for: user, this: list)
+                    .flatMap { result in
+                        switch result {
+                        case let .success(list):
+                            return request.future(list)
+                                .logMessage("updated for \(user)", on: request)
+                                .transform(to: success(for: user, on: request))
+                        case .failure(let context):
+                            return try failure(on: request, with: context)
+                        }
+                    }
             }
     }
 
-    private static func delete(on request: Request) throws -> Future<Response> {
+    private static func delete(on request: Request) throws -> EventLoopFuture<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
         return try requireList(on: request, for: user)
-            .delete(on: request)
+            .deleteModel(on: request)
             .emitEvent("deleted for \(user)", on: request)
+            .logMessage("deleted for \(user)", on: request)
             .transform(to: success(for: user, on: request))
-    }
-
-    /// Saves a list for the specified user from the request’s data.
-    /// Validates the data contained in the request, checks the constraints required for a new or
-    /// updated list and creates a new list or updates an existing list if given.
-    ///
-    /// This function handles thrown `EntityError`s by rendering the form page again while adding
-    /// the corresponding error flags to the page context.
-    private static func save(
-        from request: Request,
-        for user: User,
-        this list: List? = nil
-    ) throws
-        -> Future<Response>
-    {
-        return try request.content
-            .decode(ListPageFormData.self)
-            .flatMap { formdata in
-                var context = ListPageContext(for: user, with: list, from: formdata)
-
-                return request.future()
-                    .flatMap {
-                        return try save(
-                            from: formdata,
-                            for: user,
-                            this: list,
-                            on: request
-                        )
-                    }
-                    .catchFlatMap(EntityError<List>.self) { error in
-                        switch error {
-                        case .validationFailed(let properties, _):
-                            context.form.invalidTitle = properties.contains(\List.title)
-                            context.form.invalidVisibility = properties.contains(\List.visibility)
-                        case .uniquenessViolated:
-                            // a list with the given name already exists
-                            context.form.duplicateName = true
-                        default:
-                            throw error
-                        }
-                        return try failure(on: request, with: context)
-                    }
-            }
-    }
-
-    /// Saves a list for the specified user from the given form data.
-    /// Validates the data, checks the constraints required for a new or updated list and creates
-    /// a new list or updates an existing list if given.
-    ///
-    /// Throws `EntityError`s for invalid data or violated constraints.
-    private static func save(
-        from formdata: ListPageFormData,
-        for user: User,
-        this list: List? = nil,
-        on request: Request
-    ) throws
-        -> Future<Response>
-    {
-        let listRepository = try request.make(ListRepository.self)
-
-        return try ListData(from: formdata)
-            .validate(for: user, this: list, using: listRepository)
-            .flatMap { data in
-                // save list
-                let entity: List
-                if let list = list {
-                    // update list
-                    entity = list
-                    try entity.update(for: user, from: data)
-                    entity.modifiedAt = Date()
-                }
-                else {
-                    // create list
-                    entity = try List(for: user, from: data)
-                }
-                return try listRepository
-                    .save(list: entity)
-                    .emitEvent("created for \(user)",
-                        on: request,
-                        when: { $0.modifiedAt == $0.createdAt }
-                    )
-                    .transform(to: success(for: user, on: request))
-            }
     }
 
     // MARK: - EXTRA
@@ -168,7 +107,7 @@ final class ListController: ProtectedController, RouteCollection {
         return components.joined(separator: "-")
     }
 
-    private static func export(on request: Request) throws -> Future<Response> {
+    private static func export(on request: Request) throws -> EventLoopFuture<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
         return try requireList(on: request, for: user)
@@ -190,7 +129,7 @@ final class ListController: ProtectedController, RouteCollection {
 
     /// Returns a sucess response on a CRUD request.
     /// Not implemented yet: REST response
-    private static func success(for user: User, on request: Request) -> Future<Response> {
+    private static func success(for user: User, on request: Request) -> EventLoopFuture<Response> {
         // to add real REST support, check the accept header for json and output a json response
         if let locator = request.query.getLocator(is: .local) {
             return request.eventLoop.newSucceededFuture(
@@ -209,7 +148,7 @@ final class ListController: ProtectedController, RouteCollection {
     private static func failure(
         on request: Request,
         with context: ListPageContext
-    ) throws -> Future<Response> {
+    ) throws -> EventLoopFuture<Response> {
         // to add real REST support, check the accept header for json and output a json response
         return try renderView("User/List", with: context, on: request)
             .flatMap { view in
@@ -219,9 +158,9 @@ final class ListController: ProtectedController, RouteCollection {
 
     // MARK: -
 
-    private static func dispatch(on request: Request) throws -> Future<Response> {
+    private static func dispatch(on request: Request) throws -> EventLoopFuture<Response> {
         return try method(of: request)
-            .flatMap { method -> Future<Response> in
+            .flatMap { method -> EventLoopFuture<Response> in
                 switch method {
                 case .PUT:
                     return try update(on: request)
@@ -268,7 +207,7 @@ final class ListController: ProtectedController, RouteCollection {
         _ listdata: ListData,
         for user: User,
         on request: Request
-    ) throws -> Future<List> {
+    ) throws -> EventLoopFuture<List> {
         let listRepository = try request.make(ListRepository.self)
 
         return try listdata.validate(for: user, using: listRepository)

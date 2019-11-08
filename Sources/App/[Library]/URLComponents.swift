@@ -10,10 +10,23 @@ extension URLComponents {
         return params
     }
 
-    mutating func appendQueryItem(_ item: URLQueryItem) {
+    mutating func appendQueryItem(_ extraItem: URLQueryItem) {
         var items = queryItems ?? []
-        items.append(item)
+        items.append(extraItem)
         queryItems = items
     }
 
+    mutating func appendQueryItem(name: String, value: String) {
+        appendQueryItem(URLQueryItem(name: name, value: value))
+    }
+
+    mutating func appendQueryItems(_ extraItems: [URLQueryItem]) {
+        var items = queryItems ?? []
+        items += extraItems
+        queryItems = items
+    }
+
+    mutating func appendQueryItems(_ extraItems: [String: String]) {
+        appendQueryItems(extraItems.map { key, value in URLQueryItem(name: key, value: value) })
+    }
 }

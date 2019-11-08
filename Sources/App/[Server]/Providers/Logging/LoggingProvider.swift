@@ -31,7 +31,7 @@ struct LoggingProvider: Provider {
         }
     }
 
-    func didBoot(_ container: Container) throws -> Future<Void> {
+    func didBoot(_ container: Container) throws -> EventLoopFuture<Void> {
         return .done(on: container)
     }
 

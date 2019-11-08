@@ -31,7 +31,7 @@ extension Imageable {
     }
 
     func uploadImage(from url: URL, on request: Request) throws
-        -> Future<URL?>
+        -> EventLoopFuture<URL?>
     {
         return try request.make(ImageFileMiddleware.self)
             .upload(

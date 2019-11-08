@@ -6,13 +6,14 @@ final class ListsController: ProtectedController, SortingController, RouteCollec
 
     // MARK: - VIEWS
 
-    private static func renderView(on request: Request) throws -> Future<View> {
+    private static func renderView(on request: Request) throws -> EventLoopFuture<View> {
         let user = try requireAuthenticatedUser(on: request)
 
+        let sorting = getSorting(on: request) ?? .ascending(by: \List.title)
         let listContextsBuilder = ListContextsBuilder()
             .forUser(user)
-            .withSorting(getSorting(on: request) ?? .ascending(by: \List.title))
-            .countItems(true)
+            .withSorting(sorting)
+            .includeItemsCount(true)
         return try listContextsBuilder.build(on: request)
             .flatMap {
                 let context = ListsPageContext(for: user, with: $0)

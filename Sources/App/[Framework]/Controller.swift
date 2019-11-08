@@ -10,7 +10,7 @@ class Controller {
     /// will be some speciality: A client can perfom a specific method other than POST
     /// by sending a POST request and including the parameter ´__method´. That way a
     /// web page, for example, can send a DELETE request by using a POST form.
-    static func method(of request: Request) throws -> Future<HTTPMethod> {
+    static func method(of request: Request) throws -> EventLoopFuture<HTTPMethod> {
         let method = request.http.method
         if method == .POST {
             return request.content[String.self, at: "__method"]
@@ -82,7 +82,7 @@ class Controller {
         parameters: [ControllerParameter]? = nil,
         type: RedirectType = .normal,
         on request: Request
-    ) -> Future<Response> {
+    ) -> EventLoopFuture<Response> {
         return request.future(redirect(to: location, type: type, on: request))
     }
 
@@ -105,7 +105,7 @@ class Controller {
         to location: String,
         type: RedirectType = .normal,
         on request: Request
-    ) -> Future<Response> {
+    ) -> EventLoopFuture<Response> {
         return request.future(redirect(for: user, to: location, type: type, on: request))
     }
 
@@ -131,7 +131,7 @@ class Controller {
         to location: String,
         type: RedirectType = .normal,
         on request: Request
-    ) -> Future<Response> {
+    ) -> EventLoopFuture<Response> {
         return request.future(redirect(for: user, and: list, to: location, type: type, on: request))
     }
 
@@ -153,7 +153,7 @@ class Controller {
         parameters: [ControllerParameter]? = nil,
         type: RedirectType = .normal,
         on request: Request
-    ) -> Future<Response> {
+    ) -> EventLoopFuture<Response> {
         return request.future(redirect(for: list, parameters: parameters, type: type, on: request))
     }
 
@@ -168,7 +168,7 @@ class Controller {
         _ templateName: String,
         with pageContext: E,
         on request: Request
-    ) throws -> Future<View> where E: Encodable {
+    ) throws -> EventLoopFuture<View> where E: Encodable {
         let site = try request.make(Site.self)
         let features = try request.make(Features.self)
         let context = RenderContext(pageContext, site: site, features: features)
@@ -183,7 +183,7 @@ class Controller {
     static func renderView(
         _ templateName: String,
         on request: Request
-    ) throws -> Future<View> {
+    ) throws -> EventLoopFuture<View> {
         return try renderView(templateName, with: [String: String](), on: request)
     }
 
@@ -196,7 +196,7 @@ class Controller {
         _ templateBaseName: String,
         with pageContext: E,
         on request: Request
-    ) throws -> Future<View> where E: Encodable {
+    ) throws -> EventLoopFuture<View> where E: Encodable {
         let templateName: String
         let localization = try request.make(LocalizationService.self)
         let locale = try localization.locale(on: request)
@@ -215,7 +215,7 @@ class Controller {
     static func renderLocalizedView(
         _ templateBaseName: String,
         on request: Request
-    ) throws -> Future<View> {
+    ) throws -> EventLoopFuture<View> {
         return try renderLocalizedView(templateBaseName, with: [String: String](), on: request)
     }
 

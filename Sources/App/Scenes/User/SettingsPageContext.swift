@@ -8,12 +8,48 @@ struct SettingsPageContext: Encodable {
 
     var form: SettingsPageFormContext
 
-    init(for user: User, from data: SettingsPageFormData? = nil) {
+    fileprivate init(for user: User, from data: SettingsPageFormData? = nil) {
         self.userID = ID(user.id)
 
         self.settings = user.settings
 
         self.form = SettingsPageFormContext(from: data)
+    }
+
+}
+
+// MARK: - Builder
+
+enum SettingsPageContextBuilderError: Error {
+    case missingRequiredUser
+}
+
+class SettingsPageContextBuilder {
+
+    var user: User?
+
+    var formData: SettingsPageFormData?
+
+    @discardableResult
+    func forUser(_ user: User) -> Self {
+        self.user = user
+        return self
+    }
+
+    @discardableResult
+    func withFormData(_ formData: SettingsPageFormData?) -> Self {
+        self.formData = formData
+        return self
+    }
+
+    func build() throws -> SettingsPageContext {
+        guard let user = user else {
+            throw SettingsPageContextBuilderError.missingRequiredUser
+        }
+        return SettingsPageContext(
+            for: user,
+            from: formData
+        )
     }
 
 }

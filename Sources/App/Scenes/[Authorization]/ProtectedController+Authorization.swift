@@ -20,7 +20,7 @@ extension ProtectedController {
         on request: Request,
         for list: List,
         user: User?
-    ) throws -> Future<Authorization<List>> {
+    ) throws -> EventLoopFuture<Authorization<List>> {
         // check if the list may be accessed by the given user
         // user may be nil indicating this is a anonymous request
         return list.user.get(on: request).map { owner in

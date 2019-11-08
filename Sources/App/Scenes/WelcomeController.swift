@@ -14,21 +14,25 @@ extension ControllerParameter {
 /// Controller for displaying the welcome page.
 final class WelcomeController: Controller, RouteCollection {
 
-    static func renderView(on request: Request) throws -> Future<View> {
+    static func renderView(on request: Request) throws -> EventLoopFuture<View> {
         guard let user = try request.authenticated(User.self) else {
             return try WelcomeController.renderView("Public/Welcome", on: request)
         }
 
-        let listContextsBuilder = ListContextsBuilder().forUser(user).countItems(true)
+        let listContextsBuilder = ListContextsBuilder()
+            .forUser(user)
+            .includeItemsCount(true)
         let listContexts = try listContextsBuilder.build(on: request)
-        let favoriteContextsBuilder = FavoriteContextsBuilder().forUser(user).countItems(true)
+        let favoriteContextsBuilder = FavoriteContextsBuilder()
+            .forUser(user)
+            .includeItemsCount(true)
         let favoriteContexts = try favoriteContextsBuilder.build(on: request)
         return flatMap(listContexts, favoriteContexts) { listContexts, favoriteContexts in
-            let context = WelcomePageContext(
-                for: user,
-                lists: listContexts,
-                favorites: favoriteContexts
-            )
+            let context = try WelcomePageContextBuilder()
+                .forUser(user)
+                .withLists(listContexts)
+                .withFavorites(favoriteContexts)
+                .build()
             return try renderView("User/Welcome", with: context, on: request)
         }
     }

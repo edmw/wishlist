@@ -9,7 +9,7 @@ class AuthenticationController: ProtectedController {
         using userInfo: AuthenticationUserInfo,
         redirect defaultLocation: String,
         on request: Request
-    ) throws -> Future<ResponseEncodable> {
+    ) throws -> EventLoopFuture<ResponseEncodable> {
 
         // check authentication state
         // state token in session must match state token transported in query

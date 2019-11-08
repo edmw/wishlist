@@ -1,11 +1,11 @@
 import Vapor
 
-struct MessagingProvider: Provider {
+public struct MessagingProvider: Provider {
 
     init() {
     }
 
-    func register(_ services: inout Services) throws {
+    public func register(_ services: inout Services) throws {
         services.register(EmailService.self) { container in
             return try EmailService(configuration: container.make())
         }
@@ -17,7 +17,7 @@ struct MessagingProvider: Provider {
         }
     }
 
-    func didBoot(_ container: Container) throws -> Future<Void> {
+    public func didBoot(_ container: Container) throws -> EventLoopFuture<Void> {
         return .done(on: container)
     }
 

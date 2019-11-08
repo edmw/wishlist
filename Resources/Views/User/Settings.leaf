@@ -4,7 +4,6 @@
 #// form action and method to update a users settings
 <form method="POST" action="/user/#(page.userID)/settings#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="wl-list">
 <input name="__method" type="hidden" value="PUT">
-#if(features.userNotifications.enabled) {
 <div class="form-group">
 <label>#L10N("settings-notifications-services"){Notification Services}</label>
 <div class="row">
@@ -29,7 +28,6 @@
 </div>
 <small id="descriptionPushoverKey" class="form-text text-muted">#if(page.form.missingPushoverKey){<span class="text-danger">#L10N("settings-field-pushoverkey-missing"){Pushover User key is required.} </span>}#if(page.form.invalidPushoverKey){<span class="text-danger">#L10N("settings-field-pushoverkey-invalid"){Not a valid Pushover User key.} </span>}#L10N("settings-field-pushover-hint"){Pushover is a service to receive instant push notifications on your phone or tablet. After creating a Pushover account and registering a device with the Pushover service enter your User Key to start receiving notifications.}</small>
 </div>
-}
 <div class="form-group form-row mt-4">
 <button type="submit" class="btn btn-primary">#L10N("save"){Save}</button>
 <a class="nav-link btn btn-link ml-3" href="#if(request.parameter.p){#(request.parameter.p)}else{/user/#(page.userID)}">#L10N("cancel"){Cancel}</a>

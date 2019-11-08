@@ -1,4 +1,6 @@
 {
+    "about-intro": "<span class='title'>Wishlist</span> is an easy to use web-based application that will help you to collect, organize and keep track of things you want. It also makes it easy to share your wishes with friends and family.",
+
     "public": "Public",
     "private": "Private",
     "friends": "Friends",
@@ -9,11 +11,13 @@
     "item-preference-3": "Would love to have",
     "item-preference-4": "Must have",
 
-    "settings-notifications-test-title": "🎁 Notification",
+    "invitation-mail-title": "🎁 Invitation",
 
     "notification-html-footer": "This is an automatically generated notification email – please do not reply to it.",
     
     "reservations-notifications-create-title": "🎁 Wish reserved",
     "reservations-notifications-delete-title": "🎁 Reservation released",
+
+    "settings-notifications-test-title": "🎁 Notification",
 
 }

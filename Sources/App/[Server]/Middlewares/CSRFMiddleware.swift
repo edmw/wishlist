@@ -37,7 +37,7 @@ final class CSRFMiddleware: Middleware, ServiceType {
     func respond(
         to request: Request,
         chainingTo next: Responder
-    ) throws -> Future<Response> {
+    ) throws -> EventLoopFuture<Response> {
         guard let origin = request.http.headers[.origin].first else {
             // Origin header not present (we rely on the browser’s correct origin header handling)
             return try next.respond(to: request)
