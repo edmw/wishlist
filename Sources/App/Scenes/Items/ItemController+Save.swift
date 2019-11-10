@@ -5,24 +5,21 @@ extension ItemController {
 
     // MARK: Save
 
-    enum SaveResult {
-        case success(item: Item, list: List)
-        case failure(context: ItemPageContext)
-    }
+    final class ItemSaveOutcome: Outcome<Item, ItemPageContext> {}
 
     /// Saves an item for the specified user and list from the request’s data.
     /// Validates the data contained in the request and
     /// creates a new item or updates an existing item if given.
     ///
-    /// This function handles thrown `EntityError`s by rendering the form page again while adding
-    /// the corresponding error flags to the page context.
+    /// This function handles thrown `EntityError`s by constructing a page context while adding
+    /// the corresponding error flags.
     static func save(
         from request: Request,
         for user: User,
         and list: List,
         this item: Item? = nil
     ) throws
-        -> EventLoopFuture<SaveResult>
+        -> EventLoopFuture<ItemSaveOutcome>
     {
         return try request.content
             .decode(ItemPageFormData.self)
@@ -39,7 +36,7 @@ extension ItemController {
                         return try save(
                             from: formdata, for: user, and: list, this: item, on: request
                         )
-                        .map { item in .success(item: item, list: list) }
+                        .map { item in .success(with: item, context: context) }
                     }
                     .catchMap(EntityError<Item>.self) {
                         try handleErrorOnSave($0, with: context)
@@ -51,7 +48,7 @@ extension ItemController {
         _ error: EntityError<Item>,
         with contextIn: ItemPageContext
     ) throws
-        -> SaveResult
+        -> ItemSaveOutcome
     {
         var context = contextIn
         switch error {
@@ -63,7 +60,7 @@ extension ItemController {
         default:
             throw error
         }
-        return .failure(context: context)
+        return .failure(with: error, context: context)
     }
 
     /// Saves an item for the specified user from the given form data.

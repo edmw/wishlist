@@ -24,14 +24,9 @@ final class SettingsController: ProtectedController, RouteCollection {
     private static func update(on request: Request) throws -> EventLoopFuture<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
-        return try save(from: request, for: user).flatMap { result in
-            switch result {
-            case .success:
-                return success(for: user, on: request)
-            case .failure(let context):
-                return try failure(on: request, with: context)
-            }
-        }
+        return try save(from: request, for: user)
+            .caseSuccess { success(for: user, on: request) }
+            .caseFailure { context in try failure(on: request, with: context) }
     }
 
     // MARK: - RESULT

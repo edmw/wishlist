@@ -5,10 +5,7 @@ extension ProfileController {
 
     // MARK: Save
 
-    enum SaveResult {
-        case success(user: User)
-        case failure(context: ProfilePageContext)
-    }
+    final class ProfileSaveOutcome: Outcome<User, ProfilePageContext> {}
 
     /// Saves a profile for the specified user from the request’s data.
     /// Validates the data contained in the request and updates the user.
@@ -16,7 +13,7 @@ extension ProfileController {
         from request: Request,
         for user: User
     ) throws
-        -> EventLoopFuture<SaveResult>
+        -> EventLoopFuture<ProfileSaveOutcome>
     {
         return try request.content
             .decode(ProfilePageFormData.self)
@@ -31,7 +28,7 @@ extension ProfileController {
                         return try save(
                             from: formdata, for: user, on: request
                         )
-                        .map { user in .success(user: user) }
+                        .map { user in .success(with: user, context: context) }
                     }
                     .catchMap(EntityError<User>.self) {
                         try handleErrorOnSave($0, with: context)
@@ -43,7 +40,7 @@ extension ProfileController {
         _ error: EntityError<User>,
         with contextIn: ProfilePageContext
     ) throws
-        -> SaveResult
+        -> ProfileSaveOutcome
     {
         var context = contextIn
         switch error {
@@ -55,7 +52,7 @@ extension ProfileController {
         default:
             throw error
         }
-        return .failure(context: context)
+        return .failure(with: error, context: context)
     }
 
     /// Saves an user from the given form data.

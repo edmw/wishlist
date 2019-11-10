@@ -5,26 +5,24 @@ extension InvitationController {
 
     // MARK: Save
 
-    struct SaveResult {
+    struct InvitationSaveValue {
         let invitation: Invitation
-        let thenSendEmail: Bool
+        let thenSendMail: Bool
     }
 
-    struct SaveError: Error {
-        let context: InvitationPageContext
-    }
+    final class InvitationSaveOutcome: Outcome<InvitationSaveValue, InvitationPageContext> {}
 
     /// Saves an invitation for the specified user from the request’s data.
     /// Validates the data contained in the request, checks the constraints required for a new
     /// invitation and creates a new invitation.
     ///
-    /// This function handles thrown `EntityError`s by rendering the form page again while adding
-    /// the corresponding error flags to the page context.
+    /// This function handles thrown `EntityError`s by constructing a page context while adding
+    /// the corresponding error flags.
     static func save(
         from request: Request,
         for user: User
     ) throws
-        -> EventLoopFuture<Result<SaveResult, SaveError>>
+        -> EventLoopFuture<InvitationSaveOutcome>
     {
         return try request.content
             .decode(InvitationPageFormData.self)
@@ -42,10 +40,11 @@ extension InvitationController {
                             on: request
                         )
                         .map { invitation in
-                            let thenSendEmail = formdata.inputSendEmail ?? false
-                            return .success(
-                                SaveResult(invitation: invitation, thenSendEmail: thenSendEmail)
+                            let value = InvitationSaveValue(
+                                invitation: invitation,
+                                thenSendMail: formdata.inputSendEmail ?? false
                             )
+                            return .success(with: value, context: context)
                         }
 
                     }
@@ -59,7 +58,7 @@ extension InvitationController {
         _ error: EntityError<Invitation>,
         with contextIn: InvitationPageContext
     ) throws
-        -> Result<SaveResult, SaveError>
+        -> InvitationSaveOutcome
     {
         var context = contextIn
         switch error {
@@ -68,7 +67,7 @@ extension InvitationController {
         default:
             throw error
         }
-        return .failure(SaveError(context: context))
+        return .failure(with: error, context: context)
     }
 
     /// Saves an invitation for the specified user from the given form data.
@@ -94,52 +93,6 @@ extension InvitationController {
 
                 return invitationRepository.save(invitation: entity)
             }
-    }
-
-}
-
-// MARK: Future
-
-// Note: this is a big "playground". The goal is to make these extensions generic in way they can
-// handle abritrary save results. If this is not gonna happen, it would be much simpler to revert
-// this to the previous solution as used in the other Save controllers.
-
-struct CaseSuccessError: Error {
-    let context: InvitationPageContext
-}
-
-extension EventLoopFuture
-    where Expectation == Result<InvitationController.SaveResult, InvitationController.SaveError> {
-
-    func caseSuccess(
-        _ callback: @escaping (Invitation, Bool) throws -> EventLoopFuture<Response>
-    ) -> EventLoopFuture<Result<EventLoopFuture<Response>, CaseSuccessError>> {
-        return self.map { result in
-            switch result {
-            case let .success(saveResult):
-                return try .success(callback(saveResult.invitation, saveResult.thenSendEmail))
-            case let .failure(saveError):
-                return .failure(CaseSuccessError(context: saveError.context))
-            }
-        }
-    }
-
-}
-
-extension EventLoopFuture where Expectation == Result<EventLoopFuture<Response>, CaseSuccessError> {
-
-    func caseFailure (
-        _ callback: @escaping (InvitationPageContext) throws -> EventLoopFuture<Response>
-    ) -> EventLoopFuture<Response> {
-
-        return self.flatMap { result in
-            switch result {
-            case let .success(success):
-                return success
-            case let .failure(error):
-                return try callback(error.context)
-            }
-        }
     }
 
 }

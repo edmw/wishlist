@@ -5,23 +5,20 @@ extension ListController {
 
     // MARK: Save
 
-    enum SaveResult {
-        case success(list: List)
-        case failure(context: ListPageContext)
-    }
+    final class ListSaveOutcome: Outcome<List, ListPageContext> {}
 
     /// Saves a list for the specified user from the request’s data.
     /// Validates the data contained in the request, checks the constraints required for a new or
     /// updated list and creates a new list or updates an existing list if given.
     ///
-    /// This function handles thrown `EntityError`s by rendering the form page again while adding
-    /// the corresponding error flags to the page context.
+    /// This function handles thrown `EntityError`s by constructing a page context while adding
+    /// the corresponding error flags.
     static func save(
         from request: Request,
         for user: User,
         this list: List? = nil
     ) throws
-        -> EventLoopFuture<SaveResult>
+        -> EventLoopFuture<ListSaveOutcome>
     {
         return try request.content
             .decode(ListPageFormData.self)
@@ -36,7 +33,7 @@ extension ListController {
                             this: list,
                             on: request
                         )
-                        .map { list in .success(list: list) }
+                        .map { list in .success(with: list, context: context) }
                     }
                     .catchMap(EntityError<List>.self) {
                         try handleSaveOnError($0, with: context)
@@ -48,7 +45,7 @@ extension ListController {
         _ error: EntityError<List>,
         with contextIn: ListPageContext
     ) throws
-        -> SaveResult
+        -> ListSaveOutcome
     {
         var context = contextIn
         switch error {
@@ -61,7 +58,7 @@ extension ListController {
         default:
             throw error
         }
-        return .failure(context: context)
+        return .failure(with: error, context: context)
     }
 
     /// Saves a list for the specified user from the given form data.

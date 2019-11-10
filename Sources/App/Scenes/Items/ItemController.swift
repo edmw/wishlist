@@ -95,18 +95,14 @@ final class ItemController: ProtectedController, RouteCollection {
         return try requireList(on: request, for: user)
             .flatMap { list in
                 return try save(from: request, for: user, and: list)
-                    .flatMap { result in
-                        switch result {
-                        case let .success(item, list):
-                            return try request.future(item)
-                                .setup(on: request)
-                                .emitEvent("created for \(user)", on: request)
-                                .logMessage("created for \(user)", on: request)
-                                .transform(to: success(for: user, and: list, on: request))
-                        case .failure(let context):
-                            return try failure(on: request, with: context)
-                        }
+                    .caseSuccess { item in
+                        return try request.future(item)
+                            .setup(on: request)
+                            .emitEvent("created for \(user)", on: request)
+                            .logMessage("created for \(user)", on: request)
+                            .transform(to: success(for: user, and: list, on: request))
                     }
+                    .caseFailure { context in try failure(on: request, with: context) }
             }
     }
 
@@ -120,17 +116,13 @@ final class ItemController: ProtectedController, RouteCollection {
                 return try requireItem(on: request, for: list)
                     .flatMap { item in
                         return try save(from: request, for: user, and: list, this: item)
-                            .flatMap { result in
-                                switch result {
-                                case let .success(item, list):
-                                    return request.future(item)
-                                        .setup(on: request)
-                                        .logMessage("updated for \(user)", on: request)
-                                        .transform(to: success(for: user, and: list, on: request))
-                                case .failure(let context):
-                                    return try failure(on: request, with: context)
-                                }
+                            .caseSuccess { item in
+                                return request.future(item)
+                                    .setup(on: request)
+                                    .logMessage("updated for \(user)", on: request)
+                                    .transform(to: success(for: user, and: list, on: request))
                             }
+                            .caseFailure { context in try failure(on: request, with: context) }
                     }
             }
     }

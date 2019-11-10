@@ -71,11 +71,11 @@ final class InvitationController: ProtectedController, RouteCollection {
     private static func create(on request: Request) throws -> EventLoopFuture<Response> {
         return try authorizeUser(on: request) { user in
             return try save(from: request, for: user)
-                .caseSuccess { invitation, thenSendMail in
-                    let result = try request.future(invitation)
+                .caseSuccess { outcome in
+                    let result = try request.future(outcome.invitation)
                         .emitEvent("created for \(user)", on: request)
                         .logMessage("created for \(user)", on: request)
-                    if thenSendMail {
+                    if outcome.thenSendMail {
                         return result
                             .sendInvitation(on: request)
                             .transform(to: success(for: user, on: request))
@@ -84,9 +84,7 @@ final class InvitationController: ProtectedController, RouteCollection {
                         return result.transform(to: success(for: user, on: request))
                     }
                 }
-                .caseFailure { context in
-                    return try failure(on: request, with: context)
-                }
+                .caseFailure { context in try failure(on: request, with: context) }
         }
     }
 
@@ -160,7 +158,7 @@ final class InvitationController: ProtectedController, RouteCollection {
             }
     }
 
-    // MARK: -
+    // MARK: - Routing
 
     private static func dispatch(on request: Request) throws -> EventLoopFuture<Response> {
         return try method(of: request)

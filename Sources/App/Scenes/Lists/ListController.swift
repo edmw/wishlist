@@ -52,17 +52,13 @@ final class ListController: ProtectedController, RouteCollection {
         let user = try requireAuthenticatedUser(on: request)
 
         return try save(from: request, for: user)
-            .flatMap { result in
-                switch result {
-                case let .success(list):
-                    return try request.future(list)
-                        .emitEvent("created for \(user)", on: request)
-                        .logMessage("created for \(user)", on: request)
-                        .transform(to: success(for: user, on: request))
-                case .failure(let context):
-                    return try failure(on: request, with: context)
-                }
+            .caseSuccess { list in
+                return try request.future(list)
+                    .emitEvent("created for \(user)", on: request)
+                    .logMessage("created for \(user)", on: request)
+                    .transform(to: success(for: user, on: request))
             }
+            .caseFailure { context in try failure(on: request, with: context) }
     }
 
     private static func update(on request: Request) throws -> EventLoopFuture<Response> {
@@ -71,16 +67,12 @@ final class ListController: ProtectedController, RouteCollection {
         return try requireList(on: request, for: user)
             .flatMap { list in
                 return try save(from: request, for: user, this: list)
-                    .flatMap { result in
-                        switch result {
-                        case let .success(list):
-                            return request.future(list)
-                                .logMessage("updated for \(user)", on: request)
-                                .transform(to: success(for: user, on: request))
-                        case .failure(let context):
-                            return try failure(on: request, with: context)
-                        }
+                    .caseSuccess { list in
+                        return request.future(list)
+                            .logMessage("updated for \(user)", on: request)
+                            .transform(to: success(for: user, on: request))
                     }
+                    .caseFailure { context in try failure(on: request, with: context) }
             }
     }
 

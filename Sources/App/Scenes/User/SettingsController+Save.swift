@@ -5,12 +5,7 @@ extension SettingsController {
 
     // MARK: Save
 
-    // MARK: Save
-
-    enum SaveResult {
-        case success(settings: UserSettings)
-        case failure(context: SettingsPageContext)
-    }
+    final class SettingsSaveOutcome: Outcome<UserSettings, SettingsPageContext> {}
 
     /// Saves settings for the specified user from the request’s data.
     /// Validates the data contained in the request and updates the user.
@@ -18,7 +13,7 @@ extension SettingsController {
         from request: Request,
         for user: User
     ) throws
-        -> EventLoopFuture<SaveResult>
+        -> EventLoopFuture<SettingsSaveOutcome>
     {
         return try request.content
             .decode(SettingsPageFormData.self)
@@ -31,7 +26,7 @@ extension SettingsController {
                 return request.future()
                     .flatMap {
                         return try save(from: formdata, for: user, on: request)
-                            .map { settings in .success(settings: settings) }
+                            .map { settings in .success(with: settings, context: context) }
                     }
                     .catchMap(ValidationError.self) { error in
                         // WORKAROUND: See https://github.com/vapor/validation/issues/26
@@ -44,7 +39,7 @@ extension SettingsController {
                             context.form.invalidPushoverKey =
                                 reason.contains("'notifications.pushoverKey'")
                         }
-                        return .failure(context: context)
+                        return .failure(with: error, context: context)
                     }
             }
     }
