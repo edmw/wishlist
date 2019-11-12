@@ -4,6 +4,14 @@ import Vapor
 
 class FavoriteContextsBuilder {
 
+    let favoriteRepository: FavoriteRepository
+    let itemRepository: ItemRepository
+
+    init(_ favoriteRepository: FavoriteRepository, _ itemRepository: ItemRepository) {
+        self.favoriteRepository = favoriteRepository
+        self.itemRepository = itemRepository
+    }
+
     var user: User?
 
     var sorting = ListsSorting.ascending(by: \List.title)
@@ -39,7 +47,7 @@ class FavoriteContextsBuilder {
         // Then, we flatten the array of context futures to a future of an array of contexts.
         // Now, we map the future of an array of contexts to the actual array of contexts.
         // (better would be: use a join on the database)
-        return try request.make(FavoriteRepository.self)
+        return try self.favoriteRepository
             .favorites(for: user, sort: sorting)
             .flatMap { lists in
                 return lists.map { list in
@@ -47,7 +55,7 @@ class FavoriteContextsBuilder {
                     return list.user.get(on: request).flatMap { owner in
                         context.list.ownerName = owner.displayName
                         if self.includeItemsCount {
-                            return try request.make(ItemRepository.self)
+                            return try self.itemRepository
                                 .count(on: list)
                                 .map { itemsCount in
                                     context.list.itemsCount = itemsCount

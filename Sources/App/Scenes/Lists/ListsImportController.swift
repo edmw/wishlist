@@ -7,18 +7,26 @@ struct ListFileUpload: Content {
 
 final class ListsImportController: ProtectedController, RouteCollection {
 
+    let listRepository: ListRepository
+    let itemRepository: ItemRepository
+
+    init(_ listRepository: ListRepository, _ itemRepository: ItemRepository) {
+        self.listRepository = listRepository
+        self.itemRepository = itemRepository
+    }
+
     // MARK: - VIEWS
 
-    private static func renderImportView(on request: Request) throws -> EventLoopFuture<View> {
+    private func renderImportView(on request: Request) throws -> EventLoopFuture<View> {
         let user = try requireAuthenticatedUser(on: request)
 
         let context = ListsPageContext(for: user)
-        return try renderView("User/ListsImport", with: context, on: request)
+        return try Controller.renderView("User/ListsImport", with: context, on: request)
     }
 
     // MARK: - EXTRA
 
-    private static func importList(on request: Request) throws -> EventLoopFuture<Response> {
+    private func importList(on request: Request) throws -> EventLoopFuture<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
         return try request.content.decode(ListFileUpload.self)
@@ -32,17 +40,16 @@ final class ListsImportController: ProtectedController, RouteCollection {
 
                 let data = try decoder.decode(ListData.self, from: json)
 
-                return try request.make(ListRepository.self)
+                return try self.listRepository
                     .available(title: data.title, for: user)
                     .unwrap(
                         or: Abort(.badRequest, reason: "no available list name")
                     )
                     .flatMap { title in
-                        return try ListController
-                            .store(data.with(title: title), for: user, on: request)
+                        return try self.store(data.with(title: title), for: user, on: request)
                             .emitEvent("created for \(user)", on: request)
                             .logMessage("created for \(user)", on: request)
-                            .transform(to: success(for: user, on: request))
+                            .transform(to: self.success(for: user, on: request))
                     }
             }
             .catchFlatMap { error in
@@ -55,7 +62,55 @@ final class ListsImportController: ProtectedController, RouteCollection {
                 else {
                     throw error
                 }
-                return try failure(on: request, with: ListsPageContext(for: user))
+                return try self.failure(on: request, with: ListsPageContext(for: user))
+            }
+    }
+
+    /// Stores the given list data into a new list.
+    /// Data must pass properties validation and constraints check.
+    private func store(
+        _ listdata: ListData,
+        for user: User,
+        on request: Request
+    ) throws -> EventLoopFuture<List> {
+        return try listdata.validate(for: user, using: listRepository)
+            .flatMap { listdata in
+                // create list
+                let list = try List(for: user, from: listdata)
+                return self.listRepository
+                    .save(list: list)
+                    .flatMap { list in
+                        guard let itemsdata = listdata.items else {
+                            return request.future(list)
+                        }
+                        var futureItems = [Future<Item>]()
+                        // store items
+                        for itemdata in itemsdata {
+                            futureItems.append(
+                                try self.store(itemdata, for: list, on: request)
+                            )
+                        }
+                        return futureItems.flatten(on: request)
+                            .transform(to: list)
+                    }
+            }
+    }
+
+    /// Stores the given item data into a new item.
+    /// Data must pass properties validation and constraints check.
+    private func store(
+        _ itemdata: ItemData,
+        for list: List,
+        on request: Request
+    ) throws -> EventLoopFuture<Item> {
+        return try itemdata.validate(for: list, using: itemRepository, on: request)
+            .flatMap { itemdata in
+                // create item
+                let item = try Item(for: list, from: itemdata)
+                return self.itemRepository
+                    .save(item: item)
+                    .setup(on: request, in: self.itemRepository)
+                    .transform(to: item)
             }
     }
 
@@ -63,30 +118,30 @@ final class ListsImportController: ProtectedController, RouteCollection {
 
     /// Returns a sucess response on an import request.
     /// Not implemented yet: REST response
-    private static func success(for user: User, on request: Request) -> EventLoopFuture<Response> {
+    private func success(for user: User, on request: Request) -> EventLoopFuture<Response> {
         // to add real REST support, check the accept header for json and output a json response
         if let locator = request.query.getLocator(is: .local) {
             return request.eventLoop.newSucceededFuture(
-                result: redirect(to: locator.locationString, on: request)
+                result: Controller.redirect(to: locator.locationString, on: request)
             )
         }
         else {
             return request.eventLoop.newSucceededFuture(
-                result: redirect(for: user, to: "lists", on: request)
+                result: Controller.redirect(for: user, to: "lists", on: request)
             )
         }
     }
 
     /// Returns a failure response on a CRUD request.
     /// Not implemented yet: REST response
-    private static func failure(
+    private func failure(
         on request: Request,
         with context: ListsPageContext
     ) throws
         -> EventLoopFuture<Response>
     {
         // to add real REST support, check the accept header for json and output a json response
-        return try renderView("User/ListsImportError", with: context, on: request)
+        return try Controller.renderView("User/ListsImportError", with: context, on: request)
             .flatMap { view in
                 return try view.encode(for: request)
             }
@@ -96,10 +151,10 @@ final class ListsImportController: ProtectedController, RouteCollection {
 
     func boot(router: Router) throws {
         router.get("user", ID.parameter, "lists", "import",
-            use: ListsImportController.renderImportView
+            use: self.renderImportView
         )
         router.post("user", ID.parameter, "lists", "import",
-            use: ListsImportController.importList
+            use: self.importList
         )
     }
 

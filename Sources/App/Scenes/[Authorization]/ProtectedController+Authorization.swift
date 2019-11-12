@@ -6,7 +6,7 @@ import Vapor
 /// by an entitled user.
 extension ProtectedController {
 
-    static func requireAuthorization<V: Viewable>(
+    func requireAuthorization<V: Viewable>(
         on request: Request,
         for viewable: V,
         owner: User,
@@ -16,7 +16,7 @@ extension ProtectedController {
         return Authorization(resource: viewable, owner: owner, subject: user)
     }
 
-    static func requireAuthorization(
+    func requireAuthorization(
         on request: Request,
         for list: List,
         user: User?
@@ -24,7 +24,7 @@ extension ProtectedController {
         // check if the list may be accessed by the given user
         // user may be nil indicating this is a anonymous request
         return list.user.get(on: request).map { owner in
-            return try requireAuthorization(on: request, for: list, owner: owner, user: user)
+            return try self.requireAuthorization(on: request, for: list, owner: owner, user: user)
         }
     }
 

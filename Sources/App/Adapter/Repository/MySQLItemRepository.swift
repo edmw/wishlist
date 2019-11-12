@@ -3,12 +3,15 @@ import Fluent
 import FluentSQL
 import FluentMySQL
 
+/// Adapter for port `ItemRepository` using MySQL database.
 final class MySQLItemRepository: ItemRepository, MySQLModelRepository {
 
     // swiftlint:disable first_where
 
     let db: MySQLDatabase.ConnectionPool
 
+    /// Initializes the repository for **Items** on the specified MySQL connection pool.
+    /// - Parameter db: MySQL connection pool
     init(_ db: MySQLDatabase.ConnectionPool) {
         self.db = db
     }
@@ -143,16 +146,14 @@ final class MySQLItemRepository: ItemRepository, MySQLModelRepository {
         return db.withConnection { connection in
             if item.id == nil {
                 // item create
+                let limit = Item.maximumNumberOfItemsPerList
                 return Item.query(on: connection)
                     .filter(\.listID == item.listID)
                     .count()
-                    .flatMap { count in
-                        let maximum = Item.maximumNumberOfItemsPerList
-                        guard count < maximum else {
-                            throw EntityError<Item>.limitReached(maximum: maximum)
-                        }
-                        return item.save(on: connection)
-                    }
+                    .max(limit, or: EntityError<Item>.limitReached(maximum: limit))
+                    .transform(to:
+                        item.save(on: connection)
+                    )
             }
             else {
                 // item update

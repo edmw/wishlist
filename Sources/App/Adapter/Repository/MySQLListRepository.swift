@@ -2,11 +2,14 @@ import Vapor
 import Fluent
 import FluentMySQL
 
+/// Adapter for port `ListRepository` using MySQL database.
 final class MySQLListRepository: ListRepository, MySQLModelRepository {
     // swiftlint:disable first_where
 
     let db: MySQLDatabase.ConnectionPool
 
+    /// Initializes the repository for **Lists** on the specified MySQL connection pool.
+    /// - Parameter db: MySQL connection pool
     init(_ db: MySQLDatabase.ConnectionPool) {
         self.db = db
     }
@@ -86,16 +89,14 @@ final class MySQLListRepository: ListRepository, MySQLModelRepository {
         return db.withConnection { connection in
             if list.id == nil {
                 // list create
+                let limit = List.maximumNumberOfListsPerUser
                 return List.query(on: connection)
                     .filter(\.userID == list.userID)
                     .count()
-                    .flatMap { count in
-                        let maximum = List.maximumNumberOfListsPerUser
-                        guard count < maximum else {
-                            throw EntityError<List>.limitReached(maximum: maximum)
-                        }
-                        return list.save(on: connection)
-                    }
+                    .max(limit, or: EntityError<List>.limitReached(maximum: limit))
+                    .transform(to:
+                        list.save(on: connection)
+                    )
             }
             else {
                 // list update

@@ -13,7 +13,7 @@ extension ItemController {
     ///
     /// This function handles thrown `EntityError`s by constructing a page context while adding
     /// the corresponding error flags.
-    static func save(
+    func save(
         from request: Request,
         for user: User,
         and list: List,
@@ -33,18 +33,18 @@ extension ItemController {
 
                 return request.future()
                     .flatMap { _ in
-                        return try save(
+                        return try self.save(
                             from: formdata, for: user, and: list, this: item, on: request
                         )
                         .map { item in .success(with: item, context: context) }
                     }
                     .catchMap(EntityError<Item>.self) {
-                        try handleErrorOnSave($0, with: context)
+                        try self.handleErrorOnSave($0, with: context)
                     }
             }
     }
 
-    private static func handleErrorOnSave(
+    private func handleErrorOnSave(
         _ error: EntityError<Item>,
         with contextIn: ItemPageContext
     ) throws
@@ -68,7 +68,7 @@ extension ItemController {
     /// a new item or updates an existing item if given.
     ///
     /// Throws `EntityError`s for invalid data or violated constraints.
-    private static func save(
+    private func save(
         from formdata: ItemPageFormData,
         for user: User,
         and list: List,
@@ -77,10 +77,8 @@ extension ItemController {
     ) throws
         -> EventLoopFuture<Item>
     {
-        let itemRepository = try request.make(ItemRepository.self)
-
         return try ItemData(from: formdata)
-            .validate(for: list, this: item, using: itemRepository, on: request)
+            .validate(for: list, this: item, using: self.itemRepository, on: request)
             .flatMap { data in
                 // save item
                 let entity: Item
@@ -94,7 +92,7 @@ extension ItemController {
                     // create item
                     entity = try Item(for: list, from: data)
                 }
-                return itemRepository.save(item: entity)
+                return self.itemRepository.save(item: entity)
             }
     }
 

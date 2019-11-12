@@ -9,7 +9,7 @@ extension ProfileController {
 
     /// Saves a profile for the specified user from the request’s data.
     /// Validates the data contained in the request and updates the user.
-    static func save(
+    func save(
         from request: Request,
         for user: User
     ) throws
@@ -25,18 +25,18 @@ extension ProfileController {
 
                 return request.future()
                     .flatMap {
-                        return try save(
+                        return try self.save(
                             from: formdata, for: user, on: request
                         )
                         .map { user in .success(with: user, context: context) }
                     }
                     .catchMap(EntityError<User>.self) {
-                        try handleErrorOnSave($0, with: context)
+                        try self.handleErrorOnSave($0, with: context)
                     }
             }
     }
 
-    private static func handleErrorOnSave(
+    private func handleErrorOnSave(
         _ error: EntityError<User>,
         with contextIn: ProfilePageContext
     ) throws
@@ -60,15 +60,13 @@ extension ProfileController {
     /// existing user.
     ///
     /// Throws `EntityError`s for invalid data or violated constraints.
-    private static func save(
+    private func save(
         from formdata: ProfilePageFormData,
         for user: User,
         on request: Request
     ) throws
         -> EventLoopFuture<User>
     {
-        let userRepository = try request.make(UserRepository.self)
-
         var userData = UserData(user)
         userData.update(from: formdata)
         return try userData
@@ -78,7 +76,7 @@ extension ProfileController {
 
                 try user.update(from: data)
 
-                return userRepository.save(user: user)
+                return self.userRepository.save(user: user)
             }
     }
 

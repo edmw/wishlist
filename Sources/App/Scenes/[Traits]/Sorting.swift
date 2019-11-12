@@ -4,13 +4,13 @@ protocol SortingController {
 
     associatedtype Sorting: AnyEntitySorting
 
-    static func getSorting(on request: Request) -> Sorting?
+    func getSorting(on request: Request) -> Sorting?
 
 }
 
 extension SortingController where Self: Controller {
 
-    static func getSorting(on request: Request) -> Sorting? {
+    func getSorting(on request: Request) -> Sorting? {
         guard let orderBy = request.query[.orderBy] else {
             return nil
         }

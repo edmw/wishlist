@@ -14,16 +14,30 @@ extension ControllerParameter {
 /// Controller for displaying the welcome page.
 final class WelcomeController: Controller, RouteCollection {
 
-    static func renderView(on request: Request) throws -> EventLoopFuture<View> {
+    let listRepository: ListRepository
+    let itemRepository: ItemRepository
+    let favoriteRepository: FavoriteRepository
+
+    init(
+        _ listRepository: ListRepository,
+        _ favoriteRepository: FavoriteRepository,
+        _ itemRepository: ItemRepository
+    ) {
+        self.listRepository = listRepository
+        self.itemRepository = itemRepository
+        self.favoriteRepository = favoriteRepository
+    }
+
+    func renderView(on request: Request) throws -> EventLoopFuture<View> {
         guard let user = try request.authenticated(User.self) else {
             return try WelcomeController.renderView("Public/Welcome", on: request)
         }
 
-        let listContextsBuilder = ListContextsBuilder()
+        let listContextsBuilder = ListContextsBuilder(listRepository, itemRepository)
             .forUser(user)
             .includeItemsCount(true)
         let listContexts = try listContextsBuilder.build(on: request)
-        let favoriteContextsBuilder = FavoriteContextsBuilder()
+        let favoriteContextsBuilder = FavoriteContextsBuilder(favoriteRepository, itemRepository)
             .forUser(user)
             .includeItemsCount(true)
         let favoriteContexts = try favoriteContextsBuilder.build(on: request)
@@ -33,12 +47,12 @@ final class WelcomeController: Controller, RouteCollection {
                 .withLists(listContexts)
                 .withFavorites(favoriteContexts)
                 .build()
-            return try renderView("User/Welcome", with: context, on: request)
+            return try Controller.renderView("User/Welcome", with: context, on: request)
         }
     }
 
     func boot(router: Router) throws {
-        router.get("/", use: WelcomeController.renderView)
+        router.get("/", use: self.renderView)
     }
 
 }

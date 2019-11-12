@@ -4,7 +4,7 @@ import Vapor
 
 extension ReservationController {
 
-    static func authorizeList(
+    func authorizeList(
         on request: Request,
         _ function: @escaping (Identification, List) throws -> EventLoopFuture<Response>
     ) throws -> EventLoopFuture<Response> {
@@ -14,11 +14,11 @@ extension ReservationController {
         let identification = try user?.identification ?? requireIdentification(on: request)
 
         // get list from request
-        return try requireList(on: request)
+        return try self.requireList(on: request)
             .flatMap { list in
                 // check if the found list may be accessed by the given user
                 // user may be nil indicating this is a anonymous request
-                return try requireAuthorization(on: request, for: list, user: user)
+                return try self.requireAuthorization(on: request, for: list, user: user)
                     .flatMap { _ in
                         // execute the given function after authorization
                         return try function(identification, list)
@@ -27,7 +27,7 @@ extension ReservationController {
             }
     }
 
-    static func authorizeReservation(
+    func authorizeReservation(
         on request: Request,
         with identification: Identification,
         _ function: @escaping (Reservation) throws -> EventLoopFuture<Response>

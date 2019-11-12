@@ -1,13 +1,24 @@
 import Vapor
 import Fluent
 
-final class ListController: ProtectedController, RouteCollection {
+final class ListController: ProtectedController,
+    ListParameterAcceptor,
+    RouteCollection
+{
+
+    let listRepository: ListRepository
+    let itemRepository: ItemRepository
+
+    init(_ listRepository: ListRepository, _ itemRepository: ItemRepository) {
+        self.listRepository = listRepository
+        self.itemRepository = itemRepository
+    }
 
     // MARK: - VIEWS
 
     /// Renders a form view for creating or updating a list.
     /// This is only accessible for an authenticated user.
-    private static func renderFormView(on request: Request) throws
+    private func renderFormView(on request: Request) throws
         -> EventLoopFuture<View>
     {
         let user = try requireAuthenticatedUser(on: request)
@@ -15,7 +26,7 @@ final class ListController: ProtectedController, RouteCollection {
         if request.parameters.values.isEmpty {
             // render form to create new list
             let context = ListPageContext(for: user)
-            return try renderView("User/List", with: context, on: request)
+            return try Controller.renderView("User/List", with: context, on: request)
         }
         else {
             // render form to edit list
@@ -26,7 +37,7 @@ final class ListController: ProtectedController, RouteCollection {
                     with: list,
                     from: data
                 )
-                return try renderView("User/List", with: context, on: request)
+                return try Controller.renderView("User/List", with: context, on: request)
             }
             // malformed parameter errors yield internal server errors
         }
@@ -34,21 +45,21 @@ final class ListController: ProtectedController, RouteCollection {
 
     /// Renders a view to confirm the deletion of a list.
     /// This is only accessible for an authenticated user who owns the affected item.
-    private static func renderDeleteView(on request: Request) throws
+    private func renderDeleteView(on request: Request) throws
         -> EventLoopFuture<View>
     {
         let user = try requireAuthenticatedUser(on: request)
 
         return try requireList(on: request, for: user).flatMap { list in
             let context = ListPageContext(for: user, with: list)
-            return try renderView("User/ListDeletion", with: context, on: request)
+            return try Controller.renderView("User/ListDeletion", with: context, on: request)
         }
     }
 
     // MARK: - CRUD
 
     // Creates a list with the given data.
-    private static func create(on request: Request) throws -> EventLoopFuture<Response> {
+    private func create(on request: Request) throws -> EventLoopFuture<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
         return try save(from: request, for: user)
@@ -56,27 +67,27 @@ final class ListController: ProtectedController, RouteCollection {
                 return try request.future(list)
                     .emitEvent("created for \(user)", on: request)
                     .logMessage("created for \(user)", on: request)
-                    .transform(to: success(for: user, on: request))
+                    .transform(to: self.success(for: user, on: request))
             }
-            .caseFailure { context in try failure(on: request, with: context) }
+            .caseFailure { context in try self.failure(on: request, with: context) }
     }
 
-    private static func update(on request: Request) throws -> EventLoopFuture<Response> {
+    private func update(on request: Request) throws -> EventLoopFuture<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
         return try requireList(on: request, for: user)
             .flatMap { list in
-                return try save(from: request, for: user, this: list)
+                return try self.save(from: request, for: user, this: list)
                     .caseSuccess { list in
                         return request.future(list)
                             .logMessage("updated for \(user)", on: request)
-                            .transform(to: success(for: user, on: request))
+                            .transform(to: self.success(for: user, on: request))
                     }
-                    .caseFailure { context in try failure(on: request, with: context) }
+                .caseFailure { context in try self.failure(on: request, with: context) }
             }
     }
 
-    private static func delete(on request: Request) throws -> EventLoopFuture<Response> {
+    private func delete(on request: Request) throws -> EventLoopFuture<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
         return try requireList(on: request, for: user)
@@ -88,7 +99,7 @@ final class ListController: ProtectedController, RouteCollection {
 
     // MARK: - EXTRA
 
-    private static func exportFilename(for list: List) -> String {
+    private func exportFilename(for list: List) -> String {
         let listtitle = list.title.slugify()
         let datestamp = Date().exportDatestamp()
         var components = ["wishlist"]
@@ -99,15 +110,15 @@ final class ListController: ProtectedController, RouteCollection {
         return components.joined(separator: "-")
     }
 
-    private static func export(on request: Request) throws -> EventLoopFuture<Response> {
+    private func export(on request: Request) throws -> EventLoopFuture<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
         return try requireList(on: request, for: user)
             .flatMap { list in
-                return try request.make(ItemRepository.self)
+                return try self.itemRepository
                     .all(for: list)
                     .flatMap(to: Response.self, { items in
-                        let filename = exportFilename(for: list)
+                        let filename = self.exportFilename(for: list)
                         let headers = HTTPHeaders([
                             ("Content-Disposition", "attachment; filename=\(filename).json")
                         ])
@@ -121,28 +132,28 @@ final class ListController: ProtectedController, RouteCollection {
 
     /// Returns a sucess response on a CRUD request.
     /// Not implemented yet: REST response
-    private static func success(for user: User, on request: Request) -> EventLoopFuture<Response> {
+    private func success(for user: User, on request: Request) -> EventLoopFuture<Response> {
         // to add real REST support, check the accept header for json and output a json response
         if let locator = request.query.getLocator(is: .local) {
             return request.eventLoop.newSucceededFuture(
-                result: redirect(to: locator.locationString, on: request)
+                result: Controller.redirect(to: locator.locationString, on: request)
             )
         }
         else {
             return request.eventLoop.newSucceededFuture(
-                result: redirect(for: user, to: "lists", on: request)
+                result: Controller.redirect(for: user, to: "lists", on: request)
             )
         }
     }
 
     /// Returns a failure response on a CRUD request.
     /// Not implemented yet: REST response
-    private static func failure(
+    private func failure(
         on request: Request,
         with context: ListPageContext
     ) throws -> EventLoopFuture<Response> {
         // to add real REST support, check the accept header for json and output a json response
-        return try renderView("User/List", with: context, on: request)
+        return try Controller.renderView("User/List", with: context, on: request)
             .flatMap { view in
                 return try view.encode(for: request)
             }
@@ -150,14 +161,14 @@ final class ListController: ProtectedController, RouteCollection {
 
     // MARK: -
 
-    private static func dispatch(on request: Request) throws -> EventLoopFuture<Response> {
+    private func dispatch(on request: Request) throws -> EventLoopFuture<Response> {
         return try method(of: request)
             .flatMap { method -> EventLoopFuture<Response> in
                 switch method {
                 case .PUT:
-                    return try update(on: request)
+                    return try self.update(on: request)
                 case .DELETE:
-                    return try delete(on: request)
+                    return try self.delete(on: request)
                 default:
                     throw Abort(.methodNotAllowed)
                 }
@@ -169,60 +180,26 @@ final class ListController: ProtectedController, RouteCollection {
         // list creation
 
         router.get("user", ID.parameter, "lists", "create",
-            use: ListController.renderFormView
+            use: self.renderFormView
         )
         router.post("user", ID.parameter, "lists",
-            use: ListController.create
+            use: self.create
         )
 
         // list handling
 
         router.get("user", ID.parameter, "list", ID.parameter, "edit",
-            use: ListController.renderFormView
+            use: self.renderFormView
         )
         router.get("user", ID.parameter, "list", ID.parameter, "delete",
-            use: ListController.renderDeleteView
+            use: self.renderDeleteView
         )
         router.post("user", ID.parameter, "list", ID.parameter,
-            use: ListController.dispatch
+            use: self.dispatch
         )
         router.get("user", ID.parameter, "list", ID.parameter, "export",
-            use: ListController.export
+            use: self.export
         )
-    }
-
-    // MARK: -
-
-    /// Stores the given list data into a new list.
-    /// Data must pass properties validation and constraints check.
-    static func store(
-        _ listdata: ListData,
-        for user: User,
-        on request: Request
-    ) throws -> EventLoopFuture<List> {
-        let listRepository = try request.make(ListRepository.self)
-
-        return try listdata.validate(for: user, using: listRepository)
-            .flatMap { listdata in
-                // create list
-                let list = try List(for: user, from: listdata)
-                return listRepository
-                    .save(list: list)
-                    .flatMap { list in
-                        guard let itemsdata = listdata.items else {
-                            return request.future(list)
-                        }
-                        var futureItems = [Future<Item>]()
-                        // store items
-                        for itemdata in itemsdata {
-                            futureItems.append(
-                                try ItemController.store(itemdata, for: list, on: request)
-                            )
-                        }
-                        return futureItems.flatten(on: request)
-                            .transform(to: list)
-                    }
-            }
     }
 
 }

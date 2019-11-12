@@ -7,7 +7,7 @@ final class LogoutController: Controller, RouteCollection {
             try request.unauthenticateSession(User.self)
             try request.clearIdentification()
             try request.destroySession()
-            return LogoutController.redirect(to: "/", on: request)
+            return Controller.redirect(to: "/", on: request)
         }
     }
 

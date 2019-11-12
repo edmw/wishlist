@@ -4,20 +4,31 @@ import Fluent
 final class ListsController: ProtectedController, SortingController, RouteCollection {
     typealias Sorting = ListsSorting
 
+    let listRepository: ListRepository
+    let itemRepository: ItemRepository
+
+    init(_ listRepository: ListRepository, _ itemRepository: ItemRepository) {
+        self.listRepository = listRepository
+        self.itemRepository = itemRepository
+    }
+
     // MARK: - VIEWS
 
-    private static func renderView(on request: Request) throws -> EventLoopFuture<View> {
+    private func renderView(on request: Request) throws -> EventLoopFuture<View> {
         let user = try requireAuthenticatedUser(on: request)
 
         let sorting = getSorting(on: request) ?? .ascending(by: \List.title)
-        let listContextsBuilder = ListContextsBuilder()
+        let listContextsBuilder = ListContextsBuilder(listRepository, itemRepository)
             .forUser(user)
             .withSorting(sorting)
             .includeItemsCount(true)
         return try listContextsBuilder.build(on: request)
-            .flatMap {
-                let context = ListsPageContext(for: user, with: $0)
-                return try renderView("User/Lists", with: context, on: request)
+            .flatMap { listContexts in
+                let context = try ListsPageContextBuilder()
+                    .forUser(user)
+                    .withListContexts(listContexts)
+                    .build()
+                return try Controller.renderView("User/Lists", with: context, on: request)
             }
     }
 
@@ -25,7 +36,7 @@ final class ListsController: ProtectedController, SortingController, RouteCollec
 
     func boot(router: Router) throws {
         router.get("user", ID.parameter, "lists",
-            use: ListsController.renderView
+            use: self.renderView
         )
     }
 

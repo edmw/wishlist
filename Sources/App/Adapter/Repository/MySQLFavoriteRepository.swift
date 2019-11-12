@@ -2,11 +2,14 @@ import Vapor
 import Fluent
 import FluentMySQL
 
+/// Adapter for port `FavoriteRepository` using MySQL database.
 final class MySQLFavoriteRepository: FavoriteRepository, MySQLModelRepository {
     // swiftlint:disable first_where
 
     let db: MySQLDatabase.ConnectionPool
 
+    /// Initializes the repository for **Favorites** on the specified MySQL connection pool.
+    /// - Parameter db: MySQL connection pool
     init(_ db: MySQLDatabase.ConnectionPool) {
         self.db = db
     }
@@ -62,10 +65,12 @@ final class MySQLFavoriteRepository: FavoriteRepository, MySQLModelRepository {
         }
     }
 
-    /// Adds the specified list to the list of favorite lists for the specified user.
     func addFavorite(_ list: List, for user: User) throws -> EventLoopFuture<Favorite> {
         guard let listID = list.id else {
             throw EntityError<List>.requiredIDMissing
+        }
+        guard let userID = user.id else {
+            throw EntityError<User>.requiredIDMissing
         }
         return db.withConnection { connection in
             // check if the list is already a favorite
@@ -79,8 +84,16 @@ final class MySQLFavoriteRepository: FavoriteRepository, MySQLModelRepository {
                             .unwrap(or: EntityError<List>.lookupFailed(for: listID))
                     }
                     else {
-                        // attach list and return created favorite
-                        return user.favorites.attach(list, on: connection)
+                        // favorite create
+                        let limit = Favorite.maximumNumberOfFavoritesPerUser
+                        return Favorite.query(on: connection)
+                            .filter(\.userID == userID)
+                            .count()
+                            .max(limit, or: EntityError<Reservation>.limitReached(maximum: limit))
+                            .transform(to:
+                                // attach list and return created favorite
+                                user.favorites.attach(list, on: connection)
+                            )
                     }
                 }
         }

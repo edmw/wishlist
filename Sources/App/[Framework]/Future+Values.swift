@@ -40,4 +40,32 @@ extension EventLoopFuture where Expectation == Int {
         }
     }
 
+    /// Checks an integer value to be lower or equal than the specified maximum.
+    /// Otherwise, the supplied error will be thrown instead.
+    /// - Parameter maximum: maximum permitted value
+    /// - Parameter error: `Error` to throw if the value is greater than the specified maximum.
+    ///     This is captured with `@autoclosure` to avoid intiailize the `Error` unless needed.
+    func max(_ maximum: Int, or error: @autoclosure @escaping () -> Error) -> Future<Expectation> {
+        return map(to: Expectation.self) { value in
+            guard value <= maximum else {
+                throw error()
+            }
+            return value
+        }
+    }
+
+    /// Checks an integer value to be greater or equal than the specified minimum.
+    /// Otherwise, the supplied error will be thrown instead.
+    /// - Parameter minimum: minimum permitted value
+    /// - Parameter error: `Error` to throw if the value is loweer than the specified minimum.
+    ///     This is captured with `@autoclosure` to avoid intiailize the `Error` unless needed.
+    func min(_ minimum: Int, or error: @autoclosure @escaping () -> Error) -> Future<Expectation> {
+        return map(to: Expectation.self) { value in
+            guard value >= minimum else {
+                throw error()
+            }
+            return value
+        }
+    }
+
 }

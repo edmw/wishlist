@@ -140,4 +140,11 @@ extension EventLoopFuture where Expectation: OutcomeType {
         return self.caseFailure { _, context in try callback(context) }
     }
 
+    /// Note: Do not care about anything.
+    func caseFailure (
+        _ callback: @escaping () throws -> EventLoopFuture<Response>
+    ) -> EventLoopFuture<Response> {
+        return self.caseFailure { _, _ in try callback() }
+    }
+
 }

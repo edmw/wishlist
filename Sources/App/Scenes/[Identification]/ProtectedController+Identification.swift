@@ -10,7 +10,11 @@ extension ProtectedController {
     /// will be created and attached.
     /// It is possible to overwrite a generated identification by providing the id as query
     /// parameter to the request.
+    @available(*, deprecated)
     static func requireIdentification(on request: Request) throws -> Identification {
+        return try request.requireIdentification()
+    }
+    func requireIdentification(on request: Request) throws -> Identification {
         return try request.requireIdentification()
     }
 

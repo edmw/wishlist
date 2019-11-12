@@ -153,9 +153,15 @@ public func configure(
 
     try services.register(AuthenticationProvider())
 
-    let router = EngineRouter.default()
-    try routes(router, features, logger: logger)
-    services.register(router, as: Router.self)
+//    let router = EngineRouter.default()
+//    try routes(router, features, logger: logger)
+//    services.register(router, as: Router.self)
+
+    services.register(Router.self) { container -> EngineRouter in
+        let router = EngineRouter.default()
+        try routes(router, container, features, logger: logger)
+        return router
+    }
 
     // MARK: Localization
 

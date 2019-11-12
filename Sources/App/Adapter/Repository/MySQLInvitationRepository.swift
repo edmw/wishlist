@@ -2,11 +2,14 @@ import Vapor
 import Fluent
 import FluentMySQL
 
+/// Adapter for port `InvitationRepository` using MySQL database.
 final class MySQLInvitationRepository: InvitationRepository, MySQLModelRepository {
     // swiftlint:disable first_where
 
     let db: MySQLDatabase.ConnectionPool
 
+    /// Initializes the repository for **Invitations** on the specified MySQL connection pool.
+    /// - Parameter db: MySQL connection pool
     init(_ db: MySQLDatabase.ConnectionPool) {
         self.db = db
     }
@@ -57,16 +60,14 @@ final class MySQLInvitationRepository: InvitationRepository, MySQLModelRepositor
         return db.withConnection { connection in
             if invitation.id == nil {
                 // invitation create
+                let limit = Invitation.maximumNumberOfInvitationsPerUser
                 return Invitation.query(on: connection)
                     .filter(\.userID == invitation.userID)
                     .count()
-                    .flatMap { count in
-                        let maximum = Invitation.maximumNumberOfInvitationsPerUser
-                        guard count < maximum else {
-                            throw EntityError<Invitation>.limitReached(maximum: maximum)
-                        }
-                        return invitation.save(on: connection)
-                    }
+                    .max(limit, or: EntityError<Invitation>.limitReached(maximum: limit))
+                    .transform(to:
+                        invitation.save(on: connection)
+                    )
             }
             else {
                 // invitation update

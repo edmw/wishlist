@@ -9,17 +9,12 @@ final class GoogleAuthenticatorController: AuthenticationController, RouteCollec
     let successPath: String
     let errorPath: String
 
-    let logger: Logger?
-
     init(
         authenticationSuccessPath: String,
-        authenticationErrorPath: String,
-        logger: Logger? = nil
+        authenticationErrorPath: String
     ) {
         self.successPath = authenticationSuccessPath
         self.errorPath = authenticationErrorPath
-
-        self.logger = logger
     }
 
     /// Signs in a Google user identifiable by the given access token.

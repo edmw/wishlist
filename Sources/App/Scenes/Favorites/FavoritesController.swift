@@ -4,19 +4,28 @@ import Fluent
 final class FavoritesController: ProtectedController, SortingController, RouteCollection {
     typealias Sorting = ListsSorting
 
+    let favoriteRepository: FavoriteRepository
+    let itemRepository: ItemRepository
+
+    init(_ favoriteRepository: FavoriteRepository, _ itemRepository: ItemRepository) {
+        self.favoriteRepository = favoriteRepository
+        self.itemRepository = itemRepository
+    }
+
     // MARK: - VIEWS
 
-    private static func renderView(on request: Request) throws -> EventLoopFuture<View> {
+    private func renderView(on request: Request) throws -> EventLoopFuture<View> {
         let user = try requireAuthenticatedUser(on: request)
 
-        let favoriteContextsBuilder = FavoriteContextsBuilder()
+        let sorting = getSorting(on: request) ?? .ascending(by: \List.title)
+        let favoriteContextsBuilder = FavoriteContextsBuilder(favoriteRepository, itemRepository)
             .forUser(user)
-            .withSorting(getSorting(on: request) ?? .ascending(by: \List.title))
+            .withSorting(sorting)
             .includeItemsCount(true)
         return try favoriteContextsBuilder.build(on: request)
             .flatMap {
                 let context = FavoritesPageContext(for: user, with: $0)
-                return try renderView("User/Favorites", with: context, on: request)
+                return try Controller.renderView("User/Favorites", with: context, on: request)
             }
     }
 
@@ -24,7 +33,7 @@ final class FavoritesController: ProtectedController, SortingController, RouteCo
 
     func boot(router: Router) throws {
         router.get("user", ID.parameter, "favorites",
-            use: FavoritesController.renderView
+            use: self.renderView
         )
     }
 

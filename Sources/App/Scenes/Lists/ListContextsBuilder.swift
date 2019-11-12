@@ -4,10 +4,23 @@ import Vapor
 
 class ListContextsBuilder {
 
+    let listRepository: ListRepository
+    let itemRepository: ItemRepository
+
+    /// Builder for list contexts.
+    /// - Parameter listRepository: List repository
+    /// - Parameter itemRepository: Item repository
+    init(_ listRepository: ListRepository, _ itemRepository: ItemRepository) {
+        self.listRepository = listRepository
+        self.itemRepository = itemRepository
+    }
+
     var user: User?
 
+    /// Contexts sorting.
     var sorting = ListsSorting.ascending(by: \List.title)
 
+    /// Contexts filtering.
     var isIncluded: ((List) -> Bool)?
 
     var includeItemsCount: Bool = false
@@ -36,7 +49,7 @@ class ListContextsBuilder {
         return self
     }
 
-    func build(on request: Request) throws -> EventLoopFuture<[ListContext]> {
+    func build(on worker: Worker) throws -> EventLoopFuture<[ListContext]> {
         guard let user = user else {
             throw ListContextsBuilderError.missingRequiredUser
         }
@@ -47,7 +60,7 @@ class ListContextsBuilder {
         // Then, we flatten the array of context futures to a future of an array of contexts.
         // Now, we map the future of an array of contexts to the actual array of contexts.
         // (better would be: use a join on the database)
-        return try request.make(ListRepository.self)
+        return try self.listRepository
             .all(for: user, sort: sorting)
             .flatMap { allLists in
                 let lists: [List]
@@ -60,7 +73,7 @@ class ListContextsBuilder {
                 return try lists.map { list in
                     var context = ListContext(for: list)
                     if self.includeItemsCount {
-                        return try request.make(ItemRepository.self)
+                        return try self.itemRepository
                             .count(on: list)
                             .map { count in
                                 context.itemsCount = count
@@ -68,10 +81,10 @@ class ListContextsBuilder {
                             }
                     }
                     else {
-                        return request.future(context)
+                        return worker.future(context)
                     }
                 }
-                .flatten(on: request)
+                .flatten(on: worker)
             }
     }
 

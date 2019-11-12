@@ -1,30 +1,40 @@
 import Vapor
 import Fluent
 
-final class ItemsController: ProtectedController, SortingController, RouteCollection {
+final class ItemsController: ProtectedController,
+    ListParameterAcceptor,
+    SortingController,
+    RouteCollection
+{
     typealias Sorting = ItemsSorting
+
+    let itemRepository: ItemRepository
+    let listRepository: ListRepository
+
+    init(_ itemRepository: ItemRepository, _ listRepository: ListRepository) {
+        self.itemRepository = itemRepository
+        self.listRepository = listRepository
+    }
 
     // MARK: - VIEWS
 
-    private static func renderView(on request: Request) throws -> EventLoopFuture<View> {
+    private func renderView(on request: Request) throws -> EventLoopFuture<View> {
         let user = try requireAuthenticatedUser(on: request)
 
         let sorting = getSorting(on: request) ?? .ascending(by: \Item.title)
         return try requireList(on: request, for: user).flatMap { list in
-            return try request.make(ItemRepository.self)
-                .allAndReservations(for: list, sort: list.itemsSorting ?? sorting)
-                .flatMap(to: View.self, { itemsAndReservations in
-                    let itemContexts = itemsAndReservations.map { item, reservation in
-                        ItemContext(for: item, with: reservation)
-                    }
+            let itemContextsBuilder = ItemContextsBuilder(self.itemRepository)
+                .forList(list)
+                .withSorting(list.itemsSorting ?? sorting)
+            return try itemContextsBuilder.build(on: request)
+                .flatMap { itemContexts in
                     let context = try ItemsPageContextBuilder()
                         .forUser(user)
                         .forList(list)
                         .withItemContexts(itemContexts)
                         .build()
-                    return try renderView("User/Items", with: context, on: request)
+                    return try Controller.renderView("User/Items", with: context, on: request)
                 }
-            )
         }
     }
 
@@ -32,7 +42,7 @@ final class ItemsController: ProtectedController, SortingController, RouteCollec
 
     func boot(router: Router) throws {
         router.get("user", ID.parameter, "list", ID.parameter, "items",
-            use: ItemsController.renderView
+            use: self.renderView
         )
     }
 

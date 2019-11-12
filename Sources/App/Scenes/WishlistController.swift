@@ -16,11 +16,29 @@ enum WishlistControllerParameterMValue: String, ControllerParameterValue {
 // MARK: - Controller
 
 /// Controller for displaying and handling a wishlist.
-final class WishlistController: ProtectedController, SortingController, RouteCollection {
+final class WishlistController: ProtectedController,
+    ListParameterAcceptor,
+    SortingController,
+    RouteCollection
+{
     typealias Sorting = ItemsSorting
 
+    let listRepository: ListRepository
+    let itemRepository: ItemRepository
+    let favoriteRepository: FavoriteRepository
+
+    init(
+        _ listRepository: ListRepository,
+        _ itemRepository: ItemRepository,
+        _ favoriteRepository: FavoriteRepository
+    ) {
+        self.listRepository = listRepository
+        self.itemRepository = itemRepository
+        self.favoriteRepository = favoriteRepository
+    }
+
     /// Renders the view for a wishlist.
-    private static func renderView(
+    private func renderView(
         for list: List,
         of owner: User,
         identification: Identification,
@@ -29,14 +47,11 @@ final class WishlistController: ProtectedController, SortingController, RouteCol
     ) throws -> EventLoopFuture<View> {
         let sorting = getSorting(on: request) ?? .ascending(by: \Item.title)
         // get all items and their reservations and render page
-        return try request.make(ItemRepository.self)
-            .allAndReservations(for: list, sort: list.itemsSorting ?? sorting)
-            .map(to: WishlistPageContext.self) { results in
-                let itemContexts
-                    = results.map { result -> ItemContext in
-                        let (item, reservation) = result
-                        return ItemContext(for: item, with: reservation)
-                    }
+        let itemContextsBuilder = ItemContextsBuilder(self.itemRepository)
+            .forList(list)
+            .withSorting(list.itemsSorting ?? sorting)
+        return try itemContextsBuilder.build(on: request)
+            .map(to: WishlistPageContext.self) { itemContexts in
                 var contextBuilder = WishlistPageContextBuilder()
                     .forList(list)
                     .forOwner(owner)
@@ -50,7 +65,7 @@ final class WishlistController: ProtectedController, SortingController, RouteCol
             .flatMap(to: WishlistPageContext.self) { context in
                 // if user is present check if list is a favorite list
                 if let user = user {
-                    return try request.make(FavoriteRepository.self)
+                    return try self.favoriteRepository
                         .find(favorite: list, for: user)
                         .map { favorite in
                             // modify context
@@ -65,7 +80,7 @@ final class WishlistController: ProtectedController, SortingController, RouteCol
                 }
             }
             .flatMap(to: View.self) { context in
-                return try renderView(
+                return try Controller.renderView(
                     "Protected/Wishlist",
                     with: context,
                     on: request
@@ -74,20 +89,20 @@ final class WishlistController: ProtectedController, SortingController, RouteCol
     }
 
     /// Renders the view for a wishlist.
-    private static func renderView(on request: Request) throws -> EventLoopFuture<View> {
+    private func renderView(on request: Request) throws -> EventLoopFuture<View> {
         let user = try getAuthenticatedUser(on: request)
 
         let identification = try user?.identification ?? requireIdentification(on: request)
 
         // find list for the given list id
-        return try requireList(on: request)
+        return try self.requireList(on: request)
             .flatMap { list in
                 // check if the found list may be accessed by the given user
                 // user may be nil indicating this is a anonymous request
-                return try requireAuthorization(on: request, for: list, user: user)
+                return try self.requireAuthorization(on: request, for: list, user: user)
                     .flatMap { authorization in
                         // get all items and their reservations and render page
-                        return try renderView(
+                        return try self.renderView(
                             for: authorization.resource,
                             of: authorization.owner,
                             identification: identification,
@@ -101,7 +116,7 @@ final class WishlistController: ProtectedController, SortingController, RouteCol
 
     func boot(router: Router) throws {
         router.get("list", ID.parameter,
-            use: WishlistController.renderView
+            use: self.renderView
         )
     }
 

@@ -1,3 +1,5 @@
+import Foundation
+
 struct AnyEncodable: Encodable {
 
     var encodeFunc: (Encoder) throws -> Void

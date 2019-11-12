@@ -59,7 +59,7 @@ enum ProfilePageContextBuilderError: Error {
 class ProfilePageContextBuilder {
 
     var user: User?
-    var invitations: [InvitationContext]?
+    var invitationContexts: [InvitationContext]?
 
     var formData: ProfilePageFormData?
 
@@ -70,8 +70,8 @@ class ProfilePageContextBuilder {
     }
 
     @discardableResult
-    func withInvitations(_ invitations: [InvitationContext]) -> Self {
-        self.invitations = invitations
+    func withInvitationContexts(_ invitationContexts: [InvitationContext]) -> Self {
+        self.invitationContexts = invitationContexts
         return self
     }
 
@@ -87,7 +87,7 @@ class ProfilePageContextBuilder {
         }
         return ProfilePageContext(
             for: user,
-            invitations: invitations,
+            invitations: invitationContexts,
             from: formData
         )
     }

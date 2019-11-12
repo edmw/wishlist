@@ -14,7 +14,7 @@ final class LoginController: Controller, RouteCollection {
     /// Login page:
     /// Accepts a parameter `invitation` (InvitationCode) which enables sign up for invitees.
     /// Accepts a parameter `p` (Locator) which will be used for redirect after login succeeds.
-    static func renderView(on request: Request) throws -> EventLoopFuture<View> {
+    func renderView(on request: Request) throws -> EventLoopFuture<View> {
         var authenticationParameters = [ControllerParameter]()
 
         if let locator = request.query.getLocator() {
@@ -31,10 +31,10 @@ final class LoginController: Controller, RouteCollection {
         }
 
         let context = try LoginPageContext(
-            authenticationParametersQuery: buildQuery(parameters: authenticationParameters),
+            authenticationParametersQuery: Controller.query(with: authenticationParameters),
             invitationCode: invitationCode
         )
-        return try renderView("Public/Login", with: context, on: request)
+        return try Controller.renderView("Public/Login", with: context, on: request)
     }
 
     func boot(router: Router) throws {
@@ -42,7 +42,7 @@ final class LoginController: Controller, RouteCollection {
             guard try request.isAuthenticated(User.self) == false else {
                 return LoginController.redirect(to: "/", on: request)
             }
-            return try LoginController.renderView(on: request)
+            return try self.renderView(on: request)
                 .flatMap { view in
                     return try view.encode(for: request)
                 }

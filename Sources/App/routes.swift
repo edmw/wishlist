@@ -28,11 +28,29 @@ import Imperial
 
 // swiftlint:disable function_body_length
 
+private let googleAuthenticatorController = GoogleAuthenticatorController(
+    authenticationSuccessPath: "/",
+    authenticationErrorPath: "/authentication-error"
+)
+
+private let netIDAuthenticatorController = NetIDAuthenticatorController(
+    authenticationSuccessPath: "/",
+    authenticationErrorPath: "/authentication-error"
+)
+
 func routes(
     _ router: Router,
+    _ container: Container,
     _ features: Features,
     logger: BasicLogger? = nil
 ) throws {
+
+    let userRepository = try container.make(UserRepository.self)
+    let listRepository = try container.make(ListRepository.self)
+    let favoriteRepository = try container.make(FavoriteRepository.self)
+    let itemRepository = try container.make(ItemRepository.self)
+    let invitationRepository = try container.make(InvitationRepository.self)
+    let reservationRepository = try container.make(ReservationRepository.self)
 
     // user routes
 
@@ -41,27 +59,36 @@ func routes(
         CachingHeadersMiddleware.noCachingMiddleware()
     )
 
-    try user.register(collection: WelcomeController())
+    try user.register(
+        collection: WelcomeController(listRepository, favoriteRepository, itemRepository)
+    )
 
     try user.register(collection: LoginController())
     try user.register(collection: LogoutController())
-    try user.register(collection: ProfileController())
-    if features.userSettings.enabled {
-        try user.register(collection: SettingsController())
-    }
+    try user.register(collection: ProfileController(userRepository, invitationRepository))
+    try user.register(collection: SettingsController(userRepository))
 
-    try user.register(collection: ListsController())
-    try user.register(collection: ListsImportController())
-    try user.register(collection: ListController())
+    try user.register(collection: ListsController(listRepository, itemRepository))
+    try user.register(collection: ListController(listRepository, itemRepository))
 
-    try user.register(collection: ItemsController())
-    try user.register(collection: ItemController())
+    try user.register(collection: ListsImportController(listRepository, itemRepository))
 
-    try user.register(collection: FavoriteController())
+    try user.register(collection: ItemsController(itemRepository, listRepository))
+    try user.register(collection: ItemController(itemRepository, listRepository))
 
-    try user.register(collection: InvitationController())
+    try user.register(collection:
+        FavoritesController(favoriteRepository, itemRepository)
+    )
+    try user.register(collection:
+        FavoriteController(favoriteRepository, itemRepository, listRepository)
+    )
 
-    try user.register(collection: ReservationControllerForOwner())
+    try user.register(collection: InvitationsController(invitationRepository))
+    try user.register(collection: InvitationController(invitationRepository))
+
+    try user.register(collection:
+        ReservationControllerForOwner(reservationRepository, listRepository, itemRepository)
+    )
 
     // protected routes
 
@@ -70,8 +97,12 @@ func routes(
         CachingHeadersMiddleware.noCachingMiddleware()
     )
 
-    try protectedRoutes.register(collection: WishlistController())
-    try protectedRoutes.register(collection: ReservationController())
+    try protectedRoutes.register(collection:
+        WishlistController(listRepository, itemRepository, favoriteRepository)
+    )
+    try protectedRoutes.register(collection:
+        ReservationController(reservationRepository, listRepository, itemRepository)
+    )
 
     // public routes
 
@@ -88,21 +119,9 @@ func routes(
     let services = router.grouped(
         CachingHeadersMiddleware.noCachingMiddleware()
     )
-    try services.register(collection:
-        GoogleAuthenticatorController(
-            authenticationSuccessPath: "/",
-            authenticationErrorPath: "/authentication-error",
-            logger: logger
-        )
-    )
+    try services.register(collection: googleAuthenticatorController)
     if features.signinWithNetID.enabled {
-        try services.register(collection:
-            NetIDAuthenticatorController(
-                authenticationSuccessPath: "/",
-                authenticationErrorPath: "/authentication-error",
-                logger: logger
-            )
-        )
+        try services.register(collection: netIDAuthenticatorController)
     }
 
     // error routes

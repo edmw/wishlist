@@ -9,7 +9,7 @@ extension SettingsController {
 
     /// Saves settings for the specified user from the request’s data.
     /// Validates the data contained in the request and updates the user.
-    static func save(
+    func save(
         from request: Request,
         for user: User
     ) throws
@@ -25,7 +25,7 @@ extension SettingsController {
 
                 return request.future()
                     .flatMap {
-                        return try save(from: formdata, for: user, on: request)
+                        return try self.save(from: formdata, for: user, on: request)
                             .map { settings in .success(with: settings, context: context) }
                     }
                     .catchMap(ValidationError.self) { error in
@@ -49,15 +49,13 @@ extension SettingsController {
     /// existing user.
     ///
     /// Throws `EntityError`s for invalid data or violated constraints.
-    private static func save(
+    private func save(
         from formdata: SettingsPageFormData,
         for user: User,
         on request: Request
     ) throws
         -> EventLoopFuture<UserSettings>
     {
-        let userRepository = try request.make(UserRepository.self)
-
         var settings = user.settings
         settings.update(from: formdata)
         try settings.validate()

@@ -1,7 +1,5 @@
 import Vapor
 
-// swiftlint:disable convenience_type
-
 /// Controller for resources:
 /// Defines some common functions to be of use in resources controllers.
 class Controller {
@@ -10,7 +8,7 @@ class Controller {
     /// will be some speciality: A client can perfom a specific method other than POST
     /// by sending a POST request and including the parameter ´__method´. That way a
     /// web page, for example, can send a DELETE request by using a POST form.
-    static func method(of request: Request) throws -> EventLoopFuture<HTTPMethod> {
+    func method(of request: Request) throws -> EventLoopFuture<HTTPMethod> {
         let method = request.http.method
         if method == .POST {
             return request.content[String.self, at: "__method"]
@@ -38,7 +36,7 @@ class Controller {
         return request.future(method)
     }
 
-    static func buildQuery(parameters: [ControllerParameter]) throws -> String? {
+    static func query(with parameters: [ControllerParameter]) throws -> String? {
         var combinedParameters = [String: String?]()
         parameters.forEach { combinedParameters.merge($0) }
         let encodedParameters = try URLEncodedFormEncoder().encode(combinedParameters)
@@ -58,7 +56,7 @@ class Controller {
     ) -> Response {
         if let parameters = parameters, !parameters.isEmpty {
             do {
-                if let queryString = try buildQuery(parameters: parameters) {
+                if let queryString = try query(with: parameters) {
                     return request.redirect(to: "\(location)?\(queryString)", type: type)
                 }
             }

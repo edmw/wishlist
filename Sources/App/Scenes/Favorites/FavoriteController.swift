@@ -1,25 +1,47 @@
 import Vapor
 import Fluent
 
-final class FavoriteController: ProtectedController, RouteCollection {
+final class FavoriteController: ProtectedController,
+    FavoriteParameterAcceptor,
+    ListParameterAcceptor,
+    RouteCollection
+{
+
+    let favoriteRepository: FavoriteRepository
+    let itemRepository: ItemRepository
+    let listRepository: ListRepository
+
+    init(
+        _ favoriteRepository: FavoriteRepository,
+        _ itemRepository: ItemRepository,
+        _ listRepository: ListRepository
+    ) {
+        self.favoriteRepository = favoriteRepository
+        self.itemRepository = itemRepository
+        self.listRepository = listRepository
+    }
 
     // MARK: - VIEWS
 
     /// Renders a view to confirm the creation of a favorite.
     /// This is only accessible for an authenticated user who owns the affected item.
-    private static func renderCreationView(on request: Request) throws
+    private func renderCreationView(on request: Request) throws
         -> EventLoopFuture<View>
     {
         let user = try requireAuthenticatedUser(on: request)
 
-        return try findList(from: request)
+        return try self.findList(from: request)
             .flatMap { list in
                 // check if the found list may be accessed by the given user
                 // user may be nil indicating this is a anonymous request
-                return try requireAuthorization(on: request, for: list, user: user)
+                return try self.requireAuthorization(on: request, for: list, user: user)
                     .flatMap { _ in
                         let context = ListPageContext(for: user, with: list)
-                        return try renderView("User/FavoriteCreation", with: context, on: request)
+                        return try Controller.renderView(
+                            "User/FavoriteCreation",
+                            with: context,
+                            on: request
+                        )
                     }
                     .handleAuthorizationError(on: request)
             }
@@ -27,19 +49,23 @@ final class FavoriteController: ProtectedController, RouteCollection {
 
     /// Renders a view to confirm the deletion of a favorite.
     /// This is only accessible for an authenticated user who owns the affected item.
-    private static func renderDeletionView(on request: Request) throws
+    private func renderDeletionView(on request: Request) throws
         -> EventLoopFuture<View>
     {
         let user = try requireAuthenticatedUser(on: request)
 
-        return try findList(from: request)
+        return try self.findList(from: request)
             .flatMap { list in
                 // check if the found list may be accessed by the given user
                 // user may be nil indicating this is a anonymous request
-                return try requireAuthorization(on: request, for: list, user: user)
+                return try self.requireAuthorization(on: request, for: list, user: user)
                     .flatMap { _ in
                         let context = ListPageContext(for: user, with: list)
-                        return try renderView("User/FavoriteDeletion", with: context, on: request)
+                        return try Controller.renderView(
+                            "User/FavoriteDeletion",
+                            with: context,
+                            on: request
+                        )
                     }
                     .handleAuthorizationError(on: request)
             }
@@ -48,31 +74,31 @@ final class FavoriteController: ProtectedController, RouteCollection {
     // MARK: - CRUD
 
     // Creates a favorite with the given data.
-    private static func create(on request: Request) throws -> EventLoopFuture<Response> {
+    private func create(on request: Request) throws -> EventLoopFuture<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
         // get list to create favorite for
-        return try findList(from: request)
+        return try self.findList(from: request)
             .flatMap { list in
                 // check if the found list may be accessed by the given user
                 // user may be nil indicating this is a anonymous request
-                return try requireAuthorization(on: request, for: list, user: user)
+                return try self.requireAuthorization(on: request, for: list, user: user)
                     .flatMap { _ in
-                        return try request.make(FavoriteRepository.self)
+                        return try self.favoriteRepository
                             .addFavorite(list, for: user)
                             .emitEvent("created for \(user)", on: request)
                             .logMessage("created for \(user)", on: request)
-                            .transform(to: success(for: user, on: request))
+                            .transform(to: self.success(for: user, on: request))
                     }
                     .handleAuthorizationError(on: request)
             }
     }
 
     // Deletes a favorite with the given data.
-    private static func delete(on request: Request) throws -> EventLoopFuture<Response> {
+    private func delete(on request: Request) throws -> EventLoopFuture<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
-        return try requireFavorite(on: request, for: user)
+        return try self.requireFavorite(on: request, for: user)
             .deleteModel(on: request)
             .emitEvent("deleted for \(user)", on: request)
             .logMessage("deleted for \(user)", on: request)
@@ -80,18 +106,18 @@ final class FavoriteController: ProtectedController, RouteCollection {
     }
 
     // Deletes a favorite with the given listid.
-    private static func deleteWithListID(on request: Request) throws -> EventLoopFuture<Response> {
+    private func deleteWithListID(on request: Request) throws -> EventLoopFuture<Response> {
         let user = try requireAuthenticatedUser(on: request)
 
-        return try findList(from: request)
+        return try self.findList(from: request)
             .flatMap { list in
-                return try request.make(FavoriteRepository.self)
+                return try self.favoriteRepository
                     .find(favorite: list, for: user)
                     .unwrap(or: Abort(.notFound))
                     .deleteModel(on: request)
                     .emitEvent("deleted for \(user)", on: request)
                     .logMessage("deleted for \(user)", on: request)
-                    .transform(to: success(for: user, on: request))
+                    .transform(to: self.success(for: user, on: request))
             }
     }
 
@@ -99,28 +125,28 @@ final class FavoriteController: ProtectedController, RouteCollection {
 
     /// Returns a sucess response on a CRUD request.
     /// Not implemented yet: REST response
-    private static func success(for user: User, on request: Request) -> EventLoopFuture<Response> {
+    private func success(for user: User, on request: Request) -> EventLoopFuture<Response> {
         // to add real REST support, check the accept header for json and output a json response
         if let locator = request.query.getLocator(is: .local) {
             return request.eventLoop.newSucceededFuture(
-                result: redirect(to: locator.locationString, on: request)
+                result: Controller.redirect(to: locator.locationString, on: request)
             )
         }
         else {
             return request.eventLoop.newSucceededFuture(
-                result: redirect(to: "/", on: request)
+                result: Controller.redirect(to: "/", on: request)
             )
         }
     }
 
     // MARK: - Routing
 
-    private static func dispatch(on request: Request) throws -> EventLoopFuture<Response> {
+    private func dispatch(on request: Request) throws -> EventLoopFuture<Response> {
         return try method(of: request)
             .flatMap { method -> EventLoopFuture<Response> in
                 switch method {
                 case .DELETE:
-                    return try delete(on: request)
+                    return try self.delete(on: request)
                 default:
                     throw Abort(.methodNotAllowed)
                 }
@@ -132,40 +158,25 @@ final class FavoriteController: ProtectedController, RouteCollection {
         // favorite creation
 
         router.get("user", ID.parameter, "favorites", "create",
-            use: FavoriteController.renderCreationView
+            use: self.renderCreationView
         )
         router.post("user", ID.parameter, "favorites",
-            use: FavoriteController.create
+            use: self.create
         )
 
         // favorite deletion (by listid)
         router.get("user", ID.parameter, "favorites", "delete",
-            use: FavoriteController.renderDeletionView
+            use: self.renderDeletionView
         )
         router.post("user", ID.parameter, "favorites", "delete",
-            use: FavoriteController.deleteWithListID
+            use: self.deleteWithListID
         )
 
         // favorite handling
 
         router.post("user", ID.parameter, "favorite", ID.parameter,
-            use: FavoriteController.dispatch
+            use: self.dispatch
         )
-    }
-
-    // MARK: -
-
-    /// Returns the list specified by an list id given in the request’s body or query.
-    static func findList(from request: Request) throws -> EventLoopFuture<List> {
-        return request.content[ID.self, at: "listID"]
-            .flatMap { listID in
-                guard let listID = listID ?? request.query[.listID] else {
-                    throw Abort(.notFound)
-                }
-                return try request.make(ListRepository.self)
-                    .find(by: listID.uuid)
-                    .unwrap(or: Abort(.noContent))
-            }
     }
 
 }

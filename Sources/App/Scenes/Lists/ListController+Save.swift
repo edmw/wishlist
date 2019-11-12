@@ -13,7 +13,7 @@ extension ListController {
     ///
     /// This function handles thrown `EntityError`s by constructing a page context while adding
     /// the corresponding error flags.
-    static func save(
+    func save(
         from request: Request,
         for user: User,
         this list: List? = nil
@@ -27,7 +27,7 @@ extension ListController {
 
                 return request.future()
                     .flatMap {
-                        return try save(
+                        return try self.save(
                             from: formdata,
                             for: user,
                             this: list,
@@ -36,12 +36,12 @@ extension ListController {
                         .map { list in .success(with: list, context: context) }
                     }
                     .catchMap(EntityError<List>.self) {
-                        try handleSaveOnError($0, with: context)
+                        try self.handleSaveOnError($0, with: context)
                     }
             }
     }
 
-    private static func handleSaveOnError(
+    private func handleSaveOnError(
         _ error: EntityError<List>,
         with contextIn: ListPageContext
     ) throws
@@ -66,7 +66,7 @@ extension ListController {
     /// a new list or updates an existing list if given.
     ///
     /// Throws `EntityError`s for invalid data or violated constraints.
-    private static func save(
+    private func save(
         from formdata: ListPageFormData,
         for user: User,
         this list: List? = nil,
@@ -74,8 +74,6 @@ extension ListController {
     ) throws
         -> EventLoopFuture<List>
     {
-        let listRepository = try request.make(ListRepository.self)
-
         return try ListData(from: formdata)
             .validate(for: user, this: list, using: listRepository)
             .flatMap { data in
@@ -91,7 +89,7 @@ extension ListController {
                     // create list
                     entity = try List(for: user, from: data)
                 }
-                return listRepository.save(list: entity)
+                return self.listRepository.save(list: entity)
             }
     }
 

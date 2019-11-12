@@ -39,8 +39,6 @@ struct ItemPageContext: Encodable {
 
 }
 
-// MARK: - Builder
-
 enum ItemPageContextBuilderError: Error {
     case missingRequiredUser
     case missingRequiredList

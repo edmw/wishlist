@@ -2,11 +2,14 @@ import Vapor
 import Fluent
 import FluentMySQL
 
+/// Adapter for port `ReservationRepository` using MySQL database.
 final class MySQLReservationRepository: ReservationRepository, MySQLModelRepository {
     // swiftlint:disable first_where
 
     let db: MySQLDatabase.ConnectionPool
 
+    /// Initializes the repository for **Reservations** on the specified MySQL connection pool.
+    /// - Parameter db: MySQL connection pool
     init(_ db: MySQLDatabase.ConnectionPool) {
         self.db = db
     }
