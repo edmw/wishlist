@@ -1,3 +1,5 @@
+import Domain
+
 import Foundation
 
 struct WelcomePageContext: Encodable {
@@ -9,7 +11,6 @@ struct WelcomePageContext: Encodable {
 
     var showLists: Bool
     var showFavorites: Bool
-    var showInvitations: Bool
 
     var maximumNumberOfLists: Int
     var maximumNumberOfFavorites: Int
@@ -17,13 +18,12 @@ struct WelcomePageContext: Encodable {
 
     var lists: [ListContext]?
     var favorites: [FavoriteContext]?
-    var invitations: [InvitationContext]?
 
     fileprivate init(
-        for user: User,
-        lists: [ListContext]? = nil,
-        favorites: [FavoriteContext]? = nil,
-        invitations: [InvitationContext]? = nil
+        for user: UserRepresentation,
+        lists: [ListRepresentation]? = nil,
+        favorites: [FavoriteRepresentation]? = nil,
+        invitations: [InvitationRepresentation]? = nil
     ) {
         self.userID = ID(user.id)
 
@@ -32,15 +32,13 @@ struct WelcomePageContext: Encodable {
 
         self.showLists = true
         self.showFavorites = favorites != nil
-        self.showInvitations = invitations != nil && user.confidant
 
         self.maximumNumberOfLists = List.maximumNumberOfListsPerUser
         self.maximumNumberOfFavorites = Favorite.maximumNumberOfFavoritesPerUser
         self.maximumNumberOfInvitations = Invitation.maximumNumberOfInvitationsPerUser
 
-        self.lists = lists
-        self.favorites = favorites
-        self.invitations = invitations
+        self.lists = lists?.map { list in ListContext(list) }
+        self.favorites = favorites?.map { favorite in FavoriteContext(favorite) }
     }
 
 }
@@ -53,33 +51,26 @@ enum WelcomePageContextBuilderError: Error {
 
 class WelcomePageContextBuilder {
 
-    var user: User?
+    var user: UserRepresentation?
 
-    var lists: [ListContext]?
-    var favorites: [FavoriteContext]?
-    var invitations: [InvitationContext]?
+    var lists: [ListRepresentation]?
+    var favorites: [FavoriteRepresentation]?
 
     @discardableResult
-    func forUser(_ user: User) -> Self {
+    func forUserRepresentation(_ user: UserRepresentation) -> Self {
         self.user = user
         return self
     }
 
     @discardableResult
-    func withLists(_ lists: [ListContext]) -> Self {
+    func withListRepresentations(_ lists: [ListRepresentation]) -> Self {
         self.lists = lists
         return self
     }
 
     @discardableResult
-    func withFavorites(_ favorites: [FavoriteContext]) -> Self {
+    func withFavoriteRepresentations(_ favorites: [FavoriteRepresentation]) -> Self {
         self.favorites = favorites
-        return self
-    }
-
-    @discardableResult
-    func withInvitations(_ invitations: [InvitationContext]) -> Self {
-        self.invitations = invitations
         return self
     }
 
@@ -90,8 +81,7 @@ class WelcomePageContextBuilder {
         return WelcomePageContext(
             for: user,
             lists: lists,
-            favorites: favorites,
-            invitations: invitations
+            favorites: favorites
         )
     }
 

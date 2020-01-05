@@ -1,7 +1,7 @@
 #set("title") {#L10N("items"){Items}}
 #//
 #set("content") {
-<h2>#(page.listTitle)</h2>
+<div class="h2"><h2>#(page.listTitle)<a class="btn btn-link d-flex float-right" href="/list/#(page.listID)" title="#L10N("view-list"){View list}"><span class="btn-label">#L10N("view"){View}</span><svg class="feather"><use xlink:href="/icons/feather.svg#eye"/></svg></a></h2></div>
 <h3>#L10N("your-wishes"){Your Wishes} <small class="text-muted">(#count(page.items)/#(page.maximumNumberOfItems))</small></h3>
 #if(count(page.items) > 0 && count(page.items) < page.maximumNumberOfItems) {
 <div class="btn-toolbar justify-content-center justify-content-sm-start mt-4 mb-4">

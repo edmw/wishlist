@@ -1,3 +1,5 @@
+import Domain
+
 import Vapor
 import Leaf
 
@@ -7,7 +9,7 @@ typealias UserNotificationTemplate = (name: String, context: AnyEncodable)
 
 class UserNotification: MultiMessage, CustomStringConvertible {
 
-    let user: User
+    let user: UserRepresentation
 
     let title: String?
     let titleKey: String?
@@ -16,14 +18,28 @@ class UserNotification: MultiMessage, CustomStringConvertible {
     // html
     var htmlTemplate: UserNotificationTemplate?
 
-    init(for user: User, title: String, templateName: String, templateContext: Encodable) {
+    var emailRecipients = [EmailAddress]()
+
+    var pushoverRecipients = [PushoverUser]()
+
+    init(
+        for user: UserRepresentation,
+        title: String,
+        templateName: String,
+        templateContext: Encodable
+    ) {
         self.user = user
         self.title = title
         self.titleKey = nil
         self.textTemplate = (name: templateName, context: AnyEncodable(templateContext))
     }
 
-    init(for user: User, titleKey: String, templateName: String, templateContext: Encodable) {
+    init(
+        for user: UserRepresentation,
+        titleKey: String,
+        templateName: String,
+        templateContext: Encodable
+    ) {
         self.user = user
         self.title = nil
         self.titleKey = titleKey
@@ -31,7 +47,7 @@ class UserNotification: MultiMessage, CustomStringConvertible {
     }
 
     init(
-        for user: User,
+        for user: UserRepresentation,
         title: String,
         templateName: String,
         templateContext: Encodable,
@@ -46,7 +62,7 @@ class UserNotification: MultiMessage, CustomStringConvertible {
     }
 
     init(
-        for user: User,
+        for user: UserRepresentation,
         titleKey: String,
         templateName: String,
         templateContext: Encodable,
@@ -61,20 +77,6 @@ class UserNotification: MultiMessage, CustomStringConvertible {
     }
 
     // MARK: Message
-
-    var emailRecipients: [EmailAddress] {
-        guard user.settings.notifications.emailEnabled else {
-            return []
-        }
-        return [EmailAddress(identifier: user.email, name: user.fullName)]
-    }
-
-    var pushoverRecipients: [PushoverUser] {
-        guard user.settings.notifications.pushoverEnabled else {
-            return []
-        }
-        return [PushoverUser(key: user.settings.notifications.pushoverKey)]
-    }
 
     /// render text template
     func render(on container: Container) -> EventLoopFuture<MessageContent> {

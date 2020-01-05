@@ -26,11 +26,11 @@
     <div class="form-group">
         <label for="inputPreference">#L10N("item-field-preference"){Preference}</label>
         <select class="form-control" id="inputPreference" name="inputPreference">
-            <option value="-2"#if(page.form.data.inputPreference == "-2"){ selected}>#L10N("item-preference-0"){Not so important}</option>
-            <option value="-1"#if(page.form.data.inputPreference == "-1"){ selected}>#L10N("item-preference-1"){Not so sure}</option>
-            <option value="0"#if(page.form.data.inputPreference == "0"){ selected}>#L10N("item-preference-2"){Would be happy}</option>
-            <option value="1"#if(page.form.data.inputPreference == "1"){ selected}>#L10N("item-preference-3"){Would love to have}</option>
-            <option value="2"#if(page.form.data.inputPreference == "2"){ selected}>#L10N("item-preference-4"){Must have}</option>
+            <option value="lowest"#if(page.form.data.inputPreference == "lowest"){ selected}>#L10N("item-preference-lowest"){Not so important}</option>
+            <option value="low"#if(page.form.data.inputPreference == "low"){ selected}>#L10N("item-preference-low"){Not so sure}</option>
+            <option value="normal"#if(page.form.data.inputPreference == "normal"){ selected}>#L10N("item-preference-normal"){Would be happy}</option>
+            <option value="high"#if(page.form.data.inputPreference == "high"){ selected}>#L10N("item-preference-high"){Would love to have}</option>
+            <option value="highest"#if(page.form.data.inputPreference == "highest"){ selected}>#L10N("item-preference-highest"){Must have}</option>
         </select>
     </div>
     <div class="form-group">

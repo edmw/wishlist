@@ -25,15 +25,15 @@
     <fieldset class="form-group">
         <legend class="col-form-label pt-0">#L10N("visibility"){Visibility}</legend>
         <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="inputVisibility" id="inputPrivate" value="0"#if(page.form.data.inputVisibility != 1 && page.form.data.inputVisibility != 2){ checked } aria-describedby="descriptionVisibility">
+            <input class="form-check-input" type="radio" name="inputVisibility" id="inputPrivate" value="private"#if(page.form.data.inputVisibility != "public" && page.form.data.inputVisibility != "users"){ checked } aria-describedby="descriptionVisibility">
             <label class="form-check-label" for="inputPrivate">#L10N("visibility-private"){Only you}</label>
         </div>
         <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="inputVisibility" id="inputUsers" value="2"#if(page.form.data.inputVisibility == 2){ checked } aria-describedby="descriptionVisibility">
+            <input class="form-check-input" type="radio" name="inputVisibility" id="inputUsers" value="users"#if(page.form.data.inputVisibility == "users"){ checked } aria-describedby="descriptionVisibility">
             <label class="form-check-label" for="inputUsers">#L10N("visibility-users"){All users}</label>
         </div>
         <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="inputVisibility" id="inputPublic" value="1"#if(page.form.data.inputVisibility == 1){ checked } aria-describedby="descriptionVisibility">
+            <input class="form-check-input" type="radio" name="inputVisibility" id="inputPublic" value="public"#if(page.form.data.inputVisibility == "public"){ checked } aria-describedby="descriptionVisibility">
             <label class="form-check-label" for="inputPublic">#L10N("visibility-public"){Public}</label>
         </div>
         <small id="descriptionVisibility" class="form-text text-muted">#if(page.form.invalidVisibility){<span class="text-danger">#L10N("list-field-visibility-required"){Visibility setting is required.}</span> }#L10N("list-field-visibility-description"){Visibility setting of the list. Private wishlists are not accessible for anyone but you. Select <i>All users</i> to make your list accessible to all logged-in users of this service. Public wishlists can be viewed by everybody who knows the web address of the wishlist.}</small>

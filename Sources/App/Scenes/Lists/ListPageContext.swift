@@ -1,3 +1,5 @@
+import Domain
+
 import Foundation
 
 struct ListPageContext: Encodable {
@@ -8,56 +10,63 @@ struct ListPageContext: Encodable {
 
     var form: ListPageFormContext
 
-    init(
-        for user: User,
-        with list: List? = nil,
+    fileprivate init(
+        for user: UserRepresentation,
+        with list: ListRepresentation? = nil,
         from data: ListPageFormData? = nil
     ) {
         self.userID = ID(user.id)
 
-        if let list = list {
-            self.list = ListContext(for: list)
-        }
-        else {
-            self.list = nil
-        }
+        self.list = ListContext(list)
 
         self.form = ListPageFormContext(from: data)
     }
 
 }
 
-// MARK: - Builder
-
-enum ListsPageContextBuilderError: Error {
+enum ListPageContextBuilderError: Error {
     case missingRequiredUser
 }
 
-class ListsPageContextBuilder {
+class ListPageContextBuilder {
 
-    var user: User?
-
-    var listContexts: [ListContext]?
+    var user: UserRepresentation?
+    var list: ListRepresentation?
+    var formData: ListPageFormData?
 
     @discardableResult
-    func forUser(_ user: User) -> Self {
+    func forUserRepresentation(_ user: UserRepresentation) -> Self {
         self.user = user
         return self
     }
 
     @discardableResult
-    func withListContexts(_ listContexts: [ListContext]?) -> Self {
-        self.listContexts = listContexts
+    func withListRepresentation(_ list: ListRepresentation?) -> Self {
+        self.list = list
         return self
     }
 
-    func build() throws -> ListsPageContext {
+    @discardableResult
+    func with(_ user: UserRepresentation, _ list: ListRepresentation?) -> Self {
+        self.user = user
+        self.list = list
+        return self
+    }
+
+    @discardableResult
+    func withFormData(_ formData: ListPageFormData?) -> Self {
+        self.formData = formData
+        return self
+    }
+
+    func build() throws -> ListPageContext {
         guard let user = user else {
-            throw ListsPageContextBuilderError.missingRequiredUser
+            throw ItemPageContextBuilderError.missingRequiredUser
         }
-        return ListsPageContext(
+        return ListPageContext(
             for: user,
-            with: listContexts
+            with: list,
+            from: formData
         )
     }
 

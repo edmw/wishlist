@@ -1,25 +1,29 @@
+import Domain
+
 import Vapor
 
 import Foundation
 
-class AuthenticationController: ProtectedController {
+// MARK: AuthenticationController
 
-    /// Authenticates the user described by the given user info and returns a redirect on success.
-    static func authenticate(
-        using userInfo: AuthenticationUserInfo,
-        redirect defaultLocation: String,
-        on request: Request
-    ) throws -> EventLoopFuture<ResponseEncodable> {
+class AuthenticationController: AuthenticatableController {
 
-        // check authentication state
-        // state token in session must match state token transported in query
+    let enrollmentActor: EnrollmentActor
 
-        guard let authenticationState = try getState(on: request) else {
+    init(_ enrollmentActor: EnrollmentActor) {
+        self.enrollmentActor = enrollmentActor
+    }
+
+    /// Returns checked authentication state. Throws if invalid.
+    ///
+    /// State token in session must match state token transported in request query
+    private func requireAuthenticationState(on request: Request) throws -> AuthenticationState {
+        guard let authenticationState = try request.getAuthenticationStateFromQuery() else {
             throw Abort(.badRequest,
                 reason: "Error while decoding state parameter in request."
             )
         }
-        guard let authenticationToken = try request.session().getAuthenticationToken() else {
+        guard let authenticationToken = try request.getAuthenticationTokenFromSession() else {
             throw Abort(.forbidden,
                 reason: "Authentication aborted: No authentication token in session"
             )
@@ -27,22 +31,51 @@ class AuthenticationController: ProtectedController {
         guard authenticationState.token == authenticationToken else {
             throw AuthenticationError.invalidToken
         }
+        return authenticationState
+    }
 
+    /// Authenticates the user described by the given user info and returns a redirect on success.
+    func authenticate(
+        using userInfo: AuthenticationUserInfo,
+        redirect defaultLocation: String,
+        on request: Request
+    ) throws -> EventLoopFuture<ResponseEncodable> {
         let siteAccess = try request.site().access
 
-        // check site access
+        // check authentication state
+        let authenticationState = try requireAuthenticationState(on: request)
 
-        guard [.all, .invited, .existing].contains(siteAccess) else {
-            throw AuthenticationError.siteLocked
-        }
+        // get identification
+        let guestIdentification = try request.requireIdentification()
 
-        // authenticate user with user info
-        return try request.authenticate(
-            using: userInfo,
-            state: authenticationState,
-            access: siteAccess
+        // delete current session to avoid session fixation
+        try request.destroySession()
+
+        // materialise user with given user info and authentication state
+        return try enrollmentActor.materialiseUser(
+            .specification(
+                options: .init(from: siteAccess),
+                userIdentity: .init(from: userInfo),
+                userIdentityProvider: .init(from: userInfo),
+                userValues: .init(from: userInfo),
+                invitationCode: authenticationState.invitationCode,
+                guestIdentification: guestIdentification
+            ),
+            .boundaries(worker: request.eventLoop)
         )
-        .map { user in
+        .map { result in
+            let userid = result.userID
+            let user = result.user
+            let identification = result.identification
+
+            // attach userid to session
+            try request.authenticateSession(userid)
+            // set identification
+            try request.setIdentificationForSession(identification)
+
+            // initialize session with data from user (e.g. language)
+            try request.session().initialize(with: user)
+
             // redirect to location (now with session and user)
             let location: String
             if let locator = authenticationState.locator, locator.isLocal {
@@ -51,60 +84,14 @@ class AuthenticationController: ProtectedController {
             else {
                 location = defaultLocation
             }
-            return try AuthenticationController
-                .redirectSucceededLogin(for: user, to: location, on: request)
+            return try self.redirectSucceededLogin(for: result.user, to: location, on: request)
         }
-    }
-
-    static func createState(on request: Request) throws -> String? {
-        // create an authentication state
-        var authenticationState = try AuthenticationState()
-        authenticationState.locator = request.query.getLocator()
-        authenticationState.invitationCode = request.query[.invitationCode]
-        // encode authentication state to string
-        let encoder = try request.make(ContentCoders.self).requireDataEncoder(for: .json)
-        let stateData = try encoder.encode(authenticationState)
-        let stateString = String(data: stateData, encoding: .utf8)
-        // put associated token into session
-        try request.session().set(authenticationToken: authenticationState.token)
-
-        return stateString
-    }
-
-    static func verifyState(_ stateString: String, on request: Request) throws -> Bool {
-        guard let stateData = stateString.data(using: .utf8) else {
-            return false
-        }
-
-        let decoder = try request.make(ContentCoders.self).requireDataDecoder(for: .json)
-        let authenticationState = try decoder.decode(AuthenticationState.self, from: stateData)
-
-        guard let authenticationToken = try request.session().getAuthenticationToken() else {
-            return false
-        }
-        guard authenticationState.token == authenticationToken else {
-            return false
-        }
-        return true
-    }
-
-    private static func getState(on request: Request) throws -> AuthenticationState? {
-        // get state string from request query
-        let stateString = try request.query.get(String.self, at: "state")
-        guard let stateData = stateString.data(using: .utf8) else {
-            return nil
-        }
-        // decode authentication state from string
-        let decoder = try request.make(ContentCoders.self).requireDataDecoder(for: .json)
-        let authenticationState = try decoder.decode(AuthenticationState.self, from: stateData)
-
-        return authenticationState
     }
 
     /// Returns a redirect response to the specified location for the specified user
     /// after a succeeded login.
-    static func redirectSucceededLogin(
-        for user: User,
+    func redirectSucceededLogin(
+        for user: UserRepresentation,
         to location: String,
         type: RedirectType = .normal,
         on request: Request
@@ -116,12 +103,12 @@ class AuthenticationController: ProtectedController {
             parameters.append(.welcome())
         }
 
-        return redirect(to: location, parameters: parameters, type: type, on: request)
+        return Controller.redirect(to: location, parameters: parameters, type: type, on: request)
     }
 
     /// Returns a redirect response to the specified location
     /// after a failed login with an error.
-    static func redirectFailedLogin(
+    func redirectFailedLogin(
         with error: Error,
         to location: String,
         type: RedirectType = .normal,
@@ -137,4 +124,32 @@ class AuthenticationController: ProtectedController {
 
 extension LocatorKeys {
     static let loginSuccess = LocatorKey("loginSuccess")
+}
+
+extension MaterialiseUser.Options {
+
+    /// Creates a valid option set for user materialisation according to the specified site access.
+    init(from access: SiteAccess) throws {
+        switch access {
+        case .all:
+            self = [.createUsers]
+        case .invited:
+            self = [.createUsers, .requireInvitationToCreateUsers]
+        case .existing:
+            self = []
+        case .nobody:
+            throw AuthenticationError.siteLocked
+        }
+    }
+
+}
+
+extension Logger {
+
+    fileprivate func siteLocked(_ email: String) {
+        self.warning(
+            "Authentication for user with email \(email) denied: Site is locked"
+        )
+    }
+
 }

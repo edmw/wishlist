@@ -5,6 +5,7 @@ import Foundation
 /// This is a logger which provides different loggers for technical log events, application log
 /// events and business log events. Accordingly adds a tag to every logger. Respects the specified
 /// minimum log level.
+/// 
 /// Note(1): For now the loggers output is fixed to use `ConsoleLogger`.
 /// Note(2): Every log message sent directly to this logger will be emitted to technical logger.
 class StandardLogger: Logger, Service {

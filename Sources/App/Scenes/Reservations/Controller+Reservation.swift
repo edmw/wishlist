@@ -1,46 +1,34 @@
+import Domain
+
 import Vapor
 
 // MARK: ReservationParameterAcceptor
 
 protocol ReservationParameterAcceptor {
 
-    var reservationRepository: ReservationRepository { get }
-    var itemRepository: ItemRepository { get }
+    func reservationID(on request: Request) throws -> ReservationID?
 
-    func requireReservation(on request: Request) throws -> EventLoopFuture<Reservation>
-
-    func requireReservation(on request: Request, for item: Item) throws
-        -> EventLoopFuture<Reservation>
+    func requireReservationID(on request: Request) throws -> ReservationID
 
 }
 
-extension ReservationParameterAcceptor where Self: Controller {
+extension ItemParameterAcceptor where Self: Controller {
 
-    /// Returns the reservation specified by the reservation id given in the request’s route.
-    /// Asumes that the reservation’s id is the next routing parameter!
-    func requireReservation(on request: Request) throws -> EventLoopFuture<Reservation> {
-        let reservationID = try request.parameters.next(ID.self)
-        return self.reservationRepository
-            .find(by: reservationID.uuid)
-            .unwrap(or: Abort(.noContent))
+    /// Returns the reservation id given in the request’s route or nil if there is none.
+    /// Asumes that the reservation id is the next routing parameter!
+    /// - Parameter request: the request containing the route
+    func reservationID(on request: Request) throws -> ReservationID? {
+        guard request.parameters.values.isNotEmpty else {
+            return nil
+        }
+        return try ReservationID(request.parameters.next(ID.self))
     }
 
-    /// Returns the reservation specified by the reservation id given in the request’s route.
-    /// Asumes that the reservation’s id is the next routing parameter!
-    func requireReservation(
-        on request: Request,
-        for item: Item
-    ) throws -> EventLoopFuture<Reservation> {
-        let reservationID = try request.parameters.next(ID.self)
-        return self.reservationRepository
-            .find(by: reservationID.uuid)
-            .unwrap(or: Abort(.noContent))
-            .map { reservation in
-                guard reservation.itemID == item.id else {
-                    throw Abort(.noContent)
-                }
-                return reservation
-            }
+    /// Returns the reservation id given in the request’s route. Throws if there is none.
+    /// Asumes that the reservation id is the next routing parameter!
+    /// - Parameter request: the request containing the route
+    func requireReservationID(on request: Request) throws -> ReservationID {
+        return try ReservationID(request.parameters.next(ID.self))
     }
 
 }

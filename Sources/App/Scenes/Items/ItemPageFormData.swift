@@ -1,24 +1,27 @@
+import Library
+import Domain
+
 import Vapor
 
 /// This structures holds all the input given by the user into the item form.
-/// In contrast to `ItemData` this contains only editable properties.
+/// In contrast to `ItemRepresentation` and `ItemData` this contains only editable properties.
 struct ItemPageFormData: Content {
 
     let inputTitle: String
     let inputText: String
-    let inputPreference: Item.Preference
+    let inputPreference: String
     let inputURL: String
     let inputImageURL: String
 
     init() {
         self.inputTitle = ""
         self.inputText = ""
-        self.inputPreference = .normal
+        self.inputPreference = "normal"
         self.inputURL = ""
         self.inputImageURL = ""
     }
 
-    init(from item: Item) {
+    init(from item: ItemRepresentation) {
         self.inputTitle = item.title
         self.inputText = item.text
         self.inputPreference = item.preference
@@ -28,16 +31,18 @@ struct ItemPageFormData: Content {
 
 }
 
-extension ItemData {
+extension ItemValues {
 
     init(from formdata: ItemPageFormData) {
-        self.title = formdata.inputTitle
-        self.text = formdata.inputText
-        self.preference = formdata.inputPreference
-        self.url = formdata.inputURL
-        self.imageURL = formdata.inputImageURL
-        self.createdAt = nil
-        self.modifiedAt = nil
+        self.init(
+            title: formdata.inputTitle,
+            text: formdata.inputText,
+            preference: formdata.inputPreference,
+            url: formdata.inputURL,
+            imageURL: formdata.inputImageURL,
+            createdAt: nil,
+            modifiedAt: nil
+        )
     }
 
 }

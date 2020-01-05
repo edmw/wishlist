@@ -2,6 +2,8 @@ import Vapor
 
 struct NetIDAuthenticationUserInfo: AuthenticationUserInfo, Content, Validatable, Reflectable {
 
+    static var provider = "netid"
+
     let subjectId: String
     let email: String
     let givenName: String

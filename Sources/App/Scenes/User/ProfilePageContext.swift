@@ -1,3 +1,5 @@
+import Domain
+
 import Foundation
 
 struct ProfilePageContext: Encodable {
@@ -23,8 +25,8 @@ struct ProfilePageContext: Encodable {
     var form: ProfilePageFormContext
 
     fileprivate init(
-        for user: User,
-        invitations: [InvitationContext]? = nil,
+        for user: UserRepresentation,
+        invitations: [InvitationRepresentation]? = nil,
         from data: ProfilePageFormData? = nil
     ) {
         self.userID = ID(user.id)
@@ -32,7 +34,7 @@ struct ProfilePageContext: Encodable {
         self.userNickName = user.nickName
         self.userFirstName = user.firstName
         self.userLastName = user.lastName
-        self.userEmail = user.email
+        self.userEmail = String(user.email)
         self.userLanguage = user.language
         self.userFirstLogin = user.firstLogin
         self.userLastLogin = user.lastLogin
@@ -43,7 +45,7 @@ struct ProfilePageContext: Encodable {
 
         self.maximumNumberOfInvitations = Invitation.maximumNumberOfInvitationsPerUser
 
-        self.invitations = invitations
+        self.invitations = invitations?.map { invitation in InvitationContext(invitation) }
 
         self.form = ProfilePageFormContext(from: data)
     }
@@ -58,20 +60,20 @@ enum ProfilePageContextBuilderError: Error {
 
 class ProfilePageContextBuilder {
 
-    var user: User?
-    var invitationContexts: [InvitationContext]?
+    var user: UserRepresentation?
+    var invitations: [InvitationRepresentation]?
 
     var formData: ProfilePageFormData?
 
     @discardableResult
-    func forUser(_ user: User) -> Self {
+    func forUserRepresentation(_ user: UserRepresentation) -> Self {
         self.user = user
         return self
     }
 
     @discardableResult
-    func withInvitationContexts(_ invitationContexts: [InvitationContext]) -> Self {
-        self.invitationContexts = invitationContexts
+    func withInvitationRepresentations(_ invitations: [InvitationRepresentation]?) -> Self {
+        self.invitations = invitations
         return self
     }
 
@@ -87,7 +89,7 @@ class ProfilePageContextBuilder {
         }
         return ProfilePageContext(
             for: user,
-            invitations: invitationContexts,
+            invitations: invitations,
             from: formData
         )
     }

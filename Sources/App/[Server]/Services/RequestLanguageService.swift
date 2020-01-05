@@ -32,7 +32,7 @@ final class RequestLanguageService: ServiceType {
 
     var cache: (String, [RequestLanguage])?
 
-    fileprivate func parse(on request: Request) throws -> [RequestLanguage] {
+    func parse(on request: Request) throws -> [RequestLanguage] {
         guard let header = request.http.headers[.acceptLanguage].first else {
             return []
         }
@@ -77,7 +77,7 @@ final class RequestLanguageService: ServiceType {
         return languages
     }
 
-    fileprivate func pick(
+    func pick(
         from languageCodes: [String],
         on request: Request,
         fallback: String

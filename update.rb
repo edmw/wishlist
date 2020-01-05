@@ -21,5 +21,22 @@ else
 fi
 )
 
+# Sort build phases
+target_name = 'App'
+targets_to_sort = project.native_targets.select { |x| x.name == target_name || target_name.nil? }
+phases_to_sort = [Xcodeproj::Project::Object::PBXSourcesBuildPhase, Xcodeproj::Project::Object::PBXCopyFilesBuildPhase, Xcodeproj::Project::Object::PBXResourcesBuildPhase]
+targets_to_sort.each do |target|
+  phases_to_sort.each do |phase_to_sort|
+    target.build_phases.select { |x| x.class == phase_to_sort }.each do |phase|
+      phase.files.sort! { |l, r| l.display_name <=> r.display_name }
+    end
+  end
+end
+
+sources_group = project.groups.find do |group|
+    group.name == "Sources"
+end
+sources_group.sort_recursively_by_type()
+
 project.save()
 

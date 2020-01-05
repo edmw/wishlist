@@ -1,0 +1,145 @@
+import Foundation
+import NIO
+
+// MARK: CreateInvitation
+
+public struct CreateInvitation: Action {
+
+    // MARK: Boundaries
+
+    public struct Boundaries: ActionBoundaries, SendInvitationBoundaries {
+        public let worker: EventLoop
+        public let emailSending: EmailSendingProvider
+        public static func boundaries(
+            worker: EventLoop,
+            emailSending: EmailSendingProvider
+        ) -> Self {
+            return Self(worker: worker, emailSending: emailSending)
+        }
+    }
+
+    // MARK: Specification
+
+    public struct Specification: ActionSpecification {
+        public let userID: UserID
+        public let invitationValues: InvitationValues
+        public let sendEmail: Bool
+        public static func specification(
+            userBy userid: UserID,
+            invitationValues: InvitationValues,
+            sendEmail: Bool
+        ) -> Self {
+            return Self(userID: userid, invitationValues: invitationValues, sendEmail: sendEmail)
+        }
+    }
+
+    // MARK: Result
+
+    public struct Result: ActionResult {
+        public let user: UserRepresentation
+        public let invitation: InvitationRepresentation
+        internal init(_ user: User, _ inivitation: Invitation) {
+            self.user = user.representation
+            self.invitation = inivitation.representation
+        }
+    }
+
+    // MARK: -
+
+    internal let actor: () -> CreateInvitationActor
+
+    internal init(actor: @escaping @autoclosure () -> CreateInvitationActor) {
+        self.actor = actor
+    }
+
+    // MARK: Execute
+
+    internal func execute(
+        with values: InvitationValues,
+        for user: User,
+        in boundaries: Boundaries
+    ) throws -> EventLoopFuture<InvitationAndInviter> {
+        let actor = self.actor()
+        let invitationRepository = actor.invitationRepository
+        return try values.validate(for: user, using: invitationRepository)
+            .flatMap { values in
+                // create invitation
+                let invitation = try Invitation(for: user, from: values)
+                return invitationRepository
+                    .save(invitation: invitation)
+                    .map { invitation in
+                        return (invitation: invitation, inviter: user)
+                    }
+            }
+            .catchFlatMap { error in
+                if let valuesError = error as? ValuesError<InvitationValues> {
+                    throw CreateInvitationValidationError(user: user, error: valuesError)
+                }
+                throw error
+            }
+    }
+
+}
+
+// MARK: - Actor
+
+extension DomainUserInvitationsActor {
+
+    // MARK: createInvitation
+
+    public func createInvitation(
+        _ specification: CreateInvitation.Specification,
+        _ boundaries: CreateInvitation.Boundaries
+    ) throws -> EventLoopFuture<CreateInvitation.Result> {
+        let invitationRepository = self.invitationRepository
+        let logging = self.logging
+        let recording = self.recording
+        return userRepository.find(id: specification.userID)
+            .unwrap(or: UserFavoritesActorError.invalidUser)
+            .authorize(on: Invitation.self)
+            .flatMap { user in
+                return try CreateInvitation(actor: self)
+                    .execute(with: specification.invitationValues, for: user, in: boundaries)
+                    .logMessage("invitation created", using: logging)
+                    .recordEvent(
+                        for: { $0.invitation }, "created for \(user)", using: recording
+                    )
+                    .sendInvitation(
+                        when: specification.sendEmail,
+                        in: invitationRepository,
+                        on: boundaries
+                    )
+                    .logMessage(for: { $0.invitation }, "invitation sent", using: logging)
+                    .map { invitation, user in
+                        .init(user, invitation)
+                    }
+                    .catchMap { error in
+                        if let createError = error as? CreateInvitationValidationError {
+                            logging.debug("Invitation creation validation error: \(createError)")
+                            let error = createError.error
+                            throw UserInvitationsActorError
+                                .validationError(user.representation, nil, error)
+                        }
+                        throw error
+                    }
+            }
+    }
+
+}
+
+// MARK: -
+
+protocol CreateInvitationActor {
+    var invitationRepository: InvitationRepository { get }
+    var logging: MessageLoggingProvider { get }
+    var recording: EventRecordingProvider { get }
+}
+
+protocol CreateInvitationError: ActionError {
+    var user: User { get }
+}
+
+struct CreateInvitationValidationError: CreateInvitationError {
+    var user: User
+    var error: ValuesError<InvitationValues>
+}

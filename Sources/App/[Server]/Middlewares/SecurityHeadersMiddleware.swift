@@ -7,7 +7,9 @@ final class SecurityHeadersMiddleware: Middleware, ServiceType {
     init(environment: Environment) {
         self.configurations = [
             ContentSecurityPolicyConfiguration(value: "default-src 'self'"),
-            ReferrerPolicyConfiguration(.sameOrigin)
+            ContentTypeOptionsConfiguration(.nosniff),
+            ReferrerPolicyConfiguration(.sameOrigin),
+            FrameOptionsConfiguration(.deny)
         ]
     }
 
@@ -35,5 +37,11 @@ final class SecurityHeadersMiddleware: Middleware, ServiceType {
     {
         return .init(environment: container.environment)
     }
+
+}
+
+extension HTTPHeaderName {
+
+    static let xContentTypeOptions = HTTPHeaderName("X-Content-Type-Options")
 
 }

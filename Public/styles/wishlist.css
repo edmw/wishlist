@@ -47,7 +47,6 @@ header .content {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 132px;
 }
 @media (min-width: 768px) {
     header {
@@ -155,9 +154,13 @@ main .content {
 main .content > .h2 {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: baseline;
+    margin-bottom: 0;
 }
 main .content > h2, main .content > .h2 > h2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
     font-family: 'Open Sans', sans-serif;
     font-size: 1.8rem;
     font-weight: 800;

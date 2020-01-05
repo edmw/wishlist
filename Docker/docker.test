@@ -1,0 +1,10 @@
+FROM swift:5.1.3
+RUN apt-get -qq update && apt-get -q -y install \
+  openssl libssl-dev zlib1g-dev tzdata \
+  && rm -r /var/lib/apt/lists/*
+WORKDIR /app
+COPY . .
+RUN mkdir -p /build/lib && cp -R /usr/lib/swift/linux/lib* /build/lib
+RUN swift package resolve
+RUN swift package clean
+CMD ["swift", "test"]

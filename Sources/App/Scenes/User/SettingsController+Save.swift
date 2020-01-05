@@ -1,3 +1,5 @@
+import Domain
+
 import Vapor
 import Fluent
 
@@ -5,64 +7,64 @@ extension SettingsController {
 
     // MARK: Save
 
-    final class SettingsSaveOutcome: Outcome<UserSettings, SettingsPageContext> {}
+    final class SettingsSaveOutcome: Outcome<UserRepresentation, SettingsPageContext> {}
 
-    /// Saves settings for the specified user from the request’s data.
-    /// Validates the data contained in the request and updates the user.
     func save(
         from request: Request,
-        for user: User
+        for userid: UserID
     ) throws
         -> EventLoopFuture<SettingsSaveOutcome>
     {
+        let userSettingsActor = self.userSettingsActor
         return try request.content
             .decode(SettingsPageFormData.self)
             .flatMap { formdata in
-                var context = try SettingsPageContextBuilder()
-                    .forUser(user)
-                    .withFormData(formdata)
-                    .build()
+                var partialSettings = PartialValues<UserSettings>()
+                partialSettings[\.notifications.emailEnabled] = formdata.inputEmail ?? false
+                partialSettings[\.notifications.pushoverEnabled] = formdata.inputPushover ?? false
+                partialSettings[\.notifications.pushoverKey]
+                    = formdata.inputPushoverKey.map { PushoverKey(string: $0) }
 
-                return request.future()
-                    .flatMap {
-                        return try self.save(from: formdata, for: user, on: request)
-                            .map { settings in .success(with: settings, context: context) }
+                var contextBuilder = SettingsPageContextBuilder().withFormData(formdata)
+
+                return try userSettingsActor
+                    .updateSettings(
+                        .specification(userBy: userid, from: partialSettings),
+                        .boundaries(worker: request.eventLoop)
+                    )
+                    .map { result in
+                        contextBuilder = contextBuilder.forUserRepresentation(result.user)
+                        return try .success(with: result.user, context: contextBuilder.build())
                     }
-                    .catchMap(ValidationError.self) { error in
-                        // WORKAROUND: See https://github.com/vapor/validation/issues/26
-                        // This is a hack which parses the textual reason for an validation error.
-                        let reason = error.reason
-                        if reason.contains("'pushoverkey' missing") {
-                            context.form.missingPushoverKey = true
+                    .catchMap(UserSettingsActorError.self) { error in
+                        if case let UserSettingsActorError
+                            .validationError(user, error) = error
+                        {
+                            contextBuilder = contextBuilder.forUserRepresentation(user)
+                            return try self.handleErrorOnSave(error, with: contextBuilder.build())
                         }
-                        else {
-                            context.form.invalidPushoverKey =
-                                reason.contains("'notifications.pushoverKey'")
-                        }
-                        return .failure(with: error, context: context)
+                        throw error
                     }
             }
     }
 
-    /// Saves settings from the given form data.
-    /// Validates the data, checks the constraints required for an updated user and updates an
-    /// existing user.
-    ///
-    /// Throws `EntityError`s for invalid data or violated constraints.
-    private func save(
-        from formdata: SettingsPageFormData,
-        for user: User,
-        on request: Request
+    private func handleErrorOnSave(
+        _ error: ValuesError<UserSettings>,
+        with contextIn: SettingsPageContext
     ) throws
-        -> EventLoopFuture<UserSettings>
+        -> SettingsSaveOutcome
     {
-        var settings = user.settings
-        settings.update(from: formdata)
-        try settings.validate()
-        user.settings = settings
-        return userRepository
-            .save(user: user)
-            .transform(to: settings)
+        var context = contextIn
+        switch error {
+        case .validationFailed(let properties, _):
+            context.form.missingPushoverKey
+                = properties.contains(\UserSettings.self)
+            context.form.invalidPushoverKey
+                = properties.contains(\UserSettings.notifications.pushoverKey)
+        default:
+            throw error
+        }
+        return .failure(with: error, context: context)
     }
 
 }

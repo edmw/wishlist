@@ -1,3 +1,5 @@
+import Domain
+
 import Vapor
 
 protocol SortingController {

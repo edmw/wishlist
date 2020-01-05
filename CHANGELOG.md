@@ -9,9 +9,26 @@
 
 ## [..]
 🎁 Add functionality to move items between wishlists
+
+## [1.4.0]
 🎁 Add invitation emails
 ☘ fix link to fav icon
 ☘ fix deletion of reservation for list owner
+🛠️ Major refactoring to implement separation of concerns
+
+```
+CLOC before refactoring:
+
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+Swift                          226           2684           1523          10227
+
+CLOC after refactoring:
+
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+Swift                          383           4390           2500          16025
+```
 
 ## [1.3.3]
 ☘ fix link to about page

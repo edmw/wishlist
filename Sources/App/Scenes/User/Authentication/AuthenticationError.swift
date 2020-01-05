@@ -5,15 +5,14 @@ enum AuthenticationError: Error, Debuggable {
     case invalidToken
 
     case siteLocked
-    case notExistingUser
-    case notExistingUserNorInvitedUser
+
+    case internalError
 
     var identifier: String {
         switch self {
         case .invalidToken: return "AuthInvalidToken"
         case .siteLocked: return "AuthSiteLocked"
-        case .notExistingUser: return "AuthNotUserExists"
-        case .notExistingUserNorInvitedUser: return "AuthNotUserExistsNorUserInvited"
+        case .internalError: return "AuthInternalError"
         }
     }
 
@@ -22,11 +21,9 @@ enum AuthenticationError: Error, Debuggable {
         case .invalidToken:
             return "Authentication error: Token does not match"
         case .siteLocked:
-            return "Autentication locked for site."
-        case .notExistingUser:
-            return "Authentication not permitted for non-existing users."
-        case .notExistingUserNorInvitedUser:
-            return "Authentication not permitted for non-existing or not-invited users."
+            return "Authentication could not succeed because site is locked."
+        case .internalError:
+            return "Authentication could not succeed because an internal error occured (see log)."
         }
     }
 

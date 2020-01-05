@@ -1,3 +1,5 @@
+import Domain
+
 import Foundation
 
 struct SettingsPageContext: Encodable {
@@ -8,7 +10,7 @@ struct SettingsPageContext: Encodable {
 
     var form: SettingsPageFormContext
 
-    fileprivate init(for user: User, from data: SettingsPageFormData? = nil) {
+    fileprivate init(for user: UserRepresentation, from data: SettingsPageFormData? = nil) {
         self.userID = ID(user.id)
 
         self.settings = user.settings
@@ -26,12 +28,12 @@ enum SettingsPageContextBuilderError: Error {
 
 class SettingsPageContextBuilder {
 
-    var user: User?
+    var user: UserRepresentation?
 
     var formData: SettingsPageFormData?
 
     @discardableResult
-    func forUser(_ user: User) -> Self {
+    func forUserRepresentation(_ user: UserRepresentation) -> Self {
         self.user = user
         return self
     }

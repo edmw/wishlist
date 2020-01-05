@@ -1,6 +1,7 @@
 import Vapor
 
 import Foundation
+import Dispatch
 
 /// This is a logger logging to the console.
 /// Features:
@@ -10,6 +11,8 @@ import Foundation
 /// Configuration:
 /// - Set of symbols to use for the log level
 class ConsoleLogger: Logger, Service {
+
+    static let lock = DispatchQueue(label: "de.yamanote.wl.ConsoleLogger")
 
     let set: LogLevel.SymbolSet
 
@@ -27,14 +30,16 @@ class ConsoleLogger: Logger, Service {
         line: UInt,
         column: UInt
     ) {
-        Swift.print([
-            "\(time())",
-            "\(level.symbol(for: set))",
-            "[\(level)]",
-            "\(string)",
-            "(\(file):\(function):\(line):\(column))"
-            ].joined(separator: " ")
-        )
+        ConsoleLogger.lock.sync {
+            Swift.print([
+                "\(time())",
+                "\(level.symbol(for: set))",
+                "[\(level)]",
+                "\(string)",
+                "(\(file):\(function):\(line):\(column))"
+                ].joined(separator: " ")
+            )
+        }
     }
 
     /// Calculates and formats the time since creation of the Logger and calling time.

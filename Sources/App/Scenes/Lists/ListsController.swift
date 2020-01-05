@@ -1,32 +1,35 @@
+import Domain
+
 import Vapor
 import Fluent
 
-final class ListsController: ProtectedController, SortingController, RouteCollection {
+final class ListsController: AuthenticatableController,
+    SortingController,
+    RouteCollection
+{
     typealias Sorting = ListsSorting
 
-    let listRepository: ListRepository
-    let itemRepository: ItemRepository
+    let userListsActor: UserListsActor
 
-    init(_ listRepository: ListRepository, _ itemRepository: ItemRepository) {
-        self.listRepository = listRepository
-        self.itemRepository = itemRepository
+    init(_ userListsActor: UserListsActor) {
+        self.userListsActor = userListsActor
     }
 
     // MARK: - VIEWS
 
     private func renderView(on request: Request) throws -> EventLoopFuture<View> {
-        let user = try requireAuthenticatedUser(on: request)
+        let userid = try requireAuthenticatedUserID(on: request)
 
         let sorting = getSorting(on: request) ?? .ascending(by: \List.title)
-        let listContextsBuilder = ListContextsBuilder(listRepository, itemRepository)
-            .forUser(user)
-            .withSorting(sorting)
-            .includeItemsCount(true)
-        return try listContextsBuilder.build(on: request)
-            .flatMap { listContexts in
+        return try userListsActor
+            .getLists(
+                .specification(userBy: userid, with: sorting),
+                .boundaries(worker: request.eventLoop)
+            )
+            .flatMap { result in
                 let context = try ListsPageContextBuilder()
-                    .forUser(user)
-                    .withListContexts(listContexts)
+                    .forUserRepresentation(result.user)
+                    .withListRepresentations(result.lists)
                     .build()
                 return try Controller.renderView("User/Lists", with: context, on: request)
             }

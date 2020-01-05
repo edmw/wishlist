@@ -5,11 +5,16 @@
     "private": "Private",
     "friends": "Friends",
 
-    "item-preference-0": "Not so important",
-    "item-preference-1": "Not so sure",
-    "item-preference-2": "Would be happy",
-    "item-preference-3": "Would love to have",
-    "item-preference-4": "Must have",
+    "visibility-public": "public",
+    "visibility-private": "only you",
+    "visibility-friends": "your friends",
+    "visibility-users": "all users",
+
+    "item-preference-lowest": "Not so important",
+    "item-preference-low": "Not so sure",
+    "item-preference-normal": "Would be happy",
+    "item-preference-high": "Would love to have",
+    "item-preference-highest": "Must have",
 
     "invitation-mail-title": "🎁 Invitation",
 

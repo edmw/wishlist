@@ -1,3 +1,5 @@
+import Domain
+
 import Foundation
 
 struct ReservationPageContext: Encodable {
@@ -8,9 +10,9 @@ struct ReservationPageContext: Encodable {
 
     var reservationID: ID?
 
-    var itemID: ID?
-
     var listID: ID?
+
+    var itemID: ID?
 
     var itemTitle: String
 
@@ -18,36 +20,20 @@ struct ReservationPageContext: Encodable {
 
     fileprivate init(
         for identification: Identification,
-        and item: Item,
-        in list: List,
-        with reservation: Reservation? = nil
+        and item: ItemRepresentation,
+        in list: ListRepresentation,
+        with reservation: ReservationRepresentation? = nil,
+        user: UserRepresentation?
     ) {
         self.identification = ID(identification)
 
-        self.reservationID = ID(reservation?.id)
-
-        self.itemID = ID(item.id)
-
-        self.listID = ID(list.id)
-
-        self.itemTitle = item.title
-
-        self.listTitle = list.title
-    }
-
-    fileprivate init(
-        for user: User,
-        and item: Item,
-        in list: List,
-        with reservation: Reservation? = nil
-    ) {
-        self.userID = ID(user.id)
+        self.userID = ID(user?.id)
 
         self.reservationID = ID(reservation?.id)
 
-        self.itemID = ID(item.id)
-
         self.listID = ID(list.id)
+
+        self.itemID = ID(item.id)
 
         self.itemTitle = item.title
 
@@ -59,8 +45,7 @@ struct ReservationPageContext: Encodable {
 // MARK: - Builder
 
 enum ReservationPageContextBuilderError: Error {
-    case missingRequiredIdentificationOrUser
-    case eitherRequiredIdentificationOrUser
+    case missingRequiredIdentification
     case missingRequiredItem
     case missingRequiredList
 }
@@ -68,17 +53,11 @@ enum ReservationPageContextBuilderError: Error {
 class ReservationPageContextBuilder {
 
     var identification: Identification?
-    var user: User?
-    var item: Item?
-    var list: List?
+    var user: UserRepresentation?
+    var item: ItemRepresentation?
+    var list: ListRepresentation?
 
-    var reservation: Reservation?
-
-    @discardableResult
-    func forUser(_ user: User) -> Self {
-        self.user = user
-        return self
-    }
+    var reservation: ReservationRepresentation?
 
     @discardableResult
     func forIdentification(_ identification: Identification) -> Self {
@@ -87,19 +66,25 @@ class ReservationPageContextBuilder {
     }
 
     @discardableResult
-    func forItem(_ item: Item) -> Self {
+    func forUserRepresentation(_ user: UserRepresentation) -> Self {
+        self.user = user
+        return self
+    }
+
+    @discardableResult
+    func forItemRepresentation(_ item: ItemRepresentation) -> Self {
         self.item = item
         return self
     }
 
     @discardableResult
-    func forList(_ list: List) -> Self {
+    func forListRepresentation(_ list: ListRepresentation) -> Self {
         self.list = list
         return self
     }
 
     @discardableResult
-    func withReservation(_ reservation: Reservation) -> Self {
+    func withReservationRepresentation(_ reservation: ReservationRepresentation?) -> Self {
         self.reservation = reservation
         return self
     }
@@ -111,34 +96,16 @@ class ReservationPageContextBuilder {
         guard let list = list else {
             throw ReservationPageContextBuilderError.missingRequiredList
         }
-        // builder needs at least either identification ...
-        if let identification = identification {
-            guard user == nil else {
-                throw ReservationPageContextBuilderError.eitherRequiredIdentificationOrUser
-            }
-            return ReservationPageContext(
-                for: identification,
-                and: item,
-                in: list,
-                with: reservation
-            )
+        guard let identification = identification else {
+            throw ReservationPageContextBuilderError.missingRequiredIdentification
         }
-        // ... or user ...
-        else if let user = user {
-            guard identification == nil else {
-                throw ReservationPageContextBuilderError.eitherRequiredIdentificationOrUser
-            }
-            return ReservationPageContext(
-                for: user,
-                and: item,
-                in: list,
-                with: reservation
-            )
-        }
-        else {
-            // ... and not both
-            throw ReservationPageContextBuilderError.missingRequiredIdentificationOrUser
-        }
+        return ReservationPageContext(
+            for: identification,
+            and: item,
+            in: list,
+            with: reservation,
+            user: user
+        )
     }
 
 }

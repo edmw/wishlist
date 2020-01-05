@@ -2,6 +2,7 @@
 #set("title") {#L10N("wishlist"){Wishlist}}
 #set("subtitle") {#L10N("someones-wishlist","#(page.ownerName)"){#(page.ownerName)'s Wishlist}}
 #//
+#set("location"){/list/#(page.listID)}
 #set("content") {
 #if(page.userID) {
 <div>
@@ -16,7 +17,7 @@ you're viewing <strong>#(page.ownerName)'s #(page.listTitle) Wishlist</strong>. 
 }
 </div>
 }}
-<div class="h2"><h2 class="d-flex align-items-baseline"><span class="title">#(page.listTitle)</span>#if(page.userID && page.userID == page.ownerID){<a class="btn btn-link d-flex float-right" href="/user/#(page.userID)/list/#(page.listID)/items#if(location){?p=#(location)}" title="#L10N("edit-list"){Edit list}"><span class="btn-label">#L10N("edit"){Edit}</span><svg class="feather"><use xlink:href="/icons/feather.svg#edit-2"/></svg></a>}</h2>#if(page.userID != nil) {#if(page.userFavorsList){★}else{<a class="btn-xlg btn-link nav-link" href="/user/#(page.userID)/favorites/create?listid=#(page.listID)#if(location){&p=#(location)}" title="#L10N("add-favorite"){Add list to favorites}">☆</a>}}</div>
+<div class="h2"><h2><span class="title">#(page.listTitle)</span>#if(page.userID && page.userID == page.ownerID){<a class="btn btn-link d-flex float-right" href="/user/#(page.userID)/list/#(page.listID)/items" title="#L10N("edit-list"){Edit list}"><span class="btn-label">#L10N("edit"){Edit}</span><svg class="feather"><use xlink:href="/icons/feather.svg#edit-2"/></svg></a>}</h2>#if(page.userID != nil) {#if(page.userFavorsList){★}else{<a class="btn-xlg btn-link nav-link" href="/user/#(page.userID)/favorites/create?listid=#(page.listID)#if(location){&p=#(location)}" title="#L10N("add-favorite"){Add list to favorites}">☆</a>}}</div>
 #if(request.parameter.m == "WAR") {
 <div class="alert alert-danger" role="alert">
     #L10N("wishlist-message-war"){The selected wish is already reserved by someone else. May be you would like to choose another gift?}
@@ -27,14 +28,14 @@ you're viewing <strong>#(page.ownerName)'s #(page.listTitle) Wishlist</strong>. 
     <div id="wl-item-#(item.id)" class="wl-item p-2">
             <div id="wl-item-card-#(item.id)" class="wl-item-card">
                 #if(item.imageURL) {
-                    <img src="/images/items/#(item.imageURL)">
+                    <img src="/images/items/#(item.localImageURL)">
                 } else {
                     <img src="/images/gift.svg" class="placeholder">
                 }
                 <div class="inner p-2">
                     <div class="wl-label m-0">
                         <h5 class="m-0 px-1">#(item.title)</h5>
-                        <div class="wl-hearts m-0 px-1">#if(item.preference == -2){♥}#if(item.preference == -1){♥♥}#if(item.preference == 0){♥♥♥}#if(item.preference == 1){♥♥♥♥}#if(item.preference == 2){♥♥♥♥♥}</div>
+                        <div class="wl-hearts m-0 px-1">#if(item.preference == "lowest"){♥}#if(item.preference == "low"){♥♥}#if(item.preference == "normal"){♥♥♥}#if(item.preference == "high"){♥♥♥♥}#if(item.preference == "highest"){♥♥♥♥♥}</div>
                     </div>
                     <div class="btn-group #if(item.url) {justify-content-between} else {justify-content-end}" role="group">
                         #if(item.url) {
@@ -46,7 +47,7 @@ you're viewing <strong>#(page.ownerName)'s #(page.listTitle) Wishlist</strong>. 
                 <div class="back bg-dark p-2">
                     <div class="text pb-5">
                         <h5 class="wl-label text-light m-0 px-1">#(item.title)</h5>
-                        <p class="text-light m-0 px-1"><small><em>#L10N("item-preference-#(item.preference + 2)"){}</em></small></p>
+                        <p class="text-light m-0 px-1"><small><em>#L10N("item-preference-#(item.preference)"){}</em></small></p>
                         <p class="text-light mt-2">#(item.text)</p>
                     </div>
                     <div class="btn-group justify-content-end" role="group">

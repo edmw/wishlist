@@ -1,39 +1,47 @@
+import Domain
+
 import Vapor
 
 // MARK: ItemParameterAcceptor
 
 protocol ItemParameterAcceptor {
 
-    var itemRepository: ItemRepository { get }
+    func itemID(on request: Request) throws -> ItemID?
 
-    func requireItem(on request: Request, for list: List) throws -> EventLoopFuture<Item>
+    func requireItemID(on request: Request) throws -> ItemID
 
-    func findItem(in list: List, from request: Request) throws -> EventLoopFuture<Item>
+    func findItemID(from request: Request) throws -> EventLoopFuture<ItemID>
 
 }
 
 extension ItemParameterAcceptor where Self: Controller {
 
-    /// Returns the item specified by the item id given in the request’s route.
-    /// Asumes that the item’s id is the next routing parameter!
-    /// The item must part of the specified list.
-    func requireItem(on request: Request, for list: List) throws -> EventLoopFuture<Item> {
-        let itemID = try request.parameters.next(ID.self)
-        return try itemRepository
-            .find(by: itemID.uuid, in: list)
-            .unwrap(or: Abort(.notFound))
+    /// Returns the item id given in the request’s route or nil if there is none.
+    /// Asumes that the item id is the next routing parameter!
+    /// - Parameter request: the request containing the route
+    func itemID(on request: Request) throws -> ItemID? {
+        guard request.parameters.values.isNotEmpty else {
+            return nil
+        }
+        return try ItemID(request.parameters.next(ID.self))
     }
 
-    /// Returns the item specified by an item id given in the request’s body or query.
-    func findItem(in list: List, from request: Request) throws -> EventLoopFuture<Item> {
+    /// Returns the item id given in the request’s route. Throws if there is none.
+    /// Asumes that the item id is the next routing parameter!
+    /// - Parameter request: the request containing the route
+    func requireItemID(on request: Request) throws -> ItemID {
+        return try ItemID(request.parameters.next(ID.self))
+    }
+
+    /// Searches a item id in the request’s content and the request’s query.
+    /// - Parameter request: the request
+    func findItemID(from request: Request) throws -> EventLoopFuture<ItemID> {
         return request.content[ID.self, at: "itemID"]
-            .flatMap { itemID in
-                guard let itemID = itemID ?? request.query[.itemID] else {
+            .map { id in
+                guard let id = id ?? request.query[.itemID] else {
                     throw Abort(.notFound)
                 }
-                return try self.itemRepository
-                    .find(by: itemID.uuid, in: list)
-                    .unwrap(or: Abort(.noContent))
+                return ItemID(id)
             }
     }
 

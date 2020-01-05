@@ -123,9 +123,9 @@ final class ImageFileMiddleware: Middleware, ServiceType {
             try fileManager
                 .contentsOfDirectory(
                     at: fileDirectoryURL,
-                    includingPropertiesForKeys: []
-//                    options: [ .skipsHiddenFiles ]
-// not implemented yet for linux: https://github.com/apple/swift-corelibs-foundation/pull/1548
+                    includingPropertiesForKeys: [],
+                    options: [ .skipsHiddenFiles ]
+// FIXME: not implemented yet for linux: https://github.com/apple/swift-corelibs-foundation/pull/1548
                 )
                 .filter {
                     ImageFileMiddleware.supportedMediaTypes
@@ -141,16 +141,16 @@ final class ImageFileMiddleware: Middleware, ServiceType {
                         at: fileDirectoryURL,
                         includingPropertiesForKeys: []
                     ).isEmpty {
-                    try fileManager.removeItem(at: fileDirectoryURL)
+                        try fileManager.removeItem(at: fileDirectoryURL)
 
-                    let fileGroupDirectoryURL = fileDirectoryURL.deletingLastPathComponent()
-                    if try fileManager
-                        .contentsOfDirectory(
-                            at: fileGroupDirectoryURL,
-                            includingPropertiesForKeys: []
-                        ).isEmpty {
-                        try fileManager.removeItem(at: fileGroupDirectoryURL)
-                    }
+                        let fileGroupDirectoryURL = fileDirectoryURL.deletingLastPathComponent()
+                        if try fileManager
+                            .contentsOfDirectory(
+                                at: fileGroupDirectoryURL,
+                                includingPropertiesForKeys: []
+                            ).isEmpty {
+                            try fileManager.removeItem(at: fileGroupDirectoryURL)
+                        }
                 }
             }
         }
@@ -199,9 +199,9 @@ final class ImageFileMiddleware: Middleware, ServiceType {
         return try FileManager.default
             .contentsOfDirectory(
                 at: directory,
-                includingPropertiesForKeys: []
-//                options: [ .skipsHiddenFiles ]
-// not implemented yet for linux: https://github.com/apple/swift-corelibs-foundation/pull/1548
+                includingPropertiesForKeys: [],
+                options: [ .skipsHiddenFiles ]
+// FIXME: not implemented yet for linux: https://github.com/apple/swift-corelibs-foundation/pull/1548
             )
             .filter {
                 $0.deletingPathExtension().lastPathComponent == name
@@ -214,11 +214,22 @@ final class ImageFileMiddleware: Middleware, ServiceType {
     private func writeData(from response: Response, to url: URL, on request: Request) throws
         -> EventLoopFuture<Bool>
     {
-        guard url.path.hasPrefix(self.imagesDirectoryURL.path) else {
+        guard url.isFileURL && url.path.hasPrefix(self.imagesDirectoryURL.path) else {
             throw ImageFileMiddlewareError.invalidFileURL(url)
         }
+        FileManager.default.createFile(
+            atPath: url.path,
+            contents: nil,
+            attributes: [ .posixPermissions: 0o664 ]
+        )
         return response.http.body.consumeData(max: 2_000_000, on: request).map { data in
-            try data.write(to: url, options: .atomic)
+            if let fileHandle = FileHandle(forWritingAtPath: url.path) {
+                defer {
+                    fileHandle.closeFile()
+                }
+                fileHandle.seekToEndOfFile()
+                fileHandle.write(data)
+            }
             return true
         }
     }

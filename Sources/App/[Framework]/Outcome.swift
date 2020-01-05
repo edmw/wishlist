@@ -30,16 +30,16 @@ class Outcome<Value, Context: Encodable>: OutcomeType {
     let result: Result<Value, Error>
 
     /// This is the context for the outcome. Usually used from the outcome handlers to render a
-    /// response. Maybe different for different values or in the case of a failure.
+    /// response. Can be different for different values or in the case of a failure.
     let context: Context
 
     /// Internal variable to store a response.
-    internal var response: EventLoopFuture<Response>?
+    var response: EventLoopFuture<Response>?
 
     /// Construct an outcome. Internal use only. Use the factory methods instead.
     /// - Parameter context: context for the outcome
     /// - Parameter result: result of the outcome
-    internal required init(context: Context, result: Result<Value, Error>) {
+    required init(context: Context, result: Result<Value, Error>) {
         self.context = context
         self.result = result
         self.response = nil
@@ -58,7 +58,7 @@ class Outcome<Value, Context: Encodable>: OutcomeType {
 }
 
 /// Protocol type for an outcome. Internally used to extend `EventLoopFuture`.
-internal protocol OutcomeType {
+protocol OutcomeType {
     associatedtype Context: Encodable
     associatedtype Value
 

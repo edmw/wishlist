@@ -1,34 +1,34 @@
+import Domain
+
 import Vapor
 
 // MARK: InvitationParameterAcceptor
 
 protocol InvitationParameterAcceptor {
 
-    var invitationRepository: InvitationRepository { get }
+    func invitationID(on request: Request) throws -> InvitationID?
 
-    func requireInvitation(on request: Request, status: Invitation.Status?) throws
-        -> EventLoopFuture<Invitation>
+    func requireInvitationID(on request: Request) throws -> InvitationID
+
 }
 
 extension InvitationParameterAcceptor where Self: Controller {
 
-    /// Returns the invitation specified by the invitation id given in the request’s route.
+    /// Returns the invitation id given in the request’s route or nil if there is none.
     /// Asumes that the invitation id is the next routing parameter!
-    /// If a status is specified requires the invitation to conform to the given status,
-    /// throws `.badRequest` if status’ differ.
-    func requireInvitation(on request: Request, status: Invitation.Status? = nil) throws
-        -> EventLoopFuture<Invitation>
-    {
-        let invitationID = try request.parameters.next(ID.self)
-        return invitationRepository
-            .find(by: invitationID.uuid)
-            .unwrap(or: Abort(.noContent))
-            .map { invitation in
-                guard status == nil || invitation.status == status else {
-                    throw Abort(.badRequest)
-                }
-                return invitation
-            }
+    /// - Parameter request: the request containing the route
+    func invitationID(on request: Request) throws -> InvitationID? {
+        guard request.parameters.values.isNotEmpty else {
+            return nil
+        }
+        return try InvitationID(request.parameters.next(ID.self))
+    }
+
+    /// Returns the invitation id given in the request’s route. Throws if there is none.
+    /// Asumes that the invitation id is the next routing parameter!
+    /// - Parameter request: the request containing the route
+    func requireInvitationID(on request: Request) throws -> InvitationID {
+        return try InvitationID(request.parameters.next(ID.self))
     }
 
 }

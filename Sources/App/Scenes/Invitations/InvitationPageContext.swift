@@ -1,3 +1,5 @@
+import Domain
+
 import Foundation
 
 struct InvitationPageContext: Encodable {
@@ -11,18 +13,13 @@ struct InvitationPageContext: Encodable {
     var sendSuccess: Bool = false
 
     fileprivate init(
-        for user: User,
-        with invitation: Invitation? = nil,
+        for user: UserRepresentation,
+        with invitation: InvitationRepresentation? = nil,
         from data: InvitationPageFormData? = nil
     ) {
         self.userID = ID(user.id)
 
-        if let invitation = invitation {
-            self.invitation = InvitationContext(for: invitation)
-        }
-        else {
-            self.invitation = nil
-        }
+        self.invitation = InvitationContext(invitation)
 
         self.form = InvitationPageFormContext(from: data)
     }
@@ -38,21 +35,28 @@ enum InvitationPageContextBuilderError: Error {
 class InvitationPageContextBuilder {
     // swiftlint:disable discouraged_optional_boolean
 
-    var user: User?
-    var invitation: Invitation?
+    var user: UserRepresentation?
+    var invitation: InvitationRepresentation?
 
     var formData: InvitationPageFormData?
 
     var sendSuccess: Bool?
 
     @discardableResult
-    func forUser(_ user: User) -> Self {
+    func forUserRepresentation(_ user: UserRepresentation) -> Self {
         self.user = user
         return self
     }
 
     @discardableResult
-    func forInvitation(_ invitation: Invitation) -> Self {
+    func forInvitationRepresentation(_ invitation: InvitationRepresentation?) -> Self {
+        self.invitation = invitation
+        return self
+    }
+
+    @discardableResult
+    func with(_ user: UserRepresentation, _ invitation: InvitationRepresentation?) -> Self {
+        self.user = user
         self.invitation = invitation
         return self
     }

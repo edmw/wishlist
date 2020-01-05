@@ -1,42 +1,40 @@
+import Domain
+
 import Vapor
 import Fluent
 
-final class FavoriteController: ProtectedController,
+final class FavoriteController: AuthenticatableController,
     FavoriteParameterAcceptor,
     ListParameterAcceptor,
     RouteCollection
 {
+    let userFavoritesActor: UserFavoritesActor
 
-    let favoriteRepository: FavoriteRepository
-    let itemRepository: ItemRepository
-    let listRepository: ListRepository
-
-    init(
-        _ favoriteRepository: FavoriteRepository,
-        _ itemRepository: ItemRepository,
-        _ listRepository: ListRepository
-    ) {
-        self.favoriteRepository = favoriteRepository
-        self.itemRepository = itemRepository
-        self.listRepository = listRepository
+    init(_ userFavoritesActor: UserFavoritesActor) {
+        self.userFavoritesActor = userFavoritesActor
     }
 
     // MARK: - VIEWS
 
     /// Renders a view to confirm the creation of a favorite.
-    /// This is only accessible for an authenticated user who owns the affected item.
     private func renderCreationView(on request: Request) throws
         -> EventLoopFuture<View>
     {
-        let user = try requireAuthenticatedUser(on: request)
+        let userid = try requireAuthenticatedUserID(on: request)
 
-        return try self.findList(from: request)
-            .flatMap { list in
-                // check if the found list may be accessed by the given user
-                // user may be nil indicating this is a anonymous request
-                return try self.requireAuthorization(on: request, for: list, user: user)
-                    .flatMap { _ in
-                        let context = ListPageContext(for: user, with: list)
+        let userFavoritesActor = self.userFavoritesActor
+        return try self.findListID(from: request)
+            .flatMap { listid in
+                return try userFavoritesActor
+                    .requestFavoriteCreation(
+                        .specification(userBy: userid, listBy: listid),
+                        .boundaries(worker: request.eventLoop)
+                    )
+                    .flatMap { result in
+                        let context = try ListPageContextBuilder()
+                            .forUserRepresentation(result.user)
+                            .withListRepresentation(result.list)
+                            .build()
                         return try Controller.renderView(
                             "User/FavoriteCreation",
                             with: context,
@@ -48,19 +46,24 @@ final class FavoriteController: ProtectedController,
     }
 
     /// Renders a view to confirm the deletion of a favorite.
-    /// This is only accessible for an authenticated user who owns the affected item.
     private func renderDeletionView(on request: Request) throws
         -> EventLoopFuture<View>
     {
-        let user = try requireAuthenticatedUser(on: request)
+        let userid = try requireAuthenticatedUserID(on: request)
 
-        return try self.findList(from: request)
-            .flatMap { list in
-                // check if the found list may be accessed by the given user
-                // user may be nil indicating this is a anonymous request
-                return try self.requireAuthorization(on: request, for: list, user: user)
-                    .flatMap { _ in
-                        let context = ListPageContext(for: user, with: list)
+        let userFavoritesActor = self.userFavoritesActor
+        return try self.findListID(from: request)
+            .flatMap { listid in
+                return try userFavoritesActor
+                    .requestFavoriteDeletion(
+                        .specification(userBy: userid, listBy: listid),
+                        .boundaries(worker: request.eventLoop)
+                    )
+                    .flatMap { result in
+                        let context = try ListPageContextBuilder()
+                            .forUserRepresentation(result.user)
+                            .withListRepresentation(result.list)
+                            .build()
                         return try Controller.renderView(
                             "User/FavoriteDeletion",
                             with: context,
@@ -73,59 +76,51 @@ final class FavoriteController: ProtectedController,
 
     // MARK: - CRUD
 
-    // Creates a favorite with the given data.
+    // Creates a favorite with the given listid.
     private func create(on request: Request) throws -> EventLoopFuture<Response> {
-        let user = try requireAuthenticatedUser(on: request)
+        let userid = try requireAuthenticatedUserID(on: request)
 
-        // get list to create favorite for
-        return try self.findList(from: request)
-            .flatMap { list in
-                // check if the found list may be accessed by the given user
-                // user may be nil indicating this is a anonymous request
-                return try self.requireAuthorization(on: request, for: list, user: user)
-                    .flatMap { _ in
-                        return try self.favoriteRepository
-                            .addFavorite(list, for: user)
-                            .emitEvent("created for \(user)", on: request)
-                            .logMessage("created for \(user)", on: request)
-                            .transform(to: self.success(for: user, on: request))
+        let userFavoritesActor = self.userFavoritesActor
+        return try self.findListID(from: request)
+            .flatMap { listid in
+                return try userFavoritesActor
+                    .createFavorite(
+                        .specification(userBy: userid, listBy: listid),
+                        .boundaries(worker: request.eventLoop)
+                    )
+                    .flatMap { result in
+                        return self.success(for: result.user, on: request)
                     }
                     .handleAuthorizationError(on: request)
             }
     }
 
-    // Deletes a favorite with the given data.
-    private func delete(on request: Request) throws -> EventLoopFuture<Response> {
-        let user = try requireAuthenticatedUser(on: request)
-
-        return try self.requireFavorite(on: request, for: user)
-            .deleteModel(on: request)
-            .emitEvent("deleted for \(user)", on: request)
-            .logMessage("deleted for \(user)", on: request)
-            .transform(to: success(for: user, on: request))
-    }
-
     // Deletes a favorite with the given listid.
-    private func deleteWithListID(on request: Request) throws -> EventLoopFuture<Response> {
-        let user = try requireAuthenticatedUser(on: request)
+    private func delete(on request: Request) throws -> EventLoopFuture<Response> {
+        let userid = try requireAuthenticatedUserID(on: request)
 
-        return try self.findList(from: request)
-            .flatMap { list in
-                return try self.favoriteRepository
-                    .find(favorite: list, for: user)
-                    .unwrap(or: Abort(.notFound))
-                    .deleteModel(on: request)
-                    .emitEvent("deleted for \(user)", on: request)
-                    .logMessage("deleted for \(user)", on: request)
-                    .transform(to: self.success(for: user, on: request))
+        let userFavoritesActor = self.userFavoritesActor
+        return try self.findListID(from: request)
+            .flatMap { listid in
+                return try userFavoritesActor
+                    .deleteFavorite(
+                        .specification(userBy: userid, listBy: listid),
+                        .boundaries(worker: request.eventLoop)
+                    )
+                    .flatMap { result in
+                        return self.success(for: result.user, on: request)
+                    }
+                    .handleAuthorizationError(on: request)
             }
     }
 
     // MARK: - RESULT
 
-    /// Returns a sucess response on a CRUD request.
+    /// Returns a success response on a CRUD request.
     /// Not implemented yet: REST response
-    private func success(for user: User, on request: Request) -> EventLoopFuture<Response> {
+    private func success(for user: UserRepresentation, on request: Request)
+        -> EventLoopFuture<Response>
+    {
         // to add real REST support, check the accept header for json and output a json response
         if let locator = request.query.getLocator(is: .local) {
             return request.eventLoop.newSucceededFuture(
@@ -169,7 +164,7 @@ final class FavoriteController: ProtectedController,
             use: self.renderDeletionView
         )
         router.post("user", ID.parameter, "favorites", "delete",
-            use: self.deleteWithListID
+            use: self.delete
         )
 
         // favorite handling

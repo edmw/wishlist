@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Wishlist - Feature
 //
-// Copyright (c) 2019 Michael Baumgärtner
+// Copyright (c) 2019-2020 Michael Baumgärtner
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@
 
 import Vapor
 import Foundation
-import SwiftDate
 
 // MARK: Feature
 
@@ -32,7 +31,7 @@ enum Feature: Codable, Equatable, Comparable, CustomStringConvertible {
 
     case inPlanning(Priority)
     case inDevelopment(Bool)
-    case inProduction(DateInRegion, Version)
+    case inProduction(Date, Version)
 
     var enabled: Bool {
         switch self {
@@ -62,7 +61,7 @@ enum Feature: Codable, Equatable, Comparable, CustomStringConvertible {
             return lhs == rhs
         case let(.inProduction(lhs1, lhs2), .inProduction(rhs1, rhs2)):
             return lhs1 == rhs1 && lhs2 == rhs2
-        default:
+        case (.inPlanning, _), (.inDevelopment, _), (inProduction, _):
             return false
         }
     }
@@ -125,7 +124,7 @@ enum Feature: Codable, Equatable, Comparable, CustomStringConvertible {
     }
 
     private struct ProductionValues: Codable {
-        let date: DateInRegion
+        let date: Date
         let version: Version
     }
 
@@ -245,6 +244,36 @@ struct Version: Codable, Equatable, ExpressibleByStringLiteral, CustomStringConv
 
     var description: String {
         return string
+    }
+
+}
+
+// MARK: -
+
+extension String {
+
+    private static var dateFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+        dateFormatter.calendar = Calendar(identifier: .gregorian)
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        return dateFormatter
+    }()
+
+    fileprivate func toDate() -> Date? {
+        return String.dateFormatter.date(from: self)
+    }
+
+}
+
+extension Date {
+
+    fileprivate func toFormat(_ format: String = "yyyy-MM-dd") -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+        dateFormatter.calendar = Calendar(identifier: .gregorian)
+        dateFormatter.dateFormat = format
+        return dateFormatter.string(from: self)
     }
 
 }

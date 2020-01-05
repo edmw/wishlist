@@ -4,7 +4,7 @@ import Vapor
 
 struct SendMessageResult: JobResult {
 
-    // true,if at least one message could be sent
+    // true, if at least one message could be sent
     let success: Bool
 
     // send result of each messaging

@@ -1,3 +1,5 @@
+import Domain
+
 import Vapor
 
 /// This structures holds all the input given by the user into the settings form.
@@ -15,20 +17,10 @@ struct SettingsPageFormData: Content {
         self.inputPushoverKey = ""
     }
 
-    init(from user: User) {
+    init(from user: UserRepresentation) {
         self.inputEmail = user.settings.notifications.emailEnabled
         self.inputPushover = user.settings.notifications.pushoverEnabled
-        self.inputPushoverKey = user.settings.notifications.pushoverKey
-    }
-
-}
-
-extension UserSettings {
-
-    mutating func update(from formdata: SettingsPageFormData) {
-        self.notifications.emailEnabled = formdata.inputEmail ?? false
-        self.notifications.pushoverEnabled = formdata.inputPushover ?? false
-        self.notifications.pushoverKey = formdata.inputPushoverKey ?? ""
+        self.inputPushoverKey = String(user.settings.notifications.pushoverKey)
     }
 
 }

@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Wishlist - configure
 //
-// Copyright (c) 2019 Michael Baumgärtner
+// Copyright (c) 2019-2020 Michael Baumgärtner
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,8 @@
 // SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // swiftlint:disable function_body_length
+
+import Domain
 
 import Vapor
 import Leaf
@@ -52,15 +54,16 @@ public func configure(
 
     // MARK: Logger
 
-    let loggingProvider = LoggingProvider(logLevel: environment.isRelease ? .error : .debug)
+    let developmentLogLevel = Environment.get(.developmentLogLevel) ?? .debug
+    let releaseLogLevel = Environment.get(.releaseLogLevel) ?? .error
+    let logLevel = environment.isRelease ? releaseLogLevel : developmentLogLevel
+
+    let loggingProvider = LoggingProvider(logLevel: logLevel)
     try services.register(loggingProvider)
     config.prefer(StandardLogger.self, for: Logger.self)
 
     // logger which can be used while configuring
-    let logger = BasicLogger(
-        level: environment.isRelease ? .error : .debug,
-        tag: "CONFIG"
-    )
+    let logger = BasicLogger(level: logLevel, tag: "CONFIG")
 
     // MARK: Database
 
@@ -103,6 +106,8 @@ public func configure(
     services.register(ImageProxyService.self)
 
     // MARK: register Providers
+
+    try services.register(AuthenticationProvider())
 
     try services.register(DispatchingProvider())
     try services.register(EmailConfiguration())
@@ -149,14 +154,38 @@ public func configure(
     )
     services.register(middlewaresConfig)
 
+    // MARK: Actors
+
+    services.register(DomainUserListsActor.self)
+    services.register(DomainUserItemsActor.self)
+    services.register(DomainUserFavoritesActor.self)
+    services.register(DomainUserReservationsActor.self)
+    services.register(DomainUserInvitationsActor.self)
+    services.register(DomainUserProfileActor.self)
+    services.register(DomainUserSettingsActor.self)
+    services.register(DomainUserNotificationsActor.self)
+    config.prefer(DomainUserListsActor.self, for: UserListsActor.self)
+    config.prefer(DomainUserItemsActor.self, for: UserItemsActor.self)
+    config.prefer(DomainUserFavoritesActor.self, for: UserFavoritesActor.self)
+    config.prefer(DomainUserReservationsActor.self, for: UserReservationsActor.self)
+    config.prefer(DomainUserInvitationsActor.self, for: UserInvitationsActor.self)
+    config.prefer(DomainUserProfileActor.self, for: UserProfileActor.self)
+    config.prefer(DomainUserSettingsActor.self, for: UserSettingsActor.self)
+    config.prefer(DomainUserSettingsActor.self, for: UserSettingsActor.self)
+    services.register(DomainUserWelcomeActor.self)
+    config.prefer(DomainUserWelcomeActor.self, for: UserWelcomeActor.self)
+    services.register(DomainEnrollmentActor.self)
+    config.prefer(DomainEnrollmentActor.self, for: EnrollmentActor.self)
+    services.register(DomainWishlistActor.self)
+    config.prefer(DomainWishlistActor.self, for: WishlistActor.self)
+    services.register(DomainAnnouncementsActor.self)
+    config.prefer(DomainAnnouncementsActor.self, for: AnnouncementsActor.self)
+
     // MARK: Routes
 
-    try services.register(AuthenticationProvider())
-
-//    let router = EngineRouter.default()
-//    try routes(router, features, logger: logger)
-//    services.register(router, as: Router.self)
-
+    // Registering the router as a factory yields a separate router instance per eventloop
+    // instead of a singleton router instance, resulting in thread-safe services and controllers.
+    // @see https://github.com/vapor/vapor/issues/1711#issuecomment-408186604
     services.register(Router.self) { container -> EngineRouter in
         let router = EngineRouter.default()
         try routes(router, container, features, logger: logger)
@@ -167,12 +196,15 @@ public func configure(
 
     var localizationConfig = LocalizationConfig(defaultLanguage: "en")
     localizationConfig.setRequestResolver { requestLanguageCode, request in
+        // language set in request query takes precedence over anything else
         if let queryLanguage: String = request.query["lang"] {
             return queryLanguage.lowercased()
         }
-        if let user = try request.authenticated(User.self), let userLanguage = user.language {
+        // language set in request session should be the usual determining value
+        if let userLanguage = try request.session().languageForUser {
             return userLanguage.lowercased()
         }
+        // ultimately, language from request headers will be used
         return requestLanguageCode
     }
     try services.register(LocalizationProvider(localizationConfig))
@@ -187,10 +219,6 @@ public func configure(
     leafTagConfig.use(LocalizationDateTag(), as: "L10NDate")
     leafTagConfig.use(LocalizationLocaleTag(), as: "L10NLocale")
     services.register(leafTagConfig)
-
-    // MARK: Managers
-
-    services.register(UserNotificationManager.self)
 
     //
 
@@ -213,4 +241,29 @@ func makeSessionsConfig(_ container: Container) -> SessionsConfig {
             )
         }
     )
+}
+
+extension EnvironmentKeys {
+    static let developmentLogLevel = EnvironmentKey<LogLevel>("DEVELOPMENT_LOG_LEVEL")
+    static let releaseLogLevel = EnvironmentKey<LogLevel>("RELEASE_LOG_LEVEL")
+}
+
+extension Environment {
+
+    static func get(_ key: EnvironmentKey<LogLevel>) -> LogLevel? {
+        guard let value = get(key.string) else {
+            return nil
+        }
+        switch value {
+        case "VERBOSE": return .verbose
+        case "DEBUG": return .debug
+        case "INFO": return .info
+        case "WARNING": return .warning
+        case "ERROR": return .error
+        case "FATAL": return .fatal
+        default:
+            return nil
+        }
+    }
+
 }

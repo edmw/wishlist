@@ -1,7 +1,10 @@
+import Domain
+
 import Vapor
 
 /// This structures holds all the input given by the user into the invitation form.
-/// In contrast to `InvitationData` this contains only editable properties.
+/// In contrast to `InvitationRepresentation` and `InvitationData` this contains only
+/// editable properties.
 struct InvitationPageFormData: Content {
     // swiftlint:disable discouraged_optional_boolean
 
@@ -15,14 +18,16 @@ struct InvitationPageFormData: Content {
 
 }
 
-extension InvitationData {
+extension InvitationValues {
 
     init(from formdata: InvitationPageFormData) {
-        self.code = nil
-        self.status = nil
-        self.email = formdata.inputEmail
-        self.sentAt = nil
-        self.createdAt = nil
+        self.init(
+            code: nil,
+            status: nil,
+            email: formdata.inputEmail,
+            sentAt: nil,
+            createdAt: nil
+        )
     }
 
 }

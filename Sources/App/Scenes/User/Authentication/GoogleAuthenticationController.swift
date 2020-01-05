@@ -1,3 +1,5 @@
+import Domain
+
 import Vapor
 import Imperial
 import FluentSQLite
@@ -10,16 +12,18 @@ final class GoogleAuthenticatorController: AuthenticationController, RouteCollec
     let errorPath: String
 
     init(
+        _ enrollmentActor: EnrollmentActor,
         authenticationSuccessPath: String,
         authenticationErrorPath: String
     ) {
         self.successPath = authenticationSuccessPath
         self.errorPath = authenticationErrorPath
+        super.init(enrollmentActor)
     }
 
     /// Signs in a Google user identifiable by the given access token.
     ///
-    /// After sucessfully gathering the user‘s information from Google, authenticates the subject
+    /// After successfully gathering the user‘s information from Google, authenticates the subject
     /// and creates or update the user‘s entity. Attaches the user‘s entity to the current session
     /// and redirects to our Start page.
     ///
@@ -57,12 +61,14 @@ final class GoogleAuthenticatorController: AuthenticationController, RouteCollec
             }
             .flatMap { userInfo in
                 // authenticate user and redirect
-                return try AuthenticationController
-                    .authenticate(using: userInfo, redirect: self.successPath, on: request)
+                return try self.authenticate(
+                    using: userInfo,
+                    redirect: self.successPath,
+                    on: request
+                )
             }
             .catchMap { error in
-                return try AuthenticationController
-                    .redirectFailedLogin(with: error, to: self.errorPath, on: request)
+                return try self.redirectFailedLogin(with: error, to: self.errorPath, on: request)
             }
     }
 
@@ -76,7 +82,7 @@ final class GoogleAuthenticatorController: AuthenticationController, RouteCollec
         }
 
         // create authentication state encoded as string
-        guard let authenticationState = try AuthenticationController.createState(on: request) else {
+        guard let authenticationState = try request.createState() else {
             throw Abort(.internalServerError)
         }
 

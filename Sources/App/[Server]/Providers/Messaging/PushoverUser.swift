@@ -1,5 +1,5 @@
 /// Type which represents a pushover user.
-/// A pushover user is composed of an user key.
+/// A pushover user is composed of a user key.
 /// Note: No validation is done!
 public struct PushoverUser: ExpressibleByStringLiteral, CustomStringConvertible {
 

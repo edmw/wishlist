@@ -1,3 +1,5 @@
+import Domain
+
 import Vapor
 import Fluent
 
@@ -6,10 +8,9 @@ extension InvitationController {
     // MARK: Save
 
     struct InvitationSaveResult {
-        let invitation: Invitation
-        let thenSendMail: Bool
+        let user: UserRepresentation
+        let invitation: InvitationRepresentation
     }
-
     final class InvitationSaveOutcome: Outcome<InvitationSaveResult, InvitationPageContext> {}
 
     /// Saves an invitation for the specified user from the request’s data.
@@ -20,42 +21,58 @@ extension InvitationController {
     /// the corresponding error flags.
     func save(
         from request: Request,
-        for user: User
+        for userid: UserID
     ) throws
         -> EventLoopFuture<InvitationSaveOutcome>
     {
+        let userInvitationsActor = self.userInvitationsActor
         return try request.content
             .decode(InvitationPageFormData.self)
             .flatMap { formdata in
-                let context = try InvitationPageContextBuilder()
-                    .forUser(user)
-                    .withFormData(formdata)
-                    .build()
+                let values = InvitationValues(from: formdata)
 
-                return request.future()
-                    .flatMap {
-                        return try self.save(
-                            from: formdata,
-                            for: user,
-                            on: request
+                var contextBuilder = InvitationPageContextBuilder().withFormData(formdata)
+
+                return try userInvitationsActor
+                    .createInvitation(
+                        .specification(
+                            userBy: userid,
+                            invitationValues: values,
+                            sendEmail: formdata.inputSendEmail ?? false
+                        ),
+                        .boundaries(
+                            worker: request.eventLoop,
+                            emailSending: VaporEmailSendingProvider(on: request)
                         )
-                        .map { invitation in
-                            let value = InvitationSaveResult(
-                                invitation: invitation,
-                                thenSendMail: formdata.inputSendEmail ?? false
-                            )
-                            return .success(with: value, context: context)
-                        }
-
+                    )
+                    .map { result in
+                        return try self.handleSuccessOnSave(result, contextBuilder: contextBuilder)
                     }
-                    .catchMap(EntityError<Invitation>.self) {
-                        try self.handleErrorOnSave($0, with: context)
+                    .catchMap(UserInvitationsActorError.self) { error in
+                        if case let UserInvitationsActorError
+                            .validationError(user, invitation, error) = error
+                        {
+                            contextBuilder = contextBuilder.with(user, invitation)
+                            return try self.handleErrorOnSave(error, with: contextBuilder.build())
+                        }
+                        throw error
                     }
             }
     }
 
+    private func handleSuccessOnSave(
+        _ result: CreateInvitation.Result,
+        contextBuilder: InvitationPageContextBuilder
+    ) throws -> InvitationSaveOutcome {
+        let context = try contextBuilder.forUserRepresentation(result.user).build()
+        return .success(
+            with: .init(user: result.user, invitation: result.invitation),
+            context: context
+        )
+    }
+
     private func handleErrorOnSave(
-        _ error: EntityError<Invitation>,
+        _ error: ValuesError<InvitationValues>,
         with contextIn: InvitationPageContext
     ) throws
         -> InvitationSaveOutcome
@@ -63,34 +80,11 @@ extension InvitationController {
         var context = contextIn
         switch error {
         case .validationFailed(let properties, _):
-            context.form.invalidEmail = properties.contains(\Invitation.email)
+            context.form.invalidEmail = properties.contains(\InvitationValues.email)
         default:
             throw error
         }
         return .failure(with: error, context: context)
-    }
-
-    /// Saves an invitation for the specified user from the given form data.
-    /// Validates the data, checks the constraints required for a new invitation and creates
-    /// a new invitation.
-    ///
-    /// Throws `EntityError`s for invalid data or violated constraints.
-    private func save(
-        from formdata: InvitationPageFormData,
-        for user: User,
-        on request: Request
-    ) throws
-        -> EventLoopFuture<Invitation>
-    {
-        return try InvitationData(from: formdata)
-            .validate(for: user, using: invitationRepository, on: request)
-            .flatMap { data in
-                let entity: Invitation
-                // create invitation
-                entity = try Invitation(for: user, from: data)
-
-                return self.invitationRepository.save(invitation: entity)
-            }
     }
 
 }

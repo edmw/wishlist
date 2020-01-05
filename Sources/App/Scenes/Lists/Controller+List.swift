@@ -1,48 +1,47 @@
+import Domain
+
 import Vapor
 
 // MARK: ListParameterAcceptor
 
 protocol ListParameterAcceptor {
 
-    var listRepository: ListRepository { get }
+    func listID(on request: Request) throws -> ListID?
 
-    func requireList(on request: Request) throws -> EventLoopFuture<List>
+    func requireListID(on request: Request) throws -> ListID
 
-    func requireList(on request: Request, for user: User) throws -> EventLoopFuture<List>
+    func findListID(from request: Request) throws -> EventLoopFuture<ListID>
 
 }
 
 extension ListParameterAcceptor where Self: Controller {
 
-    /// Returns the list specified by the list id given in the request’s route.
-    /// Asumes that the list’s id is the next routing parameter!
-    func requireList(on request: Request) throws -> EventLoopFuture<List> {
-        let listID = try request.parameters.next(ID.self)
-        return listRepository
-            .find(by: listID.uuid)
-            .unwrap(or: Abort(.notFound))
+    /// Returns the list id given in the request’s route or nil if there is none.
+    /// Asumes that the list id is the next routing parameter!
+    /// - Parameter request: the request containing the route
+    func listID(on request: Request) throws -> ListID? {
+        guard request.parameters.values.isNotEmpty else {
+            return nil
+        }
+        return try ListID(request.parameters.next(ID.self))
     }
 
-    /// Returns the list specified by the list id given in the request’s route.
-    /// Asumes that the list’s id is the next routing parameter!
-    /// The list must be owned by the specified user.
-    func requireList(on request: Request, for user: User) throws -> EventLoopFuture<List> {
-        let listID = try request.parameters.next(ID.self)
-        return try listRepository
-            .find(by: listID.uuid, for: user)
-            .unwrap(or: Abort(.notFound))
+    /// Returns the list id given in the request’s route. Throws if there is none.
+    /// Asumes that the list id is the next routing parameter!
+    /// - Parameter request: the request containing the route
+    func requireListID(on request: Request) throws -> ListID {
+        return try ListID(request.parameters.next(ID.self))
     }
 
-    /// Returns the list specified by an list id given in the request’s body or query.
-    func findList(from request: Request) throws -> EventLoopFuture<List> {
+    /// Searches a list id in the request’s content and the request’s query.
+    /// - Parameter request: the request
+    func findListID(from request: Request) throws -> EventLoopFuture<ListID> {
         return request.content[ID.self, at: "listID"]
-            .flatMap { listID in
-                guard let listID = listID ?? request.query[.listID] else {
+            .map { id in
+                guard let id = id ?? request.query[.listID] else {
                     throw Abort(.notFound)
                 }
-                return self.listRepository
-                    .find(by: listID.uuid)
-                    .unwrap(or: Abort(.noContent))
+                return ListID(id)
             }
     }
 

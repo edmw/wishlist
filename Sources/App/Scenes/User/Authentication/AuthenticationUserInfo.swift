@@ -1,6 +1,10 @@
+import Domain
+
 import Vapor
 
 protocol AuthenticationUserInfo {
+
+    static var provider: String { get }
 
     var subjectId: String { get }
 
@@ -15,28 +19,35 @@ protocol AuthenticationUserInfo {
 
 }
 
-extension User {
+extension UserIdentity {
 
-    convenience init(_ userInfo: AuthenticationUserInfo) {
-        self.init(
-            id: nil,
-            email: userInfo.email,
-            fullName: userInfo.name,
-            firstName: userInfo.givenName,
-            lastName: userInfo.familyName
-        )
-        self.subjectId = userInfo.subjectId
-        self.language = userInfo.language
-        self.picture = userInfo.picture
+    /// Creates a user identity from the given authentication user info.
+    init(from userInfo: AuthenticationUserInfo) {
+        self.init(string: userInfo.subjectId)
     }
 
-    func update(_ userInfo: AuthenticationUserInfo) {
-        self.email = userInfo.email
-        self.fullName = userInfo.name
-        self.firstName = userInfo.givenName
-        self.lastName = userInfo.familyName
-        self.language = userInfo.language
-        self.picture = userInfo.picture
+}
+
+extension UserIdentityProvider {
+
+    /// Creates a user identity provider from the given authentication user info.
+    init(from userInfo: AuthenticationUserInfo) {
+        self.init(string: type(of: userInfo).provider)
+    }
+
+}
+
+extension PartialValues where Wrapped == UserValues {
+
+    /// Creates user values from the given authentication user info.
+    init(from userInfo: AuthenticationUserInfo) {
+        self.init()
+        self[\.email] = EmailSpecification(userInfo.email)
+        self[\.fullName] = userInfo.name
+        self[\.firstName] = userInfo.givenName
+        self[\.lastName] = userInfo.familyName
+        self[\.language] = userInfo.language
+        self[\.picture] = userInfo.picture
     }
 
 }

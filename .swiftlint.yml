@@ -1,8 +1,18 @@
 line_length: 100
 function_parameter_count: 6
+large_tuple:
+  warning: 3
+  error: 3
+type_name:
+  min_length:
+    error: 4
+  max_length:
+    warning: 48
+    error: 60
 cyclomatic_complexity:
   ignores_case_statements: true
 disabled_rules:
+  - static_operator
   - opening_brace
   - statement_position
 opt_in_rules:
@@ -67,9 +77,12 @@ type_name:
 identifier_name:
   min_length:
     error: 4
+  max_length:
+    error: 48
   excluded:
     - id
     - uid
+    - lid
     - key
     - db
     - row
@@ -89,5 +102,8 @@ identifier_name:
     - rhs
     - cwd
     - awd
-
+    - map
+    - min
+    - max
+    - nil
 

@@ -1,3 +1,5 @@
+import Domain
+
 import Vapor
 import Fluent
 
@@ -5,7 +7,7 @@ extension ListController {
 
     // MARK: Save
 
-    final class ListSaveOutcome: Outcome<List, ListPageContext> {}
+    final class ListSaveOutcome: Outcome<CreateOrUpdateList.Result, ListPageContext> {}
 
     /// Saves a list for the specified user from the request’s data.
     /// Validates the data contained in the request, checks the constraints required for a new or
@@ -15,34 +17,42 @@ extension ListController {
     /// the corresponding error flags.
     func save(
         from request: Request,
-        for user: User,
-        this list: List? = nil
+        for userid: UserID,
+        this listid: ListID? = nil
     ) throws
         -> EventLoopFuture<ListSaveOutcome>
     {
+        let userListsActor = self.userListsActor
         return try request.content
             .decode(ListPageFormData.self)
             .flatMap { formdata in
-                let context = ListPageContext(for: user, with: list, from: formdata)
+                let data = ListValues(from: formdata)
 
-                return request.future()
-                    .flatMap {
-                        return try self.save(
-                            from: formdata,
-                            for: user,
-                            this: list,
-                            on: request
-                        )
-                        .map { list in .success(with: list, context: context) }
+                var contextBuilder = ListPageContextBuilder().withFormData(formdata)
+
+                return try userListsActor
+                    .createOrUpdateList(
+                        .specification(userBy: userid, listBy: listid, from: data),
+                        .boundaries(worker: request.eventLoop)
+                    )
+                    .map { result in
+                        contextBuilder = contextBuilder.with(result.user, result.list)
+                        return try .success(with: result, context: contextBuilder.build())
                     }
-                    .catchMap(EntityError<List>.self) {
-                        try self.handleSaveOnError($0, with: context)
+                    .catchMap(UserListsActorError.self) { error in
+                        if case let UserListsActorError
+                            .validationError(user, list, error) = error
+                        {
+                            contextBuilder = contextBuilder.with(user, list)
+                            return try self.handleErrorOnSave(error, with: contextBuilder.build())
+                        }
+                        throw error
                     }
             }
     }
 
-    private func handleSaveOnError(
-        _ error: EntityError<List>,
+    private func handleErrorOnSave(
+        _ error: ValuesError<ListValues>,
         with contextIn: ListPageContext
     ) throws
         -> ListSaveOutcome
@@ -50,47 +60,13 @@ extension ListController {
         var context = contextIn
         switch error {
         case .validationFailed(let properties, _):
-            context.form.invalidTitle = properties.contains(\List.title)
-            context.form.invalidVisibility = properties.contains(\List.visibility)
+            context.form.invalidTitle = properties.contains(\ListValues.title)
+            context.form.invalidVisibility = properties.contains(\ListValues.visibility)
         case .uniquenessViolated:
             // a list with the given name already exists
             context.form.duplicateName = true
-        default:
-            throw error
         }
         return .failure(with: error, context: context)
-    }
-
-    /// Saves a list for the specified user from the given form data.
-    /// Validates the data, checks the constraints required for a new or updated list and creates
-    /// a new list or updates an existing list if given.
-    ///
-    /// Throws `EntityError`s for invalid data or violated constraints.
-    private func save(
-        from formdata: ListPageFormData,
-        for user: User,
-        this list: List? = nil,
-        on request: Request
-    ) throws
-        -> EventLoopFuture<List>
-    {
-        return try ListData(from: formdata)
-            .validate(for: user, this: list, using: listRepository)
-            .flatMap { data in
-                // save list
-                let entity: List
-                if let list = list {
-                    // update list
-                    entity = list
-                    try entity.update(for: user, from: data)
-                    entity.modifiedAt = Date()
-                }
-                else {
-                    // create list
-                    entity = try List(for: user, from: data)
-                }
-                return self.listRepository.save(list: entity)
-            }
     }
 
 }

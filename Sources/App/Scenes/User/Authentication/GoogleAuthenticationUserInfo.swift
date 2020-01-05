@@ -2,6 +2,8 @@ import Vapor
 
 struct GoogleAuthenticationUserInfo: AuthenticationUserInfo, Content, Validatable, Reflectable {
 
+    static var provider = "google"
+
     let subjectId: String
     let email: String
     let name: String

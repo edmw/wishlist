@@ -1,3 +1,5 @@
+import Domain
+
 import Vapor
 import Imperial
 import FluentSQLite
@@ -8,16 +10,18 @@ final class NetIDAuthenticatorController: AuthenticationController, RouteCollect
     let errorPath: String
 
     init(
+        _ enrollmentActor: EnrollmentActor,
         authenticationSuccessPath: String,
         authenticationErrorPath: String
     ) {
         self.successPath = authenticationSuccessPath
         self.errorPath = authenticationErrorPath
+        super.init(enrollmentActor)
     }
 
     /// Signs in a netID user identifiable by the given access token.
     ///
-    /// After sucessfully gathering the user‘s information from netID, authenticates the subject
+    /// After successfully gathering the user‘s information from netID, authenticates the subject
     /// and creates or update the user‘s entity. Attaches the user‘s entity to the current session
     /// and redirects to our Start page.
     ///
@@ -55,12 +59,14 @@ final class NetIDAuthenticatorController: AuthenticationController, RouteCollect
             }
             .flatMap { userInfo in
                 // authenticate user and redirect
-                return try AuthenticationController
-                    .authenticate(using: userInfo, redirect: self.successPath, on: request)
+                return try self.authenticate(
+                    using: userInfo,
+                    redirect: self.successPath,
+                    on: request
+                )
             }
             .catchMap { error in
-                return try AuthenticationController
-                    .redirectFailedLogin(with: error, to: self.errorPath, on: request)
+                return try self.redirectFailedLogin(with: error, to: self.errorPath, on: request)
             }
     }
 
@@ -71,14 +77,12 @@ final class NetIDAuthenticatorController: AuthenticationController, RouteCollect
             callback: "\(siteURL)/netid/authenticate-callback",
             claims: ["given_name", "family_name", "email"],
             state: { request in
-                guard let state = try AuthenticationController.createState(on: request) else {
+                guard let state = try request.createState() else {
                     throw Abort(.internalServerError)
                 }
                 return state
             },
-            stateVerify: { request, state in
-                return try AuthenticationController.verifyState(state, on: request)
-            }
+            stateVerify: { request, state in request.verifyState(state) }
         )
         try Imperial.NetID(router: router, config: config, completion: signin)
     }

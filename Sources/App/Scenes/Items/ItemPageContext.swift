@@ -1,3 +1,5 @@
+import Domain
+
 import Foundation
 
 // MARK: ItemPageContext
@@ -11,26 +13,21 @@ struct ItemPageContext: Encodable {
 
     var listTitle: String
 
+    // for MoveItem form
     var userLists: [ListContext]?
 
     var form: ItemPageFormContext
 
     fileprivate init(
-        for user: User,
-        and list: List,
-        with item: Item? = nil,
-        and reservation: Reservation? = nil,
+        for user: UserRepresentation,
+        and list: ListRepresentation,
+        with item: ItemRepresentation? = nil,
         from data: ItemPageFormData? = nil
     ) {
         self.userID = ID(user.id)
         self.listID = ID(list.id)
 
-        if let item = item {
-            self.item = ItemContext(for: item, with: reservation)
-        }
-        else {
-            self.item = nil
-        }
+        self.item = ItemContext(item)
 
         self.listTitle = list.title
 
@@ -46,33 +43,38 @@ enum ItemPageContextBuilderError: Error {
 
 class ItemPageContextBuilder {
 
-    var user: User?
-    var list: List?
-    var item: Item?
-    var reservation: Reservation?
+    var user: UserRepresentation?
+    var list: ListRepresentation?
+    var item: ItemRepresentation?
     var formData: ItemPageFormData?
 
     @discardableResult
-    func forUser(_ user: User) -> Self {
+    func forUserRepresentation(_ user: UserRepresentation) -> Self {
         self.user = user
         return self
     }
 
     @discardableResult
-    func forList(_ list: List) -> Self {
+    func forListRepresentation(_ list: ListRepresentation) -> Self {
         self.list = list
         return self
     }
 
     @discardableResult
-    func withItem(_ item: Item?) -> Self {
+    func withItemRepresentation(_ item: ItemRepresentation?) -> Self {
         self.item = item
         return self
     }
 
     @discardableResult
-    func withReservation(_ reservation: Reservation?) -> Self {
-        self.reservation = reservation
+    func with(
+        _ user: UserRepresentation,
+        _ list: ListRepresentation,
+        _ item: ItemRepresentation?
+    ) -> Self {
+        self.user = user
+        self.list = list
+        self.item = item
         return self
     }
 
@@ -93,7 +95,6 @@ class ItemPageContextBuilder {
             for: user,
             and: list,
             with: item,
-            and: reservation,
             from: formData
         )
     }

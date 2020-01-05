@@ -1,0 +1,9 @@
+.env*
+Wishlist.xcodeproj
+update.rb
+update.sh
+~nginx
+.DS_Store
+.dockerignore
+.git
+.gitignore

@@ -1,30 +1,34 @@
+import Domain
+
 import Vapor
 import Fluent
 
-final class FavoritesController: ProtectedController, SortingController, RouteCollection {
+final class FavoritesController: AuthenticatableController, SortingController, RouteCollection {
     typealias Sorting = ListsSorting
 
-    let favoriteRepository: FavoriteRepository
-    let itemRepository: ItemRepository
+    let userFavoritesActor: UserFavoritesActor
 
-    init(_ favoriteRepository: FavoriteRepository, _ itemRepository: ItemRepository) {
-        self.favoriteRepository = favoriteRepository
-        self.itemRepository = itemRepository
+    init(_ userFavoritesActor: UserFavoritesActor) {
+        self.userFavoritesActor = userFavoritesActor
     }
 
     // MARK: - VIEWS
 
     private func renderView(on request: Request) throws -> EventLoopFuture<View> {
-        let user = try requireAuthenticatedUser(on: request)
+        let userid = try requireAuthenticatedUserID(on: request)
 
         let sorting = getSorting(on: request) ?? .ascending(by: \List.title)
-        let favoriteContextsBuilder = FavoriteContextsBuilder(favoriteRepository, itemRepository)
-            .forUser(user)
-            .withSorting(sorting)
-            .includeItemsCount(true)
-        return try favoriteContextsBuilder.build(on: request)
-            .flatMap {
-                let context = FavoritesPageContext(for: user, with: $0)
+
+        return try userFavoritesActor
+            .getFavorites(
+                .specification(userBy: userid, with: sorting),
+                .boundaries(worker: request.eventLoop)
+            )
+            .flatMap { result in
+                let context = try FavoritesPageContextBuilder()
+                    .forUserRepresentation(result.user)
+                    .withFavoriteRepresentations(result.favorites)
+                    .build()
                 return try Controller.renderView("User/Favorites", with: context, on: request)
             }
     }

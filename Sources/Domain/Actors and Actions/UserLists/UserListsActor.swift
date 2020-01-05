@@ -1,0 +1,112 @@
+import Foundation
+import NIO
+
+// MARK: UserListsActor
+
+/// Lists use cases for the user.
+public protocol UserListsActor {
+
+    func getLists(
+        _ specification: GetLists.Specification,
+        _ boundaries: GetLists.Boundaries
+    ) throws -> EventLoopFuture<GetLists.Result>
+
+    func createList(
+        _ specification: CreateList.Specification,
+        _ boundaries: CreateList.Boundaries
+    ) throws -> EventLoopFuture<CreateList.Result>
+
+    func requestListEditing(
+        _ specification: RequestListEditing.Specification,
+        _ boundaries: RequestListEditing.Boundaries
+    ) throws -> EventLoopFuture<RequestListEditing.Result>
+
+    func updateList(
+        _ specification: UpdateList.Specification,
+        _ boundaries: UpdateList.Boundaries
+    ) throws -> EventLoopFuture<UpdateList.Result>
+
+    func createOrUpdateList(
+        _ specification: CreateOrUpdateList.Specification,
+        _ boundaries: CreateOrUpdateList.Boundaries
+    ) throws -> EventLoopFuture<CreateOrUpdateList.Result>
+
+    func requestListDeletion(
+        _ specification: RequestListDeletion.Specification,
+        _ boundaries: RequestListDeletion.Boundaries
+    ) throws -> EventLoopFuture<RequestListDeletion.Result>
+
+    func deleteList(
+        _ specification: DeleteList.Specification,
+        _ boundaries: DeleteList.Boundaries
+    ) throws -> EventLoopFuture<DeleteList.Result>
+
+    func requestListImport(
+        _ specification: RequestListImportFromJSON.Specification,
+        _ boundaries: RequestListImportFromJSON.Boundaries
+    ) throws -> EventLoopFuture<RequestListImportFromJSON.Result>
+
+    func importList(
+        _ specification: ImportListFromJSON.Specification,
+        _ boundaries: ImportListFromJSON.Boundaries
+    ) throws -> EventLoopFuture<ImportListFromJSON.Result>
+
+    func exportList(
+        _ specification: ExportListToJSON.Specification,
+        _ boundaries: ExportListToJSON.Boundaries
+    ) throws -> EventLoopFuture<ExportListToJSON.Result>
+
+}
+
+/// Errors thrown by the User Lists actor.
+public enum UserListsActorError: Error {
+    case invalidUser
+    case invalidList
+    case validationError(UserRepresentation, ListRepresentation?, ValuesError<ListValues>)
+    case importErrorForUser(UserRepresentation)
+    case exportErrorForUser(UserRepresentation)
+    case listHasReservedItems
+}
+
+/// This is the domain’s implementation of the Lists use cases. Actions will extend this by
+/// their corresponding use case methods.
+public final class DomainUserListsActor: UserListsActor,
+    CreateListActor,
+    UpdateListActor,
+    ImportListFromJSONActor,
+    ExportListToJSONActor,
+    CreateItemActor
+{
+
+    let userItemsActor: UserItemsActor
+
+    let listRepository: ListRepository
+    let itemRepository: ItemRepository
+    let userRepository: UserRepository
+
+    let logging: MessageLoggingProvider
+    let recording: EventRecordingProvider
+
+    let itemService: ItemService
+
+    let listRepresentationsBuilder: ListRepresentationsBuilder
+
+    public required init(
+        _ userItemsActor: UserItemsActor,
+        _ listRepository: ListRepository,
+        _ itemRepository: ItemRepository,
+        _ userRepository: UserRepository,
+        _ logging: MessageLoggingProvider,
+        _ recording: EventRecordingProvider
+    ) {
+        self.userItemsActor = userItemsActor
+        self.listRepository = listRepository
+        self.itemRepository = itemRepository
+        self.userRepository = userRepository
+        self.logging = logging
+        self.recording = recording
+        self.itemService = ItemService(itemRepository)
+        self.listRepresentationsBuilder = .init(listRepository, itemRepository)
+    }
+
+}

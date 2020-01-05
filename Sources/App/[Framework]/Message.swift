@@ -57,7 +57,7 @@ protocol TextMessage: Message {
     func render(on container: Container) -> EventLoopFuture<MessageContent>
 
     /// returns recipients for pushover messaging, empty if no pushover messages should be sent
-    var pushoverRecipients: [PushoverUser] { get }
+    var pushoverRecipients: [PushoverUser] { get set }
 
 }
 
@@ -86,6 +86,10 @@ extension TextMessage {
         }
     }
 
+    mutating func addPushoverRecipient(_ pushoverUser: PushoverUser) {
+        pushoverRecipients.append(pushoverUser)
+    }
+
 }
 
 // MARK: - HTMLMessage
@@ -96,7 +100,7 @@ protocol HTMLMessage: Message {
     func renderHTML(on container: Container) -> EventLoopFuture<MessageContent>
 
     /// returns recipients for email messaging, empty if no email messages should be sent
-    var emailRecipients: [EmailAddress] { get }
+    var emailRecipients: [EmailAddress] { get set }
 
 }
 
@@ -123,6 +127,10 @@ extension HTMLMessage {
 
             return messagings
         }
+    }
+
+    mutating func addEmailRecipient(_ emailAddress: EmailAddress) {
+        emailRecipients.append(emailAddress)
     }
 
 }

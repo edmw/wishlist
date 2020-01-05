@@ -1,12 +1,14 @@
-import Vapor
-import Authentication
+import Library
 
-/// ID parameter for routing:
-/// Model types use UUID for model IDs. This class provides a compact representation
-/// of UUIDs for use as routing parameters. Technically, the UUID will be encoded as
-/// base62 string.
+import Vapor
+
+/// ID parameter for routing.
+///
+/// This class provides a compact representation of UUIDs for use as routing parameters.
+/// Technically, the UUID will be encoded as base62 string.
+/// 
 /// For example, "86d5c52d-e7bf-452a-ac0b-064f65f821e8" will become "46QfEaPfUXMcvlP4dPgQJ6".
-struct ID: Parameter, CustomStringConvertible, Codable {
+struct ID: Parameter, Codable, Equatable, LosslessStringConvertible, CustomStringConvertible {
 
     var uuid: UUID
 
@@ -24,9 +26,16 @@ struct ID: Parameter, CustomStringConvertible, Codable {
         self.uuid = uuid
     }
 
+    init?(_ description: String) {
+        guard let uuid = UUID(base62String: description) else {
+            return nil
+        }
+        self.uuid = uuid
+    }
+
     /// Attempts to read the parameter from a base62 string into a `UUID`
-    public static func resolveParameter(_ parameter: String, on container: Container) throws
-        -> ID
+    public static func resolveParameter(_ parameter: String, on container: Container)
+        throws -> ID
     {
         guard let uuid = UUID(base62String: parameter) else {
             throw RoutingError(
@@ -40,7 +49,7 @@ struct ID: Parameter, CustomStringConvertible, Codable {
     // MARK: CustomStringConvertible
 
     var description: String {
-        return uuid.base62String ?? ""
+        return uuid.base62String
     }
 
     // MARK: Codable

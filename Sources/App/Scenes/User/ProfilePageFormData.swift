@@ -1,7 +1,9 @@
+import Domain
+
 import Vapor
 
 /// This structures holds all the input given by the user into the profile form.
-/// In contrast to `UserData` this contains only editable properties.
+/// In contrast to `UserRepresentation` and `UserData` this contains only editable properties.
 struct ProfilePageFormData: Content {
 
     let inputNickName: String
@@ -10,16 +12,8 @@ struct ProfilePageFormData: Content {
         self.inputNickName = ""
     }
 
-    init(from user: User) {
+    init(from user: UserRepresentation) {
         self.inputNickName = user.nickName ?? ""
-    }
-
-}
-
-extension UserData {
-
-    mutating func update(from formdata: ProfilePageFormData) {
-        self.nickName = formdata.inputNickName
     }
 
 }

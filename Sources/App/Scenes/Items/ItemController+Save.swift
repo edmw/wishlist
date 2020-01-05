@@ -1,3 +1,5 @@
+import Domain
+
 import Vapor
 import Fluent
 
@@ -5,7 +7,7 @@ extension ItemController {
 
     // MARK: Save
 
-    final class ItemSaveOutcome: Outcome<Item, ItemPageContext> {}
+    final class ItemSaveOutcome: Outcome<CreateOrUpdateItem.Result, ItemPageContext> {}
 
     /// Saves an item for the specified user and list from the request’s data.
     /// Validates the data contained in the request and
@@ -15,37 +17,46 @@ extension ItemController {
     /// the corresponding error flags.
     func save(
         from request: Request,
-        for user: User,
-        and list: List,
-        this item: Item? = nil
+        for userid: UserID,
+        and listid: ListID,
+        this itemid: ItemID? = nil
     ) throws
         -> EventLoopFuture<ItemSaveOutcome>
     {
+        let userItemsActor = self.userItemsActor
         return try request.content
             .decode(ItemPageFormData.self)
             .flatMap { formdata in
-                let context = try ItemPageContextBuilder()
-                    .forUser(user)
-                    .forList(list)
-                    .withItem(item)
-                    .withFormData(formdata)
-                    .build()
+                let data = ItemValues(from: formdata)
 
-                return request.future()
-                    .flatMap { _ in
-                        return try self.save(
-                            from: formdata, for: user, and: list, this: item, on: request
+                var contextBuilder = ItemPageContextBuilder().withFormData(formdata)
+
+                return try userItemsActor
+                    .createOrUpdateItem(
+                        .specification(userBy: userid, listBy: listid, itemBy: itemid, from: data),
+                        .boundaries(
+                            worker: request.eventLoop,
+                            imageStore: VaporImageStoreProvider(on: request)
                         )
-                        .map { item in .success(with: item, context: context) }
+                    )
+                    .map { result in
+                        contextBuilder = contextBuilder.with(result.user, result.list, result.item)
+                        return try .success(with: result, context: contextBuilder.build())
                     }
-                    .catchMap(EntityError<Item>.self) {
-                        try self.handleErrorOnSave($0, with: context)
+                    .catchMap(UserItemsActorError.self) { error in
+                        if case let UserItemsActorError
+                            .validationError(user, list, item, error) = error
+                        {
+                            contextBuilder = contextBuilder.with(user, list, item)
+                            return try self.handleErrorOnSave(error, with: contextBuilder.build())
+                        }
+                        throw error
                     }
             }
     }
 
     private func handleErrorOnSave(
-        _ error: EntityError<Item>,
+        _ error: ValuesError<ItemValues>,
         with contextIn: ItemPageContext
     ) throws
         -> ItemSaveOutcome
@@ -53,47 +64,14 @@ extension ItemController {
         var context = contextIn
         switch error {
         case .validationFailed(let properties, _):
-            context.form.invalidTitle = properties.contains(\Item.title)
-            context.form.invalidText = properties.contains(\Item.text)
-            context.form.invalidURL = properties.contains(\Item.url)
-            context.form.invalidImageURL = properties.contains(\Item.imageURL)
+            context.form.invalidTitle = properties.contains(\ItemValues.title)
+            context.form.invalidText = properties.contains(\ItemValues.text)
+            context.form.invalidURL = properties.contains(\ItemValues.url)
+            context.form.invalidImageURL = properties.contains(\ItemValues.imageURL)
         default:
             throw error
         }
         return .failure(with: error, context: context)
-    }
-
-    /// Saves an item for the specified user from the given form data.
-    /// Validates the data, checks the constraints required for a new or updated item and creates
-    /// a new item or updates an existing item if given.
-    ///
-    /// Throws `EntityError`s for invalid data or violated constraints.
-    private func save(
-        from formdata: ItemPageFormData,
-        for user: User,
-        and list: List,
-        this item: Item? = nil,
-        on request: Request
-    ) throws
-        -> EventLoopFuture<Item>
-    {
-        return try ItemData(from: formdata)
-            .validate(for: list, this: item, using: self.itemRepository, on: request)
-            .flatMap { data in
-                // save item
-                let entity: Item
-                if let item = item {
-                    // update item
-                    entity = item
-                    try entity.update(for: list, from: data)
-                    entity.modifiedAt = Date()
-                }
-                else {
-                    // create item
-                    entity = try Item(for: list, from: data)
-                }
-                return self.itemRepository.save(item: entity)
-            }
     }
 
 }

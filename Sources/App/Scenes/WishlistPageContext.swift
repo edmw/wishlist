@@ -1,3 +1,5 @@
+import Domain
+
 import Foundation
 
 struct WishlistPageContext: Encodable {
@@ -20,10 +22,10 @@ struct WishlistPageContext: Encodable {
     var identification: ID?
 
     fileprivate init(
-        for list: List,
-        of owner: User,
-        with items: [ItemContext]? = nil,
-        user: User? = nil,
+        for list: ListRepresentation,
+        of owner: UserRepresentation,
+        with items: [ItemRepresentation]? = nil,
+        user: UserRepresentation? = nil,
         identification: Identification
     ) {
         self.ownerID = ID(owner.id)
@@ -32,7 +34,7 @@ struct WishlistPageContext: Encodable {
         self.ownerName = owner.displayName
         self.listTitle = list.title
 
-        self.items = items
+        self.items = items?.map { item in ItemContext(item) }
 
         self.userID = ID(user?.id)
 
@@ -55,36 +57,43 @@ enum WishlistPageContextBuilderError: Error {
 
 class WishlistPageContextBuilder {
 
-    var list: List?
-    var owner: User?
+    var list: ListRepresentation?
+    var owner: UserRepresentation?
 
-    var user: User?
+    var user: UserRepresentation?
+    var userFavorsList: Bool = false
 
-    var items: [ItemContext]?
+    var items: [ItemRepresentation]?
 
     var identification: Identification?
 
     @discardableResult
-    func forList(_ list: List) -> Self {
+    func forListRepresentation(_ list: ListRepresentation) -> Self {
         self.list = list
         return self
     }
 
     @discardableResult
-    func forOwner(_ owner: User) -> Self {
+    func forOwnerRepresentation(_ owner: UserRepresentation) -> Self {
         self.owner = owner
         return self
     }
 
     @discardableResult
-    func withItems(_ items: [ItemContext]) -> Self {
+    func withItemRepresentations(_ items: [ItemRepresentation]) -> Self {
         self.items = items
         return self
     }
 
     @discardableResult
-    func withUser(_ user: User) -> Self {
+    func withUserRepresentation(_ user: UserRepresentation?) -> Self {
         self.user = user
+        return self
+    }
+
+    @discardableResult
+    func userFavorsList(_ isFavorite: Bool) -> Self {
+        self.userFavorsList = isFavorite
         return self
     }
 
@@ -104,13 +113,15 @@ class WishlistPageContextBuilder {
         guard let identification = identification else {
             throw WishlistPageContextBuilderError.missingRequiredIdentification
         }
-        return WishlistPageContext(
+        var context = WishlistPageContext(
             for: list,
             of: owner,
             with: items,
             user: user,
             identification: identification
         )
+        context.userFavorsList = self.userFavorsList
+        return context
     }
 
 }

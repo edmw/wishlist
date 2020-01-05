@@ -6,7 +6,7 @@ import Vapor
 /// Usually you don't want to implement all functionality by yourself, but subclass any of the
 /// provided job types, for example `DispatchableJob`.
 protocol Job {
-    /// The result type associated with the job and returned after sucessful execution.
+    /// The result type associated with the job and returned after successful execution.
     associatedtype ResultType: JobResult
 
     /// Point in time when this job should be run.
@@ -34,9 +34,9 @@ protocol Job {
     /// - parameter context context in which the job will be executed
     func cancel(_ context: JobContext) -> EventLoopFuture<Void>
 
-    /// This will be called after the job was sucessfully executed.
+    /// This will be called after the job was successfully executed.
     /// - parameter context context in which the job will be executed
-    /// - parameter result result of the sucessful execution of the job
+    /// - parameter result result of the successful execution of the job
     func success(_ context: JobContext, _ result: ResultType) -> EventLoopFuture<Void>
 
     /// This will be called after the job terminated with an error.

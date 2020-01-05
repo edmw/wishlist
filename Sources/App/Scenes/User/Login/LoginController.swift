@@ -1,3 +1,5 @@
+import Domain
+
 import Vapor
 import Random
 
@@ -39,7 +41,7 @@ final class LoginController: Controller, RouteCollection {
 
     func boot(router: Router) throws {
         router.get("signin") { request -> EventLoopFuture<Response> in
-            guard try request.isAuthenticated(User.self) == false else {
+            guard try request.isAuthenticated(UserID.self) == false else {
                 return LoginController.redirect(to: "/", on: request)
             }
             return try self.renderView(on: request)

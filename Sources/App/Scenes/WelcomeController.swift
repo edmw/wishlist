@@ -1,3 +1,5 @@
+import Domain
+
 import Vapor
 
 // MARK: - Controller Parameters
@@ -12,43 +14,31 @@ extension ControllerParameter {
 // MARK: - Controller
 
 /// Controller for displaying the welcome page.
-final class WelcomeController: Controller, RouteCollection {
+final class WelcomeController: AuthenticatableController, RouteCollection {
 
-    let listRepository: ListRepository
-    let itemRepository: ItemRepository
-    let favoriteRepository: FavoriteRepository
+    let userWelcomeActor: UserWelcomeActor
 
-    init(
-        _ listRepository: ListRepository,
-        _ favoriteRepository: FavoriteRepository,
-        _ itemRepository: ItemRepository
-    ) {
-        self.listRepository = listRepository
-        self.itemRepository = itemRepository
-        self.favoriteRepository = favoriteRepository
+    init(_ userWelcomeActor: UserWelcomeActor) {
+        self.userWelcomeActor = userWelcomeActor
     }
 
     func renderView(on request: Request) throws -> EventLoopFuture<View> {
-        guard let user = try request.authenticated(User.self) else {
+        guard let userid = try authenticatedUserID(on: request) else {
             return try WelcomeController.renderView("Public/Welcome", on: request)
         }
-
-        let listContextsBuilder = ListContextsBuilder(listRepository, itemRepository)
-            .forUser(user)
-            .includeItemsCount(true)
-        let listContexts = try listContextsBuilder.build(on: request)
-        let favoriteContextsBuilder = FavoriteContextsBuilder(favoriteRepository, itemRepository)
-            .forUser(user)
-            .includeItemsCount(true)
-        let favoriteContexts = try favoriteContextsBuilder.build(on: request)
-        return flatMap(listContexts, favoriteContexts) { listContexts, favoriteContexts in
-            let context = try WelcomePageContextBuilder()
-                .forUser(user)
-                .withLists(listContexts)
-                .withFavorites(favoriteContexts)
-                .build()
-            return try Controller.renderView("User/Welcome", with: context, on: request)
-        }
+        return try userWelcomeActor
+            .getListsAndFavorites(
+                .specification(userBy: userid),
+                .boundaries(worker: request.eventLoop)
+            )
+            .flatMap { result in
+                let context = try WelcomePageContextBuilder()
+                    .forUserRepresentation(result.user)
+                    .withListRepresentations(result.lists)
+                    .withFavoriteRepresentations(result.favorites)
+                    .build()
+                return try Controller.renderView("User/Welcome", with: context, on: request)
+            }
     }
 
     func boot(router: Router) throws {

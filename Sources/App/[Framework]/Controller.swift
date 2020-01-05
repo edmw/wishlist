@@ -1,5 +1,7 @@
 import Vapor
 
+import Domain
+
 /// Controller for resources:
 /// Defines some common functions to be of use in resources controllers.
 class Controller {
@@ -36,6 +38,7 @@ class Controller {
         return request.future(method)
     }
 
+    /// Builds a query string from the given parameters.
     static func query(with parameters: [ControllerParameter]) throws -> String? {
         var combinedParameters = [String: String?]()
         parameters.forEach { combinedParameters.merge($0) }
@@ -87,72 +90,73 @@ class Controller {
     /// Returns a redirect response to the specified location for the given user
     /// on the specified request.
     static func redirect(
-        for user: User,
+        for userid: UserID?,
         to location: String,
         type: RedirectType = .normal,
         on request: Request
     ) -> Response {
-        let uid = ID(user.id) ??? ""
-        return request.redirect(to: "/user/\(uid)/\(location)", type: type)
-    }
-
-    /// Returns a redirect response as a succeeded future to the specified location
-    /// for the specified user on the specified request.
-    static func redirect(
-        for user: User,
-        to location: String,
-        type: RedirectType = .normal,
-        on request: Request
-    ) -> EventLoopFuture<Response> {
-        return request.future(redirect(for: user, to: location, type: type, on: request))
+        guard let id = userid else {
+            return request.redirect(to: "/")
+        }
+        return request.redirect(to: "/user/\(ID(id))/\(location)", type: type)
     }
 
     /// Returns a redirect response to the specified location for the specified user
     /// and list on the specified request.
     static func redirect(
-        for user: User,
-        and list: List,
+        for userid: UserID?,
+        and listid: ListID?,
         to location: String,
         type: RedirectType = .normal,
         on request: Request
     ) -> Response {
-        let uid = ID(user.id) ??? ""
-        let listID = ID(list.id) ??? ""
-        return request.redirect(to: "/user/\(uid)/list/\(listID)/\(location)", type: type)
+        guard let uid = userid else {
+            return request.redirect(to: "/")
+        }
+        guard let lid = listid else {
+            return request.redirect(to: "/")
+        }
+        return request.redirect(to: "/user/\(ID(uid))/list/\(ID(lid))/\(location)", type: type)
     }
 
     /// Returns a redirect response as a succeeded future to the specified location
     /// for the specified user and list on the specified request.
     static func redirect(
-        for user: User,
-        and list: List,
+        for userid: UserID,
+        and listid: ListID,
         to location: String,
         type: RedirectType = .normal,
         on request: Request
     ) -> EventLoopFuture<Response> {
-        return request.future(redirect(for: user, and: list, to: location, type: type, on: request))
+        return request.future(
+            redirect(for: userid, and: listid, to: location, type: type, on: request)
+        )
     }
 
     /// Returns a redirect response to the specified wishlist on the specified request.
     static func redirect(
-        for list: List,
+        for listid: ListID?,
         parameters: [ControllerParameter]? = nil,
         type: RedirectType = .normal,
         on request: Request
     ) -> Response {
-        let listID = ID(list.id) ??? ""
-        return redirect(to: "/list/\(listID)", parameters: parameters, type: type, on: request)
+        guard let id = listid else {
+            return request.redirect(to: "/")
+        }
+        return redirect(to: "/list/\(ID(id))", parameters: parameters, type: type, on: request)
     }
 
     /// Returns a redirect response as a succeeded future to the specified wishlist
     /// on the specified request.
     static func redirect(
-        for list: List,
+        for listid: ListID?,
         parameters: [ControllerParameter]? = nil,
         type: RedirectType = .normal,
         on request: Request
     ) -> EventLoopFuture<Response> {
-        return request.future(redirect(for: list, parameters: parameters, type: type, on: request))
+        return request.future(
+            redirect(for: listid, parameters: parameters, type: type, on: request)
+        )
     }
 
     /// Renders a view with the specified template and the specified page context on the
@@ -160,7 +164,7 @@ class Controller {
     /// The given page context will be wrapped in a `RenderContext` and will be accessible from
     /// within the template by using the path `page`. The render context contains additional
     /// information for rendering the view such as the `features` path making the feature flags
-    /// available to the template. Other additional information available is the site’s and the
+    /// available to the template. Other additional information available are the site’s and the
     /// request’s parameters.
     static func renderView<E>(
         _ templateName: String,

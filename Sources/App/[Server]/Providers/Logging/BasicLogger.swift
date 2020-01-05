@@ -4,6 +4,7 @@ import Foundation
 
 /// This is a basic logger which filters all log messages to be of the same or higher level than
 /// the specified log level.
+/// 
 /// Optionally adds a tag to every log message.
 /// Note: For now the logger output is fixed to use `ConsoleLogger`.
 class BasicLogger: Logger, Service {
@@ -18,11 +19,9 @@ class BasicLogger: Logger, Service {
     ) {
         self.logLevel = logLevel
 
-        let logger = FilteredLogger(
-            target: ConsoleLogger(symbols: .weather)
-        ) { _, level -> Bool in
+        let target = ConsoleLogger(symbols: .weather)
+        let logger = FilteredLogger(target: target) { _, level -> Bool in
             level >= logLevel
-
         }
 
         if let tag = tag {

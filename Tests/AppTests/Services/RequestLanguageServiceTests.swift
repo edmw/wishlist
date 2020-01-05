@@ -3,7 +3,25 @@ import Vapor
 import VaporTestTools
 import XCTest
 
-final class RequestLanguageServiceTests : XCTestCase {
+final class RequestLanguageServiceTests : XCTestCase, HasAllTests {
+
+    static var __allTests = [
+        ("testParseNone", testParseNone),
+        ("testParseEmpty", testParseEmpty),
+        ("testParseSimple", testParseSimple),
+        ("testParseRegion", testParseRegion),
+        ("testParseScript", testParseScript),
+        ("testParseQuality", testParseQuality),
+        ("testParseWildcard", testParseWildcard),
+        ("testParseSort", testParseSort),
+        ("testParseWhitespace", testParseWhitespace),
+        ("testParseFull", testParseFull),
+        ("testParseCache", testParseCache),
+        ("testPick", testPick),
+        ("testPickCase", testPickCase),
+        ("testPickFallback", testPickFallback),
+        ("testAllTests", testAllTests)
+    ]
 
     var app: Application!
 
@@ -12,12 +30,7 @@ final class RequestLanguageServiceTests : XCTestCase {
     override func setUp() {
         super.setUp()
 
-        Environment.dotenv()
-
-        app = try! TestableProperty.new(
-            env: Environment.detect(),
-                { con, env, ser in try! App.configure(&con, &env, &ser) }
-        ) { (router) in }
+        app = try! Application.testable()
     }
 
     func buildRequest(acceptLanguage header: String?) -> Request {
@@ -178,6 +191,10 @@ final class RequestLanguageServiceTests : XCTestCase {
                 fallback: "de"
         )
         XCTAssertEqual(language3, "de")
+    }
+
+    func testAllTests() {
+        assertAllTests()
     }
 
 }

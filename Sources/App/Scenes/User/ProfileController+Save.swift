@@ -1,3 +1,5 @@
+import Domain
+
 import Vapor
 import Fluent
 
@@ -5,39 +7,46 @@ extension ProfileController {
 
     // MARK: Save
 
-    final class ProfileSaveOutcome: Outcome<User, ProfilePageContext> {}
+    final class ProfileSaveOutcome: Outcome<UserRepresentation, ProfilePageContext> {}
 
-    /// Saves a profile for the specified user from the request’s data.
-    /// Validates the data contained in the request and updates the user.
     func save(
         from request: Request,
-        for user: User
+        for userid: UserID
     ) throws
         -> EventLoopFuture<ProfileSaveOutcome>
     {
+        let userProfileActor = self.userProfileActor
         return try request.content
             .decode(ProfilePageFormData.self)
             .flatMap { formdata in
-                let context = try ProfilePageContextBuilder()
-                    .forUser(user)
-                    .withFormData(formdata)
-                    .build()
+                var partialUserData = PartialValues<UserValues>()
+                partialUserData[\.nickName] = formdata.inputNickName
 
-                return request.future()
-                    .flatMap {
-                        return try self.save(
-                            from: formdata, for: user, on: request
-                        )
-                        .map { user in .success(with: user, context: context) }
+                var contextBuilder = ProfilePageContextBuilder().withFormData(formdata)
+
+                return try userProfileActor
+                    .updateProfile(
+                        .specification(userBy: userid, from: partialUserData),
+                        .boundaries(worker: request.eventLoop)
+                    )
+                    .map { result in
+                        contextBuilder = contextBuilder.forUserRepresentation(result.user)
+                        return try .success(with: result.user, context: contextBuilder.build())
                     }
-                    .catchMap(EntityError<User>.self) {
-                        try self.handleErrorOnSave($0, with: context)
+                    .catchMap(UserProfileActorError.self) { error in
+                        if case let UserProfileActorError
+                            .validationError(user, error) = error
+                        {
+                            contextBuilder = contextBuilder.forUserRepresentation(user)
+                            return try self.handleErrorOnSave(error, with: contextBuilder.build())
+                        }
+                        throw error
                     }
             }
     }
 
     private func handleErrorOnSave(
-        _ error: EntityError<User>,
+        _ error: ValuesError<UserValues>,
         with contextIn: ProfilePageContext
     ) throws
         -> ProfileSaveOutcome
@@ -45,39 +54,12 @@ extension ProfileController {
         var context = contextIn
         switch error {
         case .validationFailed(let properties, _):
-            context.form.invalidNickName = properties.contains(\User.nickName)
+            context.form.invalidNickName = properties.contains(\UserValues.nickName)
         case .uniquenessViolated:
-            // an user with the given nickname already exists
+            // a user with the given nickname already exists
             context.form.duplicateNickName = true
-        default:
-            throw error
         }
         return .failure(with: error, context: context)
-    }
-
-    /// Saves an user from the given form data.
-    /// Validates the data, checks the constraints required for an updated user and updates an
-    /// existing user.
-    ///
-    /// Throws `EntityError`s for invalid data or violated constraints.
-    private func save(
-        from formdata: ProfilePageFormData,
-        for user: User,
-        on request: Request
-    ) throws
-        -> EventLoopFuture<User>
-    {
-        var userData = UserData(user)
-        userData.update(from: formdata)
-        return try userData
-            .validate(using: userRepository, on: request)
-            .flatMap { data in
-                // save user
-
-                try user.update(from: data)
-
-                return self.userRepository.save(user: user)
-            }
     }
 
 }

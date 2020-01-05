@@ -10,7 +10,7 @@
                 <div class="inner p-2">
                     <div class="wl-label m-0">
                         <h5 class="m-0 px-1">#(item.title)</h5>
-                        <div class="wl-hearts m-0 px-1">#if(item.preference == -2){♥}#if(item.preference == -1){♥♥}#if(item.preference == 0){♥♥♥}#if(item.preference == 1){♥♥♥♥}#if(item.preference == 2){♥♥♥♥♥}</div>
+                        <div class="wl-hearts m-0 px-1">#if(item.preference == "lowest"){♥}#if(item.preference == "low"){♥♥}#if(item.preference == "normal"){♥♥♥}#if(item.preference == "high"){♥♥♥♥}#if(item.preference == "highest"){♥♥♥♥♥}</div>
                     </div>
                     <div class="btn-group justify-content-between" role="group">
                         #if(item.url) {

@@ -22,7 +22,7 @@
                 </div>
             </td>
             <td class="wl-description" data-label="#L10N("item-description"){Description}">#(item.text)</td>
-            <td data-label="#L10N("item-preference"){Preference}">#L10N("item-preference-#(item.preference + 2)"){?}</option></td>
+            <td data-label="#L10N("item-preference"){Preference}">#L10N("item-preference-#(item.preference)"){?}</option></td>
             <td data-label="#L10N("item-state"){Status}">#if(page.maskReservations) {???} else {#if(item.reservationHolderID) {#L10N("item-reserved"){reserved}} else {#L10N("item-wanted"){wanted}}}</td>
             <td class="wl-actions" data-label="">
                 <div class="btn-group" role="group">

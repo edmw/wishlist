@@ -10,9 +10,6 @@
 #if(page.showFavorites) {
 #embed("User/Favorites-Section")
 }
-#if(page.showInvitations) {
-#embed("User/Invitations-Section")
-}
 }
 #//
 #embed("Wishlist")

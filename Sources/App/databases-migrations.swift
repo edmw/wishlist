@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Wishlist - databases migrations
 //
-// Copyright (c) 2019 Michael Baumgärtner
+// Copyright (c) 2019-2020 Michael Baumgärtner
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,8 @@
 // SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+import Domain
+
 import Vapor
 import Fluent
 import FluentMySQL
@@ -35,6 +37,8 @@ func databasesMigrations(
     config.add(model: User.self, database: .mysql)
     config.add(migration: AddUserSettings.self, database: .mysql)
     config.add(migration: RenameUserName.self, database: .mysql)
+    config.add(migration: RenameSubjectId.self, database: .mysql)
+    config.add(migration: AddUserIdentityProvider.self, database: .mysql)
     config.add(model: List.self, database: .mysql)
     config.add(migration: AddListOptions.self, database: .mysql)
     config.add(migration: RenameListName.self, database: .mysql)
@@ -47,7 +51,55 @@ func databasesMigrations(
 
 // MARK: - User
 
-struct RenameUserName: MySQLMigration {
+struct AddUserIdentityProvider: MySQLForwardMigration {
+
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
+        return connection
+            .assertFieldMustNotExist(\User.identityProvider) {
+                return Database.update(User.self, on: connection) { builder in
+                    builder.field(for: \.identityProvider)
+                }
+                .flatMap {
+                    // add provider to existing identifiers
+                    // at this point in time there are only two providers 'google' and 'netid'
+                    return User.query(on: connection).all().flatMap { users in
+                        let updates = users.map { user -> EventLoopFuture<User> in
+                            guard let identity = user.identity else {
+                                return connection.future(user)
+                            }
+                            if identity.hasLetters || identity.count > 24 {
+                                // netid identites are alphanumeric and longer than google identites
+                                user.identityProvider
+                                    = UserIdentityProvider(NetIDAuthenticationUserInfo.provider)
+                            }
+                            else {
+                                // google (by default)
+                                user.identityProvider
+                                    = UserIdentityProvider(GoogleAuthenticationUserInfo.provider)
+                            }
+                            return user.save(on: connection)
+                        }
+                        return EventLoopFuture.andAll(updates, eventLoop: connection.eventLoop)
+                    }
+                }
+            }
+    }
+
+}
+
+struct RenameSubjectId: MySQLForwardMigration {
+
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
+        return connection.assertFieldMustNotExist(\User.identity) {
+            return connection
+                .raw("ALTER TABLE User CHANGE COLUMN subjectId identity VARCHAR(255) NULL")
+                .run()
+        }
+    }
+
+}
+
+struct RenameUserName: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection.assertFieldMustNotExist(\User.fullName) {
@@ -57,15 +109,9 @@ struct RenameUserName: MySQLMigration {
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
-        return connection
-            .raw("ALTER TABLE User CHANGE COLUMN fullName name VARCHAR(255) NOT NULL")
-            .run()
-    }
-
 }
 
-struct AddUserSettings: MySQLMigration {
+struct AddUserSettings: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
@@ -76,15 +122,9 @@ struct AddUserSettings: MySQLMigration {
             }
     }
 
-    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
-        return Database.update(User.self, on: connection) { builder in
-            builder.deleteField(for: \.settings)
-        }
-    }
-
 }
 
-struct AddUserNickName: MySQLMigration {
+struct AddUserNickName: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(User.self, on: connection) { builder in
@@ -92,15 +132,9 @@ struct AddUserNickName: MySQLMigration {
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
-        return Database.update(User.self, on: connection) { builder in
-            builder.deleteField(for: \.nickName)
-        }
-    }
-
 }
 
-struct AddUserConfidant: MySQLMigration {
+struct AddUserConfidant: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(User.self, on: connection) { builder in
@@ -108,15 +142,9 @@ struct AddUserConfidant: MySQLMigration {
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
-        return Database.update(User.self, on: connection) { builder in
-            builder.deleteField(for: \.confidant)
-        }
-    }
-
 }
 
-struct AddUserIdentificationIndex: MySQLMigration {
+struct AddUserIdentificationIndex: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(User.self, on: connection) { builder in
@@ -124,17 +152,11 @@ struct AddUserIdentificationIndex: MySQLMigration {
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
-        return Database.update(User.self, on: connection) { builder in
-            builder.deleteUnique(from: \.identification)
-        }
-    }
-
 }
 
 // MARK: - List
 
-struct RenameListName: MySQLMigration {
+struct RenameListName: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection.assertFieldMustNotExist(\List.title) {
@@ -144,15 +166,9 @@ struct RenameListName: MySQLMigration {
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
-        return connection
-            .raw("ALTER TABLE List CHANGE COLUMN title name VARCHAR(255) NOT NULL")
-            .run()
-    }
-
 }
 
-struct AddListOptions: MySQLMigration {
+struct AddListOptions: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection.assertFieldMustNotExist(\List.options) {
@@ -162,15 +178,9 @@ struct AddListOptions: MySQLMigration {
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
-        return Database.update(List.self, on: connection) { builder in
-            builder.deleteField(for: \.options)
-        }
-    }
-
 }
 
-struct AddListItemsSorting: MySQLMigration {
+struct AddListItemsSorting: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(List.self, on: connection) { builder in
@@ -178,15 +188,9 @@ struct AddListItemsSorting: MySQLMigration {
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
-        return Database.update(List.self, on: connection) { builder in
-            builder.deleteField(for: \.itemsSorting)
-        }
-    }
-
 }
 
-struct RenameListModifiedOnColumn: MySQLMigration {
+struct RenameListModifiedOnColumn: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
@@ -194,15 +198,9 @@ struct RenameListModifiedOnColumn: MySQLMigration {
             .run()
     }
 
-    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
-        return connection
-            .raw("ALTER TABLE List CHANGE modifiedAt modifiedOn DATETIME(6) NOT NULL")
-            .run()
-    }
-
 }
 
-struct RenameListCreatedOnColumn: MySQLMigration {
+struct RenameListCreatedOnColumn: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
@@ -210,15 +208,9 @@ struct RenameListCreatedOnColumn: MySQLMigration {
             .run()
     }
 
-    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
-        return connection
-            .raw("ALTER TABLE List CHANGE createdAt createdOn DATETIME(6) NOT NULL")
-            .run()
-    }
-
 }
 
-struct AddListForeignKeyConstraint: MySQLMigration {
+struct AddListForeignKeyConstraint: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(List.self, on: connection) { builder in
@@ -226,17 +218,11 @@ struct AddListForeignKeyConstraint: MySQLMigration {
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
-        return Database.update(List.self, on: connection) { builder in
-            builder.deleteReference(from: \.userID, to: \User.id)
-        }
-    }
-
 }
 
 // MARK: - Item
 
-struct RenameItemName: MySQLMigration {
+struct RenameItemName: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection.assertFieldMustNotExist(\Item.title) {
@@ -246,15 +232,9 @@ struct RenameItemName: MySQLMigration {
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
-        return connection
-            .raw("ALTER TABLE Item CHANGE COLUMN title name VARCHAR(255) NOT NULL")
-            .run()
-    }
-
 }
 
-struct AddItemPreference: MySQLMigration {
+struct AddItemPreference: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(Item.self, on: connection) { builder in
@@ -262,15 +242,9 @@ struct AddItemPreference: MySQLMigration {
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
-        return Database.update(Item.self, on: connection) { builder in
-            builder.deleteField(for: \.preference)
-        }
-    }
-
 }
 
-struct RenameItemModifiedOnColumn: MySQLMigration {
+struct RenameItemModifiedOnColumn: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
@@ -278,15 +252,9 @@ struct RenameItemModifiedOnColumn: MySQLMigration {
             .run()
     }
 
-    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
-        return connection
-            .raw("ALTER TABLE Item CHANGE modifiedAt modifiedOn DATETIME(6) NOT NULL")
-            .run()
-    }
-
 }
 
-struct RenameItemCreatedOnColumn: MySQLMigration {
+struct RenameItemCreatedOnColumn: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
@@ -294,15 +262,9 @@ struct RenameItemCreatedOnColumn: MySQLMigration {
             .run()
     }
 
-    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
-        return connection
-            .raw("ALTER TABLE Item CHANGE createdAt createdOn DATETIME(6) NOT NULL")
-            .run()
-    }
-
 }
 
-struct AddItemForeignKeyConstraint: MySQLMigration {
+struct AddItemForeignKeyConstraint: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(Item.self, on: connection) { builder in
@@ -310,17 +272,11 @@ struct AddItemForeignKeyConstraint: MySQLMigration {
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
-        return Database.update(Item.self, on: connection) { builder in
-            builder.deleteReference(from: \.listID, to: \List.id)
-        }
-    }
-
 }
 
 // MARK: - Invitation
 
-struct AddInvitationInvitee: MySQLMigration {
+struct AddInvitationInvitee: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(Invitation.self, on: connection) { builder in
@@ -328,17 +284,11 @@ struct AddInvitationInvitee: MySQLMigration {
         }
     }
 
-    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
-        return Database.update(Invitation.self, on: connection) { builder in
-            builder.deleteField(for: \.invitee)
-        }
-    }
-
 }
 
 // MARK: - Reservation
 
-struct RenameReservationCreatedOnColumn: MySQLMigration {
+struct RenameReservationCreatedOnColumn: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
@@ -346,15 +296,9 @@ struct RenameReservationCreatedOnColumn: MySQLMigration {
             .run()
     }
 
-    static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
-        return connection
-            .raw("ALTER TABLE Reservation CHANGE createdAt createdOn DATETIME(6) NOT NULL")
-            .run()
-    }
-
 }
 
-struct AddReservationForeignKeyConstraint: MySQLMigration {
+struct AddReservationForeignKeyConstraint: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(Reservation.self, on: connection) { builder in
@@ -362,10 +306,18 @@ struct AddReservationForeignKeyConstraint: MySQLMigration {
         }
     }
 
+}
+
+// MARK: - MySQLMigration Extension
+
+/// Migration with an default revert function which does nothing.
+protocol MySQLForwardMigration: MySQLMigration {
+}
+
+extension MySQLForwardMigration {
+
     static func revert(on connection: MySQLConnection) -> EventLoopFuture<Void> {
-        return Database.update(Reservation.self, on: connection) { builder in
-            builder.deleteReference(from: \.itemID, to: \Item.id)
-        }
+        return connection.future(())
     }
 
 }
@@ -374,7 +326,7 @@ struct AddReservationForeignKeyConstraint: MySQLMigration {
 
 extension MySQLConnection {
 
-    /// Executes the given closure when the specified field does not exist only.
+    /// Executes the given closure only when the specified field does not exist.
     func assertFieldMustNotExist<R: Model, V>(
         _ keypath: KeyPath<R, V>,
         closure: @escaping () throws -> EventLoopFuture<Void>

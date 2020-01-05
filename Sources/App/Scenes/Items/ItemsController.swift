@@ -1,41 +1,41 @@
+import Domain
+
 import Vapor
 import Fluent
 
-final class ItemsController: ProtectedController,
+final class ItemsController: AuthenticatableController,
     ListParameterAcceptor,
     SortingController,
     RouteCollection
 {
     typealias Sorting = ItemsSorting
 
-    let itemRepository: ItemRepository
-    let listRepository: ListRepository
+    let userItemsActor: UserItemsActor
 
-    init(_ itemRepository: ItemRepository, _ listRepository: ListRepository) {
-        self.itemRepository = itemRepository
-        self.listRepository = listRepository
+    init(_ userItemsActor: UserItemsActor) {
+        self.userItemsActor = userItemsActor
     }
 
     // MARK: - VIEWS
 
     private func renderView(on request: Request) throws -> EventLoopFuture<View> {
-        let user = try requireAuthenticatedUser(on: request)
+        let userid = try requireAuthenticatedUserID(on: request)
+        let listid = try requireListID(on: request)
 
         let sorting = getSorting(on: request) ?? .ascending(by: \Item.title)
-        return try requireList(on: request, for: user).flatMap { list in
-            let itemContextsBuilder = ItemContextsBuilder(self.itemRepository)
-                .forList(list)
-                .withSorting(list.itemsSorting ?? sorting)
-            return try itemContextsBuilder.build(on: request)
-                .flatMap { itemContexts in
-                    let context = try ItemsPageContextBuilder()
-                        .forUser(user)
-                        .forList(list)
-                        .withItemContexts(itemContexts)
-                        .build()
-                    return try Controller.renderView("User/Items", with: context, on: request)
-                }
-        }
+        return try userItemsActor
+            .getItems(
+                .specification(userBy: userid, listBy: listid, with: sorting),
+                .boundaries(worker: request.eventLoop)
+            )
+            .flatMap { result in
+                let context = try ItemsPageContextBuilder()
+                    .forUserRepresentation(result.user)
+                    .forListRepresentation(result.list)
+                    .withItemRepresentations(result.items)
+                    .build()
+                return try Controller.renderView("User/Items", with: context, on: request)
+            }
     }
 
     // MARK: -

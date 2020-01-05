@@ -1,3 +1,5 @@
+import Domain
+
 import Foundation
 
 struct ItemsPageContext: Encodable {
@@ -14,7 +16,11 @@ struct ItemsPageContext: Encodable {
 
     var maskReservations: Bool
 
-    fileprivate init(for user: User, and list: List, with items: [ItemContext]? = nil) {
+    fileprivate init(
+        for user: UserRepresentation,
+        and list: ListRepresentation,
+        with items: [ItemRepresentation]? = nil
+    ) {
         self.userID = ID(user.id)
         self.listID = ID(list.id)
 
@@ -23,9 +29,9 @@ struct ItemsPageContext: Encodable {
 
         self.maximumNumberOfItems = Item.maximumNumberOfItemsPerList
 
-        self.items = items
+        self.items = items?.map { item in ItemContext(item) }
 
-        self.maskReservations = list.options.contains(.maskReservations)
+        self.maskReservations = list.maskReservations
     }
 
 }
@@ -39,26 +45,26 @@ enum ItemsPageContextBuilderError: Error {
 
 class ItemsPageContextBuilder {
 
-    var user: User?
-    var list: List?
+    var user: UserRepresentation?
+    var list: ListRepresentation?
 
-    var itemContexts: [ItemContext]?
+    var items: [ItemRepresentation]?
 
     @discardableResult
-    func forUser(_ user: User) -> Self {
+    func forUserRepresentation(_ user: UserRepresentation) -> Self {
         self.user = user
         return self
     }
 
     @discardableResult
-    func forList(_ list: List) -> Self {
+    func forListRepresentation(_ list: ListRepresentation) -> Self {
         self.list = list
         return self
     }
 
     @discardableResult
-    func withItemContexts(_ itemContexts: [ItemContext]?) -> Self {
-        self.itemContexts = itemContexts
+    func withItemRepresentations(_ items: [ItemRepresentation]?) -> Self {
+        self.items = items
         return self
     }
 
@@ -69,11 +75,7 @@ class ItemsPageContextBuilder {
         guard let list = list else {
             throw ItemsPageContextBuilderError.missingRequiredList
         }
-        return ItemsPageContext(
-            for: user,
-            and: list,
-            with: itemContexts
-        )
+        return .init(for: user, and: list, with: items)
     }
 
 }
