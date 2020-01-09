@@ -32,9 +32,9 @@ public protocol UserItemsActor {
     ) throws -> EventLoopFuture<CreateOrUpdateItem.Result>
 
     func requestItemDeletion(
-        _ specification: RequestDeletionEditing.Specification,
-        _ boundaries: RequestDeletionEditing.Boundaries
-    ) throws -> EventLoopFuture<RequestDeletionEditing.Result>
+        _ specification: RequestItemDeletion.Specification,
+        _ boundaries: RequestItemDeletion.Boundaries
+    ) throws -> EventLoopFuture<RequestItemDeletion.Result>
 
     func deleteItem(
         _ specification: DeleteItem.Specification,

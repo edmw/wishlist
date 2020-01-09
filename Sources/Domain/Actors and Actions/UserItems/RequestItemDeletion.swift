@@ -1,9 +1,9 @@
 import Foundation
 import NIO
 
-// MARK: RequestDeletionEditing
+// MARK: RequestItemDeletion
 
-public struct RequestDeletionEditing: Action {
+public struct RequestItemDeletion: Action {
 
     // MARK: Boundaries
 
@@ -51,9 +51,9 @@ extension DomainUserItemsActor {
     // MARK: requestItemDeletion
 
     public func requestItemDeletion(
-        _ specification: RequestDeletionEditing.Specification,
-        _ boundaries: RequestDeletionEditing.Boundaries
-    ) throws -> EventLoopFuture<RequestDeletionEditing.Result> {
+        _ specification: RequestItemDeletion.Specification,
+        _ boundaries: RequestItemDeletion.Boundaries
+    ) throws -> EventLoopFuture<RequestItemDeletion.Result> {
         let itemid = specification.itemID
         let listid = specification.listID
         let userid = specification.userID

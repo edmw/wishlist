@@ -125,7 +125,6 @@ final class ImageFileMiddleware: Middleware, ServiceType {
                     at: fileDirectoryURL,
                     includingPropertiesForKeys: [],
                     options: [ .skipsHiddenFiles ]
-// FIXME: not implemented yet for linux: https://github.com/apple/swift-corelibs-foundation/pull/1548
                 )
                 .filter {
                     ImageFileMiddleware.supportedMediaTypes
@@ -201,7 +200,6 @@ final class ImageFileMiddleware: Middleware, ServiceType {
                 at: directory,
                 includingPropertiesForKeys: [],
                 options: [ .skipsHiddenFiles ]
-// FIXME: not implemented yet for linux: https://github.com/apple/swift-corelibs-foundation/pull/1548
             )
             .filter {
                 $0.deletingPathExtension().lastPathComponent == name
