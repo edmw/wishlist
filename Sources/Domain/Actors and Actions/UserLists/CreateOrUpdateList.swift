@@ -7,26 +7,16 @@ public struct CreateOrUpdateList: Action {
 
     // MARK: Boundaries
 
-    public struct Boundaries: ActionBoundaries {
+    public struct Boundaries: AutoActionBoundaries {
         public let worker: EventLoop
-        public static func boundaries(worker: EventLoop) -> Self {
-            return Self(worker: worker)
-        }
     }
 
     // MARK: Specification
 
-    public struct Specification: ActionSpecification {
+    public struct Specification: AutoActionSpecification {
         public let userID: UserID
         public let listID: ListID?
-        public let listValues: ListValues
-        public static func specification(
-            userBy userid: UserID,
-            listBy listid: ListID? = nil,
-            from listValues: ListValues
-        ) -> Self {
-            return Self(userID: userid, listID: listid, listValues: listValues)
-        }
+        public let values: ListValues
     }
 
     // MARK: Result
@@ -61,7 +51,7 @@ extension DomainUserListsActor {
         _ boundaries: CreateOrUpdateList.Boundaries
     ) throws -> EventLoopFuture<CreateOrUpdateList.Result> {
         let userid = specification.userID
-        let listvalues = specification.listValues
+        let listvalues = specification.values
         if let listid = specification.listID {
             return try self.updateList(
                 .specification(userBy: userid, listBy: listid, from: listvalues),

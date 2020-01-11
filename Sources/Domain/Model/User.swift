@@ -19,8 +19,10 @@ public final class User: Entity,
 {
     static let maximumLengthOfNickName = 100
 
-    public var id: UUID?
-    public var userID: UserID? { UserID(uuid: id) }
+    public var id: UUID? {
+        didSet { userID = UserID(uuid: id) }
+    }
+    public lazy var userID = UserID(uuid: id)
 
     public var identification: Identification
 

@@ -15,11 +15,11 @@ extension DomainUserWelcomeActor: ServiceType {
     public static let serviceSupports: [Any.Type] = [UserWelcomeActor.self]
 
     public static func makeService(for container: Container) throws -> Self {
-        return .init(
-            try container.make(ListRepository.self),
-            try container.make(FavoriteRepository.self),
-            try container.make(ItemRepository.self),
-            try container.make(UserRepository.self)
+        return try .init(
+            listRepository: container.make(),
+            favoriteRepository: container.make(),
+            itemRepository: container.make(),
+            userRepository: container.make()
         )
     }
 

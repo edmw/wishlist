@@ -43,10 +43,10 @@ public final class DomainUserProfileActor: UserProfileActor,
     let invitationRepresentationsBuilder: InvitationRepresentationsBuilder
 
     public required init(
-        _ userRepository: UserRepository,
-        _ invitationRepository: InvitationRepository,
-        _ logging: MessageLoggingProvider,
-        _ recording: EventRecordingProvider
+        userRepository: UserRepository,
+        invitationRepository: InvitationRepository,
+        logging: MessageLoggingProvider,
+        recording: EventRecordingProvider
     ) {
         self.userRepository = userRepository
         self.invitationRepository = invitationRepository

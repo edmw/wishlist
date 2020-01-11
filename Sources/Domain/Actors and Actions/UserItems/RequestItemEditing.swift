@@ -7,26 +7,16 @@ public struct RequestItemEditing: Action {
 
     // MARK: Boundaries
 
-    public struct Boundaries: ActionBoundaries {
+    public struct Boundaries: AutoActionBoundaries {
         public let worker: EventLoop
-        public static func boundaries(worker: EventLoop) -> Self {
-            return Self(worker: worker)
-        }
     }
 
     // MARK: Specification
 
-    public struct Specification: ActionSpecification {
+    public struct Specification: AutoActionSpecification {
         public let userID: UserID
         public let listID: ListID
         public let itemID: ItemID?
-        public static func specification(
-            userBy userid: UserID,
-            listBy listid: ListID,
-            itemBy itemid: ItemID?
-        ) -> Self {
-            return Self(userID: userid, listID: listid, itemID: itemid)
-        }
     }
 
     // MARK: Result
@@ -54,27 +44,25 @@ extension DomainUserItemsActor {
         _ specification: RequestItemEditing.Specification,
         _ boundaries: RequestItemEditing.Boundaries
     ) throws -> EventLoopFuture<RequestItemEditing.Result> {
+        let itemid = specification.itemID
+        let listid = specification.listID
+        let userid = specification.userID
         let worker = boundaries.worker
-        return self.userRepository
-            .find(id: specification.userID)
-            .unwrap(or: UserItemsActorError.invalidUser)
-            .flatMap { user in
-                return try self.listRepository
-                    .find(by: specification.listID, for: user)
-                    .unwrap(or: UserItemsActorError.invalidList)
-                    .flatMap { list in
-                        if let itemID = specification.itemID {
-                            return try self.itemRepository
-                                .findWithReservation(by: itemID, in: list)
-                                .unwrap(or: UserItemsActorError.invalidItem)
-                                .map { item, _ in
-                                    .init(user, list, item)
-                                }
+        return try self.listRepository
+            .findWithUser(by: listid, for: userid)
+            .unwrap(or: UserItemsActorError.invalidList)
+            .flatMap { list, user in
+                if let itemid = itemid {
+                    return try self.itemRepository
+                        .findWithReservation(by: itemid, in: list)
+                        .unwrap(or: UserItemsActorError.invalidItem)
+                        .map { item, _ in
+                            .init(user, list, item)
                         }
-                        else {
-                            return worker.makeSucceededFuture(.init(user, list))
-                        }
-                    }
+                }
+                else {
+                    return worker.makeSucceededFuture(.init(user, list))
+                }
             }
     }
 

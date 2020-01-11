@@ -7,29 +7,18 @@ public struct CreateOrUpdateItem: Action {
 
     // MARK: Boundaries
 
-    public struct Boundaries: ActionBoundaries {
+    public struct Boundaries: AutoActionBoundaries {
         public let worker: EventLoop
         public let imageStore: ImageStoreProvider
-        public static func boundaries(worker: EventLoop, imageStore: ImageStoreProvider) -> Self {
-            return Self(worker: worker, imageStore: imageStore)
-        }
     }
 
     // MARK: Specification
 
-    public struct Specification: ActionSpecification {
+    public struct Specification: AutoActionSpecification {
         public let userID: UserID
         public let listID: ListID
         public let itemID: ItemID?
-        public let itemValues: ItemValues
-        public static func specification(
-            userBy userid: UserID,
-            listBy listid: ListID,
-            itemBy itemid: ItemID? = nil,
-            from itemValues: ItemValues
-        ) -> Self {
-            return Self(userID: userid, listID: listid, itemID: itemid, itemValues: itemValues)
-        }
+        public let values: ItemValues
     }
 
     // MARK: Result
@@ -69,7 +58,7 @@ extension DomainUserItemsActor {
     ) throws -> EventLoopFuture<CreateOrUpdateItem.Result> {
         let userid = specification.userID
         let listid = specification.listID
-        let itemvalues = specification.itemValues
+        let itemvalues = specification.values
         if let itemid = specification.itemID {
             return try self.updateItem(
                 .specification(userBy: userid, listBy: listid, itemBy: itemid, from: itemvalues),

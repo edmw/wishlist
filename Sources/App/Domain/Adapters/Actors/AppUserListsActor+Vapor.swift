@@ -15,13 +15,13 @@ extension DomainUserListsActor: ServiceType {
     public static let serviceSupports: [Any.Type] = [UserListsActor.self]
 
     public static func makeService(for container: Container) throws -> Self {
-        return .init(
-            try container.make(UserItemsActor.self),
-            try container.make(ListRepository.self),
-            try container.make(ItemRepository.self),
-            try container.make(UserRepository.self),
-            VaporMessageLoggingProvider(with: container.requireLogger().application),
-            VaporEventRecordingProvider(with: container.requireLogger().business)
+        return try .init(
+            userItemsActor: container.make(),
+            listRepository: container.make(),
+            itemRepository: container.make(),
+            userRepository: container.make(),
+            logging: container.make(),
+            recording: container.make()
         )
     }
 

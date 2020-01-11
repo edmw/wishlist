@@ -11,11 +11,8 @@ public struct MaterialiseUser: Action {
 
     // MARK: Boundaries
 
-    public struct Boundaries: ActionBoundaries {
+    public struct Boundaries: AutoActionBoundaries {
         public let worker: EventLoop
-        public static func boundaries(worker: EventLoop) -> Self {
-            return Self(worker: worker)
-        }
     }
 
     // MARK: Specification
@@ -31,30 +28,13 @@ public struct MaterialiseUser: Action {
         }
     }
 
-    public struct Specification: ActionSpecification {
-        public let options: Options
+    public struct Specification: AutoActionSpecification {
+        public let options: MaterialiseUser.Options
         public let userIdentity: UserIdentity
         public let userIdentityProvider: UserIdentityProvider
         public let userValues: PartialValues<UserValues>
         public let invitationCode: InvitationCode?
         public let guestIdentification: Identification?
-        public static func specification(
-            options: Options = [.createUsers],
-            userIdentity: UserIdentity,
-            userIdentityProvider: UserIdentityProvider,
-            userValues: PartialValues<UserValues>,
-            invitationCode: InvitationCode? = nil,
-            guestIdentification: Identification? = nil
-        ) -> Self {
-            return Self(
-                options: options,
-                userIdentity: userIdentity,
-                userIdentityProvider: userIdentityProvider,
-                userValues: userValues,
-                invitationCode: invitationCode,
-                guestIdentification: guestIdentification
-            )
-        }
     }
 
     // MARK: Result

@@ -7,24 +7,15 @@ public struct UpdateSettings: Action {
 
     // MARK: Boundaries
 
-    public struct Boundaries: ActionBoundaries {
+    public struct Boundaries: AutoActionBoundaries {
         public let worker: EventLoop
-        public static func boundaries(worker: EventLoop) -> Self {
-            return Self(worker: worker)
-        }
     }
 
     // MARK: Specification
 
-    public struct Specification: ActionSpecification {
+    public struct Specification: AutoActionSpecification {
         public let userID: UserID
-        public let settingsValues: PartialValues<UserSettings>
-        public static func specification(
-            userBy userid: UserID,
-            from settingsValues: PartialValues<UserSettings>
-        ) -> Self {
-            return Self(userID: userid, settingsValues: settingsValues)
-        }
+        public let values: PartialValues<UserSettings>
     }
 
     // MARK: Result
@@ -86,7 +77,7 @@ extension DomainUserSettingsActor {
         return userRepository.find(id: specification.userID)
             .unwrap(or: UserListsActorError.invalidUser)
             .flatMap { user in
-                let settingsvalues = specification.settingsValues
+                let settingsvalues = specification.values
                 return try UpdateSettings(actor: self)
                     .execute(on: user, with: settingsvalues, in: boundaries)
                     .logMessage("settings updated", using: logging)

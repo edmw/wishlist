@@ -12,8 +12,9 @@ import Foundation
 /// Relations:
 /// - Sibling: User
 /// - Sibling: List
-public struct Favorite: Entity,
+public final class Favorite: Entity,
     EntityDetachable,
+    EntityReflectable,
     Codable,
     CustomStringConvertible,
     CustomDebugStringConvertible
@@ -22,8 +23,10 @@ public struct Favorite: Entity,
     // this is a hard limit (application can have soft limits, too)
     public static let maximumNumberOfFavoritesPerUser = 100
 
-    public var id: UUID?
-    public var favoriteID: FavoriteID? { FavoriteID(uuid: id) }
+    public var id: UUID? {
+        didSet { favoriteID = FavoriteID(uuid: id) }
+    }
+    public lazy var favoriteID = FavoriteID(uuid: id)
 
     public var userID: UUID
     public var listID: UUID
@@ -38,6 +41,14 @@ public struct Favorite: Entity,
         userID = userid.uuid
         listID = listid.uuid
     }
+
+    // MARK: EntityReflectable
+
+    public static var properties: EntityProperties<Favorite> = .build(
+        .init(\Favorite.id, label: "id"),
+        .init(\Favorite.userID, label: "userID"),
+        .init(\Favorite.listID, label: "listID")
+    )
 
     // MARK: CustomStringConvertible
 

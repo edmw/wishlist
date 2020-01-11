@@ -15,8 +15,8 @@ extension DomainAnnouncementsActor: ServiceType {
     public static let serviceSupports: [Any.Type] = [AnnouncementsActor.self]
 
     public static func makeService(for container: Container) throws -> Self {
-        return .init(
-            try container.make(UserRepository.self)
+        return try .init(
+            userRepository: container.make()
         )
     }
 

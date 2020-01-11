@@ -62,12 +62,12 @@ public final class DomainUserFavoritesActor: UserFavoritesActor {
     let favoriteRepresentationsBuilder: FavoriteRepresentationsBuilder
 
     public required init(
-        _ favoriteRepository: FavoriteRepository,
-        _ listRepository: ListRepository,
-        _ itemRepository: ItemRepository,
-        _ userRepository: UserRepository,
-        _ logging: MessageLoggingProvider,
-        _ recording: EventRecordingProvider
+        favoriteRepository: FavoriteRepository,
+        listRepository: ListRepository,
+        itemRepository: ItemRepository,
+        userRepository: UserRepository,
+        logging: MessageLoggingProvider,
+        recording: EventRecordingProvider
     ) {
         self.favoriteRepository = favoriteRepository
         self.listRepository = listRepository

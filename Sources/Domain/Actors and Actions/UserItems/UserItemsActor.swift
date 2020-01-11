@@ -71,11 +71,11 @@ public final class DomainUserItemsActor: UserItemsActor,
     let itemRepresentationsBuilder: ItemRepresentationsBuilder
 
     public required init(
-        _ itemRepository: ItemRepository,
-        _ listRepository: ListRepository,
-        _ userRepository: UserRepository,
-        _ logging: MessageLoggingProvider,
-        _ recording: EventRecordingProvider
+        itemRepository: ItemRepository,
+        listRepository: ListRepository,
+        userRepository: UserRepository,
+        logging: MessageLoggingProvider,
+        recording: EventRecordingProvider
     ) {
         self.itemRepository = itemRepository
         self.userRepository = userRepository

@@ -4,7 +4,7 @@ import NIO
 // MARK: EnrollmentActor
 
 /// Enrollment use cases.
-public protocol EnrollmentActor {
+public protocol EnrollmentActor: Actor {
 
     /// Materialises a user.
     /// - Parameter specification: Specification for this action.
@@ -56,9 +56,9 @@ enum EnrollmentActorError: Error {
 /// their corresponding use case methods.
 public final class DomainEnrollmentActor: EnrollmentActor {
 
+    let userRepository: UserRepository
     let invitationRepository: InvitationRepository
     let reservationRepository: ReservationRepository
-    let userRepository: UserRepository
 
     let logging: MessageLoggingProvider
     let recording: EventRecordingProvider
@@ -68,15 +68,15 @@ public final class DomainEnrollmentActor: EnrollmentActor {
     let reservationService: ReservationService
 
     public required init(
-        _ invitationRepository: InvitationRepository,
-        _ reservationRepository: ReservationRepository,
-        _ userRepository: UserRepository,
-        _ logging: MessageLoggingProvider,
-        _ recording: EventRecordingProvider
+        userRepository: UserRepository,
+        invitationRepository: InvitationRepository,
+        reservationRepository: ReservationRepository,
+        logging: MessageLoggingProvider,
+        recording: EventRecordingProvider
     ) {
         self.invitationRepository = invitationRepository
-        self.reservationRepository = reservationRepository
         self.userRepository = userRepository
+        self.reservationRepository = reservationRepository
         self.logging = logging
         self.recording = recording
         self.userService = UserService(userRepository)

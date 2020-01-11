@@ -1,0 +1,28 @@
+{% for type in types.implementing.AutoActionSpecification %}
+// sourcery:file:AutoActionSpecification/{{type.name}}+AutoActionSpecification.generated.swift
+// MARK: {{type.name}}
+
+extension {{type.name}} {
+
+    public static func specification(
+    {% for variable in type.storedVariables %}
+          {% if variable.name == 'userID' %}userBy {% endif %}{% if variable.name == 'listID' %}listBy {% endif %}{% if variable.name == 'itemID' %}itemBy {% endif %}{% if variable.name == 'invitationID' %}invitationBy {% endif %}{% if variable.name == 'reservationID' %}reservationBy {% endif %}{% if variable.name == 'values' %}from {% endif %}{% if variable.name == 'sorting' %}with {% endif %}{% if variable.name != 'userID'
+            and variable.name != 'listID'
+            and variable.name != 'itemID'
+            and variable.name != 'invitationID'
+            and variable.name != 'reservationID'
+            and variable.name != 'values'
+            and variable.name != 'sorting'
+            and variable.name|lowercase != variable.name %}{{variable.name}} {% endif %}{{variable.name|lowercase}}: {{variable.typeName}}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+    ) -> Self {
+        return Self(
+        {% for variable in type.storedVariables %}
+            {{variable.name}}: {{variable.name|lowercase}}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+        )
+    }
+
+}
+// sourcery:end
+{% endfor %}

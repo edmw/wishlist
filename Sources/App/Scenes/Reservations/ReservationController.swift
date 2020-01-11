@@ -33,7 +33,7 @@ final class ReservationController: AuthenticatableController,
                     userBy: userid,
                     itemBy: itemid,
                     listBy: listid,
-                    reservationid: reservationid
+                    reservationBy: reservationid
                 ),
                 .boundaries(worker: request.eventLoop)
             )
@@ -66,7 +66,7 @@ final class ReservationController: AuthenticatableController,
                     userBy: userid,
                     itemBy: itemid,
                     listBy: listid,
-                    reservationid: reservationid
+                    reservationBy: reservationid
                 ),
                 .boundaries(worker: request.eventLoop)
             )

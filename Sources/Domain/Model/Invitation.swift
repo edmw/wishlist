@@ -20,8 +20,10 @@ public final class Invitation: Entity, Confidental,
     // this is a hard limit (application can have soft limits, too)
     public static let maximumNumberOfInvitationsPerUser = 10
 
-    public var id: UUID?
-    public var invitationID: InvitationID? { InvitationID(uuid: id) }
+    public var id: UUID? {
+        didSet { invitationID = InvitationID(uuid: id) }
+    }
+    public lazy var invitationID = InvitationID(uuid: id)
 
     public var code: InvitationCode
     public var status: Invitation.Status
@@ -93,7 +95,10 @@ public final class Invitation: Entity, Confidental,
         case declined = 2
         case revoked = 3
 
-        public init?(string value: String) {
+        public init?(string value: String?) {
+            guard let value = value else {
+                return nil
+            }
             switch value {
             case "open":     self = .open
             case "accepted": self = .accepted

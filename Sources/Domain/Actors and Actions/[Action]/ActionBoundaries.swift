@@ -6,3 +6,6 @@ protocol ActionBoundaries {
     var worker: EventLoop { get }
 
 }
+
+protocol AutoActionBoundaries: ActionBoundaries {
+}

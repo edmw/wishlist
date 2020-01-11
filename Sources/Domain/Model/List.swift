@@ -25,8 +25,10 @@ public final class List: Entity, Viewable,
     public static let minimumLengthOfTitle = 4
     public static let maximumLengthOfTitle = 100
 
-    public var id: UUID?
-    public var listID: ListID? { ListID(uuid: id) }
+    public var id: UUID? {
+        didSet { listID = ListID(uuid: id) }
+    }
+    public lazy var listID = ListID(uuid: id)
 
     public var title: String
     public var visibility: Visibility

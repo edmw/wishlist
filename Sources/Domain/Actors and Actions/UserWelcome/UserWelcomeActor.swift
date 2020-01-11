@@ -28,10 +28,10 @@ public final class DomainUserWelcomeActor: UserWelcomeActor {
     let userRepository: UserRepository
 
     public required init(
-        _ listRepository: ListRepository,
-        _ favoriteRepository: FavoriteRepository,
-        _ itemRepository: ItemRepository,
-        _ userRepository: UserRepository
+        listRepository: ListRepository,
+        favoriteRepository: FavoriteRepository,
+        itemRepository: ItemRepository,
+        userRepository: UserRepository
     ) {
         self.listRepository = listRepository
         self.favoriteRepository = favoriteRepository

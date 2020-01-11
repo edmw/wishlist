@@ -66,10 +66,30 @@ final class ItemController: AuthenticatableController,
 
     /// Renders a view to select the target list to move an item to.
     /// This is only accessible for an authenticated user who owns the affected item.
-//    private func renderMoveView(on request: Request) throws -> EventLoopFuture<View> {
-//        let user = try requireAuthenticatedUser(on: request)
-//
-//        return try self.requireList(on: request, for: user).flatMap { list in
+    private func renderMoveView(on request: Request) throws -> EventLoopFuture<View> {
+        let userid = try requireAuthenticatedUserID(on: request)
+        let listid = try requireListID(on: request)
+        let itemid = try requireItemID(on: request)
+
+        fatalError()
+//        return try userItemsActor
+//            .requestItemMove(
+//                .specification(userBy: userid, listBy: listid, itemBy: itemid),
+//                .boundaries(worker: request.eventLoop)
+//            )
+//            .flatMap { result in
+//                let context = try ItemPageContextBuilder()
+//                    .forUserRepresentation(result.user)
+//                    .forListRepresentation(result.list)
+//                    .withItemRepresentation(result.item)
+//                    .build()
+//                context.userLists = result.userLists
+//                return try Controller.renderView("User/ItemMove", with: context, on: request)
+//            }
+
+
+
+        //        return try self.requireList(on: request, for: user).flatMap { list in
 //            return try self.requireItem(on: request, for: list).flatMap { item in
 //                let listRepresentationsBuilder
 //                    = ListRepresentationsBuilder(self.listRepository, self.itemRepository)
@@ -77,21 +97,7 @@ final class ItemController: AuthenticatableController,
 //                        .filter { $0.id != list.id }
 //                return try listRepresentationsBuilder.build(on: request.eventLoop)
 //                    .flatMap { listRepresentations in
-//                        var context = try ItemPageContextBuilder()
-//                            .forUserRepresentation(.init(user))
-//                            .forListRepresentation(.init(list))
-//                            .withItemRepresentation(.init(item))
-//                            .build()
-//                        context.userLists = listRepresentations
-//                        return try Controller.renderView(
-//                            "User/ItemMove",
-//                            with: context,
-//                            on: request
-//                        )
-//                    }
-//            }
-//        }
-//    }
+    }
 
     // MARK: - CRUD
 
@@ -218,10 +224,10 @@ final class ItemController: AuthenticatableController,
             "user", ID.parameter, "list", ID.parameter, "item", ID.parameter, "delete",
                 use: self.renderDeleteView
         )
-//        router.get(
-//            "user", ID.parameter, "list", ID.parameter, "item", ID.parameter, "move",
-//                use: self.renderMoveView
-//        )
+        router.get(
+            "user", ID.parameter, "list", ID.parameter, "item", ID.parameter, "move",
+                use: self.renderMoveView
+        )
         router.post(
             "user", ID.parameter, "list", ID.parameter, "item", ID.parameter,
                 use: self.dispatch

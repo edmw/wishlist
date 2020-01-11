@@ -15,12 +15,12 @@ extension DomainEnrollmentActor: ServiceType {
     public static let serviceSupports: [Any.Type] = [EnrollmentActor.self]
 
     public static func makeService(for container: Container) throws -> Self {
-        return .init(
-            try container.make(InvitationRepository.self),
-            try container.make(ReservationRepository.self),
-            try container.make(UserRepository.self),
-            VaporMessageLoggingProvider(with: container.requireLogger().application),
-            VaporEventRecordingProvider(with: container.requireLogger().business)
+        return try .init(
+            userRepository: container.make(),
+            invitationRepository: container.make(),
+            reservationRepository: container.make(),
+            logging: container.make(),
+            recording: container.make()
         )
     }
 

@@ -154,7 +154,14 @@ public func configure(
     )
     services.register(middlewaresConfig)
 
-    // MARK: Actors
+    // MARK: Domain Providers
+
+    services.register(VaporMessageLoggingProvider.self)
+    config.prefer(VaporMessageLoggingProvider.self, for: MessageLoggingProvider.self)
+    services.register(VaporEventRecordingProvider.self)
+    config.prefer(VaporEventRecordingProvider.self, for: EventRecordingProvider.self)
+
+    // MARK: Domain Actors
 
     services.register(DomainUserListsActor.self)
     services.register(DomainUserItemsActor.self)

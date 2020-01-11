@@ -1,0 +1,23 @@
+{% for type in types.implementing.AutoActionBoundaries %}
+// sourcery:file:AutoActionBoundaries/{{type.name}}+AutoActionBoundaries.generated.swift
+import NIO
+
+// MARK: {{type.name}}
+
+extension {{type.name}} {
+
+    public static func boundaries(
+    {% for variable in type.storedVariables %}
+        {{variable.name}}{% if variable.name != variable.name|lowercase %} {{variable.name|lowercase}}{% endif %}: {{variable.typeName}}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+    ) -> Self {
+        return Self(
+        {% for variable in type.storedVariables %}
+            {{variable.name}}: {{variable.name|lowercase}}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+        )
+    }
+
+}
+// sourcery:end
+{% endfor %}

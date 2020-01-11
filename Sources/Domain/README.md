@@ -17,3 +17,6 @@ The domain layer consists of these components:
   * Providers
     * Interfaces defining functionalities outside of the domain layer which are used by Actions.
 
+## Code Generation
+
+Implementing the domain layer as separate module adds a certain amount of repetitive code. Some of this code is generated through a code generator. See README at the generator‘s templates for details.

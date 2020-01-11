@@ -7,30 +7,16 @@ public final class GetItems: Action {
 
     // MARK: Boundaries
 
-    public struct Boundaries: ActionBoundaries {
+    public struct Boundaries: AutoActionBoundaries {
         public let worker: EventLoop
-        public static func boundaries(worker: EventLoop) -> Self {
-            return Self(worker: worker)
-        }
     }
 
     // MARK: Specification
 
-    public struct Specification: ActionSpecification {
+    public struct Specification: AutoActionSpecification {
         public let userID: UserID
         public let listID: ListID
         public let sorting: ItemsSorting
-        public static func specification(
-            userBy userid: UserID,
-            listBy listid: ListID,
-            with sorting: ItemsSorting = .ascending(by: \Item.title)
-        ) -> Self {
-            return Self(
-                userID: userid,
-                listID: listid,
-                sorting: sorting
-            )
-        }
     }
 
     // MARK: Result

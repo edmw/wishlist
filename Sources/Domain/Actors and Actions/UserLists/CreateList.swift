@@ -7,24 +7,15 @@ public struct CreateList: Action {
 
     // MARK: Boundaries
 
-    public struct Boundaries: ActionBoundaries {
+    public struct Boundaries: AutoActionBoundaries {
         public let worker: EventLoop
-        public static func boundaries(worker: EventLoop) -> Self {
-            return Self(worker: worker)
-        }
     }
 
     // MARK: Specification
 
-    public struct Specification: ActionSpecification {
+    public struct Specification: AutoActionSpecification {
         public let userID: UserID
-        public let listValues: ListValues
-        public static func specification(
-            userBy userid: UserID,
-            from listValues: ListValues
-        ) -> Self {
-            return Self(userID: userid, listValues: listValues)
-        }
+        public let values: ListValues
     }
 
     // MARK: Result
@@ -88,7 +79,7 @@ extension DomainUserListsActor {
             .unwrap(or: UserListsActorError.invalidUser)
             .flatMap { user in
                 return try CreateList(actor: self)
-                    .execute(with: specification.listValues, for: user, in: boundaries)
+                    .execute(with: specification.values, for: user, in: boundaries)
                     .logMessage("list created", using: self.logging)
                     .recordEvent(
                         for: { $0.list }, "created for \(user)", using: self.recording

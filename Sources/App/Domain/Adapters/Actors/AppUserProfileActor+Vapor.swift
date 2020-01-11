@@ -15,11 +15,11 @@ extension DomainUserProfileActor: ServiceType {
     public static let serviceSupports: [Any.Type] = [UserProfileActor.self]
 
     public static func makeService(for container: Container) throws -> Self {
-        return .init(
-            try container.make(UserRepository.self),
-            try container.make(InvitationRepository.self),
-            VaporMessageLoggingProvider(with: container.requireLogger().application),
-            VaporEventRecordingProvider(with: container.requireLogger().business)
+        return try .init(
+            userRepository: container.make(),
+            invitationRepository: container.make(),
+            logging: container.make(),
+            recording: container.make()
         )
     }
 

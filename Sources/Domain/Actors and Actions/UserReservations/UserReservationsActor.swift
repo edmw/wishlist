@@ -35,10 +35,10 @@ public final class DomainUserReservationsActor: UserReservationsActor {
     let recording: EventRecordingProvider
 
     public required init(
-        _ itemRepository: ItemRepository,
-        _ reservationRepository: ReservationRepository,
-        _ logging: MessageLoggingProvider,
-        _ recording: EventRecordingProvider
+        itemRepository: ItemRepository,
+        reservationRepository: ReservationRepository,
+        logging: MessageLoggingProvider,
+        recording: EventRecordingProvider
     ) {
         self.itemRepository = itemRepository
         self.reservationRepository = reservationRepository

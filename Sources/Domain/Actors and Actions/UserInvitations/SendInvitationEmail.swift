@@ -12,15 +12,9 @@ public struct SendInvitationEmail: Action {
 
     // MARK: Boundaries
 
-    public struct Boundaries: ActionBoundaries, SendInvitationBoundaries {
+    public struct Boundaries: AutoActionBoundaries, SendInvitationBoundaries {
         public let worker: EventLoop
         public let emailSending: EmailSendingProvider
-        public static func boundaries(
-            worker: EventLoop,
-            emailSending: EmailSendingProvider
-        ) -> Self {
-            return Self(worker: worker, emailSending: emailSending)
-        }
     }
 
     // MARK: Specification

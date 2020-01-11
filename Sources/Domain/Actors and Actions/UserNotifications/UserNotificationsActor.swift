@@ -27,9 +27,9 @@ public final class DomainUserNotificationsActor: UserNotificationsActor {
     let recording: EventRecordingProvider
 
     public required init(
-        _ userRepository: UserRepository,
-        _ logging: MessageLoggingProvider,
-        _ recording: EventRecordingProvider
+        userRepository: UserRepository,
+        logging: MessageLoggingProvider,
+        recording: EventRecordingProvider
     ) {
         self.userRepository = userRepository
         self.logging = logging

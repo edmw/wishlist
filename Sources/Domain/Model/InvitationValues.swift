@@ -36,15 +36,7 @@ public struct InvitationValues: Values, ValueValidatable {
         if let codeString = codeString {
             self.code = InvitationCode(string: codeString)
         }
-        else {
-            self.code = nil
-        }
-        if let statusString = statusString {
-            self.status = Invitation.Status(string: statusString)
-        }
-        else {
-            self.status = nil
-        }
+        self.status = Invitation.Status(string: statusString)
         self.email = EmailSpecification(string: email)
         self.sentAt = sentAt
         self.createdAt = createdAt

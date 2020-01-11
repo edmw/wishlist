@@ -4,7 +4,7 @@ import NIO
 // MARK: AnnouncementsActor
 
 /// Announcements use cases.
-public protocol AnnouncementsActor {
+public protocol AnnouncementsActor: Actor {
 
     /// Presents publicly available information.
     /// - Parameter specification: Specification for this action.
@@ -44,9 +44,7 @@ public final class DomainAnnouncementsActor: AnnouncementsActor {
 
     let userRepository: UserRepository
 
-    public required init(
-        _ userRepository: UserRepository
-    ) {
+    public required init(userRepository: UserRepository) {
         self.userRepository = userRepository
     }
 

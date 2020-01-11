@@ -7,20 +7,14 @@ public struct RequestProfileEditing: Action {
 
     // MARK: Boundaries
 
-    public struct Boundaries: ActionBoundaries {
+    public struct Boundaries: AutoActionBoundaries {
         public let worker: EventLoop
-        public static func boundaries(worker: EventLoop) -> Self {
-            return Self(worker: worker)
-        }
     }
 
     // MARK: Specification
 
-    public struct Specification: ActionSpecification {
+    public struct Specification: AutoActionSpecification {
         public let userID: UserID
-        public static func specification(userBy userid: UserID) -> Self {
-            return Self(userID: userid)
-        }
     }
 
     // MARK: Result

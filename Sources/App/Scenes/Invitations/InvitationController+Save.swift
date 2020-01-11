@@ -37,7 +37,7 @@ extension InvitationController {
                     .createInvitation(
                         .specification(
                             userBy: userid,
-                            invitationValues: values,
+                            from: values,
                             sendEmail: formdata.inputSendEmail ?? false
                         ),
                         .boundaries(

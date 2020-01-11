@@ -54,13 +54,13 @@ public final class DomainWishlistActor: WishlistActor,
     let recording: EventRecordingProvider
 
     public required init(
-        _ listRepository: ListRepository,
-        _ itemRepository: ItemRepository,
-        _ reservationRepository: ReservationRepository,
-        _ favoriteRepository: FavoriteRepository,
-        _ userRepository: UserRepository,
-        _ logging: MessageLoggingProvider,
-        _ recording: EventRecordingProvider
+        listRepository: ListRepository,
+        itemRepository: ItemRepository,
+        reservationRepository: ReservationRepository,
+        favoriteRepository: FavoriteRepository,
+        userRepository: UserRepository,
+        logging: MessageLoggingProvider,
+        recording: EventRecordingProvider
     ) {
         self.listRepository = listRepository
         self.favoriteRepository = favoriteRepository

@@ -27,8 +27,10 @@ public final class Item: Entity, Imageable,
 
     public static let maximumLengthOfURL = 2_000
 
-    public var id: UUID?
-    public var itemID: ItemID? { ItemID(uuid: id) }
+    public var id: UUID? {
+        didSet { itemID = ItemID(uuid: id) }
+    }
+    public lazy var itemID = ItemID(uuid: id)
 
     public var title: String
     public var text: String

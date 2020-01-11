@@ -7,7 +7,7 @@ import Vapor
 /// Adapter for the domain layers `MessageLoggingProvider` to be used with Vapor.
 ///
 /// This delegates the work to the web app‘s message logging framework.
-struct VaporMessageLoggingProvider: MessageLoggingProvider {
+struct VaporMessageLoggingProvider: MessageLoggingProvider, ServiceType {
 
     let logger: Logger
 
@@ -29,6 +29,14 @@ struct VaporMessageLoggingProvider: MessageLoggingProvider {
 
     func log(error string: String, file: String, function: String, line: UInt, column: UInt) {
         self.logger.error(string, file: file, function: function, line: line, column: column)
+    }
+
+    // MARK: Service
+
+    static let serviceSupports: [Any.Type] = [MessageLoggingProvider.self]
+
+    static func makeService(for container: Container) throws -> Self {
+        return .init(with: container.requireLogger().application)
     }
 
 }

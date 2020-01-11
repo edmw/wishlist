@@ -7,30 +7,17 @@ public struct CreateInvitation: Action {
 
     // MARK: Boundaries
 
-    public struct Boundaries: ActionBoundaries, SendInvitationBoundaries {
+    public struct Boundaries: AutoActionBoundaries, SendInvitationBoundaries {
         public let worker: EventLoop
         public let emailSending: EmailSendingProvider
-        public static func boundaries(
-            worker: EventLoop,
-            emailSending: EmailSendingProvider
-        ) -> Self {
-            return Self(worker: worker, emailSending: emailSending)
-        }
     }
 
     // MARK: Specification
 
-    public struct Specification: ActionSpecification {
+    public struct Specification: AutoActionSpecification {
         public let userID: UserID
-        public let invitationValues: InvitationValues
+        public let values: InvitationValues
         public let sendEmail: Bool
-        public static func specification(
-            userBy userid: UserID,
-            invitationValues: InvitationValues,
-            sendEmail: Bool
-        ) -> Self {
-            return Self(userID: userid, invitationValues: invitationValues, sendEmail: sendEmail)
-        }
     }
 
     // MARK: Result
@@ -99,7 +86,7 @@ extension DomainUserInvitationsActor {
             .authorize(on: Invitation.self)
             .flatMap { user in
                 return try CreateInvitation(actor: self)
-                    .execute(with: specification.invitationValues, for: user, in: boundaries)
+                    .execute(with: specification.values, for: user, in: boundaries)
                     .logMessage("invitation created", using: logging)
                     .recordEvent(
                         for: { $0.invitation }, "created for \(user)", using: recording

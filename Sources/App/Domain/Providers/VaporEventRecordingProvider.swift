@@ -7,7 +7,7 @@ import Vapor
 /// Adapter for the domain layers `RecordingProvider` to be used with Vapor.
 ///
 /// This delegates the work to the web app‘s event recording framework.
-struct VaporEventRecordingProvider: EventRecordingProvider {
+struct VaporEventRecordingProvider: EventRecordingProvider, ServiceType {
 
     let logger: Logger
 
@@ -24,6 +24,14 @@ struct VaporEventRecordingProvider: EventRecordingProvider {
             line: line,
             column: column
         )
+    }
+
+    // MARK: Service
+
+    static let serviceSupports: [Any.Type] = [EventRecordingProvider.self]
+
+    static func makeService(for container: Container) throws -> Self {
+        return .init(with: container.requireLogger().business)
     }
 
 }

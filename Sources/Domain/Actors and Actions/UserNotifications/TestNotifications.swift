@@ -7,26 +7,15 @@ public struct TestNotifications: Action {
 
     // MARK: Boundaries
 
-    public struct Boundaries: ActionBoundaries {
+    public struct Boundaries: AutoActionBoundaries {
         public let worker: EventLoop
         public let notificationSending: NotificationSendingProvider
-        public static func boundaries(
-            worker: EventLoop,
-            notificationSending: NotificationSendingProvider
-        ) -> Self {
-            return Self(worker: worker, notificationSending: notificationSending)
-        }
     }
 
     // MARK: Specification
 
-    public struct Specification: ActionSpecification {
+    public struct Specification: AutoActionSpecification {
         public let userID: UserID
-        public static func specification(
-            userBy userid: UserID
-        ) -> Self {
-            return Self(userID: userid)
-        }
     }
 
     // MARK: Result

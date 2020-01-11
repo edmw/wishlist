@@ -7,24 +7,15 @@ public struct UpdateProfile: Action {
 
     // MARK: Boundaries
 
-    public struct Boundaries: ActionBoundaries {
+    public struct Boundaries: AutoActionBoundaries {
         public let worker: EventLoop
-        public static func boundaries(worker: EventLoop) -> Self {
-            return Self(worker: worker)
-        }
     }
 
     // MARK: Specification
 
-    public struct Specification: ActionSpecification {
+    public struct Specification: AutoActionSpecification {
         public let userID: UserID
-        public let userValues: PartialValues<UserValues>
-        public static func specification(
-            userBy userid: UserID,
-            from userValues: PartialValues<UserValues>
-        ) -> Self {
-            return Self(userID: userid, userValues: userValues)
-        }
+        public let values: PartialValues<UserValues>
     }
 
     // MARK: Result
@@ -86,7 +77,7 @@ extension DomainUserProfileActor {
         return userRepository.find(id: specification.userID)
             .unwrap(or: UserListsActorError.invalidUser)
             .flatMap { user in
-                let uservalues = specification.userValues
+                let uservalues = specification.values
                 return try UpdateProfile(actor: self)
                     .execute(on: user, with: uservalues, in: boundaries)
                     .logMessage("user updated", using: logging)

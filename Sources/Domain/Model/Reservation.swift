@@ -16,8 +16,10 @@ public final class Reservation: Entity,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {
-    public var id: UUID?
-    public var reservationID: ReservationID? { ReservationID(uuid: id) }
+    public var id: UUID? {
+        didSet { reservationID = ReservationID(uuid: id) }
+    }
+    public lazy var reservationID = ReservationID(uuid: id)
 
     public var createdAt: Date
 

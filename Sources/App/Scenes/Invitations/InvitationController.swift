@@ -45,7 +45,7 @@ final class InvitationController: AuthenticatableController,
 
         return try userInvitationsActor
             .requestInvitationRevocation(
-                .specification(userBy: userid, invitation: invitationid),
+                .specification(userBy: userid, invitationBy: invitationid),
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
@@ -91,7 +91,7 @@ final class InvitationController: AuthenticatableController,
                         }
                     return try userInvitationsActor
                         .revokeInvitation(
-                            .specification(userBy: userid, invitation: invitationid),
+                            .specification(userBy: userid, invitationBy: invitationid),
                             .boundaries(worker: request.eventLoop)
                         )
                         .flatMap { result in self.success(for: result.user, on: request) }
