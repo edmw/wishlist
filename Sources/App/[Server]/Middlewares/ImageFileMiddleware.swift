@@ -114,12 +114,15 @@ final class ImageFileMiddleware: Middleware, ServiceType {
         deleteDirectory: Bool = false,
         on request: Request
     ) throws {
+        let fileManager = FileManager.default
 
         let fileDirectoryURL = try buildDirectory(for: key, and: groupkey)
 
-        do {
-            let fileManager = FileManager.default
+        guard fileManager.fileExists(atPath: fileDirectoryURL.path) else {
+            return
+        }
 
+        do {
             try fileManager
                 .contentsOfDirectory(
                     at: fileDirectoryURL,
