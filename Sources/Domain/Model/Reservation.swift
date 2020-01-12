@@ -13,6 +13,7 @@ public final class Reservation: Entity,
     EntityDetachable,
     EntityReflectable,
     Codable,
+    Loggable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {

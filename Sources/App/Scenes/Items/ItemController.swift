@@ -67,10 +67,9 @@ final class ItemController: AuthenticatableController,
     /// Renders a view to select the target list to move an item to.
     /// This is only accessible for an authenticated user who owns the affected item.
     private func renderMoveView(on request: Request) throws -> EventLoopFuture<View> {
-        let userid = try requireAuthenticatedUserID(on: request)
-        let listid = try requireListID(on: request)
-        let itemid = try requireItemID(on: request)
-
+        //let userid = try requireAuthenticatedUserID(on: request)
+        //let listid = try requireListID(on: request)
+        //let itemid = try requireItemID(on: request)
         fatalError()
 //        return try userItemsActor
 //            .requestItemMove(
@@ -85,10 +84,7 @@ final class ItemController: AuthenticatableController,
 //                    .build()
 //                context.userLists = result.userLists
 //                return try Controller.renderView("User/ItemMove", with: context, on: request)
-//            }
-
-
-
+//
         //        return try self.requireList(on: request, for: user).flatMap { list in
 //            return try self.requireItem(on: request, for: list).flatMap { item in
 //                let listRepresentationsBuilder

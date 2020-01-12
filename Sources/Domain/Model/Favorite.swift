@@ -16,6 +16,7 @@ public final class Favorite: Entity,
     EntityDetachable,
     EntityReflectable,
     Codable,
+    Loggable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {

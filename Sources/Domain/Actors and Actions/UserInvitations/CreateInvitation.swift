@@ -68,6 +68,23 @@ public struct CreateInvitation: Action {
 
 }
 
+// MARK: -
+
+protocol CreateInvitationActor {
+    var invitationRepository: InvitationRepository { get }
+    var logging: MessageLoggingProvider { get }
+    var recording: EventRecordingProvider { get }
+}
+
+protocol CreateInvitationError: ActionError {
+    var user: User { get }
+}
+
+struct CreateInvitationValidationError: CreateInvitationError {
+    var user: User
+    var error: ValuesError<InvitationValues>
+}
+
 // MARK: - Actor
 
 extension DomainUserInvitationsActor {
@@ -87,7 +104,7 @@ extension DomainUserInvitationsActor {
             .flatMap { user in
                 return try CreateInvitation(actor: self)
                     .execute(with: specification.values, for: user, in: boundaries)
-                    .logMessage("invitation created", using: logging)
+                    .logMessage(.createInvitation(for: user), using: logging)
                     .recordEvent(
                         for: { $0.invitation }, "created for \(user)", using: recording
                     )
@@ -96,7 +113,7 @@ extension DomainUserInvitationsActor {
                         in: invitationRepository,
                         on: boundaries
                     )
-                    .logMessage(for: { $0.invitation }, "invitation sent", using: logging)
+                    .logMessage(.createInvitationSent(for: user), using: logging)
                     .map { invitation, user in
                         .init(user, invitation)
                     }
@@ -114,19 +131,20 @@ extension DomainUserInvitationsActor {
 
 }
 
-// MARK: -
+// MARK: Logging
 
-protocol CreateInvitationActor {
-    var invitationRepository: InvitationRepository { get }
-    var logging: MessageLoggingProvider { get }
-    var recording: EventRecordingProvider { get }
-}
+extension LoggingMessageRoot {
 
-protocol CreateInvitationError: ActionError {
-    var user: User { get }
-}
+    static func createInvitation(for user: User) -> Self {
+        return Self({ subject in
+            LoggingMessage(label: "Create Invitation", subject: subject, attributes: [user])
+        })
+    }
 
-struct CreateInvitationValidationError: CreateInvitationError {
-    var user: User
-    var error: ValuesError<InvitationValues>
+    static func createInvitationSent(for user: User) -> Self {
+        return Self({ subject in
+            LoggingMessage(label: "Create Invitation (Sent)", subject: subject, attributes: [user])
+        })
+    }
+
 }

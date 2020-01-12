@@ -81,6 +81,12 @@ public struct AddReservationToItem: Action {
 
 }
 
+// MARK: -
+
+protocol AddReservationToItemActor {
+    var reservationRepository: ReservationRepository { get }
+}
+
 // MARK: - Actor
 
 extension DomainWishlistActor {
@@ -104,7 +110,7 @@ extension DomainWishlistActor {
                     .flatMap { item in
                         return try AddReservationToItem(actor: self)
                             .execute(for: item, on: list, for: identification)
-                            .logMessage("reservation added", using: logging)
+                            .logMessage(.addReservationToItem, using: logging)
                             .recordEvent("added for \(identification)", using: recording)
                             .flatMap { reservation in
                                 return try boundaries.notificationSending
@@ -135,8 +141,14 @@ extension NotificationSendingProvider {
 
 }
 
-// MARK: -
+// MARK: Logging
 
-protocol AddReservationToItemActor {
-    var reservationRepository: ReservationRepository { get }
+extension LoggingMessageRoot {
+
+    static var addReservationToItem: Self {
+        return Self({ subject in
+            LoggingMessage(label: "Add Reservation to Item", subject: subject, attributes: [])
+        })
+    }
+
 }

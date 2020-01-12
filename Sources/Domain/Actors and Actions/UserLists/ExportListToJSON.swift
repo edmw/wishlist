@@ -73,6 +73,14 @@ public struct ExportListToJSON: Action {
 
 }
 
+// MARK: -
+
+protocol ExportListToJSONActor {
+    var listRepository: ListRepository { get }
+    var itemRepository: ItemRepository { get }
+    var logging: MessageLoggingProvider { get }
+}
+
 // MARK: - Actor
 
 extension DomainUserListsActor {
@@ -94,7 +102,9 @@ extension DomainUserListsActor {
                         return try ExportListToJSON(actor: self)
                             .execute(with: list, for: user, in: boundaries)
                             .recordEvent(for: list, "exported for \(user)", using: self.recording)
-                            .logMessage(for: list, "exported for \(user)", using: self.logging)
+                            .logMessage(
+                                .exportList(list, user), for: { $0.0 }, using: self.logging
+                            )
                             .map { name, json in
                                 guard let json = json else {
                                     throw UserListsActorError
@@ -108,15 +118,19 @@ extension DomainUserListsActor {
 
 }
 
-// MARK: -
+// MARK: Logging
 
-protocol ExportListToJSONActor {
-    var listRepository: ListRepository { get }
-    var itemRepository: ItemRepository { get }
-    var logging: MessageLoggingProvider { get }
+extension LoggingMessageRoot {
+
+    static func exportList(_ list: List, _ user: User) -> Self {
+        return Self({ subject in
+            LoggingMessage(label: "Export List", subject: subject, attributes: [list, user])
+        })
+    }
+
 }
 
-// MARK: -
+// MARK: Date
 
 extension Date {
 
@@ -125,6 +139,8 @@ extension Date {
     }
 
 }
+
+// MARK: DateFormatter
 
 extension DateFormatter {
 

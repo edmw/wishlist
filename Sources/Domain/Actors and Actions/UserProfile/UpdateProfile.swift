@@ -63,6 +63,14 @@ public struct UpdateProfile: Action {
 
 }
 
+// MARK: -
+
+protocol UpdateProfileActor {
+    var userRepository: UserRepository { get }
+    var logging: MessageLoggingProvider { get }
+    var recording: EventRecordingProvider { get }
+}
+
 // MARK: - Actor
 
 extension DomainUserProfileActor {
@@ -80,7 +88,7 @@ extension DomainUserProfileActor {
                 let uservalues = specification.values
                 return try UpdateProfile(actor: self)
                     .execute(on: user, with: uservalues, in: boundaries)
-                    .logMessage("user updated", using: logging)
+                    .logMessage(.updateProfile, using: logging)
                     .map { user in
                         .init(user)
                     }
@@ -97,10 +105,14 @@ extension DomainUserProfileActor {
 
 }
 
-// MARK: -
+// MARK: Logging
 
-protocol UpdateProfileActor {
-    var userRepository: UserRepository { get }
-    var logging: MessageLoggingProvider { get }
-    var recording: EventRecordingProvider { get }
+extension LoggingMessageRoot {
+
+    static var updateProfile: Self {
+        return Self({ subject in
+            LoggingMessage(label: "Update Profile", subject: subject, attributes: [])
+        })
+    }
+
 }

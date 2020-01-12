@@ -57,10 +57,22 @@ extension DomainUserInvitationsActor {
                         let invitation = authorization.entity
                         return try self.invitationService
                             .revokeInvitation(invitation)
-                            .logMessage("invitation revoked", using: logging)
+                            .logMessage(.revokeInvitation, using: logging)
                             .map { invitation in .init(user, invitation) }
                     }
             }
+    }
+
+}
+
+// MARK: Logging
+
+extension LoggingMessageRoot {
+
+    static var revokeInvitation: Self {
+        return Self({ subject in
+            LoggingMessage(label: "Revoke Invitation", subject: subject, attributes: [])
+        })
     }
 
 }

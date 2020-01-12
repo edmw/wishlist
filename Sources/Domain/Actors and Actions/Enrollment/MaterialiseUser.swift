@@ -129,14 +129,18 @@ extension DomainEnrollmentActor {
                     // creating user
                     guard options.contains(.createUsers) else {
                         let userEmail = userValues[\.email]
-                        self.logging.userCreationNotAllowed(userEmail)
+                        self.logging.message(
+                            .userCreationNotAllowed(userEmail)
+                        )
                         throw EnrollmentActorError.userCreationNotAllowed
                     }
                     guard !options.contains(.requireInvitationToCreateUsers)
                             || invitation != nil
                     else {
                         let userEmail = userValues[\.email]
-                        self.logging.invitationForUserCreationNotProvided(userEmail, invitationCode)
+                        self.logging.message(
+                            .invitationForUserCreationNotProvided(userEmail, invitationCode)
+                        )
                         throw EnrollmentActorError.invitationForUserCreationNotProvided
                     }
                     return try self.userService
@@ -195,33 +199,50 @@ extension DomainEnrollmentActor {
                 return self.userRepository
                     .save(user: user)
                     .recordEvent("materialised", using: self.recording)
-                    .logMessage("materialised", using: self.logging)
+                    .logMessage(.materialiseUser, using: self.logging)
                     .map { user in .init(user) }
             }
     }
 
 }
 
-extension MessageLoggingProvider {
+// MARK: Logging
 
-    fileprivate func userCreationNotAllowed(_ email: EmailSpecification?) {
-        let with = email == nil ? "" : " with email '\(email ??? "???")'"
-        self.warning(
-            "Authentication for user\(with) denied:" +
-                " User creation not allowed"
+extension LoggingMessage {
+
+    fileprivate static func userCreationNotAllowed(
+        _ email: EmailSpecification?
+    ) -> LoggingMessage {
+        let message = "Authentication for user denied: User Creation Not Allowed."
+        return Self(
+            warn: "User Creation Not Allowed",
+            subject: email ?? "",
+            attributes: [message]
         )
     }
 
-    fileprivate func invitationForUserCreationNotProvided(
+    fileprivate static func invitationForUserCreationNotProvided(
         _ email: EmailSpecification?,
         _ invitationCode: InvitationCode?
-    ) {
-        let with = email == nil ? "" : " with email '\(email ??? "???")'"
-        let withInvitation = invitationCode == nil ? "" : " with code '\(invitationCode ??? "???")'"
-        self.warning(
-            "Authentication for user\(with) denied:" +
-                " Invitation for user creation\(withInvitation) not provided"
+    ) -> LoggingMessage {
+        let message = "Authentication for user denied: Invitation for User Creation not provided."
+        return Self(
+            warn: "Invitation for User Creation not provided",
+            subject: email ?? "",
+            attributes: [message, invitationCode]
         )
+    }
+
+}
+
+// MARK: Logging
+
+extension LoggingMessageRoot {
+
+    fileprivate static var materialiseUser: Self {
+        return Self({ subject in
+            LoggingMessage(label: "Materialise User", subject: subject, attributes: [])
+        })
     }
 
 }

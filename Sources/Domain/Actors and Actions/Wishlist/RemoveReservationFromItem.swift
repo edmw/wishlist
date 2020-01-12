@@ -72,6 +72,12 @@ public struct RemoveReservationFromItem: Action {
 
 }
 
+// MARK: -
+
+protocol RemoveReservationFromItemActor {
+    var reservationRepository: ReservationRepository { get }
+}
+
 // MARK: - Actor
 
 extension DomainWishlistActor {
@@ -95,7 +101,7 @@ extension DomainWishlistActor {
                     .flatMap { arguments in let (reservation, item) = arguments
                         return try RemoveReservationFromItem(actor: self)
                             .execute(for: reservation, on: item, for: identification)
-                            .logMessage("reservation removed", using: logging)
+                            .logMessage(.removeReservationFromItem, using: logging)
                             .recordEvent("removed for \(identification)", using: recording)
                             .flatMap { reservation in
                                 return try boundaries.notificationSending
@@ -126,8 +132,14 @@ extension NotificationSendingProvider {
 
 }
 
-// MARK: -
+// MARK: Logging
 
-protocol RemoveReservationFromItemActor {
-    var reservationRepository: ReservationRepository { get }
+extension LoggingMessageRoot {
+
+    static var removeReservationFromItem: Self {
+        return Self({ subject in
+            LoggingMessage(label: "Remove Reservation from Item", subject: subject, attributes: [])
+        })
+    }
+
 }

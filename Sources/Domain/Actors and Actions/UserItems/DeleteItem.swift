@@ -54,20 +54,32 @@ extension DomainUserItemsActor {
                         guard reservation == nil else {
                             throw UserItemsActorError.itemIsReserved
                         }
-                        self.logging.message(for: item, with: "deleting")
                         // remove images for item
                         try boundaries.imageStore.removeImages(for: item)
                         // delete item
+                        let id = item.itemID
                         return try self.itemRepository
                             .delete(item: item, in: list)
                             .unwrap(or: UserItemsActorError.invalidItem)
-                            .logMessage(for: item, "deleted", using: self.logging)
+                            .logMessage(.deleteItem(with: id), using: self.logging)
                             .recordEvent(for: item, "deleted for \(user)", using: self.recording)
                             .map { _ in
                                 .init(user, list)
                             }
                     }
             }
+    }
+
+}
+
+// MARK: Logging
+
+extension LoggingMessageRoot {
+
+    fileprivate static func deleteItem(with id: ItemID?) -> Self {
+        return Self({ subject in
+            LoggingMessage(label: "Delete Item", subject: subject, attributes: [id])
+        })
     }
 
 }

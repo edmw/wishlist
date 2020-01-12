@@ -52,10 +52,12 @@ extension DomainUserFavoritesActor {
                         return try favoriteRepository.find(favorite: list, for: user)
                             .unwrap(or: UserFavoritesActorError.invalidFavoriteForUser)
                             .flatMap { favorite in
+                                // delete favorite
+                                let id = favorite.favoriteID
                                 return try favoriteRepository
                                     .deleteFavorite(favorite)
                                     .recordEvent("deleted for \(user)", using: recording)
-                                    .logMessage("deleted for \(user)", using: logging)
+                                    .logMessage(.deleteFavorite(with: id), using: logging)
                                     .map { _ in
                                         .init(user)
                                     }
@@ -64,4 +66,12 @@ extension DomainUserFavoritesActor {
             }
     }
 
+}
+
+extension LoggingMessageRoot {
+    static func deleteFavorite(with id: FavoriteID?) -> Self {
+        return Self({ subject in
+            LoggingMessage(label: "Delete Favorite", subject: subject, attributes: [id])
+        })
+    }
 }

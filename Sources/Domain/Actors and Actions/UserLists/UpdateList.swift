@@ -71,50 +71,6 @@ public struct UpdateList: Action {
 
 }
 
-// MARK: - Actor
-
-extension DomainUserListsActor {
-
-    // MARK: updateList
-
-    public func updateList(
-        _ specification: UpdateList.Specification,
-        _ boundaries: UpdateList.Boundaries
-    ) throws -> EventLoopFuture<UpdateList.Result> {
-        return self.userRepository
-            .find(id: specification.userID)
-            .unwrap(or: UserListsActorError.invalidUser)
-            .flatMap { user in
-                return try self.listRepository
-                    .find(by: specification.listID, for: user)
-                    .unwrap(or: UserListsActorError.invalidList)
-                    .flatMap { list in
-                        let listvalues = specification.values
-                        return try UpdateList(actor: self)
-                            .execute(on: list, with: listvalues, for: user, in: boundaries)
-                            .logMessage("list updated", using: self.logging)
-                            .map { user, list in
-                                .init(user, list)
-                            }
-                            .catchMap { error in
-                                if let updateError = error as? UpdateListValidationError {
-                                    self.logging.debug(
-                                        "List updating validation error: \(updateError)"
-                                    )
-                                    throw UserListsActorError.validationError(
-                                        updateError.user.representation,
-                                        updateError.list.representation,
-                                        updateError.error
-                                    )
-                                }
-                                throw error
-                            }
-                    }
-            }
-    }
-
-}
-
 // MARK: -
 
 protocol UpdateListActor {
@@ -137,4 +93,60 @@ struct UpdateListValidationError: UpdateListError {
     var user: User
     var list: List
     var error: ValuesError<ListValues>
+}
+
+// MARK: - Actor
+
+extension DomainUserListsActor {
+
+    // MARK: updateList
+
+    public func updateList(
+        _ specification: UpdateList.Specification,
+        _ boundaries: UpdateList.Boundaries
+    ) throws -> EventLoopFuture<UpdateList.Result> {
+        return self.userRepository
+            .find(id: specification.userID)
+            .unwrap(or: UserListsActorError.invalidUser)
+            .flatMap { user in
+                return try self.listRepository
+                    .find(by: specification.listID, for: user)
+                    .unwrap(or: UserListsActorError.invalidList)
+                    .flatMap { list in
+                        let listvalues = specification.values
+                        return try UpdateList(actor: self)
+                            .execute(on: list, with: listvalues, for: user, in: boundaries)
+                            .logMessage(.updateList, using: self.logging)
+                            .map { user, list in
+                                .init(user, list)
+                            }
+                            .catchMap { error in
+                                if let updateError = error as? UpdateListValidationError {
+                                    self.logging.debug(
+                                        "List updating validation error: \(updateError)"
+                                    )
+                                    throw UserListsActorError.validationError(
+                                        updateError.user.representation,
+                                        updateError.list.representation,
+                                        updateError.error
+                                    )
+                                }
+                                throw error
+                            }
+                    }
+            }
+    }
+
+}
+
+// MARK: Logging
+
+extension LoggingMessageRoot {
+
+    static var updateList: Self {
+        return Self({ subject in
+            LoggingMessage(label: "Update List", subject: subject, attributes: [])
+        })
+    }
+
 }

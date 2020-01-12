@@ -116,39 +116,6 @@ public struct ImportListFromJSON: Action {
 
 }
 
-// MARK: - Actor
-
-extension DomainUserListsActor {
-
-    // MARK: importList
-
-    public func importList(
-        _ specification: ImportListFromJSON.Specification,
-        _ boundaries: ImportListFromJSON.Boundaries
-    ) throws -> EventLoopFuture<ImportListFromJSON.Result> {
-        return self.userRepository
-            .find(id: specification.userID)
-            .unwrap(or: UserListsActorError.invalidUser)
-            .flatMap { user in
-                return try ImportListFromJSON(actor: self)
-                    .execute(with: specification.json, for: user, in: boundaries)
-                    .recordEvent("imported for \(user)", using: self.recording)
-                    .logMessage("imported for \(user)", using: self.logging)
-                    .map { list in
-                        .init(user, list)
-                    }
-                    .catchMap { error in
-                        if let importError = error as? ImportListFromJSONError {
-                            self.logging.debug("Import error: \(importError)")
-                            throw UserListsActorError.importErrorForUser(user.representation)
-                        }
-                        throw error
-                    }
-            }
-    }
-
-}
-
 // MARK: -
 
 protocol ImportListFromJSONActor {
@@ -166,6 +133,49 @@ struct ImportListFromJSONNoListNameError: ImportListFromJSONError {
 
 struct ImportListFromJSONValidationError: ImportListFromJSONError {
     var error: AnyEntityError
+}
+
+// MARK: - Actor
+
+extension DomainUserListsActor {
+
+    // MARK: importList
+
+    public func importList(
+        _ specification: ImportListFromJSON.Specification,
+        _ boundaries: ImportListFromJSON.Boundaries
+    ) throws -> EventLoopFuture<ImportListFromJSON.Result> {
+        return self.userRepository
+            .find(id: specification.userID)
+            .unwrap(or: UserListsActorError.invalidUser)
+            .flatMap { user in
+                return try ImportListFromJSON(actor: self)
+                    .execute(with: specification.json, for: user, in: boundaries)
+                    .recordEvent("imported for \(user)", using: self.recording)
+                    .logMessage(.importList(for: user), using: self.logging)
+                    .map { list in
+                        .init(user, list)
+                    }
+                    .catchMap { error in
+                        if let importError = error as? ImportListFromJSONError {
+                            self.logging.debug("Import error: \(importError)")
+                            throw UserListsActorError.importErrorForUser(user.representation)
+                        }
+                        throw error
+                    }
+            }
+    }
+
+}
+
+extension LoggingMessageRoot {
+
+    static func importList(for user: User) -> Self {
+        return Self({ subject in
+            LoggingMessage(label: "Import List", subject: subject, attributes: [user])
+        })
+    }
+
 }
 
 // MARK: -

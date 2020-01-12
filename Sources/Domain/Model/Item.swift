@@ -13,6 +13,7 @@ public final class Item: Entity, Imageable,
     EntityDetachable,
     EntityReflectable,
     Codable,
+    Loggable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {

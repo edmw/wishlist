@@ -53,20 +53,38 @@ extension DomainUserListsActor {
                         when: ItemServiceError.deleteItemsHasReservedItems,
                         then: UserListsActorError.listHasReservedItems
                     )
-                    .logMessage("items deleted", using: self.logging)
+                    .logMessage(.deleteListItems, using: self.logging)
                     .flatMap { _ in
-                        self.logging.message(for: list, with: "deleting")
                         // delete list
+                        let id = list.listID
                         return try self.listRepository
                             .delete(list: list, for: user)
                             .unwrap(or: UserListsActorError.invalidList)
-                            .logMessage("deleted", using: self.logging)
+                            .logMessage(.deleteList(with: id), using: self.logging)
                             .recordEvent("deleted for \(user)", using: self.recording)
                             .map { _ in
                                 .init(user)
                             }
                     }
             }
+    }
+
+}
+
+// MARK: Logging
+
+extension LoggingMessageRoot {
+
+    fileprivate static func deleteList(with id: ListID?) -> Self {
+        return Self({ subject in
+            LoggingMessage(label: "Delete List", subject: subject, attributes: [id])
+        })
+    }
+
+    static var deleteListItems: Self {
+        return Self({ subject in
+            LoggingMessage(label: "Delete List (Items)", subject: subject, attributes: [])
+        })
     }
 
 }

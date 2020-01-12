@@ -4,12 +4,6 @@ require 'xcodeproj'
 
 project = Xcodeproj::Project.open('Wishlist.xcodeproj')
 
-# Change deployment target to 10.12 for all build configurations
-build_configurations = project.build_configuration_list.build_configurations
-for build_configuration in build_configurations
-    build_configuration.build_settings['MACOSX_DEPLOYMENT_TARGET'] = '10.12'
-end
-
 # Add swiftlint script phase to targets
 targets_to_lint = project.native_targets.select { |x| x.name == 'App' || x.name == 'Domain' || x.name == 'Library' }
 targets_to_lint.each do |target|

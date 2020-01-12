@@ -69,61 +69,6 @@ public struct CreateItem: Action {
 
 }
 
-// MARK: - Actor
-
-extension DomainUserItemsActor {
-
-    // MARK: createItem
-
-    public func createItem(
-        _ specification: CreateItem.Specification,
-        _ boundaries: CreateItem.Boundaries
-    ) throws -> EventLoopFuture<CreateItem.Result> {
-        return try self.listRepository
-            .findWithUser(by: specification.listID, for: specification.userID)
-            .unwrap(or: UserItemsActorError.invalidList)
-            .flatMap { list, user in
-                return try CreateItem(actor: self)
-                    .execute(with: specification.values, for: list, in: boundaries)
-                    .logMessage("item created", using: self.logging)
-                    .recordEvent(
-                        for: { $0.item }, "created for \(user) in \(list)", using: self.recording
-                    )
-                    .map { list, item in
-                        .init(user, list, item)
-                    }
-                    .catchMap { error in
-                        if let createError = error as? CreateItemValidationError {
-                            self.logging.debug("Item creation validation error: \(createError)")
-                            let list = createError.list.representation
-                            let error = createError.error
-                            throw UserItemsActorError
-                                .validationError(user.representation, list, nil, error)
-                        }
-                        throw error
-                    }
-            }
-    }
-
-}
-
-// MARK: -
-
-protocol CreateItemActor {
-    var itemRepository: ItemRepository { get }
-    var logging: MessageLoggingProvider { get }
-    var recording: EventRecordingProvider { get }
-}
-
-protocol CreateItemError: ActionError {
-    var list: List { get }
-}
-
-struct CreateItemValidationError: CreateItemError {
-    var list: List
-    var error: ValuesError<ItemValues>
-}
-
 // MARK: - setupItem
 
 extension EventLoopFuture where Expectation == Item {
@@ -150,6 +95,73 @@ extension EventLoopFuture where Expectation == Item {
                     return item
                 }
         }
+    }
+
+}
+
+// MARK: -
+
+protocol CreateItemActor {
+    var itemRepository: ItemRepository { get }
+    var logging: MessageLoggingProvider { get }
+    var recording: EventRecordingProvider { get }
+}
+
+protocol CreateItemError: ActionError {
+    var list: List { get }
+}
+
+struct CreateItemValidationError: CreateItemError {
+    var list: List
+    var error: ValuesError<ItemValues>
+}
+
+// MARK: - Actor
+
+extension DomainUserItemsActor {
+
+    // MARK: createItem
+
+    public func createItem(
+        _ specification: CreateItem.Specification,
+        _ boundaries: CreateItem.Boundaries
+    ) throws -> EventLoopFuture<CreateItem.Result> {
+        return try self.listRepository
+            .findWithUser(by: specification.listID, for: specification.userID)
+            .unwrap(or: UserItemsActorError.invalidList)
+            .flatMap { list, user in
+                return try CreateItem(actor: self)
+                    .execute(with: specification.values, for: list, in: boundaries)
+                    .logMessage(.createItem(for: user), using: self.logging)
+                    .recordEvent(
+                        for: { $0.item }, "created for \(user) in \(list)", using: self.recording
+                    )
+                    .map { list, item in
+                        .init(user, list, item)
+                    }
+                    .catchMap { error in
+                        if let createError = error as? CreateItemValidationError {
+                            self.logging.debug("Item creation validation error: \(createError)")
+                            let list = createError.list.representation
+                            let error = createError.error
+                            throw UserItemsActorError
+                                .validationError(user.representation, list, nil, error)
+                        }
+                        throw error
+                    }
+            }
+    }
+
+}
+
+// MARK: Logging
+
+extension LoggingMessageRoot {
+
+    static func createItem(for user: User) -> Self {
+        return Self({ subject in
+            LoggingMessage(label: "Create Item", subject: subject, attributes: [user])
+        })
     }
 
 }

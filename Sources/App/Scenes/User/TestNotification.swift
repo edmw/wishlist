@@ -31,9 +31,9 @@ extension VaporNotificationSendingProvider {
             TestNotification(for: user),
             for: user,
             using: channels,
-            dispatch: true
+            dispatch: false
         )
-        .unwrap(or: Abort(.internalServerError))
+        .unwrap(or: Abort(.internalServerError, reason: "unwrap(sendUserNotification)" ))
     }
 
 }

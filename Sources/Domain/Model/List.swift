@@ -14,6 +14,7 @@ public final class List: Entity, Viewable,
     EntityDetachable,
     EntityReflectable,
     Codable,
+    Loggable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {

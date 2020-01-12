@@ -16,6 +16,7 @@ public protocol Identifier: AnyIdentifier,
     RawRepresentable,
     LosslessStringConvertible,
     Hashable,
+    Loggable,
     Codable
 {
 

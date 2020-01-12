@@ -64,6 +64,23 @@ public struct CreateList: Action {
 
 }
 
+// MARK: -
+
+protocol CreateListActor {
+    var listRepository: ListRepository { get }
+    var logging: MessageLoggingProvider { get }
+    var recording: EventRecordingProvider { get }
+}
+
+protocol CreateListError: ActionError {
+    var user: User { get }
+}
+
+struct CreateListValidationError: CreateListError {
+    var user: User
+    var error: ValuesError<ListValues>
+}
+
 // MARK: - Actor
 
 extension DomainUserListsActor {
@@ -80,7 +97,7 @@ extension DomainUserListsActor {
             .flatMap { user in
                 return try CreateList(actor: self)
                     .execute(with: specification.values, for: user, in: boundaries)
-                    .logMessage("list created", using: self.logging)
+                    .logMessage(.createList(for: user), for: { $0.list }, using: self.logging)
                     .recordEvent(
                         for: { $0.list }, "created for \(user)", using: self.recording
                     )
@@ -101,19 +118,14 @@ extension DomainUserListsActor {
 
 }
 
-// MARK: -
+// MARK: Logging
 
-protocol CreateListActor {
-    var listRepository: ListRepository { get }
-    var logging: MessageLoggingProvider { get }
-    var recording: EventRecordingProvider { get }
-}
+extension LoggingMessageRoot {
 
-protocol CreateListError: ActionError {
-    var user: User { get }
-}
+    static func createList(for user: User) -> Self {
+        return Self({ subject in
+            LoggingMessage(label: "Create List", subject: subject, attributes: [user])
+        })
+    }
 
-struct CreateListValidationError: CreateListError {
-    var user: User
-    var error: ValuesError<ListValues>
 }

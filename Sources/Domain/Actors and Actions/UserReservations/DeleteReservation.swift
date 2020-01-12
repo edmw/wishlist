@@ -59,16 +59,30 @@ extension DomainUserReservationsActor {
                     .find(for: item)
                     .unwrap(or: UserReservationsActorError.invalidReservation)
                     .flatMap { reservation in
+                        // delete reservation
+                        let id = reservation.reservationID
                         return try reservationRepository
                             .delete(reservation: reservation, for: item)
                             .unwrap(or: UserReservationsActorError.invalidReservation)
-                            .logMessage("reservation deleted", using: logging)
+                            .logMessage(.deleteReservation(with: id), using: logging)
                             .recordEvent("deleted by \(user)", using: recording)
                             .map { _ in
                                 .init(user, item, list)
                             }
                     }
             }
+    }
+
+}
+
+// MARK: Logging
+
+extension LoggingMessageRoot {
+
+    static func deleteReservation(with id: ReservationID?) -> Self {
+        return Self({ subject in
+            LoggingMessage(label: "Delete Reservation", subject: subject, attributes: [id])
+        })
     }
 
 }

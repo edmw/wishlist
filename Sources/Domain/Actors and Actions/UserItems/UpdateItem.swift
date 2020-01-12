@@ -76,6 +76,30 @@ public struct UpdateItem: Action {
 
 }
 
+// MARK: -
+
+protocol UpdateItemActor {
+    var itemRepository: ItemRepository { get }
+    var logging: MessageLoggingProvider { get }
+    var recording: EventRecordingProvider { get }
+}
+
+protocol UpdateItemError: ActionError {
+    var list: List { get }
+    var item: Item { get }
+}
+
+struct UpdateItemInvalidOwnerError: UpdateItemError {
+    var list: List
+    var item: Item
+}
+
+struct UpdateItemValidationError: UpdateItemError {
+    var list: List
+    var item: Item
+    var error: ValuesError<ItemValues>
+}
+
 // MARK: - Actor
 
 extension DomainUserItemsActor {
@@ -97,7 +121,7 @@ extension DomainUserItemsActor {
                         let itemvalues = specification.values
                         return try UpdateItem(actor: self)
                             .execute(on: item, with: itemvalues, in: list, in: boundaries)
-                            .logMessage("updated", using: self.logging)
+                            .logMessage(.updateItem, using: self.logging)
                             .map { list, item in
                                 .init(user, list, item)
                             }
@@ -121,28 +145,16 @@ extension DomainUserItemsActor {
 
 }
 
-// MARK: -
+// MARK: Logging
 
-protocol UpdateItemActor {
-    var itemRepository: ItemRepository { get }
-    var logging: MessageLoggingProvider { get }
-    var recording: EventRecordingProvider { get }
-}
+extension LoggingMessageRoot {
 
-protocol UpdateItemError: ActionError {
-    var list: List { get }
-    var item: Item { get }
-}
+    static var updateItem: Self {
+        return Self({ subject in
+            LoggingMessage(label: "Update Item", subject: subject, attributes: [])
+        })
+    }
 
-struct UpdateItemInvalidOwnerError: UpdateItemError {
-    var list: List
-    var item: Item
-}
-
-struct UpdateItemValidationError: UpdateItemError {
-    var list: List
-    var item: Item
-    var error: ValuesError<ItemValues>
 }
 
 // MARK: -

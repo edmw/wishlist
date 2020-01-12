@@ -63,6 +63,14 @@ public struct UpdateSettings: Action {
 
 }
 
+// MARK: -
+
+internal protocol UpdateSettingsActor {
+    var userRepository: UserRepository { get }
+    var logging: MessageLoggingProvider { get }
+    var recording: EventRecordingProvider { get }
+}
+
 // MARK: - Actor
 
 extension DomainUserSettingsActor {
@@ -80,7 +88,7 @@ extension DomainUserSettingsActor {
                 let settingsvalues = specification.values
                 return try UpdateSettings(actor: self)
                     .execute(on: user, with: settingsvalues, in: boundaries)
-                    .logMessage("settings updated", using: logging)
+                    .logMessage(.updateSettings, using: logging)
                     .map { user in
                         .init(user)
                     }
@@ -97,10 +105,14 @@ extension DomainUserSettingsActor {
 
 }
 
-// MARK: -
+// MARK: Logging
 
-internal protocol UpdateSettingsActor {
-    var userRepository: UserRepository { get }
-    var logging: MessageLoggingProvider { get }
-    var recording: EventRecordingProvider { get }
+extension LoggingMessageRoot {
+
+    static var updateSettings: Self {
+        return Self({ subject in
+            LoggingMessage(label: "Update Settings", subject: subject, attributes: [])
+        })
+    }
+
 }

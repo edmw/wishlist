@@ -13,6 +13,7 @@ public final class Invitation: Entity, Confidental,
     EntityDetachable,
     EntityReflectable,
     Codable,
+    Loggable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {

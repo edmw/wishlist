@@ -1,3 +1,5 @@
+import Library
+
 import Foundation
 import NIO
 
@@ -29,10 +31,9 @@ public protocol MessageLoggingProvider {
     /// As a user use `error()` instead. This indirection is needed for the #-literals to work.
     func log(error string: String, file: String, function: String, line: UInt, column: UInt)
 
-    /// Writes a log message for a given subject with level info.
+    /// Writes a log message.
     func message(
-        for subject: @autoclosure () -> Any,
-        with message: String,
+        _ message: LoggingMessage,
         file: String,
         function: String,
         line: UInt,
@@ -84,17 +85,34 @@ extension MessageLoggingProvider {
     }
 
     public func message(
-        for subject: @autoclosure () -> Any,
-        with message: String,
+        _ message: LoggingMessage,
         file: String = #file,
         function: String = #function,
         line: UInt = #line,
         column: UInt = #column
     ) {
-        log(
-            info: "\(String(describing: subject())) \(message)",
-            file: file, function: function, line: line, column: column
-        )
+        var values = message.encodableValues
+        values["__file"] = AnyEncodable(file)
+        values["__function"] = AnyEncodable(function)
+        values["__line"] = AnyEncodable(line)
+        values["__column"] = AnyEncodable(column)
+
+        let logmessage: String
+
+        let jsonencoder = JSONEncoder()
+        jsonencoder.outputFormatting = [.prettyPrinted]
+        if let jsondata = try? jsonencoder.encode(values),
+           let jsonstring = String(data: jsondata, encoding: .utf8)
+        {
+            logmessage = "JSON \(jsonstring)"
+        }
+        else {
+            let string = String(describing: values)
+            logmessage = "STRING \(string)"
+        }
+
+        let info = "\(message.label):\n\(logmessage)\n"
+        log(info: info, file: file, function: function, line: line, column: column)
     }
 
 }
@@ -103,10 +121,9 @@ extension MessageLoggingProvider {
 
 extension EventLoopFuture {
 
-    /// Logs an info message together with a description of this future’s expectation.
     func logMessage(
+        _ root: LoggingMessageRoot,
         for subject: ((Expectation) -> Any)? = nil,
-        _ message: String,
         using logging: MessageLoggingProvider,
         when condition: ((Expectation) -> Bool)? = nil,
         file: String = #file,
@@ -114,42 +131,20 @@ extension EventLoopFuture {
         line: UInt = #line,
         column: UInt = #column
     ) -> EventLoopFuture<Expectation> {
-        return self.map(to: Expectation.self) { value in
+        return self.map(to: Expectation.self) { expectationValue in
             let log: Bool
             if let condition = condition {
-                log = condition(value)
+                log = condition(expectationValue)
             }
             else {
                 log = true
             }
             if log {
-                logging.message(
-                    for: subject?(value) ?? value,
-                    with: message,
-                    file: file, function: function, line: line, column: column
-                )
+                let message = root.transform(subject?(expectationValue) ?? expectationValue)
+                logging.message(message, file: file, function: function, line: line, column: column)
             }
-            return value
+            return expectationValue
         }
-    }
-
-    func logMessage(
-        for subject: Any,
-        _ message: String,
-        using logging: MessageLoggingProvider,
-        when condition: ((Expectation) -> Bool)? = nil,
-        file: String = #file,
-        function: String = #function,
-        line: UInt = #line,
-        column: UInt = #column
-    ) -> EventLoopFuture<Expectation> {
-        return self.logMessage(
-            for: { _ in subject },
-            message,
-            using: logging,
-            when: condition,
-            file: file, function: function, line: line, column: column
-        )
     }
 
 }

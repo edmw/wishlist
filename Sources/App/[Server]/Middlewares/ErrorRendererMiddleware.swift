@@ -1,4 +1,5 @@
 import Vapor
+import Library
 
 final class ErrorRendererMiddleware: Middleware, ServiceType {
 

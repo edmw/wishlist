@@ -51,11 +51,23 @@ extension DomainUserNotificationsActor {
                         for: userRepresentation,
                         using: UserNotificationService.channels(for: user)
                     )
-                    .logMessage("notification sent", using: logging)
+                    .logMessage(.testNotifications(for: user), using: logging)
                     .map { sendingResults in
                         TestNotifications.Result(user, sendingResults: sendingResults)
                     }
             }
+    }
+
+}
+
+// MARK: Logging
+
+extension LoggingMessageRoot {
+
+    static func testNotifications(for user: User) -> Self {
+        return Self({ subject in
+            LoggingMessage(label: "Test Notifications", subject: subject, attributes: [user])
+        })
     }
 
 }

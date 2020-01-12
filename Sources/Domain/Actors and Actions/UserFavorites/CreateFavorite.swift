@@ -57,13 +57,25 @@ extension DomainUserFavoritesActor {
                                 return try favoriteRepository
                                     .addFavorite(list, for: user)
                                     .recordEvent("created for \(user)", using: recording)
-                                    .logMessage("created for \(user)", using: logging)
+                                    .logMessage(.createFavorite(for: user), using: logging)
                                     .map { _ in
                                         .init(user, list)
                                     }
                             }
                     }
             }
+    }
+
+}
+
+// MARK: Logging
+
+extension LoggingMessageRoot {
+
+    static func createFavorite(for user: User) -> Self {
+        return Self({ subject in
+            LoggingMessage(label: "Create Favorite", subject: subject, attributes: [user])
+        })
     }
 
 }

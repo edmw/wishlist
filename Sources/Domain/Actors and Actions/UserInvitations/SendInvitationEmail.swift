@@ -70,7 +70,9 @@ extension DomainUserInvitationsActor {
                         return (authorization.entity, authorization.owner)
                     }
                     .sendInvitation(in: invitationRepository, on: boundaries)
-                    .logMessage(for: { $0.invitation }, "invitation sent", using: logging)
+                    .logMessage(
+                        .sendInvitationEmail(for: user), for: { $0.invitation }, using: logging
+                    )
                     .map { invitation, user in
                         return .init(user, invitation)
                     }
@@ -79,7 +81,7 @@ extension DomainUserInvitationsActor {
 
 }
 
-// MARK: Future
+// MARK: send Invitation
 
 extension EventLoopFuture where Expectation == InvitationAndInviter {
 
@@ -109,6 +111,18 @@ extension EventLoopFuture where Expectation == InvitationAndInviter {
                     }
                 }
         }
+    }
+
+}
+
+// MARK: Logging
+
+extension LoggingMessageRoot {
+
+    static func sendInvitationEmail(for user: User) -> Self {
+        return Self({ subject in
+            LoggingMessage(label: "Send Invitation Email", subject: subject, attributes: [user])
+        })
     }
 
 }

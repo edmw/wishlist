@@ -14,6 +14,7 @@ public final class User: Entity,
     EntityReflectable,
     Codable,
     Equatable,
+    Loggable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {
