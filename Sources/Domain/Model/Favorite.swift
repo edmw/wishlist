@@ -15,8 +15,8 @@ import Foundation
 public final class Favorite: Entity,
     EntityDetachable,
     EntityReflectable,
-    Codable,
     Loggable,
+    Codable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {
@@ -54,15 +54,13 @@ public final class Favorite: Entity,
     // MARK: CustomStringConvertible
 
     public var description: String {
-        return "Favorite[\(id ??? "???"):\(favoriteID ??? "???")]" +
-            "[user:\(userID)|list:\(listID)]"
+        return "Favorite[\(id ??? "???"):\(favoriteID ??? "???")](user:\(userID)|list:\(listID))"
     }
 
     // MARK: CustomDebugStringConvertible
 
     public var debugDescription: String {
-        return "Favorite[\(id ??? "???"):\(favoriteID ??? "???")]" +
-            "[user:\(userID)|list:\(listID)]"
+        return "Favorite[\(id ??? "???"):\(favoriteID ??? "???")](user:\(userID)|list:\(listID))"
     }
 
 }

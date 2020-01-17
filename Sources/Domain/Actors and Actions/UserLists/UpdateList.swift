@@ -75,8 +75,8 @@ public struct UpdateList: Action {
 
 protocol UpdateListActor {
     var listRepository: ListRepository { get }
-    var logging: MessageLoggingProvider { get }
-    var recording: EventRecordingProvider { get }
+    var logging: MessageLogging { get }
+    var recording: EventRecording { get }
 }
 
 protocol UpdateListError: ActionError {
@@ -105,34 +105,33 @@ extension DomainUserListsActor {
         _ specification: UpdateList.Specification,
         _ boundaries: UpdateList.Boundaries
     ) throws -> EventLoopFuture<UpdateList.Result> {
-        return self.userRepository
-            .find(id: specification.userID)
-            .unwrap(or: UserListsActorError.invalidUser)
-            .flatMap { user in
-                return try self.listRepository
-                    .find(by: specification.listID, for: user)
-                    .unwrap(or: UserListsActorError.invalidList)
-                    .flatMap { list in
-                        let listvalues = specification.values
-                        return try UpdateList(actor: self)
-                            .execute(on: list, with: listvalues, for: user, in: boundaries)
-                            .logMessage(.updateList, using: self.logging)
-                            .map { user, list in
-                                .init(user, list)
-                            }
-                            .catchMap { error in
-                                if let updateError = error as? UpdateListValidationError {
-                                    self.logging.debug(
-                                        "List updating validation error: \(updateError)"
-                                    )
-                                    throw UserListsActorError.validationError(
-                                        updateError.user.representation,
-                                        updateError.list.representation,
-                                        updateError.error
-                                    )
-                                }
-                                throw error
-                            }
+        let userid = specification.userID
+        let listid = specification.listID
+        return try self.listRepository
+            .findWithUser(by: listid, for: userid)
+            .unwrap(or: UserListsActorError.invalidList)
+            .flatMap { list, user in
+                let listvalues = specification.values
+                return try UpdateList(actor: self)
+                    .execute(on: list, with: listvalues, for: user, in: boundaries)
+                    .logMessage(
+                        .updateList(for: user), for: { $0.1 }, using: self.logging
+                    )
+                    .map { user, list in
+                        .init(user, list)
+                    }
+                    .catchMap { error in
+                        if let updateError = error as? UpdateListValidationError {
+                            self.logging.debug(
+                                "List updating validation error: \(updateError)"
+                            )
+                            throw UserListsActorError.validationError(
+                                updateError.user.representation,
+                                updateError.list.representation,
+                                updateError.error
+                            )
+                        }
+                        throw error
                     }
             }
     }
@@ -143,9 +142,9 @@ extension DomainUserListsActor {
 
 extension LoggingMessageRoot {
 
-    static var updateList: Self {
-        return Self({ subject in
-            LoggingMessage(label: "Update List", subject: subject, attributes: [])
+    fileprivate static func updateList(for user: User) -> LoggingMessageRoot<List> {
+        return .init({ list in
+            LoggingMessage(label: "Update List", subject: list, loggables: [user])
         })
     }
 

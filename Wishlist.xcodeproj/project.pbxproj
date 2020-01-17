@@ -56,8 +56,22 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		4CCEAF6023CBB05300859BEA /* String+Loggable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCEAF5E23CBB02700859BEA /* String+Loggable.swift */; };
+		4C51169123CFD3880011F728 /* FileName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C51168F23CFD3580011F728 /* FileName.swift */; };
+		4C51169423D04F0F0011F728 /* JSONEncoder+Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C51169223D04EBC0011F728 /* JSONEncoder+Logging.swift */; };
+		4C51169723D068720011F728 /* String+Replacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C51169523D05D7E0011F728 /* String+Replacing.swift */; };
+		4C51169A23D069B10011F728 /* SensitiveStringValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C51169823D0698C0011F728 /* SensitiveStringValue.swift */; };
+		4C51169D23D06A410011F728 /* SensitiveStringValue+Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C51169B23D06A1A0011F728 /* SensitiveStringValue+Logging.swift */; };
+		4C51169F23D06B390011F728 /* StringTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C51169E23D06B390011F728 /* StringTests.swift */; };
+		4C83DAC823D10F86005BFB13 /* HeapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C83DAC623D10F69005BFB13 /* HeapTests.swift */; };
 		4CCEAF6223CBE35200859BEA /* LoggingMessageRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCEAF6123CBE35200859BEA /* LoggingMessageRoot.swift */; };
+		4CCEAF6823CC793500859BEA /* MessageLogging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCEAF6723CC793500859BEA /* MessageLogging.swift */; };
+		4CCEAF6A23CC796A00859BEA /* EventLoopFuture+MessageLogging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCEAF6923CC796A00859BEA /* EventLoopFuture+MessageLogging.swift */; };
+		4CCEAF6D23CC7C3500859BEA /* EventRecording.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCEAF6C23CC7C3500859BEA /* EventRecording.swift */; };
+		4CCEAF6F23CC7C4700859BEA /* EventLoopFuture+EventRecording.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCEAF6E23CC7C4700859BEA /* EventLoopFuture+EventRecording.swift */; };
+		4CCEAF7123CC982900859BEA /* MessageLoggingConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCEAF7023CC982900859BEA /* MessageLoggingConfiguration.swift */; };
+		4CCEAF7523CD1B0C00859BEA /* Entity+Loggable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCEAF7423CD1B0C00859BEA /* Entity+Loggable.swift */; };
+		4CCEAF7E23CF463300859BEA /* NotificationSendingChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCEAF7D23CF463300859BEA /* NotificationSendingChannel.swift */; };
+		4CCEAF8023CF466100859BEA /* NotificationSendingResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCEAF7F23CF466100859BEA /* NotificationSendingResult.swift */; };
 		OBJ_1998 /* AppAnnouncementsActor+Vapor.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* AppAnnouncementsActor+Vapor.swift */; };
 		OBJ_1999 /* AppEnrollmentActor+Vapor.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_13 /* AppEnrollmentActor+Vapor.swift */; };
 		OBJ_2000 /* AppUserFavoritesActor+Vapor.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_14 /* AppUserFavoritesActor+Vapor.swift */; };
@@ -8188,8 +8202,22 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		4CCEAF5E23CBB02700859BEA /* String+Loggable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Loggable.swift"; sourceTree = "<group>"; };
+		4C51168F23CFD3580011F728 /* FileName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileName.swift; sourceTree = "<group>"; };
+		4C51169223D04EBC0011F728 /* JSONEncoder+Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSONEncoder+Logging.swift"; sourceTree = "<group>"; };
+		4C51169523D05D7E0011F728 /* String+Replacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Replacing.swift"; sourceTree = "<group>"; };
+		4C51169823D0698C0011F728 /* SensitiveStringValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensitiveStringValue.swift; sourceTree = "<group>"; };
+		4C51169B23D06A1A0011F728 /* SensitiveStringValue+Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SensitiveStringValue+Logging.swift"; sourceTree = "<group>"; };
+		4C51169E23D06B390011F728 /* StringTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringTests.swift; sourceTree = "<group>"; };
+		4C83DAC623D10F69005BFB13 /* HeapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeapTests.swift; sourceTree = "<group>"; };
 		4CCEAF6123CBE35200859BEA /* LoggingMessageRoot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggingMessageRoot.swift; sourceTree = "<group>"; };
+		4CCEAF6723CC793500859BEA /* MessageLogging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageLogging.swift; sourceTree = "<group>"; };
+		4CCEAF6923CC796A00859BEA /* EventLoopFuture+MessageLogging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EventLoopFuture+MessageLogging.swift"; sourceTree = "<group>"; };
+		4CCEAF6C23CC7C3500859BEA /* EventRecording.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventRecording.swift; sourceTree = "<group>"; };
+		4CCEAF6E23CC7C4700859BEA /* EventLoopFuture+EventRecording.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EventLoopFuture+EventRecording.swift"; sourceTree = "<group>"; };
+		4CCEAF7023CC982900859BEA /* MessageLoggingConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageLoggingConfiguration.swift; sourceTree = "<group>"; };
+		4CCEAF7423CD1B0C00859BEA /* Entity+Loggable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Entity+Loggable.swift"; sourceTree = "<group>"; };
+		4CCEAF7D23CF463300859BEA /* NotificationSendingChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSendingChannel.swift; sourceTree = "<group>"; };
+		4CCEAF7F23CF466100859BEA /* NotificationSendingResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSendingResult.swift; sourceTree = "<group>"; };
 		"Auth::Authentication::Product" /* Authentication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Authentication.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Console::Command::Product" /* Command.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Command.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"Console::Console::Product" /* Console.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Console.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -11108,6 +11136,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4CCEAF6B23CC7C2300859BEA /* EventRecording */ = {
+			isa = PBXGroup;
+			children = (
+				4CCEAF6E23CC7C4700859BEA /* EventLoopFuture+EventRecording.swift */,
+				4CCEAF6C23CC7C3500859BEA /* EventRecording.swift */,
+			);
+			path = EventRecording;
+			sourceTree = "<group>";
+		};
 		OBJ_10 /* Adapters */ = {
 			isa = PBXGroup;
 			children = (
@@ -14007,15 +14044,13 @@
 		OBJ_360 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_398 /* [Entity] */,
-				OBJ_407 /* [Traits] */,
-				OBJ_413 /* [Values] */,
 				OBJ_361 /* Authorization.swift */,
 				OBJ_362 /* AuthorizationError.swift */,
 				OBJ_363 /* EmailSpecification.swift */,
 				OBJ_364 /* Favorite.swift */,
 				OBJ_365 /* FavoriteID.swift */,
 				OBJ_366 /* FavoriteRepository.swift */,
+				4C51168F23CFD3580011F728 /* FileName.swift */,
 				OBJ_367 /* Identification.swift */,
 				OBJ_368 /* Identifier.swift */,
 				OBJ_370 /* Invitation.swift */,
@@ -14047,6 +14082,9 @@
 				OBJ_395 /* UserSettings.swift */,
 				OBJ_396 /* UserValues.swift */,
 				OBJ_397 /* Visibility.swift */,
+				OBJ_398 /* [Entity] */,
+				OBJ_407 /* [Traits] */,
+				OBJ_413 /* [Values] */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -14055,6 +14093,7 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_399 /* Entity.swift */,
+				4CCEAF7423CD1B0C00859BEA /* Entity+Loggable.swift */,
 				OBJ_400 /* EntityDetachable.swift */,
 				OBJ_401 /* EntityError.swift */,
 				OBJ_402 /* EntityKeyPath.swift */,
@@ -14114,6 +14153,7 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_416 /* StringValue.swift */,
+				4C51169823D0698C0011F728 /* SensitiveStringValue.swift */,
 			);
 			path = Types;
 			sourceTree = "<group>";
@@ -14155,11 +14195,14 @@
 		OBJ_440 /* Providers */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_444 /* MessageLogging */,
 				OBJ_441 /* EmailSendingProvider.swift */,
 				OBJ_442 /* EventRecordingProvider.swift */,
 				OBJ_443 /* ImageStoreProvider.swift */,
+				4CCEAF7023CC982900859BEA /* MessageLoggingConfiguration.swift */,
+				OBJ_447 /* MessageLoggingProvider.swift */,
 				OBJ_448 /* NotificationSendingProvider.swift */,
+				4CCEAF7D23CF463300859BEA /* NotificationSendingChannel.swift */,
+				4CCEAF7F23CF466100859BEA /* NotificationSendingResult.swift */,
 			);
 			path = Providers;
 			sourceTree = "<group>";
@@ -14167,11 +14210,13 @@
 		OBJ_444 /* MessageLogging */ = {
 			isa = PBXGroup;
 			children = (
+				4CCEAF6923CC796A00859BEA /* EventLoopFuture+MessageLogging.swift */,
+				4C51169223D04EBC0011F728 /* JSONEncoder+Logging.swift */,
 				OBJ_445 /* Loggable.swift */,
 				OBJ_446 /* LoggingMessage.swift */,
 				4CCEAF6123CBE35200859BEA /* LoggingMessageRoot.swift */,
-				OBJ_447 /* MessageLoggingProvider.swift */,
-				4CCEAF5E23CBB02700859BEA /* String+Loggable.swift */,
+				4CCEAF6723CC793500859BEA /* MessageLogging.swift */,
+				4C51169B23D06A1A0011F728 /* SensitiveStringValue+Logging.swift */,
 			);
 			path = MessageLogging;
 			sourceTree = "<group>";
@@ -14184,6 +14229,8 @@
 				OBJ_452 /* ReservationService.swift */,
 				OBJ_453 /* UserNotificationService.swift */,
 				OBJ_454 /* UserService.swift */,
+				4CCEAF6B23CC7C2300859BEA /* EventRecording */,
+				OBJ_444 /* MessageLogging */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -14248,7 +14295,7 @@
 			path = AutoActionBoundaries;
 			sourceTree = "<group>";
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -14267,7 +14314,6 @@
 				OBJ_1991 /* update.sh */,
 				OBJ_1992 /* update.rb */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_501 /* AutoActionSpecification */ = {
@@ -14364,6 +14410,7 @@
 			children = (
 				OBJ_555 /* Array+.swift */,
 				OBJ_556 /* String+.swift */,
+				4C51169523D05D7E0011F728 /* String+Replacing.swift */,
 				OBJ_557 /* String+Slugify.swift */,
 				OBJ_558 /* UUID+Base62.swift */,
 			);
@@ -14493,6 +14540,8 @@
 		OBJ_592 /* LibraryTests */ = {
 			isa = PBXGroup;
 			children = (
+				4C83DAC623D10F69005BFB13 /* HeapTests.swift */,
+				4C51169E23D06B390011F728 /* StringTests.swift */,
 				OBJ_593 /* UUIDTests.swift */,
 				OBJ_594 /* XCTestCase+.swift */,
 			);
@@ -17854,7 +17903,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_1919 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -18689,6 +18738,7 @@
 				OBJ_3145 /* GetInvitations.swift in Sources */,
 				OBJ_3146 /* RequestInvitationCreation.swift in Sources */,
 				OBJ_3147 /* RequestInvitationRevocation.swift in Sources */,
+				4CCEAF6D23CC7C3500859BEA /* EventRecording.swift in Sources */,
 				OBJ_3148 /* RevokeInvitation.swift in Sources */,
 				OBJ_3149 /* SendInvitationEmail.swift in Sources */,
 				OBJ_3150 /* UserInvitationsActor+.swift in Sources */,
@@ -18703,6 +18753,8 @@
 				OBJ_3159 /* UpdateItem.swift in Sources */,
 				OBJ_3160 /* UserItemsActor.swift in Sources */,
 				OBJ_3161 /* CreateList.swift in Sources */,
+				4CCEAF6823CC793500859BEA /* MessageLogging.swift in Sources */,
+				4CCEAF6A23CC796A00859BEA /* EventLoopFuture+MessageLogging.swift in Sources */,
 				OBJ_3162 /* CreateOrUpdateList.swift in Sources */,
 				OBJ_3163 /* DeleteList.swift in Sources */,
 				OBJ_3164 /* ExportListToJSON.swift in Sources */,
@@ -18721,6 +18773,7 @@
 				OBJ_3177 /* UpdateProfile.swift in Sources */,
 				OBJ_3178 /* UserProfileActor.swift in Sources */,
 				OBJ_3179 /* DeleteReservation.swift in Sources */,
+				4CCEAF7123CC982900859BEA /* MessageLoggingConfiguration.swift in Sources */,
 				OBJ_3180 /* RequestReservationDeletion.swift in Sources */,
 				OBJ_3181 /* UserReservationsActor.swift in Sources */,
 				OBJ_3182 /* RequestSettingsEditing.swift in Sources */,
@@ -18760,6 +18813,7 @@
 				OBJ_3215 /* Identification.swift in Sources */,
 				OBJ_3216 /* Identifier.swift in Sources */,
 				OBJ_3217 /* Invitation+Authorization.swift in Sources */,
+				4C51169D23D06A410011F728 /* SensitiveStringValue+Logging.swift in Sources */,
 				OBJ_3218 /* Invitation.swift in Sources */,
 				OBJ_3219 /* InvitationCode.swift in Sources */,
 				OBJ_3220 /* InvitationError.swift in Sources */,
@@ -18776,13 +18830,17 @@
 				OBJ_3231 /* ListRepository.swift in Sources */,
 				OBJ_3232 /* ListValues.swift in Sources */,
 				OBJ_3233 /* PushoverKey.swift in Sources */,
+				4CCEAF7E23CF463300859BEA /* NotificationSendingChannel.swift in Sources */,
 				OBJ_3234 /* Reservation.swift in Sources */,
 				OBJ_3235 /* ReservationID.swift in Sources */,
+				4CCEAF6F23CC7C4700859BEA /* EventLoopFuture+EventRecording.swift in Sources */,
 				OBJ_3236 /* ReservationRepository.swift in Sources */,
 				OBJ_3237 /* User+Authorization.swift in Sources */,
 				OBJ_3238 /* User.swift in Sources */,
 				OBJ_3239 /* UserID.swift in Sources */,
 				OBJ_3240 /* UserIdentity.swift in Sources */,
+				4C51169423D04F0F0011F728 /* JSONEncoder+Logging.swift in Sources */,
+				4CCEAF8023CF466100859BEA /* NotificationSendingResult.swift in Sources */,
 				OBJ_3241 /* UserIdentityProvider.swift in Sources */,
 				OBJ_3242 /* UserRepository.swift in Sources */,
 				OBJ_3243 /* UserSettings.swift in Sources */,
@@ -18817,6 +18875,7 @@
 				OBJ_3272 /* URLValidator.swift in Sources */,
 				OBJ_3273 /* ValueValidatable.swift in Sources */,
 				OBJ_3274 /* ValueValidationError.swift in Sources */,
+				4C51169A23D069B10011F728 /* SensitiveStringValue.swift in Sources */,
 				OBJ_3275 /* ValueValidationErrorType.swift in Sources */,
 				OBJ_3276 /* ValueValidationErrors.swift in Sources */,
 				OBJ_3277 /* ValueValidations.swift in Sources */,
@@ -18870,6 +18929,7 @@
 				OBJ_3325 /* RequestListDeletion.Boundaries+AutoActionBoundaries.generated.swift in Sources */,
 				OBJ_3326 /* RequestListEditing.Boundaries+AutoActionBoundaries.generated.swift in Sources */,
 				OBJ_3327 /* RequestListImportFromJSON.Boundaries+AutoActionBoundaries.generated.swift in Sources */,
+				4C51169123CFD3880011F728 /* FileName.swift in Sources */,
 				OBJ_3328 /* RequestProfileEditing.Boundaries+AutoActionBoundaries.generated.swift in Sources */,
 				OBJ_3329 /* RequestReservationDeletion.Boundaries+AutoActionBoundaries.generated.swift in Sources */,
 				OBJ_3330 /* RequestSettingsEditing.Boundaries+AutoActionBoundaries.generated.swift in Sources */,
@@ -18905,6 +18965,7 @@
 				OBJ_3360 /* RequestItemDeletion.Specification+AutoActionSpecification.generated.swift in Sources */,
 				OBJ_3361 /* RequestItemEditing.Specification+AutoActionSpecification.generated.swift in Sources */,
 				OBJ_3362 /* RequestItemMovement.Specification+AutoActionSpecification.generated.swift in Sources */,
+				4CCEAF7523CD1B0C00859BEA /* Entity+Loggable.swift in Sources */,
 				OBJ_3363 /* RequestListDeletion.Specification+AutoActionSpecification.generated.swift in Sources */,
 				OBJ_3364 /* RequestListEditing.Specification+AutoActionSpecification.generated.swift in Sources */,
 				OBJ_3365 /* RequestListImportFromJSON.Specification+AutoActionSpecification.generated.swift in Sources */,
@@ -18919,7 +18980,6 @@
 				OBJ_3374 /* UpdateSettings.Specification+AutoActionSpecification.generated.swift in Sources */,
 				OBJ_3375 /* EventLoop+.swift in Sources */,
 				OBJ_3376 /* EventLoopFuture+Error.swift in Sources */,
-				4CCEAF6023CBB05300859BEA /* String+Loggable.swift in Sources */,
 				OBJ_3377 /* EventLoopFuture+Flatten.swift in Sources */,
 				OBJ_3378 /* EventLoopFuture+FutureType.swift in Sources */,
 				OBJ_3379 /* EventLoopFuture+Map.swift in Sources */,
@@ -19263,6 +19323,7 @@
 				OBJ_4080 /* Heap.swift in Sources */,
 				OBJ_4081 /* Operators.swift in Sources */,
 				OBJ_4082 /* Array+.swift in Sources */,
+				4C51169723D068720011F728 /* String+Replacing.swift in Sources */,
 				OBJ_4083 /* String+.swift in Sources */,
 				OBJ_4084 /* String+Slugify.swift in Sources */,
 				OBJ_4085 /* UUID+Base62.swift in Sources */,
@@ -19276,7 +19337,9 @@
 			buildActionMask = 0;
 			files = (
 				OBJ_4094 /* UUIDTests.swift in Sources */,
+				4C51169F23D06B390011F728 /* StringTests.swift in Sources */,
 				OBJ_4095 /* XCTestCase+.swift in Sources */,
+				4C83DAC823D10F86005BFB13 /* HeapTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

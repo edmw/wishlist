@@ -12,8 +12,8 @@ import Foundation
 public final class Invitation: Entity, Confidental,
     EntityDetachable,
     EntityReflectable,
-    Codable,
     Loggable,
+    Codable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {

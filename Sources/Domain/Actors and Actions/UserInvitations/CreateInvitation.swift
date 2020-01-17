@@ -72,8 +72,8 @@ public struct CreateInvitation: Action {
 
 protocol CreateInvitationActor {
     var invitationRepository: InvitationRepository { get }
-    var logging: MessageLoggingProvider { get }
-    var recording: EventRecordingProvider { get }
+    var logging: MessageLogging { get }
+    var recording: EventRecording { get }
 }
 
 protocol CreateInvitationError: ActionError {
@@ -104,7 +104,7 @@ extension DomainUserInvitationsActor {
             .flatMap { user in
                 return try CreateInvitation(actor: self)
                     .execute(with: specification.values, for: user, in: boundaries)
-                    .logMessage(.createInvitation(for: user), using: logging)
+                    .logMessage(.createInvitation(for: user), for: { $0.0 }, using: logging)
                     .recordEvent(
                         for: { $0.invitation }, "created for \(user)", using: recording
                     )
@@ -113,7 +113,7 @@ extension DomainUserInvitationsActor {
                         in: invitationRepository,
                         on: boundaries
                     )
-                    .logMessage(.createInvitationSent(for: user), using: logging)
+                    .logMessage(.createInvitationSent(for: user), for: { $0.0 }, using: logging)
                     .map { invitation, user in
                         .init(user, invitation)
                     }
@@ -135,15 +135,19 @@ extension DomainUserInvitationsActor {
 
 extension LoggingMessageRoot {
 
-    static func createInvitation(for user: User) -> Self {
-        return Self({ subject in
-            LoggingMessage(label: "Create Invitation", subject: subject, attributes: [user])
+    fileprivate static func createInvitation(for user: User) -> LoggingMessageRoot<Invitation> {
+        return .init({ invitation in
+            LoggingMessage(label: "Create Invitation", subject: invitation, loggables: [user])
         })
     }
 
-    static func createInvitationSent(for user: User) -> Self {
-        return Self({ subject in
-            LoggingMessage(label: "Create Invitation (Sent)", subject: subject, attributes: [user])
+    fileprivate static func createInvitationSent(for user: User) -> LoggingMessageRoot<Invitation> {
+        return .init({ invitation in
+            LoggingMessage(
+                label: "Create Invitation (Sent)",
+                subject: invitation,
+                loggables: [user]
+            )
         })
     }
 

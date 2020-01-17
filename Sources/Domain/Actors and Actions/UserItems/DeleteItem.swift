@@ -76,9 +76,9 @@ extension DomainUserItemsActor {
 
 extension LoggingMessageRoot {
 
-    fileprivate static func deleteItem(with id: ItemID?) -> Self {
-        return Self({ subject in
-            LoggingMessage(label: "Delete Item", subject: subject, attributes: [id])
+    fileprivate static func deleteItem(with id: ItemID?) -> LoggingMessageRoot<Item> {
+        return .init({ item in
+            LoggingMessage(label: "Delete Item", subject: item, loggables: [id])
         })
     }
 

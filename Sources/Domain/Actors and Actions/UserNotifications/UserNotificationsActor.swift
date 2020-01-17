@@ -23,8 +23,8 @@ enum UserNotificationsActorError: Error {
 public final class DomainUserNotificationsActor: UserNotificationsActor {
     let userRepository: UserRepository
 
-    let logging: MessageLoggingProvider
-    let recording: EventRecordingProvider
+    let logging: MessageLogging
+    let recording: EventRecording
 
     public required init(
         userRepository: UserRepository,
@@ -32,8 +32,8 @@ public final class DomainUserNotificationsActor: UserNotificationsActor {
         recording: EventRecordingProvider
     ) {
         self.userRepository = userRepository
-        self.logging = logging
-        self.recording = recording
+        self.logging = MessageLogging(provider: logging)
+        self.recording = EventRecording(provider: recording)
     }
 
 }

@@ -31,8 +31,8 @@ public final class DomainUserReservationsActor: UserReservationsActor {
     let itemRepository: ItemRepository
     let reservationRepository: ReservationRepository
 
-    let logging: MessageLoggingProvider
-    let recording: EventRecordingProvider
+    let logging: MessageLogging
+    let recording: EventRecording
 
     public required init(
         itemRepository: ItemRepository,
@@ -42,8 +42,8 @@ public final class DomainUserReservationsActor: UserReservationsActor {
     ) {
         self.itemRepository = itemRepository
         self.reservationRepository = reservationRepository
-        self.logging = logging
-        self.recording = recording
+        self.logging = MessageLogging(provider: logging)
+        self.recording = EventRecording(provider: recording)
     }
 
 }

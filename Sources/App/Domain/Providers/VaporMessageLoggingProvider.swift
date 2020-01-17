@@ -11,8 +11,12 @@ struct VaporMessageLoggingProvider: MessageLoggingProvider, ServiceType {
 
     let logger: Logger
 
-    init(with logger: Logger) {
+    let configuration: MessageLoggingConfiguration
+
+    init(with logger: Logger, in environment: Environment) {
         self.logger = logger
+
+        self.configuration = MessageLoggingConfiguration(production: environment.isRelease)
     }
 
     func log(debug string: String, file: String, function: String, line: UInt, column: UInt) {
@@ -36,7 +40,7 @@ struct VaporMessageLoggingProvider: MessageLoggingProvider, ServiceType {
     static let serviceSupports: [Any.Type] = [MessageLoggingProvider.self]
 
     static func makeService(for container: Container) throws -> Self {
-        return .init(with: container.requireLogger().application)
+        return .init(with: container.requireLogger().application, in: container.environment)
     }
 
 }

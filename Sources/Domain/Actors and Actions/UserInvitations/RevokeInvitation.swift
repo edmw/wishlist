@@ -69,9 +69,9 @@ extension DomainUserInvitationsActor {
 
 extension LoggingMessageRoot {
 
-    static var revokeInvitation: Self {
-        return Self({ subject in
-            LoggingMessage(label: "Revoke Invitation", subject: subject, attributes: [])
+    fileprivate static var revokeInvitation: LoggingMessageRoot<Invitation> {
+        return .init({ invitation in
+            LoggingMessage(label: "Revoke Invitation", subject: invitation)
         })
     }
 

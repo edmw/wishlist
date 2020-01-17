@@ -119,9 +119,9 @@ extension EventLoopFuture where Expectation == InvitationAndInviter {
 
 extension LoggingMessageRoot {
 
-    static func sendInvitationEmail(for user: User) -> Self {
-        return Self({ subject in
-            LoggingMessage(label: "Send Invitation Email", subject: subject, attributes: [user])
+    fileprivate static func sendInvitationEmail(for user: User) -> LoggingMessageRoot<Invitation> {
+        return .init({ invitation in
+            LoggingMessage(label: "Send Invitation Email", subject: invitation, loggables: [user])
         })
     }
 

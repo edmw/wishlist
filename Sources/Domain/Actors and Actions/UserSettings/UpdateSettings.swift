@@ -67,8 +67,8 @@ public struct UpdateSettings: Action {
 
 internal protocol UpdateSettingsActor {
     var userRepository: UserRepository { get }
-    var logging: MessageLoggingProvider { get }
-    var recording: EventRecordingProvider { get }
+    var logging: MessageLogging { get }
+    var recording: EventRecording { get }
 }
 
 // MARK: - Actor
@@ -109,9 +109,9 @@ extension DomainUserSettingsActor {
 
 extension LoggingMessageRoot {
 
-    static var updateSettings: Self {
-        return Self({ subject in
-            LoggingMessage(label: "Update Settings", subject: subject, attributes: [])
+    fileprivate static var updateSettings: LoggingMessageRoot<User> {
+        return .init({ user in
+            LoggingMessage(label: "Update Settings", subject: user)
         })
     }
 

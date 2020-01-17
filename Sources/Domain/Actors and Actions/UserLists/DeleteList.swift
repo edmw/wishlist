@@ -75,15 +75,15 @@ extension DomainUserListsActor {
 
 extension LoggingMessageRoot {
 
-    fileprivate static func deleteList(with id: ListID?) -> Self {
-        return Self({ subject in
-            LoggingMessage(label: "Delete List", subject: subject, attributes: [id])
+    fileprivate static func deleteList(with id: ListID?) -> LoggingMessageRoot<List> {
+        return .init({ list in
+            LoggingMessage(label: "Delete List", subject: list, loggables: [id])
         })
     }
 
-    static var deleteListItems: Self {
-        return Self({ subject in
-            LoggingMessage(label: "Delete List (Items)", subject: subject, attributes: [])
+    fileprivate static var deleteListItems: LoggingMessageRoot<List> {
+        return .init({ list in
+            LoggingMessage(label: "Delete List (Items)", subject: list)
         })
     }
 

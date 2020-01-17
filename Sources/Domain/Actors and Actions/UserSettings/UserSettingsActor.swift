@@ -31,8 +31,8 @@ public final class DomainUserSettingsActor: UserSettingsActor,
 {
     let userRepository: UserRepository
 
-    let logging: MessageLoggingProvider
-    let recording: EventRecordingProvider
+    let logging: MessageLogging
+    let recording: EventRecording
 
     public required init(
         userRepository: UserRepository,
@@ -40,8 +40,8 @@ public final class DomainUserSettingsActor: UserSettingsActor,
         recording: EventRecordingProvider
     ) {
         self.userRepository = userRepository
-        self.logging = logging
-        self.recording = recording
+        self.logging = MessageLogging(provider: logging)
+        self.recording = EventRecording(provider: recording)
     }
 
 }

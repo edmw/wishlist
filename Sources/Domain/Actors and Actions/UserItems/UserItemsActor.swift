@@ -65,8 +65,8 @@ public final class DomainUserItemsActor: UserItemsActor,
     let listRepository: ListRepository
     let userRepository: UserRepository
 
-    let logging: MessageLoggingProvider
-    let recording: EventRecordingProvider
+    let logging: MessageLogging
+    let recording: EventRecording
 
     let itemRepresentationsBuilder: ItemRepresentationsBuilder
 
@@ -80,8 +80,8 @@ public final class DomainUserItemsActor: UserItemsActor,
         self.itemRepository = itemRepository
         self.userRepository = userRepository
         self.listRepository = listRepository
-        self.logging = logging
-        self.recording = recording
+        self.logging = MessageLogging(provider: logging)
+        self.recording = EventRecording(provider: recording)
         self.itemRepresentationsBuilder = .init(itemRepository)
     }
 

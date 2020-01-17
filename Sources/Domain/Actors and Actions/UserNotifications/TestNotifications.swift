@@ -64,9 +64,15 @@ extension DomainUserNotificationsActor {
 
 extension LoggingMessageRoot {
 
-    static func testNotifications(for user: User) -> Self {
-        return Self({ subject in
-            LoggingMessage(label: "Test Notifications", subject: subject, attributes: [user])
+    fileprivate static func testNotifications(for user: User)
+        -> LoggingMessageRoot<[NotificationSendingResult]>
+    {
+        return .init({ results in
+            LoggingMessage(
+                label: "Test Notifications",
+                subject: results,
+                attributes: ["User": user]
+            )
         })
     }
 

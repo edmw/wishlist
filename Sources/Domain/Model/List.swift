@@ -13,8 +13,8 @@ import Foundation
 public final class List: Entity, Viewable,
     EntityDetachable,
     EntityReflectable,
-    Codable,
     Loggable,
+    Codable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {

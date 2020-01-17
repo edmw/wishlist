@@ -12,8 +12,8 @@ import Foundation
 public final class Item: Entity, Imageable,
     EntityDetachable,
     EntityReflectable,
-    Codable,
     Loggable,
+    Codable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {

@@ -121,7 +121,7 @@ public struct ImportListFromJSON: Action {
 protocol ImportListFromJSONActor {
     var listRepository: ListRepository { get }
     var itemRepository: ItemRepository { get }
-    var logging: MessageLoggingProvider { get }
+    var logging: MessageLogging { get }
 }
 
 protocol ImportListFromJSONError: ActionError {
@@ -168,16 +168,6 @@ extension DomainUserListsActor {
 
 }
 
-extension LoggingMessageRoot {
-
-    static func importList(for user: User) -> Self {
-        return Self({ subject in
-            LoggingMessage(label: "Import List", subject: subject, attributes: [user])
-        })
-    }
-
-}
-
 // MARK: -
 
 extension CreateItem.Boundaries {
@@ -185,6 +175,18 @@ extension CreateItem.Boundaries {
     init(from boundaries: ImportListFromJSON.Boundaries) {
         self.worker = boundaries.worker
         self.imageStore = boundaries.imageStore
+    }
+
+}
+
+// MARK: Logging
+
+extension LoggingMessageRoot {
+
+    fileprivate static func importList(for user: User) -> LoggingMessageRoot<List> {
+        return .init({ list in
+            LoggingMessage(label: "Import List", subject: list, loggables: [user])
+        })
     }
 
 }

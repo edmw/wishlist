@@ -12,8 +12,8 @@ import Foundation
 public final class Reservation: Entity,
     EntityDetachable,
     EntityReflectable,
-    Codable,
     Loggable,
+    Codable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {
@@ -60,13 +60,15 @@ public final class Reservation: Entity,
     // MARK: CustomStringConvertible
 
     public var description: String {
-        return "Reservation[\(id ??? "???")](\(itemID))"
+        return "Reservation[\(id ??? "???"):\(reservationID ??? "???")]" +
+            "(item:\(itemID)|holder:\(holder))"
     }
 
     // MARK: CustomDebugStringConvertible
 
     public var debugDescription: String {
-        return "Reservation[\(id ??? "???")](\(itemID))"
+        return "Reservation[\(id ??? "???"):\(reservationID ??? "???")]" +
+            "(item:\(itemID))|holder:\(holder))"
     }
 
 }

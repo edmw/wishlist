@@ -9,6 +9,7 @@
 
 ## [..]
 - 🎁 Add functionality to move items between wishlists
+- 🛠️ Introduce structured logging
 
 ## [1.4.0]
 - 🎁 Add invitation emails

@@ -68,8 +68,8 @@ public struct CreateList: Action {
 
 protocol CreateListActor {
     var listRepository: ListRepository { get }
-    var logging: MessageLoggingProvider { get }
-    var recording: EventRecordingProvider { get }
+    var logging: MessageLogging { get }
+    var recording: EventRecording { get }
 }
 
 protocol CreateListError: ActionError {
@@ -122,9 +122,9 @@ extension DomainUserListsActor {
 
 extension LoggingMessageRoot {
 
-    static func createList(for user: User) -> Self {
-        return Self({ subject in
-            LoggingMessage(label: "Create List", subject: subject, attributes: [user])
+    fileprivate static func createList(for user: User) -> LoggingMessageRoot<List> {
+        return .init({ list in
+            LoggingMessage(label: "Create List", subject: list, loggables: [user])
         })
     }
 

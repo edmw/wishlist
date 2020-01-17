@@ -24,7 +24,7 @@ final class AnnouncementsActorTests : XCTestCase, HasAllTests {
         super.setUp()
         eventLoop = EmbeddedEventLoop()
         userRepository = TestingUserRepository(worker: eventLoop)
-        actor = DomainAnnouncementsActor(userRepository)
+        actor = DomainAnnouncementsActor(userRepository: userRepository)
     }
 
     /// Testing `PresentPublicly` action with an user id of an existing user.

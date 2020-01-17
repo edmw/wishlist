@@ -103,8 +103,8 @@ extension EventLoopFuture where Expectation == Item {
 
 protocol CreateItemActor {
     var itemRepository: ItemRepository { get }
-    var logging: MessageLoggingProvider { get }
-    var recording: EventRecordingProvider { get }
+    var logging: MessageLogging { get }
+    var recording: EventRecording { get }
 }
 
 protocol CreateItemError: ActionError {
@@ -132,7 +132,9 @@ extension DomainUserItemsActor {
             .flatMap { list, user in
                 return try CreateItem(actor: self)
                     .execute(with: specification.values, for: list, in: boundaries)
-                    .logMessage(.createItem(for: user), using: self.logging)
+                    .logMessage(
+                        .createItem(for: user, and: list), for: { $0.1 }, using: self.logging
+                    )
                     .recordEvent(
                         for: { $0.item }, "created for \(user) in \(list)", using: self.recording
                     )
@@ -158,9 +160,9 @@ extension DomainUserItemsActor {
 
 extension LoggingMessageRoot {
 
-    static func createItem(for user: User) -> Self {
-        return Self({ subject in
-            LoggingMessage(label: "Create Item", subject: subject, attributes: [user])
+    fileprivate static func createItem(for user: User, and list: List) -> LoggingMessageRoot<Item> {
+        return .init({ item in
+            LoggingMessage(label: "Create Item", subject: item, loggables: [user, list])
         })
     }
 

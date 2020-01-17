@@ -190,8 +190,8 @@ public final class DomainUserInvitationsActor: UserInvitationsActor,
     let invitationRepository: InvitationRepository
     let userRepository: UserRepository
 
-    let logging: MessageLoggingProvider
-    let recording: EventRecordingProvider
+    let logging: MessageLogging
+    let recording: EventRecording
 
     let invitationService: InvitationService
 
@@ -205,8 +205,8 @@ public final class DomainUserInvitationsActor: UserInvitationsActor,
     ) {
         self.invitationRepository = invitationRepository
         self.userRepository = userRepository
-        self.logging = logging
-        self.recording = recording
+        self.logging = MessageLogging(provider: logging)
+        self.recording = EventRecording(provider: recording)
         self.invitationService = InvitationService(invitationRepository)
         self.invitationRepresentationsBuilder
             = InvitationRepresentationsBuilder(invitationRepository)

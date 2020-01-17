@@ -79,9 +79,11 @@ extension DomainUserReservationsActor {
 
 extension LoggingMessageRoot {
 
-    static func deleteReservation(with id: ReservationID?) -> Self {
-        return Self({ subject in
-            LoggingMessage(label: "Delete Reservation", subject: subject, attributes: [id])
+    fileprivate static func deleteReservation(with id: ReservationID?)
+        -> LoggingMessageRoot<Reservation>
+    {
+        return .init({ reservation in
+            LoggingMessage(label: "Delete Reservation", subject: reservation, loggables: [id])
         })
     }
 

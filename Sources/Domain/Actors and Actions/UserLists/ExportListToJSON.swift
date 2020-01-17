@@ -22,9 +22,9 @@ public struct ExportListToJSON: Action {
 
     public struct Result: ActionResult {
         public let user: UserRepresentation
-        public let name: String
+        public let name: FileName
         public let json: String
-        internal init(_ user: User, name: String, json: String) {
+        internal init(_ user: User, name: FileName, json: String) {
             self.user = user.representation
             self.name = name
             self.json = json
@@ -39,7 +39,7 @@ public struct ExportListToJSON: Action {
         self.actor = actor
     }
 
-    private func exportName(for list: List) -> String {
+    private func exportName(for list: List) -> FileName {
         let listtitle = list.title.slugify()
         let datestamp = Date().exportDatestamp()
         var components = ["wishlist"]
@@ -47,13 +47,13 @@ public struct ExportListToJSON: Action {
             components.append(listtitle)
         }
         components.append(datestamp)
-        return components.joined(separator: "-")
+        return FileName(components.joined(separator: "-"))
     }
 
     // MARK: Execute
 
     internal func execute(with list: List, for user: User, in boundaries: Boundaries) throws
-        -> EventLoopFuture<(name: String, json: String?)>
+        -> EventLoopFuture<(name: FileName, json: String?)>
     {
         let actor = self.actor()
         let itemRepository = actor.itemRepository
@@ -78,7 +78,7 @@ public struct ExportListToJSON: Action {
 protocol ExportListToJSONActor {
     var listRepository: ListRepository { get }
     var itemRepository: ItemRepository { get }
-    var logging: MessageLoggingProvider { get }
+    var logging: MessageLogging { get }
 }
 
 // MARK: - Actor
@@ -122,9 +122,11 @@ extension DomainUserListsActor {
 
 extension LoggingMessageRoot {
 
-    static func exportList(_ list: List, _ user: User) -> Self {
-        return Self({ subject in
-            LoggingMessage(label: "Export List", subject: subject, attributes: [list, user])
+    fileprivate static func exportList(_ list: List, _ user: User)
+        -> LoggingMessageRoot<FileName>
+    {
+        return .init({ name in
+            LoggingMessage(label: "Export List", subject: name, loggables: [list, user])
         })
     }
 

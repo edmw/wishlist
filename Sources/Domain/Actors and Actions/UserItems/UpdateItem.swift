@@ -80,8 +80,8 @@ public struct UpdateItem: Action {
 
 protocol UpdateItemActor {
     var itemRepository: ItemRepository { get }
-    var logging: MessageLoggingProvider { get }
-    var recording: EventRecordingProvider { get }
+    var logging: MessageLogging { get }
+    var recording: EventRecording { get }
 }
 
 protocol UpdateItemError: ActionError {
@@ -110,49 +110,37 @@ extension DomainUserItemsActor {
         _ specification: UpdateItem.Specification,
         _ boundaries: UpdateItem.Boundaries
     ) throws -> EventLoopFuture<UpdateItem.Result> {
-        return try self.listRepository
-            .findWithUser(by: specification.listID, for: specification.userID)
-            .unwrap(or: UserItemsActorError.invalidList)
-            .flatMap { list, user in
-                return try self.itemRepository
-                    .find(by: specification.itemID, in: list)
-                    .unwrap(or: UserItemsActorError.invalidItem)
-                    .flatMap { item in
-                        let itemvalues = specification.values
-                        return try UpdateItem(actor: self)
-                            .execute(on: item, with: itemvalues, in: list, in: boundaries)
-                            .logMessage(.updateItem, using: self.logging)
-                            .map { list, item in
-                                .init(user, list, item)
-                            }
-                            .catchMap { error in
-                                if let updateError = error as? UpdateItemValidationError {
-                                    self.logging.debug(
-                                        "Item updating validation error: \(updateError)"
-                                    )
-                                    throw UserItemsActorError.validationError(
-                                        user.representation,
-                                        updateError.list.representation,
-                                        updateError.item.representation,
-                                        updateError.error
-                                    )
-                                }
-                                throw error
-                            }
+        let userid = specification.userID
+        let listid = specification.listID
+        let itemid = specification.itemID
+        return try self.itemRepository
+            .findWithListAndUser(by: itemid, in: listid, for: userid)
+            .unwrap(or: UserItemsActorError.invalidItem)
+            .flatMap { item, list, user in
+                let itemvalues = specification.values
+                return try UpdateItem(actor: self)
+                    .execute(on: item, with: itemvalues, in: list, in: boundaries)
+                    .logMessage(
+                        .updateItem(for: user, and: list), for: { $0.1 }, using: self.logging
+                    )
+                    .map { list, item in
+                        .init(user, list, item)
+                    }
+                    .catchMap { error in
+                        if let updateError = error as? UpdateItemValidationError {
+                            self.logging.debug(
+                                "Item updating validation error: \(updateError)"
+                            )
+                            throw UserItemsActorError.validationError(
+                                user.representation,
+                                updateError.list.representation,
+                                updateError.item.representation,
+                                updateError.error
+                            )
+                        }
+                        throw error
                     }
             }
-    }
-
-}
-
-// MARK: Logging
-
-extension LoggingMessageRoot {
-
-    static var updateItem: Self {
-        return Self({ subject in
-            LoggingMessage(label: "Update Item", subject: subject, attributes: [])
-        })
     }
 
 }
@@ -164,6 +152,18 @@ extension CreateItem.Boundaries {
     init(from boundaries: UpdateItem.Boundaries) {
         self.worker = boundaries.worker
         self.imageStore = boundaries.imageStore
+    }
+
+}
+
+// MARK: Logging
+
+extension LoggingMessageRoot {
+
+    fileprivate static func updateItem(for user: User, and list: List) -> LoggingMessageRoot<Item> {
+        return .init({ item in
+            LoggingMessage(label: "Update Item", subject: item, loggables: [user, list])
+        })
     }
 
 }

@@ -72,9 +72,9 @@ extension DomainUserFavoritesActor {
 
 extension LoggingMessageRoot {
 
-    static func createFavorite(for user: User) -> Self {
-        return Self({ subject in
-            LoggingMessage(label: "Create Favorite", subject: subject, attributes: [user])
+    fileprivate static func createFavorite(for user: User) -> LoggingMessageRoot<Favorite> {
+        return .init({ favorite in
+            LoggingMessage(label: "Create Favorite", subject: favorite, loggables: [user])
         })
     }
 

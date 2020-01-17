@@ -123,7 +123,7 @@ struct VaporNotificationSendingResult: NotificationSendingResult, CustomStringCo
     let status: UInt
 
     var description: String {
-        return "VaporNotificationSendingResult"
+        return "NotificationSendingResult"
             + "[channel: \(channel), success: \(success), status: \(status)]"
     }
 

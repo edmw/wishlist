@@ -99,9 +99,11 @@ extension DomainWishlistActor {
                     .findWithItem(by: specification.reservationID)
                     .unwrap(or: WishlistActorError.invalidReservation)
                     .flatMap { arguments in let (reservation, item) = arguments
+                        // remove reservation
+                        let id = reservation.reservationID
                         return try RemoveReservationFromItem(actor: self)
                             .execute(for: reservation, on: item, for: identification)
-                            .logMessage(.removeReservationFromItem, using: logging)
+                            .logMessage(.removeReservationFromItem(with: id), using: logging)
                             .recordEvent("removed for \(identification)", using: recording)
                             .flatMap { reservation in
                                 return try boundaries.notificationSending
@@ -136,9 +138,15 @@ extension NotificationSendingProvider {
 
 extension LoggingMessageRoot {
 
-    static var removeReservationFromItem: Self {
-        return Self({ subject in
-            LoggingMessage(label: "Remove Reservation from Item", subject: subject, attributes: [])
+    fileprivate static func removeReservationFromItem(with id: ReservationID?)
+        -> LoggingMessageRoot<Reservation>
+    {
+        return .init({ reservation in
+            LoggingMessage(
+                label: "Remove Reservation from Item",
+                subject: reservation,
+                loggables: [id]
+            )
         })
     }
 

@@ -69,9 +69,11 @@ extension DomainUserFavoritesActor {
 }
 
 extension LoggingMessageRoot {
-    static func deleteFavorite(with id: FavoriteID?) -> Self {
-        return Self({ subject in
-            LoggingMessage(label: "Delete Favorite", subject: subject, attributes: [id])
+
+    fileprivate static func deleteFavorite(with id: FavoriteID?) -> LoggingMessageRoot<Favorite> {
+        return .init({ favorite in
+            LoggingMessage(label: "Delete Favorite", subject: favorite, loggables: [id])
         })
     }
+
 }

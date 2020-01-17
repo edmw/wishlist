@@ -217,7 +217,7 @@ extension LoggingMessage {
         return Self(
             warn: "User Creation Not Allowed",
             subject: email ?? "",
-            attributes: [message]
+            attributes: [ "message": message ]
         )
     }
 
@@ -229,7 +229,7 @@ extension LoggingMessage {
         return Self(
             warn: "Invitation for User Creation not provided",
             subject: email ?? "",
-            attributes: [message, invitationCode]
+            attributes: [ "message": message, "InvitationCode": invitationCode as Any ]
         )
     }
 
@@ -239,9 +239,9 @@ extension LoggingMessage {
 
 extension LoggingMessageRoot {
 
-    fileprivate static var materialiseUser: Self {
-        return Self({ subject in
-            LoggingMessage(label: "Materialise User", subject: subject, attributes: [])
+    fileprivate static var materialiseUser: LoggingMessageRoot<User> {
+        return .init({ user in
+            LoggingMessage(label: "Materialise User", subject: user)
         })
     }
 

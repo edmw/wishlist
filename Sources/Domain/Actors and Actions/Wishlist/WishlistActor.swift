@@ -50,8 +50,8 @@ public final class DomainWishlistActor: WishlistActor,
     let favoriteRepository: FavoriteRepository
     let userRepository: UserRepository
 
-    let logging: MessageLoggingProvider
-    let recording: EventRecordingProvider
+    let logging: MessageLogging
+    let recording: EventRecording
 
     public required init(
         listRepository: ListRepository,
@@ -67,8 +67,8 @@ public final class DomainWishlistActor: WishlistActor,
         self.reservationRepository = reservationRepository
         self.itemRepository = itemRepository
         self.userRepository = userRepository
-        self.logging = logging
-        self.recording = recording
+        self.logging = MessageLogging(provider: logging)
+        self.recording = EventRecording(provider: recording)
     }
 
 }

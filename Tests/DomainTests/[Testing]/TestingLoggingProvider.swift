@@ -2,6 +2,8 @@
 
 struct TestingLoggingProvider: MessageLoggingProvider {
 
+    var configuration = MessageLoggingConfiguration(production: false)
+
     class Messages {
         var debug = [String]()
         var info = [String]()

@@ -12,9 +12,9 @@ import Foundation
 public final class User: Entity,
     EntityDetachable,
     EntityReflectable,
+    Loggable,
     Codable,
     Equatable,
-    Loggable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {

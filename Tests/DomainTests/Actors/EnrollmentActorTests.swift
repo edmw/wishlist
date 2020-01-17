@@ -67,11 +67,11 @@ final class EnrollmentActorTests : XCTestCase, HasAllTests {
         XCTAssertEqual(anInvitation.userID, aUser.id)
 
         actor = DomainEnrollmentActor(
-            invitationRepository,
-            reservationRepository,
-            userRepository,
-            logging,
-            recording
+            userRepository: userRepository,
+            invitationRepository: invitationRepository,
+            reservationRepository: reservationRepository,
+            logging: logging,
+            recording: recording
         )
     }
 
@@ -89,9 +89,12 @@ final class EnrollmentActorTests : XCTestCase, HasAllTests {
         let count = try! userRepository.count().wait()
         let result = try! actor.materialiseUser(
                 .specification(
+                    options: [.createUsers],
                     userIdentity: useridentity,
                     userIdentityProvider: useridentityprovider,
-                    userValues: partialuservalues
+                    userValues: partialuservalues,
+                    invitationCode: nil,
+                    guestIdentification: nil
                 ),
                 .boundaries(worker: eventLoop)
             ).wait()
@@ -120,10 +123,12 @@ final class EnrollmentActorTests : XCTestCase, HasAllTests {
     func testMaterialiseUserWithInvitation() throws {
         let result = try! actor.materialiseUser(
                 .specification(
+                    options: [.createUsers],
                     userIdentity: useridentity,
                     userIdentityProvider: useridentityprovider,
                     userValues: partialuservalues,
-                    invitationCode: anInvitation.code
+                    invitationCode: anInvitation.code,
+                    guestIdentification: nil
                 ),
                 .boundaries(worker: eventLoop)
             ).wait()
@@ -138,7 +143,8 @@ final class EnrollmentActorTests : XCTestCase, HasAllTests {
                     userIdentity: useridentity,
                     userIdentityProvider: useridentityprovider,
                     userValues: partialuservalues,
-                    invitationCode: anInvitation.code
+                    invitationCode: anInvitation.code,
+                    guestIdentification: nil
                 ),
                 .boundaries(worker: eventLoop)
             ).wait()
@@ -153,7 +159,9 @@ final class EnrollmentActorTests : XCTestCase, HasAllTests {
                         options: [.createUsers, .requireInvitationToCreateUsers],
                         userIdentity: useridentity,
                         userIdentityProvider: useridentityprovider,
-                        userValues: partialuservalues
+                        userValues: partialuservalues,
+                        invitationCode: nil,
+                        guestIdentification: nil
                     ),
                     .boundaries(worker: eventLoop)
                 ).wait(),
@@ -169,7 +177,8 @@ final class EnrollmentActorTests : XCTestCase, HasAllTests {
                         userIdentity: useridentity,
                         userIdentityProvider: useridentityprovider,
                         userValues: partialuservalues,
-                        invitationCode: InvitationCode()
+                        invitationCode: InvitationCode(),
+                        guestIdentification: nil
                     ),
                     .boundaries(worker: eventLoop)
                 ).wait(),
@@ -186,7 +195,8 @@ final class EnrollmentActorTests : XCTestCase, HasAllTests {
                         userIdentity: useridentity,
                         userIdentityProvider: useridentityprovider,
                         userValues: partialuservalues,
-                        invitationCode: anInvitation.code
+                        invitationCode: anInvitation.code,
+                        guestIdentification: nil
                     ),
                     .boundaries(worker: eventLoop)
                 ).wait(),

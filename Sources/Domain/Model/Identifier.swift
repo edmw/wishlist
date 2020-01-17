@@ -13,11 +13,11 @@ public protocol AnyIdentifier {
 // MARK: Identifier
 
 public protocol Identifier: AnyIdentifier,
-    RawRepresentable,
-    LosslessStringConvertible,
-    Hashable,
     Loggable,
-    Codable
+    Codable,
+    Hashable,
+    RawRepresentable,
+    LosslessStringConvertible
 {
 
     var rawValue: UUID { get }

@@ -56,8 +56,8 @@ public final class DomainUserFavoritesActor: UserFavoritesActor {
     let itemRepository: ItemRepository
     let userRepository: UserRepository
 
-    let logging: MessageLoggingProvider
-    let recording: EventRecordingProvider
+    let logging: MessageLogging
+    let recording: EventRecording
 
     let favoriteRepresentationsBuilder: FavoriteRepresentationsBuilder
 
@@ -73,8 +73,8 @@ public final class DomainUserFavoritesActor: UserFavoritesActor {
         self.listRepository = listRepository
         self.itemRepository = itemRepository
         self.userRepository = userRepository
-        self.logging = logging
-        self.recording = recording
+        self.logging = MessageLogging(provider: logging)
+        self.recording = EventRecording(provider: recording)
         self.favoriteRepresentationsBuilder
             = FavoriteRepresentationsBuilder(favoriteRepository, listRepository, itemRepository)
     }

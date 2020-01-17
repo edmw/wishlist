@@ -60,8 +60,8 @@ public final class DomainEnrollmentActor: EnrollmentActor {
     let invitationRepository: InvitationRepository
     let reservationRepository: ReservationRepository
 
-    let logging: MessageLoggingProvider
-    let recording: EventRecordingProvider
+    let logging: MessageLogging
+    let recording: EventRecording
 
     let userService: UserService
     let invitationService: InvitationService
@@ -77,8 +77,8 @@ public final class DomainEnrollmentActor: EnrollmentActor {
         self.invitationRepository = invitationRepository
         self.userRepository = userRepository
         self.reservationRepository = reservationRepository
-        self.logging = logging
-        self.recording = recording
+        self.logging = MessageLogging(provider: logging)
+        self.recording = EventRecording(provider: recording)
         self.userService = UserService(userRepository)
         self.invitationService = InvitationService(invitationRepository)
         self.reservationService = ReservationService(reservationRepository, userRepository)
