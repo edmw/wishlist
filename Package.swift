@@ -42,8 +42,8 @@ let package = Package(
         .target(
             name: "App",
             dependencies: [
-                "Library",
                 "Domain",
+                "Library",
                 "Vapor",
                 "Leaf",
                 "Authentication",

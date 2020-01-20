@@ -57,19 +57,19 @@ class WelcomePageContextBuilder {
     var favorites: [FavoriteRepresentation]?
 
     @discardableResult
-    func forUserRepresentation(_ user: UserRepresentation) -> Self {
+    func forUser(_ user: UserRepresentation) -> Self {
         self.user = user
         return self
     }
 
     @discardableResult
-    func withListRepresentations(_ lists: [ListRepresentation]) -> Self {
+    func withLists(_ lists: [ListRepresentation]) -> Self {
         self.lists = lists
         return self
     }
 
     @discardableResult
-    func withFavoriteRepresentations(_ favorites: [FavoriteRepresentation]) -> Self {
+    func withFavorites(_ favorites: [FavoriteRepresentation]) -> Self {
         self.favorites = favorites
         return self
     }

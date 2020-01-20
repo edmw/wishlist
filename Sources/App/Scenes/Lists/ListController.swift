@@ -30,10 +30,10 @@ final class ListController: AuthenticatableController,
             )
             .flatMap { result in
                 var contextBuilder = ListPageContextBuilder()
-                    .forUserRepresentation(result.user)
+                    .forUser(result.user)
                 if let list = result.list {
                     contextBuilder = contextBuilder
-                        .withListRepresentation(list)
+                        .withList(list)
                         .withFormData(ListPageFormData(from: list))
                 }
                 let context = try contextBuilder.build()
@@ -56,8 +56,8 @@ final class ListController: AuthenticatableController,
             )
             .flatMap { result in
                 let context = try ListPageContextBuilder()
-                    .forUserRepresentation(result.user)
-                    .withListRepresentation(result.list)
+                    .forUser(result.user)
+                    .withList(result.list)
                     .build()
                 return try Controller.renderView("User/ListDeletion", with: context, on: request)
             }

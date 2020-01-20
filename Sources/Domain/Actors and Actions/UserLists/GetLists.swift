@@ -31,8 +31,8 @@ public final class GetLists: Action {
     public struct Result {
         public let user: UserRepresentation
         public let lists: [ListRepresentation]
-        internal init(_ user: UserRepresentation, lists: [ListRepresentation]) {
-            self.user = user
+        internal init(_ user: User, lists: [ListRepresentation]) {
+            self.user = user.representation
             self.lists = lists
         }
     }
@@ -60,7 +60,7 @@ extension DomainUserListsActor {
                     .withSorting(specification.sorting)
                     .includeItemsCount(specification.includeItemsCount)
                     .build(on: worker)
-                    .map { lists in .init(user.representation, lists: lists) }
+                    .map { lists in .init(user, lists: lists) }
             }
     }
 

@@ -51,19 +51,19 @@ class ItemsPageContextBuilder {
     var items: [ItemRepresentation]?
 
     @discardableResult
-    func forUserRepresentation(_ user: UserRepresentation) -> Self {
+    func forUser(_ user: UserRepresentation) -> Self {
         self.user = user
         return self
     }
 
     @discardableResult
-    func forListRepresentation(_ list: ListRepresentation) -> Self {
+    func forList(_ list: ListRepresentation) -> Self {
         self.list = list
         return self
     }
 
     @discardableResult
-    func withItemRepresentations(_ items: [ItemRepresentation]?) -> Self {
+    func withItems(_ items: [ItemRepresentation]?) -> Self {
         self.items = items
         return self
     }

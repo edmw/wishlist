@@ -32,8 +32,8 @@ final class FavoriteController: AuthenticatableController,
                     )
                     .flatMap { result in
                         let context = try ListPageContextBuilder()
-                            .forUserRepresentation(result.user)
-                            .withListRepresentation(result.list)
+                            .forUser(result.user)
+                            .withList(result.list)
                             .build()
                         return try Controller.renderView(
                             "User/FavoriteCreation",
@@ -61,8 +61,8 @@ final class FavoriteController: AuthenticatableController,
                     )
                     .flatMap { result in
                         let context = try ListPageContextBuilder()
-                            .forUserRepresentation(result.user)
-                            .withListRepresentation(result.list)
+                            .forUser(result.user)
+                            .withList(result.list)
                             .build()
                         return try Controller.renderView(
                             "User/FavoriteDeletion",

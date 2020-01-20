@@ -35,13 +35,13 @@ class ListPageContextBuilder {
     var formData: ListPageFormData?
 
     @discardableResult
-    func forUserRepresentation(_ user: UserRepresentation) -> Self {
+    func forUser(_ user: UserRepresentation) -> Self {
         self.user = user
         return self
     }
 
     @discardableResult
-    func withListRepresentation(_ list: ListRepresentation?) -> Self {
+    func withList(_ list: ListRepresentation?) -> Self {
         self.list = list
         return self
     }

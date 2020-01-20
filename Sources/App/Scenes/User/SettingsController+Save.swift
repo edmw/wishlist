@@ -33,14 +33,14 @@ extension SettingsController {
                         .boundaries(worker: request.eventLoop)
                     )
                     .map { result in
-                        contextBuilder = contextBuilder.forUserRepresentation(result.user)
+                        contextBuilder = contextBuilder.forUser(result.user)
                         return try .success(with: result.user, context: contextBuilder.build())
                     }
                     .catchMap(UserSettingsActorError.self) { error in
                         if case let UserSettingsActorError
                             .validationError(user, error) = error
                         {
-                            contextBuilder = contextBuilder.forUserRepresentation(user)
+                            contextBuilder = contextBuilder.forUser(user)
                             return try self.handleErrorOnSave(error, with: contextBuilder.build())
                         }
                         throw error

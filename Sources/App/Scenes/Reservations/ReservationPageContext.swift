@@ -66,25 +66,25 @@ class ReservationPageContextBuilder {
     }
 
     @discardableResult
-    func forUserRepresentation(_ user: UserRepresentation) -> Self {
+    func forUser(_ user: UserRepresentation) -> Self {
         self.user = user
         return self
     }
 
     @discardableResult
-    func forItemRepresentation(_ item: ItemRepresentation) -> Self {
+    func forItem(_ item: ItemRepresentation) -> Self {
         self.item = item
         return self
     }
 
     @discardableResult
-    func forListRepresentation(_ list: ListRepresentation) -> Self {
+    func forList(_ list: ListRepresentation) -> Self {
         self.list = list
         return self
     }
 
     @discardableResult
-    func withReservationRepresentation(_ reservation: ReservationRepresentation?) -> Self {
+    func withReservation(_ reservation: ReservationRepresentation?) -> Self {
         self.reservation = reservation
         return self
     }

@@ -40,13 +40,13 @@ class ListsPageContextBuilder {
     var lists: [ListRepresentation]?
 
     @discardableResult
-    func forUserRepresentation(_ user: UserRepresentation) -> Self {
+    func forUser(_ user: UserRepresentation) -> Self {
         self.user = user
         return self
     }
 
     @discardableResult
-    func withListRepresentations(_ lists: [ListRepresentation]?) -> Self {
+    func withLists(_ lists: [ListRepresentation]?) -> Self {
         self.lists = lists
         return self
     }

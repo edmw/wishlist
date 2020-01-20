@@ -64,7 +64,7 @@ extension InvitationController {
         _ result: CreateInvitation.Result,
         contextBuilder: InvitationPageContextBuilder
     ) throws -> InvitationSaveOutcome {
-        let context = try contextBuilder.forUserRepresentation(result.user).build()
+        let context = try contextBuilder.forUser(result.user).build()
         return .success(
             with: .init(user: result.user, invitation: result.invitation),
             context: context

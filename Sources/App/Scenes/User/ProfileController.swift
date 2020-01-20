@@ -23,8 +23,8 @@ final class ProfileController: AuthenticatableController,
             )
             .flatMap { result in
                 let context = try ProfilePageContextBuilder()
-                    .forUserRepresentation(result.user)
-                    .withInvitationRepresentations(result.invitations)
+                    .forUser(result.user)
+                    .withInvitations(result.invitations)
                     .build()
                 return try Controller.renderView("User/Profile", with: context, on: request)
             }
@@ -45,7 +45,7 @@ final class ProfileController: AuthenticatableController,
             .flatMap { result in
                 let data = ProfilePageFormData(from: result.user)
                 let context = try ProfilePageContextBuilder()
-                    .forUserRepresentation(result.user)
+                    .forUser(result.user)
                     .withFormData(data)
                     .build()
                 return try Controller.renderView("User/ProfileForm", with: context, on: request)

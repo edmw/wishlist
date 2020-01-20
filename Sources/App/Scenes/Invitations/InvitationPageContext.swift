@@ -43,13 +43,13 @@ class InvitationPageContextBuilder {
     var sendSuccess: Bool?
 
     @discardableResult
-    func forUserRepresentation(_ user: UserRepresentation) -> Self {
+    func forUser(_ user: UserRepresentation) -> Self {
         self.user = user
         return self
     }
 
     @discardableResult
-    func forInvitationRepresentation(_ invitation: InvitationRepresentation?) -> Self {
+    func forInvitation(_ invitation: InvitationRepresentation?) -> Self {
         self.invitation = invitation
         return self
     }

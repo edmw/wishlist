@@ -28,8 +28,8 @@ final class ListsController: AuthenticatableController,
             )
             .flatMap { result in
                 let context = try ListsPageContextBuilder()
-                    .forUserRepresentation(result.user)
-                    .withListRepresentations(result.lists)
+                    .forUser(result.user)
+                    .withLists(result.lists)
                     .build()
                 return try Controller.renderView("User/Lists", with: context, on: request)
             }

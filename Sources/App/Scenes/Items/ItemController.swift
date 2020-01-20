@@ -30,11 +30,11 @@ final class ItemController: AuthenticatableController,
             )
             .flatMap { result in
                 var contextBuilder = ItemPageContextBuilder()
-                    .forUserRepresentation(result.user)
-                    .forListRepresentation(result.list)
+                    .forUser(result.user)
+                    .forList(result.list)
                 if let item = result.item {
                     contextBuilder = contextBuilder
-                        .withItemRepresentation(item)
+                        .withItem(item)
                         .withFormData(ItemPageFormData(from: item))
                 }
                 let context = try contextBuilder.build()
@@ -56,9 +56,9 @@ final class ItemController: AuthenticatableController,
             )
             .flatMap { result in
                 let context = try ItemPageContextBuilder()
-                    .forUserRepresentation(result.user)
-                    .forListRepresentation(result.list)
-                    .withItemRepresentation(result.item)
+                    .forUser(result.user)
+                    .forList(result.list)
+                    .withItem(result.item)
                     .build()
                 return try Controller.renderView("User/ItemDeletion", with: context, on: request)
             }
@@ -67,32 +67,23 @@ final class ItemController: AuthenticatableController,
     /// Renders a view to select the target list to move an item to.
     /// This is only accessible for an authenticated user who owns the affected item.
     private func renderMoveView(on request: Request) throws -> EventLoopFuture<View> {
-        //let userid = try requireAuthenticatedUserID(on: request)
-        //let listid = try requireListID(on: request)
-        //let itemid = try requireItemID(on: request)
-        fatalError()
-//        return try userItemsActor
-//            .requestItemMove(
-//                .specification(userBy: userid, listBy: listid, itemBy: itemid),
-//                .boundaries(worker: request.eventLoop)
-//            )
-//            .flatMap { result in
-//                let context = try ItemPageContextBuilder()
-//                    .forUserRepresentation(result.user)
-//                    .forListRepresentation(result.list)
-//                    .withItemRepresentation(result.item)
-//                    .build()
-//                context.userLists = result.userLists
-//                return try Controller.renderView("User/ItemMove", with: context, on: request)
-//
-        //        return try self.requireList(on: request, for: user).flatMap { list in
-//            return try self.requireItem(on: request, for: list).flatMap { item in
-//                let listRepresentationsBuilder
-//                    = ListRepresentationsBuilder(self.listRepository, self.itemRepository)
-//                        .forUser(user)
-//                        .filter { $0.id != list.id }
-//                return try listRepresentationsBuilder.build(on: request.eventLoop)
-//                    .flatMap { listRepresentations in
+        let userid = try requireAuthenticatedUserID(on: request)
+        let listid = try requireListID(on: request)
+        let itemid = try requireItemID(on: request)
+        return try userItemsActor
+            .requestItemMovement(
+                .specification(userBy: userid, listBy: listid, itemBy: itemid),
+                .boundaries(worker: request.eventLoop)
+            )
+            .flatMap { result in
+                var context = try ItemPageContextBuilder()
+                    .forUser(result.user)
+                    .forList(result.list)
+                    .withItem(result.item)
+                    .build()
+                context.userLists = result.lists.map { ListContext($0) }
+                return try Controller.renderView("User/ItemMove", with: context, on: request)
+            }
     }
 
     // MARK: - CRUD

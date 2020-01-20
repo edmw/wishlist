@@ -49,19 +49,19 @@ class ItemPageContextBuilder {
     var formData: ItemPageFormData?
 
     @discardableResult
-    func forUserRepresentation(_ user: UserRepresentation) -> Self {
+    func forUser(_ user: UserRepresentation) -> Self {
         self.user = user
         return self
     }
 
     @discardableResult
-    func forListRepresentation(_ list: ListRepresentation) -> Self {
+    func forList(_ list: ListRepresentation) -> Self {
         self.list = list
         return self
     }
 
     @discardableResult
-    func withItemRepresentation(_ item: ItemRepresentation?) -> Self {
+    func withItem(_ item: ItemRepresentation?) -> Self {
         self.item = item
         return self
     }

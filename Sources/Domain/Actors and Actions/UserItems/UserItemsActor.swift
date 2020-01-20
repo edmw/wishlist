@@ -41,6 +41,11 @@ public protocol UserItemsActor {
         _ boundaries: DeleteItem.Boundaries
     ) throws -> EventLoopFuture<DeleteItem.Result>
 
+    func requestItemMovement(
+        _ specification: RequestItemMovement.Specification,
+        _ boundaries: RequestItemMovement.Boundaries
+    ) throws -> EventLoopFuture<RequestItemMovement.Result>
+
 }
 
 /// Errors thrown by the User Items actor.
@@ -69,6 +74,7 @@ public final class DomainUserItemsActor: UserItemsActor,
     let recording: EventRecording
 
     let itemRepresentationsBuilder: ItemRepresentationsBuilder
+    let listRepresentationsBuilder: ListRepresentationsBuilder
 
     public required init(
         itemRepository: ItemRepository,
@@ -83,6 +89,7 @@ public final class DomainUserItemsActor: UserItemsActor,
         self.logging = MessageLogging(provider: logging)
         self.recording = EventRecording(provider: recording)
         self.itemRepresentationsBuilder = .init(itemRepository)
+        self.listRepresentationsBuilder = .init(listRepository, itemRepository)
     }
 
 }

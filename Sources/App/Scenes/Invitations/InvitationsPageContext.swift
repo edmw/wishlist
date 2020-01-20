@@ -40,13 +40,13 @@ class InvitationsPageContextBuilder {
     var invitations: [InvitationRepresentation]?
 
     @discardableResult
-    func forUserRepresentation(_ user: UserRepresentation) -> Self {
+    func forUser(_ user: UserRepresentation) -> Self {
         self.user = user
         return self
     }
 
     @discardableResult
-    func withInvitationRepresentations(_ invitations: [InvitationRepresentation]?) -> Self {
+    func withInvitations(_ invitations: [InvitationRepresentation]?) -> Self {
         self.invitations = invitations
         return self
     }

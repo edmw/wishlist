@@ -68,25 +68,25 @@ class WishlistPageContextBuilder {
     var identification: Identification?
 
     @discardableResult
-    func forListRepresentation(_ list: ListRepresentation) -> Self {
+    func forList(_ list: ListRepresentation) -> Self {
         self.list = list
         return self
     }
 
     @discardableResult
-    func forOwnerRepresentation(_ owner: UserRepresentation) -> Self {
+    func forOwner(_ owner: UserRepresentation) -> Self {
         self.owner = owner
         return self
     }
 
     @discardableResult
-    func withItemRepresentations(_ items: [ItemRepresentation]) -> Self {
+    func withItems(_ items: [ItemRepresentation]) -> Self {
         self.items = items
         return self
     }
 
     @discardableResult
-    func withUserRepresentation(_ user: UserRepresentation?) -> Self {
+    func withUser(_ user: UserRepresentation?) -> Self {
         self.user = user
         return self
     }

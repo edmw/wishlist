@@ -30,9 +30,9 @@ final class ItemsController: AuthenticatableController,
             )
             .flatMap { result in
                 let context = try ItemsPageContextBuilder()
-                    .forUserRepresentation(result.user)
-                    .forListRepresentation(result.list)
-                    .withItemRepresentations(result.items)
+                    .forUser(result.user)
+                    .forList(result.list)
+                    .withItems(result.items)
                     .build()
                 return try Controller.renderView("User/Items", with: context, on: request)
             }

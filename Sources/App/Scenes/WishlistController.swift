@@ -50,11 +50,11 @@ final class WishlistController: AuthenticatableController,
             )
             .flatMap { result in
                 let context = try WishlistPageContextBuilder()
-                    .forListRepresentation(result.list)
-                    .forOwnerRepresentation(result.owner)
-                    .withUserRepresentation(result.user)
+                    .forList(result.list)
+                    .forOwner(result.owner)
+                    .withUser(result.user)
                     .userFavorsList(result.isFavorite)
-                    .withItemRepresentations(result.items)
+                    .withItems(result.items)
                     .forIdentification(result.identification)
                     .build()
                 return try Controller.renderView("Protected/Wishlist", with: context, on: request)
@@ -103,8 +103,8 @@ final class WishlistController: AuthenticatableController,
             { identification, item, list, _ throws in
                 let context = try ReservationPageContextBuilder()
                     .forIdentification(identification)
-                    .forItemRepresentation(item)
-                    .forListRepresentation(list)
+                    .forItem(item)
+                    .forList(list)
                     .build()
                 return try Controller.renderView(
                     "Protected/ReservationCreation",
@@ -122,9 +122,9 @@ final class WishlistController: AuthenticatableController,
             { identification, item, list, reservation throws in
                 let context = try ReservationPageContextBuilder()
                     .forIdentification(identification)
-                    .forItemRepresentation(item)
-                    .forListRepresentation(list)
-                    .withReservationRepresentation(reservation)
+                    .forItem(item)
+                    .forList(list)
+                    .withReservation(reservation)
                     .build()
                 return try Controller.renderView(
                     "Protected/ReservationDeletion",

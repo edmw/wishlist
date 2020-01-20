@@ -33,7 +33,7 @@ class SettingsPageContextBuilder {
     var formData: SettingsPageFormData?
 
     @discardableResult
-    func forUserRepresentation(_ user: UserRepresentation) -> Self {
+    func forUser(_ user: UserRepresentation) -> Self {
         self.user = user
         return self
     }

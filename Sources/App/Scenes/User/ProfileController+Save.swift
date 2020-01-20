@@ -30,14 +30,14 @@ extension ProfileController {
                         .boundaries(worker: request.eventLoop)
                     )
                     .map { result in
-                        contextBuilder = contextBuilder.forUserRepresentation(result.user)
+                        contextBuilder = contextBuilder.forUser(result.user)
                         return try .success(with: result.user, context: contextBuilder.build())
                     }
                     .catchMap(UserProfileActorError.self) { error in
                         if case let UserProfileActorError
                             .validationError(user, error) = error
                         {
-                            contextBuilder = contextBuilder.forUserRepresentation(user)
+                            contextBuilder = contextBuilder.forUser(user)
                             return try self.handleErrorOnSave(error, with: contextBuilder.build())
                         }
                         throw error

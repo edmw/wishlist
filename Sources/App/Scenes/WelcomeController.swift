@@ -33,9 +33,9 @@ final class WelcomeController: AuthenticatableController, RouteCollection {
             )
             .flatMap { result in
                 let context = try WelcomePageContextBuilder()
-                    .forUserRepresentation(result.user)
-                    .withListRepresentations(result.lists)
-                    .withFavoriteRepresentations(result.favorites)
+                    .forUser(result.user)
+                    .withLists(result.lists)
+                    .withFavorites(result.favorites)
                     .build()
                 return try Controller.renderView("User/Welcome", with: context, on: request)
             }

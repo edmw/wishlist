@@ -24,8 +24,8 @@ final class InvitationsController: AuthenticatableController,
             )
             .flatMap { result in
                 let context = try InvitationsPageContextBuilder()
-                    .forUserRepresentation(result.user)
-                    .withInvitationRepresentations(result.invitations)
+                    .forUser(result.user)
+                    .withInvitations(result.invitations)
                     .build()
                 return try Controller.renderView("User/Invitations", with: context, on: request)
             }

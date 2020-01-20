@@ -26,8 +26,8 @@ final class FavoritesController: AuthenticatableController, SortingController, R
             )
             .flatMap { result in
                 let context = try FavoritesPageContextBuilder()
-                    .forUserRepresentation(result.user)
-                    .withFavoriteRepresentations(result.favorites)
+                    .forUser(result.user)
+                    .withFavorites(result.favorites)
                     .build()
                 return try Controller.renderView("User/Favorites", with: context, on: request)
             }
