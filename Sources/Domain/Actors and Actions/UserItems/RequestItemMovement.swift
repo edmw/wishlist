@@ -62,8 +62,6 @@ extension DomainUserItemsActor {
             }
     }
 
-
-
 //        return try self.requireList(on: request, for: user).flatMap { list in
 //    return try self.requireItem(on: request, for: list).flatMap { item in
 //        let listRepresentationsBuilder
@@ -72,6 +70,5 @@ extension DomainUserItemsActor {
 //                .filter { $0.id != list.id }
 //        return try listRepresentationsBuilder.build(on: request.eventLoop)
 //            .flatMap { listRepresentations in
-
 
 }

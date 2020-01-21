@@ -7,8 +7,11 @@ extension EventLoopFuture {
     /// `MessageLogging`. The specified `LoggingMessageRoot` is used to create the logging message
     /// from this future‘s value. This future‘s value is transformed into the `LoggingMessage`‘s
     /// subject by the specfied closure.
-    /// - Parameter root: Factory to create a logging message from this future‘s value.
-    /// - Parameter subject: Closure to transform this future‘s value into the logging messages‘ type.
+    /// - Parameter root: Factory to create a logging message from this future‘s value. This
+    ///     future‘s value is processed through the specified closure `subject`, first and than
+    ///     given to this factory to construct a logging message.
+    /// - Parameter subject: Closure to transform this future‘s value into the logging messages‘
+    ///     type. The result is passed to the specified factory to construct a logging message.
     /// - Parameter condition: Conditionally turn of logging by returning `false` from this closure.
     /// - Parameter logging: Logging target to log into.
     /// - Parameter file: #file

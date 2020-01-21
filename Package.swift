@@ -29,14 +29,19 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Library",
+            name: "Tooling",
             dependencies: []
+        ),
+        .target(
+            name: "Library",
+            dependencies: [ "Tooling" ]
         ),
         .target(
             name: "Domain",
             dependencies: [
                 "Library",
-                "NIO"
+                "NIO",
+                "Tooling"
             ]
         ),
         .target(
@@ -52,7 +57,8 @@ let package = Package(
                 "FluentMySQL",
                 "Imperial",
                 "Lingo",
-                "SwiftSMTP"
+                "SwiftSMTP",
+                "Tooling"
             ]
         ),
         .target(
