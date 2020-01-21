@@ -13,7 +13,6 @@ public protocol AnyIdentifier {
 // MARK: Identifier
 
 public protocol Identifier: AnyIdentifier,
-    Loggable,
     Codable,
     Hashable,
     RawRepresentable,

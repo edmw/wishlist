@@ -7,10 +7,10 @@ import Foundation
 /// Additionally, to ease handling by humans an invitation code should be as short in length as
 /// possible and consisting of alphanumeric characters only. Best, if only characters are used
 /// which can not be easily mistaken by humans (which this implementation doesn't do).
-public struct InvitationCode: StringValue, Loggable {
+public struct InvitationCode: Encodable {
 
     /// Let me introduce to you: The code itself.
-    public let rawValue: String
+    public var rawValue: String
 
     /// Generates a new invitation code. This uses UUID as base for the codes which isn't
     /// optimal because UUIDs are designed to be unique not to be random. Nevertheless, we will

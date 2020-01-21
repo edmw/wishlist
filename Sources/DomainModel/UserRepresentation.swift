@@ -5,7 +5,6 @@ import Foundation
 // MARK: UserRepresentation
 
 public struct UserRepresentation: Encodable,
-    Equatable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {
@@ -24,21 +23,32 @@ public struct UserRepresentation: Encodable,
 
     public let settings: UserSettings
 
-    internal init(_ user: User) {
-        self.id = user.userID
-
-        self.nickName = user.nickName
-        self.displayName = user.displayName
-        self.fullName = user.fullName
-        self.firstName = user.firstName
-        self.lastName = user.lastName
-        self.email = String(user.email)
-        self.language = user.language
-        self.confidant = user.confidant
-        self.firstLogin = user.firstLogin
-        self.lastLogin = user.lastLogin
-
-        self.settings = user.settings
+    public init(
+        id: UserID?,
+        nickName: String?,
+        displayName: String,
+        fullName: String,
+        firstName: String,
+        lastName: String,
+        email: String,
+        language: String?,
+        confidant: Bool,
+        firstLogin: Date?,
+        lastLogin: Date?,
+        settings: UserSettings
+    ) {
+        self.id = id
+        self.nickName = nickName
+        self.displayName = displayName
+        self.fullName = fullName
+        self.firstName = firstName
+        self.lastName = lastName
+        self.email = email
+        self.language = language
+        self.confidant = confidant
+        self.firstLogin = firstLogin
+        self.lastLogin = lastLogin
+        self.settings = settings
     }
 
     // MARK: CustomStringConvertible
@@ -52,15 +62,6 @@ public struct UserRepresentation: Encodable,
     public var debugDescription: String {
         return "UserRepresentation[\(id ??? "???")]"
             + "(\(email), \(fullName))"
-    }
-
-}
-
-extension User {
-
-    /// Returns a representation for this model.
-    var representation: UserRepresentation {
-        return .init(self)
     }
 
 }

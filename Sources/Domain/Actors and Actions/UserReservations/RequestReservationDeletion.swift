@@ -1,3 +1,5 @@
+import DomainModel
+
 import Foundation
 import NIO
 

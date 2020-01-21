@@ -1,7 +1,7 @@
 import Foundation
 
 /// This type represents a file name.
-public struct FileName: StringValue, Loggable {
+public struct FileName: Codable, Equatable {
 
     /// Let me introduce to you: The key itself.
     public var rawValue: String

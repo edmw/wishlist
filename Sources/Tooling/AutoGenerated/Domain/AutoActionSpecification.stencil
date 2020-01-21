@@ -1,5 +1,7 @@
 {% for type in types.implementing.AutoActionSpecification %}
 // sourcery:file:AutoActionSpecification/{{type.name}}+AutoActionSpecification.generated.swift
+import DomainModel
+
 // MARK: {{type.name}}
 
 extension {{type.name}} {

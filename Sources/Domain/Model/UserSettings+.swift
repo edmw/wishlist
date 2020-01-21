@@ -1,23 +1,9 @@
+import DomainModel
+
 import Foundation
 import NIO
 
-/// This type represents a users settings.
-public struct UserSettings: Values, ValueValidatable, Equatable {
-
-    public var notifications: UserSettings.Notifications
-
-    public struct Notifications: Codable, Equatable {
-
-        public var emailEnabled: Bool = false
-
-        public var pushoverEnabled: Bool = false
-        public var pushoverKey: PushoverKey = ""
-
-    }
-
-    public init() {
-        notifications = Notifications()
-    }
+extension UserSettings: Values, ValueValidatable {
 
     // MARK: Validatable
 

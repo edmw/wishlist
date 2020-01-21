@@ -1,7 +1,7 @@
 import Foundation
 
 /// This type represents an pushover key.
-public struct PushoverKey: SensitiveStringValue {
+public struct PushoverKey: Codable, Equatable {
 
     /// Let me introduce to you: The key itself.
     public let rawValue: String

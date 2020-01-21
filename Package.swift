@@ -9,6 +9,7 @@ let package = Package(
     products: [
         .library(name: "WishlistLibrary", targets: [ "Library" ]),
         .library(name: "WishlistDomain", targets: [ "Domain" ]),
+        .library(name: "WishlistDomainModel", targets: [ "DomainModel" ]),
         .executable(name: "Wishlist", targets: [ "Run" ])
     ],
     dependencies: [
@@ -37,17 +38,27 @@ let package = Package(
             dependencies: [ "Tooling" ]
         ),
         .target(
+            name: "DomainModel",
+            dependencies: [
+                "Tooling",
+                "Library"
+            ]
+        ),
+        .target(
             name: "Domain",
             dependencies: [
+                "DomainModel",
+                "Tooling",
                 "Library",
-                "NIO",
-                "Tooling"
+                "NIO"
             ]
         ),
         .target(
             name: "App",
             dependencies: [
                 "Domain",
+                "DomainModel",
+                "Tooling",
                 "Library",
                 "Vapor",
                 "Leaf",
@@ -57,8 +68,7 @@ let package = Package(
                 "FluentMySQL",
                 "Imperial",
                 "Lingo",
-                "SwiftSMTP",
-                "Tooling"
+                "SwiftSMTP"
             ]
         ),
         .target(

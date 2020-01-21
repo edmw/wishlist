@@ -1,3 +1,6 @@
+import DomainModel
+import Library
+
 import Foundation
 import NIO
 
@@ -69,20 +72,25 @@ class FavoriteRepresentationsBuilder {
             .favorites(for: user, sort: sorting)
             .flatMap { lists in
                 return lists.map { list in
-                    var representation = FavoriteRepresentation(list)
                     return self.listRepository
                         .owner(of: list)
                         .flatMap { owner in
-                            representation.list.ownerName = owner.displayName
                             if self.includeItemsCount {
                                 return try self.itemRepository
                                     .count(on: list)
                                     .map { itemsCount in
-                                        representation.list.itemsCount = itemsCount
-                                        return representation
+                                        return FavoriteRepresentation(
+                                            list,
+                                            ownerName: owner.displayName,
+                                            itemsCount: itemsCount
+                                        )
                                     }
                             }
                             else {
+                                let representation = FavoriteRepresentation(
+                                    list,
+                                    ownerName: owner.displayName
+                                )
                                 return worker.makeSucceededFuture(representation)
                             }
                         }

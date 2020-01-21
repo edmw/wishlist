@@ -2,7 +2,7 @@ import Foundation
 
 /// This type represents an identity for a user used for authentication. This unique per identity
 /// provider.
-public struct UserIdentity: StringValue {
+public struct UserIdentity: Codable, Equatable {
 
     /// Let me introduce to you: The user identity itself.
     public let rawValue: String

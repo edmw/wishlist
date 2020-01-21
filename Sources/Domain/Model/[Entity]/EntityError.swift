@@ -1,3 +1,5 @@
+import DomainModel
+
 import Foundation
 
 // MARK: AnyEntityError
