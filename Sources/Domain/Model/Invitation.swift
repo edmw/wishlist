@@ -1,7 +1,6 @@
-import DomainModel
-import Library
-
 import Foundation
+
+import Library
 
 // MARK: Entity
 

@@ -1,5 +1,3 @@
-import Foundation
-
 // MARK: EntityProperties
 
 public struct EntityProperties<Type: Entity>: Collection {

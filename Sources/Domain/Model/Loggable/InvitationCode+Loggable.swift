@@ -1,4 +1,4 @@
-import DomainModel
+// MARK: InvitationCode+Loggable
 
 extension InvitationCode: Loggable {
 }

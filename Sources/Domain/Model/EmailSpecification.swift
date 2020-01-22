@@ -1,7 +1,7 @@
-import Foundation
+// MARK: EmailSpecification
 
 /// This type represents an email specification as of RFC 5322 (section 3.4.1).
-public struct EmailSpecification: Codable, Equatable {
+public struct EmailSpecification: StringValue {
 
     /// Let me introduce to you: The specification itself.
     public let rawValue: String

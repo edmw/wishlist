@@ -1,6 +1,8 @@
 import Foundation
 import NIO
 
+// MARK: UserValues
+
 /// Representation of a user with external properties only and with simple types.
 /// Used for validation, importing and exporting.
 public struct UserValues: Values, ValueValidatable {

@@ -1,6 +1,6 @@
-import Library
-
 import Foundation
+
+import Library
 
 // MARK: ListRepresentation
 
@@ -20,7 +20,7 @@ public struct ListRepresentation: Encodable, Equatable {
 
     public var itemsCount: Int?
 
-    public init(
+    init(
         id: ListID?,
         title: String,
         visibility: String,
@@ -40,6 +40,20 @@ public struct ListRepresentation: Encodable, Equatable {
         self.ownerName = ownerName
         self.itemsSorting = itemsSorting
         self.itemsCount = itemsCount
+    }
+
+    init(_ list: List, ownerName: String? = nil, itemsCount: Int? = nil) {
+        self.init(
+            id: list.listID,
+            title: list.title ??? "�",
+            visibility: String(describing: list.visibility),
+            createdAt: list.createdAt,
+            modifiedAt: list.modifiedAt,
+            maskReservations: list.options.contains(.maskReservations),
+            ownerName: ownerName,
+            itemsSorting: list.itemsSorting.map { String(describing: $0) },
+            itemsCount: itemsCount
+        )
     }
 
 }

@@ -1,8 +1,7 @@
-import DomainModel
-import Library
-
 import Foundation
 import NIO
+
+import Library
 
 // MARK: ListRepresentationsBuilder
 

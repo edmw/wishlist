@@ -1,4 +1,4 @@
-import DomainModel
+// MARK: PushoverKey+Loggable
 
 extension PushoverKey: Loggable {
 }

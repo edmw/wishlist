@@ -1,4 +1,4 @@
-import Foundation
+// MARK: AuthorizationError
 
 public enum AuthorizationError: Error {
 

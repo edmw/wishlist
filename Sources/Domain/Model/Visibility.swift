@@ -2,6 +2,8 @@
 
 import Foundation
 
+// MARK: Visibility
+
 public enum Visibility: Int, Codable, LosslessStringConvertible, CustomStringConvertible {
 
     case ´private´ = 0

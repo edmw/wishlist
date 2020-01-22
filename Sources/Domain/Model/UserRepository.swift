@@ -1,7 +1,6 @@
-import DomainModel
-
-import Foundation
 import NIO
+
+// MARK: UserRepository
 
 public protocol UserRepository: EntityRepository {
 

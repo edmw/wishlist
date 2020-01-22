@@ -1,13 +1,13 @@
-import Library
-
 import Foundation
+
+// MARK: InvitationCode
 
 /// This type represents an invitation code. An invitation code is mostly a simple string
 /// which should be hard to guess and unique amongst the set of all invitation codes.
 /// Additionally, to ease handling by humans an invitation code should be as short in length as
 /// possible and consisting of alphanumeric characters only. Best, if only characters are used
 /// which can not be easily mistaken by humans (which this implementation doesn't do).
-public struct InvitationCode: Encodable {
+public struct InvitationCode: StringValue {
 
     /// Let me introduce to you: The code itself.
     public var rawValue: String

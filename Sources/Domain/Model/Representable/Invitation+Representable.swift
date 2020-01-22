@@ -1,4 +1,4 @@
-import DomainModel
+// MARK: Invitation+Representable
 
 extension Invitation {
 

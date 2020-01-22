@@ -1,7 +1,6 @@
 {% for type in types.implementing.AutoActionBoundaries %}
 // sourcery:file:AutoActionBoundaries/{{type.name}}+AutoActionBoundaries.generated.swift
-import DomainModel
-
+import Foundation
 import NIO
 
 // MARK: {{type.name}}

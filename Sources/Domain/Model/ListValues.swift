@@ -1,6 +1,8 @@
 import Foundation
 import NIO
 
+// MARK: ListValues
+
 /// Representation of a list with external properties only and with simple types.
 /// Used for validation, importing and exporting.
 public struct ListValues: Values, ValueValidatable {

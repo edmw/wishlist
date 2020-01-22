@@ -1,6 +1,6 @@
-import Library
-
 import Foundation
+
+import Library
 
 // MARK: ItemRepresentation
 
@@ -21,7 +21,7 @@ public struct ItemRepresentation: Encodable, Equatable {
     public let reservationID: ReservationID?
     public let reservationHolderID: Identification?
 
-    public init(
+    init(
         id: ItemID?,
         title: String,
         text: String,
@@ -45,6 +45,22 @@ public struct ItemRepresentation: Encodable, Equatable {
         self.localImageURL = localImageURL
         self.reservationID = reservationID
         self.reservationHolderID = reservationHolderID
+    }
+
+    init(_ item: Item, with reservation: Reservation? = nil) {
+        self.init(
+            id: item.itemID,
+            title: item.title ??? "�",
+            text: item.text ??? "�",
+            preference: String(describing: item.preference),
+            createdAt: item.createdAt,
+            modifiedAt: item.modifiedAt,
+            url: item.url?.absoluteString,
+            imageURL: item.imageURL?.absoluteString,
+            localImageURL: item.localImageURL?.absoluteString,
+            reservationID: reservation?.reservationID,
+            reservationHolderID: reservation?.holder
+        )
     }
 
 }

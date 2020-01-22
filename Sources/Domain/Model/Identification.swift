@@ -1,5 +1,7 @@
 import Foundation
 
+// MARK: Identification
+
 /// This type represents an identifier used to identify anonymous as well as authenticated users.
 /// Any reservation for an item will be attached to this identifier. This allows anonymous as well
 /// as authenticated users to make reservations. In a rather complex process this application tries

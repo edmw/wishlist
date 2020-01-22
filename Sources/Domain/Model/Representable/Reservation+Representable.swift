@@ -1,4 +1,4 @@
-import DomainModel
+// MARK: Reservation+Representable
 
 extension Reservation {
 

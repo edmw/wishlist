@@ -1,2 +1,4 @@
+// MARK: Confidental
+
 protocol Confidental {
 }

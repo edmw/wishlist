@@ -1,4 +1,4 @@
-import Foundation
+// MARK: Loggable+Entity
 
 /// Default implementation of `Loggable` for types conforming to `Entity`.
 /// Must confirm to `Codable` and `CustomStringConvertible`, also.

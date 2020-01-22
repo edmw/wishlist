@@ -1,7 +1,6 @@
-import DomainModel
-
-import Foundation
 import NIO
+
+// MARK: ReservationRepository
 
 public protocol ReservationRepository: EntityRepository {
 

@@ -1,4 +1,4 @@
-import DomainModel
+// MARK: FileName+Loggable
 
 extension FileName: Loggable {
 }

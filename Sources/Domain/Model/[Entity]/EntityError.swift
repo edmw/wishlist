@@ -1,11 +1,3 @@
-import DomainModel
-
-import Foundation
-
-// MARK: AnyEntityError
-
-public protocol AnyEntityError: Error {}
-
 // MARK: EntityError
 
 public enum EntityError<T: Entity & EntityReflectable>: AnyEntityError,
@@ -53,3 +45,7 @@ public enum EntityError<T: Entity & EntityReflectable>: AnyEntityError,
     }
 
 }
+
+// MARK: AnyEntityError
+
+public protocol AnyEntityError: Error {}

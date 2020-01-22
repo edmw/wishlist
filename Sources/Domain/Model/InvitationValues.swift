@@ -1,7 +1,7 @@
-import DomainModel
-
 import Foundation
 import NIO
+
+// MARK: InvitationValues
 
 /// Representation of an invitation without any internal properties and with simple types.
 /// Used for validation, importing and exporting.

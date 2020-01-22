@@ -1,4 +1,4 @@
-import DomainModel
+// MARK: User+Representable
 
 extension User {
 

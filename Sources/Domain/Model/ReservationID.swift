@@ -1,5 +1,7 @@
 import Foundation
 
+// MARK: ReservationID
+
 public struct ReservationID: Identifier {
 
     public let rawValue: UUID

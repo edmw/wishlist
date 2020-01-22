@@ -1,10 +1,10 @@
-import Library
-
 import Foundation
+
+import Library
 
 // MARK: UserRepresentation
 
-public struct UserRepresentation: Encodable,
+public struct UserRepresentation: Encodable, Equatable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {
@@ -23,7 +23,7 @@ public struct UserRepresentation: Encodable,
 
     public let settings: UserSettings
 
-    public init(
+    init(
         id: UserID?,
         nickName: String?,
         displayName: String,
@@ -49,6 +49,23 @@ public struct UserRepresentation: Encodable,
         self.firstLogin = firstLogin
         self.lastLogin = lastLogin
         self.settings = settings
+    }
+
+    init(_ user: User) {
+        self.init(
+            id: user.userID,
+            nickName: user.nickName,
+            displayName: user.displayName,
+            fullName: user.fullName,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: String(user.email),
+            language: user.language,
+            confidant: user.confidant,
+            firstLogin: user.firstLogin,
+            lastLogin: user.lastLogin,
+            settings: user.settings
+        )
     }
 
     // MARK: CustomStringConvertible

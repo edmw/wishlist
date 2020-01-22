@@ -1,10 +1,9 @@
 // swiftlint:disable function_body_length closure_body_length
 
-import DomainModel
-import Library
-
 import Foundation
 import NIO
+
+import Library
 
 // MARK: MaterialiseUser
 

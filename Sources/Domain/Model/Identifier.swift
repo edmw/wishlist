@@ -1,14 +1,4 @@
-import Library
-
 import Foundation
-
-// MARK: AnyIdentifier
-
-public protocol AnyIdentifier {
-
-    var uuid: UUID { get }
-
-}
 
 // MARK: Identifier
 
@@ -104,6 +94,14 @@ extension Identifier {
         var container = encoder.singleValueContainer()
         try container.encode(rawValue)
     }
+
+}
+
+// MARK: AnyIdentifier
+
+public protocol AnyIdentifier {
+
+    var uuid: UUID { get }
 
 }
 

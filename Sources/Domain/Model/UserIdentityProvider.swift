@@ -1,7 +1,7 @@
-import Foundation
+// MARK: UserIdentityProvider
 
 /// This type represents an identity provider for a user used for authentication.
-public struct UserIdentityProvider: Codable, Equatable {
+public struct UserIdentityProvider: StringValue {
 
     /// Let me introduce to you: The user identity provider itself.
     public let rawValue: String

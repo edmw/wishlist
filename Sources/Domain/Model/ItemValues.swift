@@ -1,6 +1,8 @@
 import Foundation
 import NIO
 
+// MARK: ItemValues
+
 /// Representation of an item without any internal properties and with simple types.
 /// Used for validation, importing and exporting.
 public struct ItemValues: Values, ValueValidatable {

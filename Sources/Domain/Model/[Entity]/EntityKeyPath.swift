@@ -1,4 +1,4 @@
-import Foundation
+// MARK: EntityKeyPath
 
 /// Type-erased key-path from a concrete root type to any resulting value type capable of
 /// - comparing the values of two properties for the key-path on two given instances

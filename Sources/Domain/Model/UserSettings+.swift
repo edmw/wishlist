@@ -1,7 +1,7 @@
-import DomainModel
-
 import Foundation
 import NIO
+
+// MARK: UserSettings
 
 extension UserSettings: Values, ValueValidatable {
 

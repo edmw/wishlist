@@ -1,5 +1,3 @@
-import DomainModel
-
 import Foundation
 
 // MARK: Loggable

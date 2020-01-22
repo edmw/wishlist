@@ -1,5 +1,3 @@
-import Foundation
-
 // MARK: Entity
 
 public protocol Entity: Equatable {

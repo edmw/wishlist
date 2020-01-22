@@ -1,5 +1,6 @@
-import Foundation
 import NIO
+
+// MARK: Invitation+Authorization
 
 extension Invitation {
 

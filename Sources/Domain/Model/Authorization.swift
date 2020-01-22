@@ -1,4 +1,4 @@
-import Foundation
+// MARK: Authorization
 
 struct Authorization<T> {
     let entity: T

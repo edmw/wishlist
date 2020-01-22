@@ -1,4 +1,4 @@
-import DomainModel
+// MARK: EmailSpecification+Loggable
 
 extension EmailSpecification: Loggable {
 }

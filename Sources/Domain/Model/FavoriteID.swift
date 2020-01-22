@@ -1,6 +1,8 @@
 import Foundation
 
-public struct ItemID: Identifier {
+// MARK: FavoriteID
+
+public struct FavoriteID: Identifier {
 
     public let rawValue: UUID
 

@@ -1,5 +1,4 @@
-import Foundation
-import NIO
+// MARK: Entity+Confidental
 
 extension Entity where Self: Confidental {
 

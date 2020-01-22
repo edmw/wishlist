@@ -1,7 +1,6 @@
-import DomainModel
-
-import Foundation
 import NIO
+
+// MARK: FavoriteRepository
 
 public protocol FavoriteRepository: EntityRepository {
 

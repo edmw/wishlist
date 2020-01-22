@@ -1,7 +1,7 @@
-import Foundation
+// MARK: FileName
 
 /// This type represents a file name.
-public struct FileName: Codable, Equatable {
+public struct FileName: StringValue {
 
     /// Let me introduce to you: The key itself.
     public var rawValue: String

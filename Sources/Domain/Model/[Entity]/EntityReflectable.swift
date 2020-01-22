@@ -1,5 +1,3 @@
-import Foundation
-
 // MARK: EntityReflectable
 
 public protocol EntityReflectable: Entity {

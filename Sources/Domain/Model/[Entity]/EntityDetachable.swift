@@ -1,6 +1,3 @@
-import Foundation
-import NIO
-
 // MARK: EntityDetachable
 
 public protocol EntityDetachable: Entity {

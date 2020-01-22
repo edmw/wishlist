@@ -1,5 +1,6 @@
-import Foundation
 import NIO
+
+// MARK: List+Authorization
 
 extension List {
 

@@ -1,3 +1,5 @@
+// MARK: Imageable
+
 public protocol Imageable {
 
     var imageableEntityGroupKey: String? { get }

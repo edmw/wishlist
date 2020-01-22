@@ -1,5 +1,6 @@
-import Foundation
 import NIO
+
+// MARK: User+Authorization
 
 extension User {
 

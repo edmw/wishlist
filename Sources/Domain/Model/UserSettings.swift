@@ -1,5 +1,7 @@
 import Foundation
 
+// MARK: UserSettings
+
 /// This type represents a users settings.
 public struct UserSettings: Codable, Equatable {
 

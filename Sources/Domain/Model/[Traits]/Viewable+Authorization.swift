@@ -1,5 +1,4 @@
-import Foundation
-import NIO
+// MARK: Entity+Viewable
 
 extension Entity where Self: Viewable {
 
