@@ -4,7 +4,7 @@ import NIO
 // MARK: WishlistActor
 
 /// Wishlist use cases for guests and the user.
-public protocol WishlistActor {
+public protocol WishlistActor: Actor {
 
     func presentWishlist(
         _ specification: PresentWishlist.Specification,

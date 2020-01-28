@@ -40,9 +40,9 @@ final class ReservationController: AuthenticatableController,
             .flatMap { result in
                 let context = try ReservationPageContextBuilder()
                     .forIdentification(result.holder)
-                    .forUser(result.user)
                     .forItem(result.item)
                     .forList(result.list)
+                    .withUser(result.user)
                     .withReservation(result.reservation)
                     .build()
                 return try Controller.renderView(

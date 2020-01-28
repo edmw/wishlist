@@ -4,7 +4,7 @@ import NIO
 // MARK: UserSettingsActor
 
 /// Settings use cases for the user.
-public protocol UserSettingsActor {
+public protocol UserSettingsActor: Actor {
 
     func requestSettingsEditing(
         _ specification: RequestSettingsEditing.Specification,

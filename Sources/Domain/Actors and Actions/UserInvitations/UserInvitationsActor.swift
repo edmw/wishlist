@@ -4,7 +4,7 @@ import NIO
 // MARK: UserInvitationsActor
 
 /// Invitations use cases for the user.
-public protocol UserInvitationsActor {
+public protocol UserInvitationsActor: Actor {
 
     /// Gets all invitations for the specified user.
     /// - Parameter specification: Specification for this action.

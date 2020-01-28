@@ -2,7 +2,7 @@ import Domain
 
 import Foundation
 
-struct FavoritesPageContext: Encodable {
+struct FavoritesPageContext: Encodable, AutoPageContextBuilder {
 
     var userID: ID?
 
@@ -12,7 +12,8 @@ struct FavoritesPageContext: Encodable {
 
     var favorites: [FavoriteContext]?
 
-    fileprivate init(
+    // sourcery: AutoPageContextBuilderInitializer
+    init(
         for user: UserRepresentation,
         with favorites: [FavoriteRepresentation]? = nil
     ) {
@@ -23,39 +24,6 @@ struct FavoritesPageContext: Encodable {
         self.maximumNumberOfFavorites = Favorite.maximumNumberOfFavoritesPerUser
 
         self.favorites = favorites?.map { favorite in FavoriteContext(favorite) }
-    }
-
-}
-
-// MARK: - Builder
-
-enum FavoritesPageContextBuilderError: Error {
-    case missingRequiredUser
-}
-
-class FavoritesPageContextBuilder {
-
-    var user: UserRepresentation?
-
-    var favorites: [FavoriteRepresentation]?
-
-    @discardableResult
-    func forUser(_ user: UserRepresentation) -> Self {
-        self.user = user
-        return self
-    }
-
-    @discardableResult
-    func withFavorites(_ favorites: [FavoriteRepresentation]?) -> Self {
-        self.favorites = favorites
-        return self
-    }
-
-    func build() throws -> FavoritesPageContext {
-        guard let user = user else {
-            throw FavoritesPageContextBuilderError.missingRequiredUser
-        }
-        return .init(for: user, with: favorites)
     }
 
 }

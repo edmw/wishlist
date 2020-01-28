@@ -4,7 +4,7 @@ import NIO
 // MARK: UserWelcomeActor
 
 /// Welcome use cases for the user.
-public protocol UserWelcomeActor {
+public protocol UserWelcomeActor: Actor {
 
     func getListsAndFavorites(
         _ specification: GetListsAndFavorites.Specification,

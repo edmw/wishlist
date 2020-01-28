@@ -1,3 +1,3 @@
 #!/bin/bash
-vapor update && vapor xcode -n && ./update.rb && open Wishlist.xcodeproj/
+swift package update && swift package generate-xcodeproj && ./update.rb && open Wishlist.xcodeproj/
 

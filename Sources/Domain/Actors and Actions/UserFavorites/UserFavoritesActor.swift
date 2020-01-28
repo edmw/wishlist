@@ -4,7 +4,7 @@ import NIO
 // MARK: UserFavoritesActor
 
 /// Favorites use cases for the user.
-public protocol UserFavoritesActor {
+public protocol UserFavoritesActor: Actor {
 
     func getFavorites(
         _ specification: GetFavorites.Specification,

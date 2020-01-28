@@ -1,0 +1,57 @@
+{% for type in types.implementing.AutoPageContextBuilder %}
+{% macro builder_methodname_for_parameter parameter %}{% if parameter.typeName.name == "Bool" %}{{parameter.name}}{% else %}{% if parameter.isOptional %}with{% else %}for{% endif %}{{parameter.name|upperFirstLetter}}{% endif %}{% endmacro %}
+// sourcery:file:AutoBuilder/{{type.name}}+AutoPageContextBuilder.generated.swift
+import Domain
+
+import Foundation
+
+// MARK: {{type.name}}
+
+enum {{type.name}}BuilderError: Error {
+{% for initializer in type.initializers where initializer|annotated:"AutoPageContextBuilderInitializer" %}
+{% for parameter in initializer.parameters %}
+  {% if parameter.isOptional == false %}
+  case missingRequired{{parameter.name|upperFirstLetter}}
+  {% endif %}
+{% endfor %}
+{% endfor %}
+}
+
+class {{type.name}}Builder {
+
+{% for initializer in type.initializers where initializer|annotated:"AutoPageContextBuilderInitializer" %}
+{% for parameter in initializer.parameters %}
+    var {{parameter.name}}: {{parameter.typeName}}{% if parameter.typeName.name == "Bool" %} = {% if parameter.defaultValue %}{{parameter.defaultValue}}{% else %}HELLO{% endif %}{% else %}{% if parameter.isOptional == false %}?{% endif %}{% endif %}
+{% endfor %}
+{% endfor %}
+{% for initializer in type.initializers where initializer|annotated:"AutoPageContextBuilderInitializer" %}
+{% for parameter in initializer.parameters %}
+
+    @discardableResult
+    func {% call builder_methodname_for_parameter parameter %}(_ {{parameter.name}}: {{parameter.typeName}}) -> Self {
+        self.{{parameter.name}} = {{parameter.name}}
+        return self
+    }
+{% endfor %}
+{% endfor %}
+
+    func build() throws -> {{type.name}} {
+      {% for initializer in type.initializers where initializer|annotated:"AutoPageContextBuilderInitializer" %}
+      {% for parameter in initializer.parameters %}
+        {% if parameter.isOptional == false and parameter.typeName.name != "Bool" %}
+        guard let {{parameter.name}} = {{parameter.name}} else {
+            throw {{type.name}}BuilderError.missingRequired{{parameter.name|upperFirstLetter}}
+        }
+        {% endif %}
+      {% endfor %}
+        return .init(
+        {% for parameter in initializer.parameters %}
+            {{parameter.argumentLabel}}: {{parameter.name}}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+        )
+      {% endfor %}
+    }
+
+}
+// sourcery:end
+{% endfor %}

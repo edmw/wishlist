@@ -29,8 +29,6 @@ extension ItemController {
             .flatMap { formdata in
                 let data = ItemValues(from: formdata)
 
-                var contextBuilder = ItemPageContextBuilder().withFormData(formdata)
-
                 return try userItemsActor
                     .createOrUpdateItem(
                         .specification(userBy: userid, listBy: listid, itemBy: itemid, from: data),
@@ -40,38 +38,57 @@ extension ItemController {
                         )
                     )
                     .map { result in
-                        contextBuilder = contextBuilder.with(result.user, result.list, result.item)
-                        return try .success(with: result, context: contextBuilder.build())
+                        return try self.handleSuccessOnSave(with: result, formdata: formdata)
                     }
                     .catchMap(UserItemsActorError.self) { error in
-                        if case let UserItemsActorError
-                            .validationError(user, list, item, error) = error
-                        {
-                            contextBuilder = contextBuilder.with(user, list, item)
-                            return try self.handleErrorOnSave(error, with: contextBuilder.build())
-                        }
-                        throw error
+                        return try self.handleErrorOnSave(with: error, formdata: formdata)
                     }
             }
     }
 
+    private func handleSuccessOnSave(
+        with result: CreateOrUpdateItem.Result,
+        formdata: ItemPageFormData
+    ) throws -> ItemSaveOutcome {
+        let user = result.user
+        let list = result.list
+        let item = result.item
+        let context = try ItemPageContextBuilder()
+            .withFormData(formdata)
+            .forUser(user)
+            .forList(list)
+            .withItem(item)
+            .build()
+        return .success(with: result, context: context)
+    }
+
     private func handleErrorOnSave(
-        _ error: ValuesError<ItemValues>,
-        with contextIn: ItemPageContext
-    ) throws
-        -> ItemSaveOutcome
-    {
-        var context = contextIn
-        switch error {
-        case .validationFailed(let properties, _):
-            context.form.invalidTitle = properties.contains(\ItemValues.title)
-            context.form.invalidText = properties.contains(\ItemValues.text)
-            context.form.invalidURL = properties.contains(\ItemValues.url)
-            context.form.invalidImageURL = properties.contains(\ItemValues.imageURL)
-        default:
+        with error: UserItemsActorError,
+        formdata: ItemPageFormData
+    ) throws -> ItemSaveOutcome {
+        if case let UserItemsActorError
+            .validationError(user, list, item, error) = error
+        {
+            var context = try ItemPageContextBuilder()
+                .withFormData(formdata)
+                .forUser(user)
+                .forList(list)
+                .withItem(item)
+                .build()
+            switch error {
+            case .validationFailed(let properties, _):
+                context.form.invalidTitle = properties.contains(\ItemValues.title)
+                context.form.invalidText = properties.contains(\ItemValues.text)
+                context.form.invalidURL = properties.contains(\ItemValues.url)
+                context.form.invalidImageURL = properties.contains(\ItemValues.imageURL)
+            default:
+                throw error
+            }
+            return .failure(with: error, context: context)
+        }
+        else {
             throw error
         }
-        return .failure(with: error, context: context)
     }
 
 }

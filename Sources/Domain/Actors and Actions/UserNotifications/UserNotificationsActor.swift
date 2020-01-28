@@ -4,7 +4,7 @@ import NIO
 // MARK: UserNotificationsActor
 
 /// Notifications use cases for the user.
-public protocol UserNotificationsActor {
+public protocol UserNotificationsActor: Actor {
 
     func testNotifications(
         _ specification: TestNotifications.Specification,

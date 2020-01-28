@@ -4,7 +4,7 @@ import NIO
 // MARK: UserItemsActor
 
 /// Items use cases for the user.
-public protocol UserItemsActor {
+public protocol UserItemsActor: Actor {
 
     func getItems(
         _ specification: GetItems.Specification,

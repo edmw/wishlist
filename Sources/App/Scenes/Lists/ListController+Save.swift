@@ -28,45 +28,61 @@ extension ListController {
             .flatMap { formdata in
                 let data = ListValues(from: formdata)
 
-                var contextBuilder = ListPageContextBuilder().withFormData(formdata)
-
                 return try userListsActor
                     .createOrUpdateList(
                         .specification(userBy: userid, listBy: listid, from: data),
                         .boundaries(worker: request.eventLoop)
                     )
                     .map { result in
-                        contextBuilder = contextBuilder.with(result.user, result.list)
-                        return try .success(with: result, context: contextBuilder.build())
+                        return try self.handleSuccessOnSave(with: result, formdata: formdata)
                     }
                     .catchMap(UserListsActorError.self) { error in
-                        if case let UserListsActorError
-                            .validationError(user, list, error) = error
-                        {
-                            contextBuilder = contextBuilder.with(user, list)
-                            return try self.handleErrorOnSave(error, with: contextBuilder.build())
-                        }
-                        throw error
+                        return try self.handleErrorOnSave(with: error, formdata: formdata)
                     }
             }
     }
 
+    private func handleSuccessOnSave(
+        with result: CreateOrUpdateList.Result,
+        formdata: ListPageFormData
+    ) throws -> ListSaveOutcome {
+        let user = result.user
+        let list = result.list
+        let context = try ListPageContextBuilder()
+            .withFormData(formdata)
+            .forUser(user)
+            .withList(list)
+            .build()
+        return .success(with: result, context: context)
+    }
+
     private func handleErrorOnSave(
-        _ error: ValuesError<ListValues>,
-        with contextIn: ListPageContext
+        with error: UserListsActorError,
+        formdata: ListPageFormData
     ) throws
         -> ListSaveOutcome
     {
-        var context = contextIn
-        switch error {
-        case .validationFailed(let properties, _):
-            context.form.invalidTitle = properties.contains(\ListValues.title)
-            context.form.invalidVisibility = properties.contains(\ListValues.visibility)
-        case .uniquenessViolated:
-            // a list with the given name already exists
-            context.form.duplicateName = true
+        if case let UserListsActorError
+            .validationError(user, list, error) = error
+        {
+            var context = try ListPageContextBuilder()
+                .withFormData(formdata)
+                .forUser(user)
+                .withList(list)
+                .build()
+            switch error {
+            case .validationFailed(let properties, _):
+                context.form.invalidTitle = properties.contains(\ListValues.title)
+                context.form.invalidVisibility = properties.contains(\ListValues.visibility)
+            case .uniquenessViolated:
+                // a list with the given name already exists
+                context.form.duplicateName = true
+            }
+            return .failure(with: error, context: context)
         }
-        return .failure(with: error, context: context)
+        else {
+            throw error
+        }
     }
 
 }

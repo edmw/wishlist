@@ -4,7 +4,7 @@ import NIO
 // MARK: UserListsActor
 
 /// Lists use cases for the user.
-public protocol UserListsActor {
+public protocol UserListsActor: Actor {
 
     func getLists(
         _ specification: GetLists.Specification,

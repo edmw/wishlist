@@ -22,44 +22,57 @@ extension ProfileController {
                 var partialUserData = PartialValues<UserValues>()
                 partialUserData[\.nickName] = formdata.inputNickName
 
-                var contextBuilder = ProfilePageContextBuilder().withFormData(formdata)
-
                 return try userProfileActor
                     .updateProfile(
                         .specification(userBy: userid, from: partialUserData),
                         .boundaries(worker: request.eventLoop)
                     )
                     .map { result in
-                        contextBuilder = contextBuilder.forUser(result.user)
-                        return try .success(with: result.user, context: contextBuilder.build())
+                        return try self.handleSuccessOnSave(with: result, formdata: formdata)
                     }
                     .catchMap(UserProfileActorError.self) { error in
-                        if case let UserProfileActorError
-                            .validationError(user, error) = error
-                        {
-                            contextBuilder = contextBuilder.forUser(user)
-                            return try self.handleErrorOnSave(error, with: contextBuilder.build())
-                        }
-                        throw error
+                        return try self.handleErrorOnSave(with: error, formdata: formdata)
                     }
             }
     }
 
+    private func handleSuccessOnSave(
+        with result: UpdateProfile.Result,
+        formdata: ProfilePageFormData
+    ) throws -> ProfileSaveOutcome {
+        let user = result.user
+        let context = try ProfilePageContextBuilder()
+            .withFormData(formdata)
+            .forUser(user)
+            .build()
+        return .success(with: user, context: context)
+    }
+
     private func handleErrorOnSave(
-        _ error: ValuesError<UserValues>,
-        with contextIn: ProfilePageContext
+        with error: UserProfileActorError,
+        formdata: ProfilePageFormData
     ) throws
         -> ProfileSaveOutcome
     {
-        var context = contextIn
-        switch error {
-        case .validationFailed(let properties, _):
-            context.form.invalidNickName = properties.contains(\UserValues.nickName)
-        case .uniquenessViolated:
-            // a user with the given nickname already exists
-            context.form.duplicateNickName = true
+        if case let UserProfileActorError
+            .validationError(user, error) = error
+        {
+            var context = try ProfilePageContextBuilder()
+                .withFormData(formdata)
+                .forUser(user)
+                .build()
+            switch error {
+            case .validationFailed(let properties, _):
+                context.form.invalidNickName = properties.contains(\UserValues.nickName)
+            case .uniquenessViolated:
+                // a user with the given nickname already exists
+                context.form.duplicateNickName = true
+            }
+            return .failure(with: error, context: context)
         }
-        return .failure(with: error, context: context)
+        else {
+            throw error
+        }
     }
 
 }

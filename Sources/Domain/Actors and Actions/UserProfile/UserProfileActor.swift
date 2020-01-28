@@ -4,7 +4,7 @@ import NIO
 // MARK: UserProfileActor
 
 /// Profile use cases for the user.
-public protocol UserProfileActor {
+public protocol UserProfileActor: Actor {
 
     func getProfileAndInvitations(
         _ specification: GetProfileAndInvitations.Specification,

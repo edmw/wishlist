@@ -1,0 +1,40 @@
+{% for type in types.implementing.AutoMapper %}
+// sourcery:file:AutoMapper/{{type.name}}+AutoMapper.generated.swift
+import Domain
+
+// MARK: {{type.name}}
+
+{% if type.implements.Identifier %}
+extension {{type.name}} {
+
+    /// Maps an app id to the {{type.name|lowercase}} type.
+    init(_ id: ID) {
+        self.init(uuid: id.uuid)
+    }
+
+}
+
+extension ID {
+
+    /// Maps a {{type.name|lowercase}} to the app id type.
+    init(_ identifier: {{type.name}}) {
+        self.init(identifier.rawValue)
+    }
+
+    /// Maps an app id to the {{type.name|lowercase}} type.
+    init?(_ identifier: {{type.name}}?) {
+        self.init(identifier?.rawValue)
+    }
+
+    public static func == (lhs: ID, rhs: {{type.name}}) -> Bool {
+        return lhs.uuid == rhs
+    }
+
+    public static func == (lhs: {{type.name}}, rhs: ID) -> Bool {
+        return lhs == rhs.uuid
+    }
+
+}
+{% endif %}
+// sourcery:end
+{% endfor %}

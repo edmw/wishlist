@@ -53,7 +53,7 @@ final class WishlistController: AuthenticatableController,
                     .forList(result.list)
                     .forOwner(result.owner)
                     .withUser(result.user)
-                    .userFavorsList(result.isFavorite)
+                    .isFavorite(result.isFavorite)
                     .withItems(result.items)
                     .forIdentification(result.identification)
                     .build()

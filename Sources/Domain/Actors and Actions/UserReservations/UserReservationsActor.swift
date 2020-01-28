@@ -4,7 +4,7 @@ import NIO
 // MARK: UserReservationsActor
 
 /// Reservations use cases for the user.
-public protocol UserReservationsActor {
+public protocol UserReservationsActor: Actor {
 
     func requestReservationDeletion(
         _ specification: RequestReservationDeletion.Specification,
