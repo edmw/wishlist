@@ -16,8 +16,8 @@ public struct ItemValues: Values, ValueValidatable {
     public let modifiedAt: Date?
 
     internal init(_ item: Item) {
-        self.title = item.title
-        self.text = item.text
+        self.title = String(item.title)
+        self.text = String(item.text)
         self.preference = item.preference
         self.url = item.url?.absoluteString
         self.imageURL = item.imageURL?.absoluteString
@@ -139,7 +139,7 @@ public struct ItemValues: Values, ValueValidatable {
 extension Item {
 
     convenience init(for list: List, from data: ItemValues) throws {
-        try self.init(title: data.title, text: data.text, list: list)
+        try self.init(title: Title(data.title), text: Text(data.text), list: list)
         if let urlString = data.url {
             self.url = URL(string: urlString)
         }
@@ -158,8 +158,8 @@ extension Item {
         guard listID == list.id else {
             throw EntityError<List>.requiredIDMismatch
         }
-        title = data.title
-        text = data.text
+        title = Title(data.title)
+        text = Text(data.text)
         preference = data.preference
         if let urlString = data.url {
             url = URL(string: urlString)

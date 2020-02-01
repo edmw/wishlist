@@ -4,6 +4,8 @@ import NIO
 
 public protocol FavoriteRepository: EntityRepository {
 
+    var sortingDefault: ListsSorting { get }
+
     /// Searches a favorite by the specified favorite id. The favorite must belong to the
     /// specified user.
     /// - Parameter id: favorite id to search for
@@ -32,5 +34,13 @@ public protocol FavoriteRepository: EntityRepository {
     /// Deletes the specified favorite.
     /// - Parameter favorite: favorite to be deleted
     func deleteFavorite(_ favorite: Favorite) throws -> EventLoopFuture<Favorite>
+
+}
+
+extension FavoriteRepository {
+
+    public var sortingDefault: ListsSorting {
+        return ListsSorting(\List.title, .ascending)
+    }
 
 }

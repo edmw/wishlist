@@ -9,7 +9,8 @@ import Library
 ///
 /// Relations:
 /// - Parent: User
-public final class Invitation: Entity, Confidental,
+public final class Invitation: InvitationModel, Confidental,
+    Entity,
     EntityDetachable,
     EntityReflectable,
     Loggable,
@@ -37,6 +38,17 @@ public final class Invitation: Entity, Confidental,
 
     /// User (who was invited)
     public var invitee: UUID?
+
+    public init<T: InvitationModel>(from other: T) {
+        self.id = other.id
+        self.code = other.code
+        self.status = other.status
+        self.email = other.email
+        self.sentAt = other.sentAt
+        self.createdAt = other.createdAt
+        self.userID = other.userID
+        self.invitee = other.invitee
+    }
 
     init(
         id: UUID? = nil,

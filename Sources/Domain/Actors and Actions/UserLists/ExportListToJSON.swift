@@ -40,7 +40,7 @@ public struct ExportListToJSON: Action {
     }
 
     private func exportName(for list: List) -> FileName {
-        let listtitle = list.title.slugify()
+        let listtitle = String(list.title).slugify()
         let datestamp = Date().exportDatestamp()
         var components = ["wishlist"]
         if let listtitle = listtitle {

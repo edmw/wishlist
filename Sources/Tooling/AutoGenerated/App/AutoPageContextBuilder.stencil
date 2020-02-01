@@ -1,6 +1,9 @@
 {% for type in types.implementing.AutoPageContextBuilder %}
 {% macro builder_methodname_for_parameter parameter %}{% if parameter.typeName.name == "Bool" %}{{parameter.name}}{% else %}{% if parameter.isOptional %}with{% else %}for{% endif %}{{parameter.name|upperFirstLetter}}{% endif %}{% endmacro %}
-// sourcery:file:AutoBuilder/{{type.name}}+AutoPageContextBuilder.generated.swift
+// sourcery:inline:{{type.name}}Builder.AutoPageContextBuilder
+
+// MARK: DO NOT EDIT
+
 import Domain
 
 import Foundation

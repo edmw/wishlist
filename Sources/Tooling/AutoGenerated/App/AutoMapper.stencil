@@ -1,5 +1,8 @@
 {% for type in types.implementing.AutoMapper %}
-// sourcery:file:AutoMapper/{{type.name}}+AutoMapper.generated.swift
+// sourcery:inline:{{type.name}}.AutoMapper
+
+// MARK: DO NOT EDIT
+
 import Domain
 
 // MARK: {{type.name}}

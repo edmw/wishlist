@@ -9,7 +9,8 @@ import Library
 ///
 /// Relations:
 /// - Childs: Lists
-public final class User: Entity,
+public final class User: UserModel,
+    Entity,
     EntityDetachable,
     EntityReflectable,
     Loggable,
@@ -32,7 +33,7 @@ public final class User: Entity,
     public var firstName: String
     public var lastName: String
     public var nickName: String?
-    public var language: String?
+    public var language: LanguageTag?
     public var picture: URL?
 
     public var confidant: Bool
@@ -50,12 +51,33 @@ public final class User: Entity,
         return nickName ?? firstName
     }
 
-    init(
+    public init<T: UserModel>(from other: T) {
+        self.id = other.id
+        self.identification = other.identification
+        self.email = other.email
+        self.fullName = other.fullName
+        self.firstName = other.firstName
+        self.lastName = other.lastName
+        self.nickName = other.nickName
+        self.language = other.language
+        self.picture = other.picture
+        self.confidant = other.confidant
+        self.settings = other.settings
+        self.firstLogin = other.firstLogin
+        self.lastLogin = other.lastLogin
+        self.identity = other.identity
+        self.identityProvider = other.identityProvider
+    }
+
+    public init(
         id: UserID? = nil,
         email: EmailSpecification,
         fullName: String,
         firstName: String,
-        lastName: String
+        lastName: String,
+        nickName: String? = nil,
+        language: LanguageTag? = nil,
+        picture: URL? = nil
     ) {
         self.id = id?.uuid
 
@@ -65,6 +87,9 @@ public final class User: Entity,
         self.fullName = fullName
         self.firstName = firstName
         self.lastName = lastName
+        self.nickName = nickName
+        self.language = language
+        self.picture = picture
 
         self.confidant = false
 

@@ -12,7 +12,8 @@ import Library
 /// Relations:
 /// - Sibling: User
 /// - Sibling: List
-public final class Favorite: Entity,
+public final class Favorite: FavoriteModel,
+    Entity,
     EntityDetachable,
     EntityReflectable,
     Loggable,
@@ -32,15 +33,20 @@ public final class Favorite: Entity,
     public var userID: UUID
     public var listID: UUID
 
-    public init(_ user: User, _ list: List) throws {
-        guard let userid = user.userID else {
-            throw EntityError<User>.requiredIDMissing
-        }
-        guard let listid = list.listID else {
-            throw EntityError<List>.requiredIDMissing
-        }
-        userID = userid.uuid
-        listID = listid.uuid
+    public init<T: FavoriteModel>(from other: T) {
+        self.id = other.id
+        self.userID = other.userID
+        self.listID = other.listID
+    }
+
+    public init(
+        id: FavoriteID? = nil,
+        userID: UUID,
+        listID: UUID
+    ) {
+        self.id = id?.uuid
+        self.userID = userID
+        self.listID = listID
     }
 
     // MARK: EntityReflectable

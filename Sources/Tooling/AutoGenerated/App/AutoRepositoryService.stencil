@@ -1,0 +1,35 @@
+{% for type in types.implementing.FluentRepository where type.implements.Driven %}
+{% macro repositoryType type %}{% for inheritedTypeName in type.inheritedTypes %}{% for inheritedType in types.protocols where inheritedType.name == inheritedTypeName %}{% if inheritedType.implements.EntityRepository %}{{inheritedType.name}}{% endif %}{% endfor %}{% endfor %}{% endmacro %}
+// sourcery:inline:{{type.name}}.AutoRepositoryService
+
+// MARK: DO NOT EDIT
+
+import Domain
+
+import Vapor
+
+// MARK: {{type.name}}
+
+/// Adapter for the domain layers `{{type.name}}` to be used with Vapor.
+///
+/// This adds the functionality needed that this repository can be injected by Vapor‘s dependency
+/// injection framework.
+extension {{type.name}}: ServiceType {
+
+    // MARK: Service
+
+{% if type.implements.FluentRepository %}
+    public static let serviceSupports: [Any.Type] = [{% call repositoryType type %}.self]
+
+    public static func makeService(for worker: Container) throws -> Self {
+        {% if type.implements.FluentRepository %}
+        return .init(try worker.connectionPool(to: .mysql))
+        {% else %}
+        fatalError("Code generation for AutoRepositoryService failed on '{{type.name}}'")
+        {% endif %}
+    }
+{% endif %}
+
+}
+// sourcery:end
+{% endfor %}

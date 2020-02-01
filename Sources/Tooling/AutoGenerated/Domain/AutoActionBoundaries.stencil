@@ -1,8 +1,13 @@
-{% for type in types.implementing.AutoActionBoundaries %}
-// sourcery:file:AutoActionBoundaries/{{type.name}}+AutoActionBoundaries.generated.swift
+// sourcery:inline:ActionBoundaries.AutoActionBoundaries
+// swiftlint:disable superfluous_disable_command
+// swiftlint:disable file_length
+
+// MARK: DO NOT EDIT
+
 import Foundation
 import NIO
 
+{% for type in types.implementing.AutoActionBoundaries %}
 // MARK: {{type.name}}
 
 extension {{type.name}} {
@@ -20,5 +25,6 @@ extension {{type.name}} {
     }
 
 }
-// sourcery:end
 {% endfor %}
+
+// sourcery:end

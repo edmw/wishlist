@@ -1,0 +1,36 @@
+{% for type in types.implementing.Actor where type.implements.Driver %}
+// sourcery:inline:{{type.name}}.AutoActorService
+
+// MARK: DO NOT EDIT
+
+import Domain
+
+import Vapor
+
+// MARK: {{type.name}}
+
+/// Adapter for the domain layers `{{type.name}}` to be used with Vapor.
+///
+/// This adds the functionality needed that this actor can be injected by Vapor‘s dependency
+/// injection framework.
+extension {{type.name}}: ServiceType {
+
+    // MARK: Service
+
+    public static let serviceSupports: [Any.Type] = [{{type.name|replace:"Domain",""}}.self]
+
+    public static func makeService(for container: Container) throws -> Self {
+        {% for initializer in type.initializers %}
+            {% if initializer.isRequired %}
+        return try .init(
+        {% for parameter in initializer.parameters %}
+            {{parameter.name}}: container.make(){% if not forloop.last %},{% endif %}
+        {% endfor %}
+        )
+            {% endif %}
+        {% endfor %}
+    }
+
+}
+// sourcery:end
+{% endfor %}

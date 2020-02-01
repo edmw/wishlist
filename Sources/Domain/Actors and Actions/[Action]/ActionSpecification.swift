@@ -1,6 +1,7 @@
 import Foundation
 
-protocol ActionSpecification {}
+protocol ActionSpecification {
+}
 
 protocol AutoActionSpecification: ActionSpecification {
 }

@@ -46,7 +46,7 @@ extension PartialValues where Wrapped == UserValues {
         self[\.fullName] = userInfo.name
         self[\.firstName] = userInfo.givenName
         self[\.lastName] = userInfo.familyName
-        self[\.language] = userInfo.language
+        self[\.language] = LanguageTag(userInfo.language)
         self[\.picture] = userInfo.picture
     }
 

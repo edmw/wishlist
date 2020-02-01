@@ -5,7 +5,8 @@ import Fluent
 import XCTest
 
 protocol HasEntityTestSupport {
-    associatedtype EntityType: Entity & EntityReflectable & Model
+    associatedtype EntityType: Entity & EntityReflectable
+    associatedtype ModelType: Model
 
     func entityTestProperties()
 
@@ -18,7 +19,7 @@ extension HasEntityTestSupport {
     /// of declared properties.
     func entityTestProperties() {
         // these are the properties reflected by Vapor on this type (count them)
-        let count = try! EntityType.reflectProperties(depth: 0).count
+        let count = try! ModelType.reflectProperties(depth: 0).count
         // this is the collection required by the EntityReflectable protocol
         // should be the same number of properties than Vapor sees
         XCTAssertEqual(EntityType.properties.count, count)

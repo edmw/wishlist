@@ -1,0 +1,233 @@
+{% for entity in types.implementing.AutoFluentEntity %}
+{% set typePrefix %}Fluent{% endset %}
+{% set typeName %}{{typePrefix}}{{entity.name}}{% endset %}
+// sourcery:inline:{{typeName}}.AutoFluentEntity
+// swiftlint:disable superfluous_disable_command
+// swiftlint:disable cyclomatic_complexity
+
+// MARK: DO NOT EDIT
+
+import Domain
+
+import Vapor
+import Fluent
+import FluentMySQL
+
+// MARK: {{typeName}}
+
+/// This generated type is based on the Domain‘s {{typeName}} model type and is used for
+/// storing data to and retrieving data from a SQL database using Fluent.
+public struct {{typeName}}: {{entity.name}}Model,
+    Fluent.Model,
+    Fluent.Migration{% if entity.annotations.AutoFluentEntityPivot %},
+    Fluent.ModifiablePivot{% endif %},
+    Equatable
+{
+    // MARK: Fluent.Model
+
+    public typealias Database = MySQLDatabase
+    public typealias ID = UUID
+    public static let idKey: IDKey = \.id
+    public static let name = "{{entity.name}}"
+    public static let migrationName = "{{entity.name}}"
+
+{% for variable in entity.storedVariables %}
+  {% if variable.isLazy == false %}
+    public var {{variable.name}}: {{variable.typeName}}
+  {% endif %}
+{% endfor %}
+
+    init(
+{% for variable in entity.storedVariables %}
+  {% if variable.isLazy == false %}
+        {{variable.name}}: {{variable.typeName}}{% if not forloop.last %},{% endif %}
+  {% endif %}
+{% endfor %}
+    ) {
+{% for variable in entity.storedVariables %}
+  {% if variable.isLazy == false %}
+        self.{{variable.name}} = {{variable.name}}
+  {% endif %}
+{% endfor %}
+    }
+
+{% if entity.annotations.AutoFluentEntityPivot %}
+    // MARK: Fluent.Pivot
+
+    {% set ltype %}{{entity.annotations.AutoFluentEntityPivotLeft}}{% endset %}
+    {% set lname %}{{entity.annotations.AutoFluentEntityPivotLeft|lowercase}}{% endset %}
+    {% set rtype %}{{entity.annotations.AutoFluentEntityPivotRight}}{% endset %}
+    {% set rname %}{{entity.annotations.AutoFluentEntityPivotRight|lowercase}}{% endset %}
+    public typealias Left = {{typePrefix}}{{ltype}}
+    public typealias Right = {{typePrefix}}{{rtype}}
+
+    public static var leftIDKey: LeftIDKey = \{{typeName}}.{{lname}}ID
+    public static var rightIDKey: RightIDKey = \{{typeName}}.{{rname}}ID
+
+    public init(_ left: {{typePrefix}}{{ltype}}, _ right: {{typePrefix}}{{rtype}}) throws {
+        guard let leftid = left.id else {
+            throw {{typeName}}Error.required{{ltype}}IDMissing
+        }
+        guard let rightid = right.id else {
+            throw {{typeName}}Error.required{{rtype}}IDMissing
+        }
+        self.{{lname}}ID = leftid
+        self.{{rname}}ID = rightid
+    }
+
+{% endif %}
+    // MARK: Fluent.Migration
+
+    public static func prepare(on connection: Database.Connection) -> EventLoopFuture<Void> {
+        return Database.create(self, on: connection) { builder in
+{% for variable in entity.storedVariables %}
+{% if variable.isLazy == false %}
+            builder.field(for: \.{{variable.name}})
+  {% if entity.annotations.AutoFluentEntityUniqueFields %}
+    {% if entity.annotations.AutoFluentEntityUniqueFields|contains: variable.name %}
+            builder.unique(on: \.{{variable.name}})
+    {% endif %}
+  {% endif %}
+{% endif %}
+{% endfor %}
+{% if entity.annotations.AutoFluentEntityParent %}
+{% set parent %}{{entity.annotations.AutoFluentEntityParent}}{% endset %}
+{% if entity.annotations.AutoFluentEntityParentOnDeleteCascade %}
+            builder.reference(from: \.{{parent|lowercase}}ID, to: \{{typePrefix}}{{parent}}.id, onDelete: .cascade)
+{% else %}
+            builder.reference(from: \.{{parent|lowercase}}ID, to: \{{typePrefix}}{{parent}}.id)
+{% endif %}
+{% endif %}
+        }
+    }
+
+{% if entity.annotations.AutoFluentEntityParent or entity.annotations.AutoFluentEntityChildren %}
+    // MARK: Relations
+
+{% if entity.annotations.AutoFluentEntityParent %}
+  {% set parent %}{{entity.annotations.AutoFluentEntityParent}}{% endset %}
+    var {{parent|lowercase}}: Parent<{{typeName}}, {{typePrefix}}{{parent}}> {
+        return parent(\{{typeName}}.{{parent|lowercase}}ID)
+    }
+
+    func require{{parent}}(on container: Container) throws -> EventLoopFuture<{{parent}}> {
+        return container.withPooledConnection(to: .mysql) { connection in
+            return self.{{parent|lowercase}}.get(on: connection).mapToEntity()
+        }
+    }
+
+{% endif %}
+{% if entity.annotations.AutoFluentEntityChildren %}
+  {% set children %}{{entity.annotations.AutoFluentEntityChildren}}{% endset %}
+    var {{children|lowercase}}s: Children<{{typeName}}, {{typePrefix}}{{children}}> {
+        return children(\{{typePrefix}}{{children}}.{{entity.name|lowercase}}ID)
+    }
+
+{% endif %}
+{% endif %}
+    // MARK: Equatable
+
+    public static func == (lhs: {{typeName}}, rhs: {{typeName}}) -> Bool {
+{% for variable in entity.storedVariables %}
+{% if variable.isLazy == false %}
+        guard lhs.{{variable.name}} == rhs.{{variable.name}} else {
+            return false
+        }
+{% endif %}
+{% endfor %}
+        return true
+    }
+
+}
+
+{% set needsErrorType %}{{entity.annotations.AutoFluentEntityPivot}}{% endset %}
+{% if needsErrorType %}
+enum {{typeName}}Error: Error {
+{% if entity.annotations.AutoFluentEntityPivot %}
+{% set ltype %}{{entity.annotations.AutoFluentEntityPivotLeft}}{% endset %}
+{% set rtype %}{{entity.annotations.AutoFluentEntityPivotRight}}{% endset %}
+    case required{{ltype}}IDMissing
+    case required{{rtype}}IDMissing
+{% endif %}
+}
+
+{% endif %}
+{% if entity.annotations.AutoFluentEntityPivot %}
+// MARK: Siblings
+
+    {% set ltype %}{{entity.annotations.AutoFluentEntityPivotLeft}}{% endset %}
+    {% set lname %}{{entity.annotations.AutoFluentEntityPivotLeft|lowercase}}{% endset %}
+    {% set rtype %}{{entity.annotations.AutoFluentEntityPivotRight}}{% endset %}
+    {% set rname %}{{entity.annotations.AutoFluentEntityPivotRight|lowercase}}{% endset %}
+extension {{typePrefix}}{{ltype}} {
+
+    // this {{ltype}}'s {{entity.name|lowercase}} {{rname}}s
+    var {{entity.name|lowercase}}s: Siblings<{{typePrefix}}{{ltype}}, {{typePrefix}}{{rtype}}, {{typeName}}> {
+        return siblings()
+    }
+
+}
+
+extension {{typePrefix}}{{rtype}} {
+
+    // all {{ltype}}s that {{entity.name|lowercase}} this {{rname}}
+    var {{lname}}s: Siblings<{{typePrefix}}{{rtype}}, {{typePrefix}}{{ltype}}, {{typeName}}> {
+        return siblings()
+    }
+
+}
+
+{% endif %}
+// MARK: - {{entity.name}}
+
+extension {{entity.name}} {
+
+    var model: {{typeName}} {
+        return .init(
+{% for variable in entity.storedVariables %}
+  {% if variable.isLazy == false %}
+            {{variable.name}}: {{variable.name}}{% if not forloop.last %},{% endif %}
+  {% endif %}
+{% endfor %}
+        )
+    }
+
+}
+
+// MARK: - EventLoopFuture
+
+extension EventLoopFuture where Expectation == {{typeName}}? {
+
+    func mapToEntity() -> EventLoopFuture<{{entity.name}}?> {
+        return self.map { model in
+            guard let model = model else {
+                return nil
+            }
+            return {{entity.name}}(from: model)
+        }
+    }
+
+}
+
+extension EventLoopFuture where Expectation == {{typeName}} {
+
+    func mapToEntity() -> EventLoopFuture<{{entity.name}}> {
+        return self.map { model in
+            return {{entity.name}}(from: model)
+        }
+    }
+
+}
+
+extension EventLoopFuture where Expectation == [{{typeName}}] {
+
+    func mapToEntities() -> EventLoopFuture<[{{entity.name}}]> {
+        return self.map { models in
+            return models.map { model in {{entity.name}}(from: model) }
+        }
+    }
+
+}
+
+// sourcery:end
+{% endfor %}

@@ -1,0 +1,4 @@
+import Domain
+
+protocol AutoFluentValue {
+}

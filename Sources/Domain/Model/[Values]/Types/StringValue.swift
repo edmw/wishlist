@@ -35,6 +35,13 @@ extension StringValue {
         self.init(string: description)
     }
 
+    public init?(_ description: String?) {
+        guard let description = description else {
+            return nil
+        }
+        self.init(string: description)
+    }
+
     // MARK: CustomStringConvertible
 
     public var description: String {

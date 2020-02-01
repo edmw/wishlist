@@ -1,7 +1,12 @@
-{% for type in types.implementing.AutoActionSpecification %}
-// sourcery:file:AutoActionSpecification/{{type.name}}+AutoActionSpecification.generated.swift
+// sourcery:inline:ActionSpecification.AutoActionSpecification
+// swiftlint:disable superfluous_disable_command
+// swiftlint:disable file_length
+
+// MARK: DO NOT EDIT
+
 import Foundation
 
+{% for type in types.implementing.AutoActionSpecification %}
 // MARK: {{type.name}}
 
 extension {{type.name}} {
@@ -26,5 +31,6 @@ extension {{type.name}} {
     }
 
 }
-// sourcery:end
 {% endfor %}
+
+// sourcery:end

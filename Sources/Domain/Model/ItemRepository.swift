@@ -6,6 +6,8 @@ public final class ItemsSorting: EntitySorting<Item> {}
 
 public protocol ItemRepository: EntityRepository {
 
+    var sortingDefault: ItemsSorting { get }
+
     func find(by id: ItemID) -> EventLoopFuture<Item?>
     func find(by id: ItemID, in list: List) throws -> EventLoopFuture<Item?>
 
@@ -31,5 +33,13 @@ public protocol ItemRepository: EntityRepository {
 
     func delete(item: Item, in list: List) throws -> EventLoopFuture<Item?>
     func delete(items: [Item], in list: List) throws -> EventLoopFuture<[Item]>
+
+}
+
+extension ItemRepository {
+
+    public var sortingDefault: ItemsSorting {
+        return ItemsSorting(\Item.title, .ascending)
+    }
 
 }

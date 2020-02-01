@@ -10,7 +10,8 @@ import Library
 /// Relations:
 /// - Parent: User
 /// - Childs: Items
-public final class List: Entity, Viewable,
+public final class List: ListModel, Viewable,
+    Entity,
     EntityDetachable,
     EntityReflectable,
     Loggable,
@@ -31,7 +32,7 @@ public final class List: Entity, Viewable,
     }
     public lazy var listID = ListID(uuid: id)
 
-    public var title: String
+    public var title: Title
     public var visibility: Visibility
     public var createdAt: Date
     public var modifiedAt: Date
@@ -42,9 +43,23 @@ public final class List: Entity, Viewable,
     /// Parent
     public var userID: UUID
 
+    public init<T: ListModel>(from other: T) {
+        self.id = other.id
+
+        self.title = other.title
+        self.visibility = other.visibility
+        self.createdAt = other.createdAt
+        self.modifiedAt = other.modifiedAt
+        self.options = other.options
+
+        self.itemsSorting = other.itemsSorting
+
+        self.userID = other.userID
+    }
+
     init(
         id: ListID? = nil,
-        title: String,
+        title: Title,
         visibility: Visibility,
         user: User
     ) throws {

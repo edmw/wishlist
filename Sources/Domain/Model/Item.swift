@@ -9,7 +9,8 @@ import Library
 ///
 /// Relations:
 /// - Parent: List
-public final class Item: Entity, Imageable,
+public final class Item: ItemModel, Imageable,
+    Entity,
     EntityDetachable,
     EntityReflectable,
     Loggable,
@@ -33,8 +34,8 @@ public final class Item: Entity, Imageable,
     }
     public lazy var itemID = ItemID(uuid: id)
 
-    public var title: String
-    public var text: String
+    public var title: Title
+    public var text: Text
     public var preference: Item.Preference
     public var url: URL?
     public var imageURL: URL?
@@ -46,10 +47,23 @@ public final class Item: Entity, Imageable,
     /// Parent
     public var listID: UUID
 
+    public init<T: ItemModel>(from other: T) {
+        self.id = other.id
+        self.title = other.title
+        self.text = other.text
+        self.preference = other.preference
+        self.url = other.url
+        self.imageURL = other.imageURL
+        self.createdAt = other.createdAt
+        self.modifiedAt = other.modifiedAt
+        self.localImageURL = other.localImageURL
+        self.listID = other.listID
+    }
+
     init(
         id: UUID? = nil,
-        title: String,
-        text: String,
+        title: Title,
+        text: Text,
         preference: Item.Preference? = nil,
         url: URL? = nil,
         imageURL: URL? = nil,

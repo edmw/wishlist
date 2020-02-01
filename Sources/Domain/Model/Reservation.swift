@@ -30,6 +30,13 @@ public final class Reservation: Entity,
     /// Holder (who reserved that item)
     public var holder: Identification
 
+    public init<T: ReservationModel>(from other: T) {
+        self.id = other.id
+        self.createdAt = other.createdAt
+        self.itemID = other.itemID
+        self.holder = other.holder
+    }
+
     init(
         id: ReservationID? = nil,
         item: Item,

@@ -22,7 +22,7 @@ public struct ListValues: Values, ValueValidatable {
     public var ownerName: String?
 
     init(_ list: List, _ items: [Item]? = nil) {
-        self.title = list.title
+        self.title = String(list.title)
         self.visibility = list.visibility
         self.createdAt = list.createdAt
         self.modifiedAt = list.modifiedAt
@@ -135,7 +135,7 @@ public struct ListValues: Values, ValueValidatable {
             // validate for new list:
             // list title must be unique
             return try repository
-                .count(title: title, for: user)
+                .count(title: Title(title), for: user)
                 .null(or: ValuesError<ListValues>.uniquenessViolated(for: \ListValues.title))
                 .transform(to: self)
         }
@@ -148,14 +148,14 @@ public struct ListValues: Values, ValueValidatable {
 extension List {
 
     convenience init(for user: User, from data: ListValues) throws {
-        try self.init(title: data.title, visibility: data.visibility, user: user)
+        try self.init(title: Title(data.title), visibility: data.visibility, user: user)
     }
 
     func update(for user: User, from data: ListValues) throws {
         guard userID == user.id else {
             throw EntityError<User>.requiredIDMismatch
         }
-        title = data.title
+        title = Title(data.title)
         visibility = data.visibility
         options = data.options
         itemsSorting = data.itemsSorting
