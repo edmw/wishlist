@@ -25,13 +25,10 @@ public final class Favorite: FavoriteModel,
     // this is a hard limit (application can have soft limits, too)
     public static let maximumNumberOfFavoritesPerUser = 100
 
-    public var id: UUID? {
-        didSet { favoriteID = FavoriteID(uuid: id) }
-    }
-    public lazy var favoriteID = FavoriteID(uuid: id)
+    public var id: FavoriteID?
 
-    public var userID: UUID
-    public var listID: UUID
+    public var userID: UserID
+    public var listID: ListID
 
     public init<T: FavoriteModel>(from other: T) {
         self.id = other.id
@@ -41,10 +38,10 @@ public final class Favorite: FavoriteModel,
 
     public init(
         id: FavoriteID? = nil,
-        userID: UUID,
-        listID: UUID
+        userID: UserID,
+        listID: ListID
     ) {
-        self.id = id?.uuid
+        self.id = id
         self.userID = userID
         self.listID = listID
     }
@@ -60,13 +57,13 @@ public final class Favorite: FavoriteModel,
     // MARK: CustomStringConvertible
 
     public var description: String {
-        return "Favorite[\(id ??? "???"):\(favoriteID ??? "???")](user:\(userID)|list:\(listID))"
+        return "Favorite[\(id ??? "???")](user:\(userID)|list:\(listID))"
     }
 
     // MARK: CustomDebugStringConvertible
 
     public var debugDescription: String {
-        return "Favorite[\(id ??? "???"):\(favoriteID ??? "???")](user:\(userID)|list:\(listID))"
+        return "Favorite[\(id ??? "???")](user:\(userID)|list:\(listID))"
     }
 
 }

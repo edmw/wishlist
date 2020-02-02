@@ -60,7 +60,7 @@ extension DomainUserReservationsActor {
                     .unwrap(or: UserReservationsActorError.invalidReservation)
                     .flatMap { reservation in
                         // delete reservation
-                        let id = reservation.reservationID
+                        let id = reservation.id
                         return try reservationRepository
                             .delete(reservation: reservation, for: item)
                             .unwrap(or: UserReservationsActorError.invalidReservation)

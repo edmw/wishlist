@@ -27,9 +27,9 @@ final class FluentReservationRepository: ReservationRepository, FluentRepository
 
     func find(for item: Item) throws -> EventLoopFuture<Reservation?> {
         return db.withConnection { connection in
-            let itemid = try item.model.requireID()
+            let itemkey = try item.model.requireID()
             return FluentReservation.query(on: connection)
-                .filter(\.itemID == itemid)
+                .filter(\.itemKey == itemkey)
                 .first()
                 .mapToEntity()
         }
@@ -40,8 +40,8 @@ final class FluentReservationRepository: ReservationRepository, FluentRepository
     {
         return db.withConnection { connection in
             return FluentReservation.query(on: connection)
-                .join(\FluentItem.id, to: \FluentReservation.itemID)
-                .filter(\.id == id.uuid)
+                .join(\FluentItem.uuid, to: \FluentReservation.itemKey)
+                .filter(\.uuid == id.uuid)
                 .alsoDecode(FluentItem.self)
                 .first()
                 .mapToEntities()
@@ -66,7 +66,7 @@ final class FluentReservationRepository: ReservationRepository, FluentRepository
 
     func delete(reservation: Reservation, for item: Item) throws -> EventLoopFuture<Reservation?> {
         return db.withConnection { connection in
-            guard let itemid = item.itemID, itemid == reservation.itemID else {
+            guard let itemid = item.id, itemid == reservation.itemID else {
                 return connection.future(nil)
             }
             return reservation.model.delete(on: connection)

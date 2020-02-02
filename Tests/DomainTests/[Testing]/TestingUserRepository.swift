@@ -56,12 +56,12 @@ final class TestingUserRepository: UserRepository {
     }
 
     func save(user: User) -> EventLoopFuture<User> {
-        if let id = user.userID {
+        if let id = user.id {
             storage[id] = user
         }
         else {
-            user.id = UUID()
-            storage[user.userID!] = user
+            user.id = UserID()
+            storage[user.id!] = user
         }
         return worker.newSucceededFuture(result: user)
     }

@@ -12,8 +12,11 @@ import FluentMySQL
 
 // MARK: FluentInvitation
 
-/// This generated type is based on the Domain‘s FluentInvitation model type and is used for
-/// storing data to and retrieving data from a SQL database using Fluent.
+/// This generated type is based on the Domain‘s Invitation model type and is used for
+/// storing data into and retrieving data from a SQL database using Fluent.
+///
+/// The Domain builds relations between models using model identifiers (UserID, ListID, ...).
+/// This will translate model identifiers to UUIDs and vice versa to handle relations using UUIDs.
 public struct FluentInvitation: InvitationModel,
     Fluent.Model,
     Fluent.Migration,
@@ -23,60 +26,76 @@ public struct FluentInvitation: InvitationModel,
 
     public typealias Database = MySQLDatabase
     public typealias ID = UUID
-    public static let idKey: IDKey = \.id
+    public static let idKey: IDKey = \.uuid
     public static let name = "Invitation"
     public static let migrationName = "Invitation"
 
-    public var id: UUID?
+    public var uuid: UUID?
+    public var id: InvitationID? { InvitationID(uuid: uuid) }
     public var code: InvitationCode
     public var status: Invitation.Status
     public var email: EmailSpecification
     public var sentAt: Date?
     public var createdAt: Date
-    public var userID: UUID
-    public var invitee: UUID?
+    public var userKey: UUID
+    public var userID: UserID { UserID(uuid: userKey) }
+    public var inviteeKey: UUID?
+    public var inviteeID: UserID? { UserID(uuid: inviteeKey) }
 
+    /// Initializes a SQL layer's `FluentInvitation`. Usually not called directly.
+    /// To create this object a getter `model` is provided on the Domain entity `Invitation`.
     init(
-        id: UUID?,
+        uuid: UUID?,
         code: InvitationCode,
         status: Invitation.Status,
         email: EmailSpecification,
         sentAt: Date?,
         createdAt: Date,
-        userID: UUID,
-        invitee: UUID?
+        userKey: UUID,
+        inviteeKey: UUID?
     ) {
-        self.id = id
+        self.uuid = uuid
         self.code = code
         self.status = status
         self.email = email
         self.sentAt = sentAt
         self.createdAt = createdAt
-        self.userID = userID
-        self.invitee = invitee
+        self.userKey = userKey
+        self.inviteeKey = inviteeKey
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case uuid = "id"
+        case code
+        case status
+        case email
+        case sentAt
+        case createdAt
+        case userKey = "userID"
+        case inviteeKey = "inviteeID"
     }
 
     // MARK: Fluent.Migration
 
     public static func prepare(on connection: Database.Connection) -> EventLoopFuture<Void> {
         return Database.create(self, on: connection) { builder in
-            builder.field(for: \.id)
+            builder.field(for: \.uuid)
             builder.field(for: \.code)
             builder.unique(on: \.code)
             builder.field(for: \.status)
             builder.field(for: \.email)
             builder.field(for: \.sentAt)
             builder.field(for: \.createdAt)
-            builder.field(for: \.userID)
-            builder.field(for: \.invitee)
-            builder.reference(from: \.userID, to: \FluentUser.id)
+            builder.field(for: \.userKey)
+            builder.field(for: \.inviteeKey)
+            builder.reference(from: \.userKey, to: \FluentUser.id)
         }
     }
 
     // MARK: Relations
 
     var user: Parent<FluentInvitation, FluentUser> {
-        return parent(\FluentInvitation.userID)
+        return parent(\FluentInvitation.userKey)
     }
 
     func requireUser(on container: Container) throws -> EventLoopFuture<User> {
@@ -88,7 +107,7 @@ public struct FluentInvitation: InvitationModel,
     // MARK: Equatable
 
     public static func == (lhs: FluentInvitation, rhs: FluentInvitation) -> Bool {
-        guard lhs.id == rhs.id else {
+        guard lhs.uuid == rhs.uuid else {
             return false
         }
         guard lhs.code == rhs.code else {
@@ -106,10 +125,10 @@ public struct FluentInvitation: InvitationModel,
         guard lhs.createdAt == rhs.createdAt else {
             return false
         }
-        guard lhs.userID == rhs.userID else {
+        guard lhs.userKey == rhs.userKey else {
             return false
         }
-        guard lhs.invitee == rhs.invitee else {
+        guard lhs.inviteeKey == rhs.inviteeKey else {
             return false
         }
         return true
@@ -123,14 +142,14 @@ extension Invitation {
 
     var model: FluentInvitation {
         return .init(
-            id: id,
+            uuid: id?.uuid,
             code: code,
             status: status,
             email: email,
             sentAt: sentAt,
             createdAt: createdAt,
-            userID: userID,
-            invitee: invitee
+            userKey: userID.uuid,
+            inviteeKey: inviteeID?.uuid
         )
     }
 
@@ -138,8 +157,22 @@ extension Invitation {
 
 // MARK: - EventLoopFuture
 
+extension EventLoopFuture where Expectation == FluentInvitation {
+
+    /// Maps this future‘s expectation from an SQL layer's `FluentInvitation`
+    /// to the Domain entity `Invitation`.
+    func mapToEntity() -> EventLoopFuture<Invitation> {
+        return self.map { model in
+            return Invitation(from: model)
+        }
+    }
+
+}
+
 extension EventLoopFuture where Expectation == FluentInvitation? {
 
+    /// Maps this future‘s expectation from an SQL layer's optional `FluentInvitation`
+    /// to the optional Domain entity `Invitation`.
     func mapToEntity() -> EventLoopFuture<Invitation?> {
         return self.map { model in
             guard let model = model else {
@@ -151,18 +184,10 @@ extension EventLoopFuture where Expectation == FluentInvitation? {
 
 }
 
-extension EventLoopFuture where Expectation == FluentInvitation {
-
-    func mapToEntity() -> EventLoopFuture<Invitation> {
-        return self.map { model in
-            return Invitation(from: model)
-        }
-    }
-
-}
-
 extension EventLoopFuture where Expectation == [FluentInvitation] {
 
+    /// Maps this future‘s expectation from an array of SQL layer's `FluentInvitation`s
+    /// to an array of the Domain entities `Invitation`s.
     func mapToEntities() -> EventLoopFuture<[Invitation]> {
         return self.map { models in
             return models.map { model in Invitation(from: model) }

@@ -22,7 +22,7 @@ final class DomainModelUserTests: XCTestCase, HasEntityTestSupport, HasAllTests 
 
     func testMapping() throws {
         let model = FluentUser(
-            id: UUID(),
+            uuid: UUID(),
             identification: Identification(),
             email: "abc@1234.ab",
             fullName: "abc def",

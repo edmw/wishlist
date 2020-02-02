@@ -117,7 +117,7 @@ public struct ItemValues: Values, ValueValidatable {
         if let item = item {
             // validate against given item:
             // item id must exist
-            guard let itemID = item.itemID else {
+            guard let itemID = item.id else {
                 throw EntityError<Item>.requiredIDMissing
             }
             return repository

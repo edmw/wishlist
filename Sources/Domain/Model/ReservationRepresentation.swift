@@ -18,7 +18,7 @@ public struct ReservationRepresentation: Encodable, Equatable {
 
     init(_ reservation: Reservation) {
         self.init(
-            id: reservation.reservationID,
+            id: reservation.id,
             createdAt: reservation.createdAt
         )
     }

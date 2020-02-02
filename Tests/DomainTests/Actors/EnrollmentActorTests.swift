@@ -111,13 +111,13 @@ final class EnrollmentActorTests : XCTestCase, HasAllTests {
         let theUser = try! userRepository
             .find(identity: useridentity, of: useridentityprovider)
             .wait()
-        let theInvitation = try! invitationRepository.find(by: anInvitation.invitationID!).wait()
+        let theInvitation = try! invitationRepository.find(by: anInvitation.id!).wait()
         XCTAssertNotNil(theInvitation)
-        XCTAssertEqual(theInvitation!.invitationID, anInvitation.invitationID)
+        XCTAssertEqual(theInvitation!.id, anInvitation.id)
         // invitation must be accepted
         XCTAssertEqual(theInvitation!.status, Invitation.Status.accepted)
         // invitation must be accepted by the created user
-        XCTAssertEqual(theInvitation!.invitee, theUser!.id)
+        XCTAssertEqual(theInvitation!.inviteeID, theUser!.id)
     }
 
     func testMaterialiseUserWithInvitation() throws {

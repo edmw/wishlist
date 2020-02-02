@@ -18,8 +18,8 @@ final class TestingUserRepositoryTests : XCTestCase, HasAllTests {
         let user = UserSupport.randomUser()
         // save random user
         let savedUser = try repository.save(user: user).wait()
-        XCTAssertNotNil(savedUser.userID)
-        let foundUser = try repository.find(id: savedUser.userID!).wait()
+        XCTAssertNotNil(savedUser.id)
+        let foundUser = try repository.find(id: savedUser.id!).wait()
         XCTAssertEqual(savedUser, foundUser)
     }
 

@@ -22,10 +22,7 @@ public final class Invitation: InvitationModel, Confidental,
     // this is a hard limit (application can have soft limits, too)
     public static let maximumNumberOfInvitationsPerUser = 10
 
-    public var id: UUID? {
-        didSet { invitationID = InvitationID(uuid: id) }
-    }
-    public lazy var invitationID = InvitationID(uuid: id)
+    public var id: InvitationID?
 
     public var code: InvitationCode
     public var status: Invitation.Status
@@ -34,10 +31,10 @@ public final class Invitation: InvitationModel, Confidental,
     public var createdAt: Date
 
     /// User (who initiated that invitation)
-    public var userID: UUID
+    public var userID: UserID
 
     /// User (who was invited)
-    public var invitee: UUID?
+    public var inviteeID: UserID?
 
     public init<T: InvitationModel>(from other: T) {
         self.id = other.id
@@ -47,11 +44,11 @@ public final class Invitation: InvitationModel, Confidental,
         self.sentAt = other.sentAt
         self.createdAt = other.createdAt
         self.userID = other.userID
-        self.invitee = other.invitee
+        self.inviteeID = other.inviteeID
     }
 
     init(
-        id: UUID? = nil,
+        id: InvitationID? = nil,
         code: InvitationCode? = nil,
         status: Invitation.Status? = nil,
         email: EmailSpecification,
@@ -83,7 +80,7 @@ public final class Invitation: InvitationModel, Confidental,
         .init(\Invitation.sentAt, label: "sentAt"),
         .init(\Invitation.createdAt, label: "createdAt"),
         .init(\Invitation.userID, label: "userID"),
-        .init(\Invitation.invitee, label: "invitee")
+        .init(\Invitation.inviteeID, label: "invitee")
     )
 
     // MARK: CustomStringConvertible

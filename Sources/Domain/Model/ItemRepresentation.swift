@@ -49,7 +49,7 @@ public struct ItemRepresentation: Encodable, Equatable {
 
     init(_ item: Item, with reservation: Reservation? = nil) {
         self.init(
-            id: item.itemID,
+            id: item.id,
             title: item.title ??? "�",
             text: item.text ??? "�",
             preference: String(describing: item.preference),
@@ -58,7 +58,7 @@ public struct ItemRepresentation: Encodable, Equatable {
             url: item.url?.absoluteString,
             imageURL: item.imageURL?.absoluteString,
             localImageURL: item.localImageURL?.absoluteString,
-            reservationID: reservation?.reservationID,
+            reservationID: reservation?.id,
             reservationHolderID: reservation?.holder
         )
     }

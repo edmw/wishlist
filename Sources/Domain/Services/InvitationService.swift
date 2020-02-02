@@ -26,7 +26,7 @@ struct InvitationService {
         guard invitation.status == .open else {
             throw InvitationServiceError.acceptInvitationInvalidStatus(invitation)
         }
-        invitation.invitee = user.id
+        invitation.inviteeID = user.id
         invitation.status = .accepted
         return invitationRepository.save(invitation: invitation)
     }

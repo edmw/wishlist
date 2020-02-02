@@ -43,13 +43,6 @@ extension Identifier {
         self.init(uuid: UUID())
     }
 
-    public init?(uuid: UUID?) {
-        guard let uuid = uuid else {
-            return nil
-        }
-        self.init(uuid: uuid)
-    }
-
     /// Creates an identifier using the specified string. No checks are made on the given
     /// string. It's completely up to the caller to ensure the validity of the identifier.
     public init?(string: String) {

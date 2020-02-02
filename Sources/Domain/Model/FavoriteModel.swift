@@ -1,7 +1,7 @@
 import Foundation
 
 public protocol FavoriteModel {
-    var id: UUID? { get }
-    var userID: UUID { get }
-    var listID: UUID { get }
+    var id: FavoriteID? { get }
+    var userID: UserID { get }
+    var listID: ListID { get }
 }

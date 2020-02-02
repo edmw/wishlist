@@ -12,8 +12,11 @@ import FluentMySQL
 
 // MARK: FluentList
 
-/// This generated type is based on the Domain‘s FluentList model type and is used for
-/// storing data to and retrieving data from a SQL database using Fluent.
+/// This generated type is based on the Domain‘s List model type and is used for
+/// storing data into and retrieving data from a SQL database using Fluent.
+///
+/// The Domain builds relations between models using model identifiers (UserID, ListID, ...).
+/// This will translate model identifiers to UUIDs and vice versa to handle relations using UUIDs.
 public struct FluentList: ListModel,
     Fluent.Model,
     Fluent.Migration,
@@ -23,59 +26,74 @@ public struct FluentList: ListModel,
 
     public typealias Database = MySQLDatabase
     public typealias ID = UUID
-    public static let idKey: IDKey = \.id
+    public static let idKey: IDKey = \.uuid
     public static let name = "List"
     public static let migrationName = "List"
 
-    public var id: UUID?
+    public var uuid: UUID?
+    public var id: ListID? { ListID(uuid: uuid) }
     public var title: Title
     public var visibility: Visibility
     public var createdAt: Date
     public var modifiedAt: Date
     public var options: List.Options
     public var itemsSorting: ItemsSorting?
-    public var userID: UUID
+    public var userKey: UUID
+    public var userID: UserID { UserID(uuid: userKey) }
 
+    /// Initializes a SQL layer's `FluentList`. Usually not called directly.
+    /// To create this object a getter `model` is provided on the Domain entity `List`.
     init(
-        id: UUID?,
+        uuid: UUID?,
         title: Title,
         visibility: Visibility,
         createdAt: Date,
         modifiedAt: Date,
         options: List.Options,
         itemsSorting: ItemsSorting?,
-        userID: UUID
+        userKey: UUID
     ) {
-        self.id = id
+        self.uuid = uuid
         self.title = title
         self.visibility = visibility
         self.createdAt = createdAt
         self.modifiedAt = modifiedAt
         self.options = options
         self.itemsSorting = itemsSorting
-        self.userID = userID
+        self.userKey = userKey
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case uuid = "id"
+        case title
+        case visibility
+        case createdAt
+        case modifiedAt
+        case options
+        case itemsSorting
+        case userKey = "userID"
     }
 
     // MARK: Fluent.Migration
 
     public static func prepare(on connection: Database.Connection) -> EventLoopFuture<Void> {
         return Database.create(self, on: connection) { builder in
-            builder.field(for: \.id)
+            builder.field(for: \.uuid)
             builder.field(for: \.title)
             builder.field(for: \.visibility)
             builder.field(for: \.createdAt)
             builder.field(for: \.modifiedAt)
             builder.field(for: \.options)
             builder.field(for: \.itemsSorting)
-            builder.field(for: \.userID)
-            builder.reference(from: \.userID, to: \FluentUser.id, onDelete: .cascade)
+            builder.field(for: \.userKey)
+            builder.reference(from: \.userKey, to: \FluentUser.id, onDelete: .cascade)
         }
     }
 
     // MARK: Relations
 
     var user: Parent<FluentList, FluentUser> {
-        return parent(\FluentList.userID)
+        return parent(\FluentList.userKey)
     }
 
     func requireUser(on container: Container) throws -> EventLoopFuture<User> {
@@ -85,13 +103,13 @@ public struct FluentList: ListModel,
     }
 
     var items: Children<FluentList, FluentItem> {
-        return children(\FluentItem.listID)
+        return children(\FluentItem.listKey)
     }
 
     // MARK: Equatable
 
     public static func == (lhs: FluentList, rhs: FluentList) -> Bool {
-        guard lhs.id == rhs.id else {
+        guard lhs.uuid == rhs.uuid else {
             return false
         }
         guard lhs.title == rhs.title else {
@@ -112,7 +130,7 @@ public struct FluentList: ListModel,
         guard lhs.itemsSorting == rhs.itemsSorting else {
             return false
         }
-        guard lhs.userID == rhs.userID else {
+        guard lhs.userKey == rhs.userKey else {
             return false
         }
         return true
@@ -126,14 +144,14 @@ extension List {
 
     var model: FluentList {
         return .init(
-            id: id,
+            uuid: id?.uuid,
             title: title,
             visibility: visibility,
             createdAt: createdAt,
             modifiedAt: modifiedAt,
             options: options,
             itemsSorting: itemsSorting,
-            userID: userID
+            userKey: userID.uuid
         )
     }
 
@@ -141,8 +159,22 @@ extension List {
 
 // MARK: - EventLoopFuture
 
+extension EventLoopFuture where Expectation == FluentList {
+
+    /// Maps this future‘s expectation from an SQL layer's `FluentList`
+    /// to the Domain entity `List`.
+    func mapToEntity() -> EventLoopFuture<List> {
+        return self.map { model in
+            return List(from: model)
+        }
+    }
+
+}
+
 extension EventLoopFuture where Expectation == FluentList? {
 
+    /// Maps this future‘s expectation from an SQL layer's optional `FluentList`
+    /// to the optional Domain entity `List`.
     func mapToEntity() -> EventLoopFuture<List?> {
         return self.map { model in
             guard let model = model else {
@@ -154,18 +186,10 @@ extension EventLoopFuture where Expectation == FluentList? {
 
 }
 
-extension EventLoopFuture where Expectation == FluentList {
-
-    func mapToEntity() -> EventLoopFuture<List> {
-        return self.map { model in
-            return List(from: model)
-        }
-    }
-
-}
-
 extension EventLoopFuture where Expectation == [FluentList] {
 
+    /// Maps this future‘s expectation from an array of SQL layer's `FluentList`s
+    /// to an array of the Domain entities `List`s.
     func mapToEntities() -> EventLoopFuture<[List]> {
         return self.map { models in
             return models.map { model in List(from: model) }

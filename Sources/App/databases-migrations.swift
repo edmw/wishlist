@@ -58,6 +58,7 @@ func databasesMigrations(
     config.add(model: FluentReservation.self, database: .mysql)
     // Invitation
     config.add(model: FluentInvitation.self, database: .mysql)
+    config.add(migration: RenameInvitationInviteeColumn.self, database: .mysql)
 }
 
 // MARK: - User
@@ -310,7 +311,7 @@ struct AddItemForeignKeyConstraint: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(FluentItem.self, on: connection) { builder in
-            builder.reference(from: \.listID, to: \FluentList.id, onDelete: .cascade)
+            builder.reference(from: \.listKey, to: \FluentList.id, onDelete: .cascade)
         }
     }
 
@@ -332,11 +333,23 @@ struct RenameFavoriteTable: MySQLForwardMigration {
 
 // MARK: - Invitation
 
+struct RenameInvitationInviteeColumn: MySQLForwardMigration {
+
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
+        return connection.assertFieldMustNotExist(\FluentInvitation.inviteeKey) {
+            return connection
+                .raw("ALTER TABLE Invitation CHANGE invitee inviteeID VARBINARY(16) NULL")
+                .run()
+        }
+    }
+
+}
+
 struct AddInvitationInvitee: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(FluentInvitation.self, on: connection) { builder in
-            builder.field(for: \.invitee)
+            builder.field(for: \.inviteeID)
         }
     }
 

@@ -53,7 +53,7 @@ extension DomainUserFavoritesActor {
                             .unwrap(or: UserFavoritesActorError.invalidFavoriteForUser)
                             .flatMap { favorite in
                                 // delete favorite
-                                let id = favorite.favoriteID
+                                let id = favorite.id
                                 return try favoriteRepository
                                     .deleteFavorite(favorite)
                                     .recordEvent("deleted for \(user)", using: recording)

@@ -12,8 +12,11 @@ import FluentMySQL
 
 // MARK: FluentFavorite
 
-/// This generated type is based on the Domain‘s FluentFavorite model type and is used for
-/// storing data to and retrieving data from a SQL database using Fluent.
+/// This generated type is based on the Domain‘s Favorite model type and is used for
+/// storing data into and retrieving data from a SQL database using Fluent.
+///
+/// The Domain builds relations between models using model identifiers (UserID, ListID, ...).
+/// This will translate model identifiers to UUIDs and vice versa to handle relations using UUIDs.
 public struct FluentFavorite: FavoriteModel,
     Fluent.Model,
     Fluent.Migration,
@@ -24,22 +27,33 @@ public struct FluentFavorite: FavoriteModel,
 
     public typealias Database = MySQLDatabase
     public typealias ID = UUID
-    public static let idKey: IDKey = \.id
+    public static let idKey: IDKey = \.uuid
     public static let name = "Favorite"
     public static let migrationName = "Favorite"
 
-    public var id: UUID?
-    public var userID: UUID
-    public var listID: UUID
+    public var uuid: UUID?
+    public var id: FavoriteID? { FavoriteID(uuid: uuid) }
+    public var userKey: UUID
+    public var userID: UserID { UserID(uuid: userKey) }
+    public var listKey: UUID
+    public var listID: ListID { ListID(uuid: listKey) }
 
+    /// Initializes a SQL layer's `FluentFavorite`. Usually not called directly.
+    /// To create this object a getter `model` is provided on the Domain entity `Favorite`.
     init(
-        id: UUID?,
-        userID: UUID,
-        listID: UUID
+        uuid: UUID?,
+        userKey: UUID,
+        listKey: UUID
     ) {
-        self.id = id
-        self.userID = userID
-        self.listID = listID
+        self.uuid = uuid
+        self.userKey = userKey
+        self.listKey = listKey
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case uuid = "id"
+        case userKey = "userID"
+        case listKey = "listID"
     }
 
     // MARK: Fluent.Pivot
@@ -47,8 +61,8 @@ public struct FluentFavorite: FavoriteModel,
     public typealias Left = FluentUser
     public typealias Right = FluentList
 
-    public static var leftIDKey: LeftIDKey = \FluentFavorite.userID
-    public static var rightIDKey: RightIDKey = \FluentFavorite.listID
+    public static var leftIDKey: LeftIDKey = \FluentFavorite.userKey
+    public static var rightIDKey: RightIDKey = \FluentFavorite.listKey
 
     public init(_ left: FluentUser, _ right: FluentList) throws {
         guard let leftid = left.id else {
@@ -57,30 +71,30 @@ public struct FluentFavorite: FavoriteModel,
         guard let rightid = right.id else {
             throw FluentFavoriteError.requiredListIDMissing
         }
-        self.userID = leftid
-        self.listID = rightid
+        self.userKey = leftid.uuid
+        self.listKey = rightid.uuid
     }
 
     // MARK: Fluent.Migration
 
     public static func prepare(on connection: Database.Connection) -> EventLoopFuture<Void> {
         return Database.create(self, on: connection) { builder in
-            builder.field(for: \.id)
-            builder.field(for: \.userID)
-            builder.field(for: \.listID)
+            builder.field(for: \.uuid)
+            builder.field(for: \.userKey)
+            builder.field(for: \.listKey)
         }
     }
 
     // MARK: Equatable
 
     public static func == (lhs: FluentFavorite, rhs: FluentFavorite) -> Bool {
-        guard lhs.id == rhs.id else {
+        guard lhs.uuid == rhs.uuid else {
             return false
         }
-        guard lhs.userID == rhs.userID else {
+        guard lhs.userKey == rhs.userKey else {
             return false
         }
-        guard lhs.listID == rhs.listID else {
+        guard lhs.listKey == rhs.listKey else {
             return false
         }
         return true
@@ -119,9 +133,9 @@ extension Favorite {
 
     var model: FluentFavorite {
         return .init(
-            id: id,
-            userID: userID,
-            listID: listID
+            uuid: id?.uuid,
+            userKey: userID.uuid,
+            listKey: listID.uuid
         )
     }
 
@@ -129,8 +143,22 @@ extension Favorite {
 
 // MARK: - EventLoopFuture
 
+extension EventLoopFuture where Expectation == FluentFavorite {
+
+    /// Maps this future‘s expectation from an SQL layer's `FluentFavorite`
+    /// to the Domain entity `Favorite`.
+    func mapToEntity() -> EventLoopFuture<Favorite> {
+        return self.map { model in
+            return Favorite(from: model)
+        }
+    }
+
+}
+
 extension EventLoopFuture where Expectation == FluentFavorite? {
 
+    /// Maps this future‘s expectation from an SQL layer's optional `FluentFavorite`
+    /// to the optional Domain entity `Favorite`.
     func mapToEntity() -> EventLoopFuture<Favorite?> {
         return self.map { model in
             guard let model = model else {
@@ -142,18 +170,10 @@ extension EventLoopFuture where Expectation == FluentFavorite? {
 
 }
 
-extension EventLoopFuture where Expectation == FluentFavorite {
-
-    func mapToEntity() -> EventLoopFuture<Favorite> {
-        return self.map { model in
-            return Favorite(from: model)
-        }
-    }
-
-}
-
 extension EventLoopFuture where Expectation == [FluentFavorite] {
 
+    /// Maps this future‘s expectation from an array of SQL layer's `FluentFavorite`s
+    /// to an array of the Domain entities `Favorite`s.
     func mapToEntities() -> EventLoopFuture<[Favorite]> {
         return self.map { models in
             return models.map { model in Favorite(from: model) }

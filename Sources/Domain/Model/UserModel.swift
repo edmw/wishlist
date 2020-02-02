@@ -1,7 +1,7 @@
 import Foundation
 
 public protocol UserModel {
-    var id: UUID? { get }
+    var id: UserID? { get }
     var identification: Identification { get }
     var email: EmailSpecification { get }
     var fullName: String { get }

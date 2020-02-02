@@ -44,7 +44,7 @@ public struct ListRepresentation: Encodable, Equatable {
 
     init(_ list: List, ownerName: String? = nil, itemsCount: Int? = nil) {
         self.init(
-            id: list.listID,
+            id: list.id,
             title: list.title ??? "�",
             visibility: String(describing: list.visibility),
             createdAt: list.createdAt,

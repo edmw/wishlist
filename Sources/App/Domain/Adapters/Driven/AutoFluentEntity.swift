@@ -10,6 +10,7 @@ extension Favorite: AutoFluentEntity {}
 
 // sourcery: AutoFluentEntityUniqueFields = code
 // sourcery: AutoFluentEntityParent = User
+// sourcery: AutoFluentEntityRelation = Invitee
 extension Invitation: AutoFluentEntity {}
 
 // sourcery: AutoFluentEntityParent = List

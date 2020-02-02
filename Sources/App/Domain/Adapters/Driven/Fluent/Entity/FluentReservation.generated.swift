@@ -12,8 +12,11 @@ import FluentMySQL
 
 // MARK: FluentReservation
 
-/// This generated type is based on the Domain‘s FluentReservation model type and is used for
-/// storing data to and retrieving data from a SQL database using Fluent.
+/// This generated type is based on the Domain‘s Reservation model type and is used for
+/// storing data into and retrieving data from a SQL database using Fluent.
+///
+/// The Domain builds relations between models using model identifiers (UserID, ListID, ...).
+/// This will translate model identifiers to UUIDs and vice versa to handle relations using UUIDs.
 public struct FluentReservation: ReservationModel,
     Fluent.Model,
     Fluent.Migration,
@@ -23,43 +26,54 @@ public struct FluentReservation: ReservationModel,
 
     public typealias Database = MySQLDatabase
     public typealias ID = UUID
-    public static let idKey: IDKey = \.id
+    public static let idKey: IDKey = \.uuid
     public static let name = "Reservation"
     public static let migrationName = "Reservation"
 
-    public var id: UUID?
+    public var uuid: UUID?
+    public var id: ReservationID? { ReservationID(uuid: uuid) }
     public var createdAt: Date
-    public var itemID: UUID
+    public var itemKey: UUID
+    public var itemID: ItemID { ItemID(uuid: itemKey) }
     public var holder: Identification
 
+    /// Initializes a SQL layer's `FluentReservation`. Usually not called directly.
+    /// To create this object a getter `model` is provided on the Domain entity `Reservation`.
     init(
-        id: UUID?,
+        uuid: UUID?,
         createdAt: Date,
-        itemID: UUID,
+        itemKey: UUID,
         holder: Identification
     ) {
-        self.id = id
+        self.uuid = uuid
         self.createdAt = createdAt
-        self.itemID = itemID
+        self.itemKey = itemKey
         self.holder = holder
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case uuid = "id"
+        case createdAt
+        case itemKey = "itemID"
+        case holder
     }
 
     // MARK: Fluent.Migration
 
     public static func prepare(on connection: Database.Connection) -> EventLoopFuture<Void> {
         return Database.create(self, on: connection) { builder in
-            builder.field(for: \.id)
+            builder.field(for: \.uuid)
             builder.field(for: \.createdAt)
-            builder.field(for: \.itemID)
+            builder.field(for: \.itemKey)
             builder.field(for: \.holder)
-            builder.reference(from: \.itemID, to: \FluentItem.id, onDelete: .cascade)
+            builder.reference(from: \.itemKey, to: \FluentItem.id, onDelete: .cascade)
         }
     }
 
     // MARK: Relations
 
     var item: Parent<FluentReservation, FluentItem> {
-        return parent(\FluentReservation.itemID)
+        return parent(\FluentReservation.itemKey)
     }
 
     func requireItem(on container: Container) throws -> EventLoopFuture<Item> {
@@ -71,13 +85,13 @@ public struct FluentReservation: ReservationModel,
     // MARK: Equatable
 
     public static func == (lhs: FluentReservation, rhs: FluentReservation) -> Bool {
-        guard lhs.id == rhs.id else {
+        guard lhs.uuid == rhs.uuid else {
             return false
         }
         guard lhs.createdAt == rhs.createdAt else {
             return false
         }
-        guard lhs.itemID == rhs.itemID else {
+        guard lhs.itemKey == rhs.itemKey else {
             return false
         }
         guard lhs.holder == rhs.holder else {
@@ -94,9 +108,9 @@ extension Reservation {
 
     var model: FluentReservation {
         return .init(
-            id: id,
+            uuid: id?.uuid,
             createdAt: createdAt,
-            itemID: itemID,
+            itemKey: itemID.uuid,
             holder: holder
         )
     }
@@ -105,8 +119,22 @@ extension Reservation {
 
 // MARK: - EventLoopFuture
 
+extension EventLoopFuture where Expectation == FluentReservation {
+
+    /// Maps this future‘s expectation from an SQL layer's `FluentReservation`
+    /// to the Domain entity `Reservation`.
+    func mapToEntity() -> EventLoopFuture<Reservation> {
+        return self.map { model in
+            return Reservation(from: model)
+        }
+    }
+
+}
+
 extension EventLoopFuture where Expectation == FluentReservation? {
 
+    /// Maps this future‘s expectation from an SQL layer's optional `FluentReservation`
+    /// to the optional Domain entity `Reservation`.
     func mapToEntity() -> EventLoopFuture<Reservation?> {
         return self.map { model in
             guard let model = model else {
@@ -118,18 +146,10 @@ extension EventLoopFuture where Expectation == FluentReservation? {
 
 }
 
-extension EventLoopFuture where Expectation == FluentReservation {
-
-    func mapToEntity() -> EventLoopFuture<Reservation> {
-        return self.map { model in
-            return Reservation(from: model)
-        }
-    }
-
-}
-
 extension EventLoopFuture where Expectation == [FluentReservation] {
 
+    /// Maps this future‘s expectation from an array of SQL layer's `FluentReservation`s
+    /// to an array of the Domain entities `Reservation`s.
     func mapToEntities() -> EventLoopFuture<[Reservation]> {
         return self.map { models in
             return models.map { model in Reservation(from: model) }

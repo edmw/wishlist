@@ -22,14 +22,14 @@ final class InvitationTests: XCTestCase, HasEntityTestSupport, HasAllTests {
 
     func testMapping() {
         let model = FluentInvitation(
-            id: UUID(),
+            uuid: UUID(),
             code: InvitationCode(),
             status: .accepted,
             email: EmailSpecification("123@abc.de"),
             sentAt: Date(),
             createdAt: Date(),
-            userID: UUID(),
-            invitee: UUID()
+            userKey: UUID(),
+            inviteeKey: UUID()
         )
         let entity = Invitation(from: model)
         XCTAssertEqual(entity.model, model)

@@ -32,21 +32,21 @@ final class TestingReservationRepository: ReservationRepository {
     }
 
     func save(reservation: Reservation) -> EventLoopFuture<Reservation> {
-        if let id = reservation.reservationID {
+        if let id = reservation.id {
             storage[id] = reservation
         }
         else {
-            reservation.id = UUID()
-            storage[reservation.reservationID!] = reservation
+            reservation.id = ReservationID()
+            storage[reservation.id!] = reservation
         }
         return worker.newSucceededFuture(result: reservation)
     }
 
     func delete(reservation: Reservation, for item: Item) throws -> EventLoopFuture<Reservation?> {
-        guard let reservationid = reservation.reservationID else {
+        guard let reservationid = reservation.id else {
             throw EntityError<Reservation>.requiredIDMissing
         }
-        guard let itemid = item.itemID, itemid == reservation.itemID else {
+        guard let itemid = item.id, itemid == reservation.itemID else {
             return worker.newSucceededFuture(result: nil)
         }
         storage.removeValue(forKey: reservationid)

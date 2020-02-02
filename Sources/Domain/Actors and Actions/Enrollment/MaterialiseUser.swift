@@ -44,7 +44,7 @@ public struct MaterialiseUser: Action {
         public let user: UserRepresentation
         public let identification: Identification
         internal init(_ user: User) {
-            guard let userid = user.userID else {
+            guard let userid = user.id else {
                 fatalError("RealizeUser: no id for user")
             }
             self.userID = userid

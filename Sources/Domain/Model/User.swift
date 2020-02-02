@@ -21,10 +21,7 @@ public final class User: UserModel,
 {
     static let maximumLengthOfNickName = 100
 
-    public var id: UUID? {
-        didSet { userID = UserID(uuid: id) }
-    }
-    public lazy var userID = UserID(uuid: id)
+    public var id: UserID?
 
     public var identification: Identification
 
@@ -79,7 +76,7 @@ public final class User: UserModel,
         language: LanguageTag? = nil,
         picture: URL? = nil
     ) {
-        self.id = id?.uuid
+        self.id = id
 
         self.identification = Identification()
 
@@ -121,13 +118,13 @@ public final class User: UserModel,
     // MARK: CustomStringConvertible
 
     public var description: String {
-        return "User[\(id ??? "???"):\(userID ??? "???")][identification: \(identification)]"
+        return "User[\(id ??? "???")][identification: \(identification)]"
     }
 
     // MARK: CustomDebugStringConvertible
 
     public var debugDescription: String {
-        return "User[\(id ??? "???"):\(userID ??? "???")][identification: \(identification)]"
+        return "User[\(id ??? "???")][identification: \(identification)]"
             + "(\(email), \(fullName))"
     }
 

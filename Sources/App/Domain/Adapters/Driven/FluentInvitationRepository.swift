@@ -45,24 +45,24 @@ final class FluentInvitationRepository: InvitationRepository, FluentRepository {
     }
 
     func all(for user: User) throws -> EventLoopFuture<[Invitation]> {
-        guard let userid = user.userID else {
+        guard let userid = user.id else {
             throw EntityError<User>.requiredIDMissing
         }
         return db.withConnection { connection in
             return FluentInvitation.query(on: connection)
-                .filter(\.userID == userid.uuid)
+                .filter(\.userKey == userid.uuid)
                 .all()
                 .mapToEntities()
         }
     }
 
     func count(for user: User) throws -> EventLoopFuture<Int> {
-        guard let userid = user.userID else {
+        guard let userid = user.id else {
             throw EntityError<User>.requiredIDMissing
         }
         return db.withConnection { connection in
             return FluentInvitation.query(on: connection)
-                .filter(\.userID == userid.uuid)
+                .filter(\.userKey == userid.uuid)
                 .count()
         }
     }
@@ -76,21 +76,22 @@ final class FluentInvitationRepository: InvitationRepository, FluentRepository {
 
     func save(invitation: Invitation) -> EventLoopFuture<Invitation> {
         return db.withConnection { connection in
-            if invitation.id == nil {
+            let invitationmodel = invitation.model
+            if invitationmodel.id == nil {
                 // invitation create
                 let limit = Invitation.maximumNumberOfInvitationsPerUser
                 return FluentInvitation.query(on: connection)
-                    .filter(\.userID == invitation.userID)
+                    .filter(\.userKey == invitationmodel.userKey)
                     .count()
                     .max(limit, or: EntityError<Invitation>.limitReached(maximum: limit))
                     .transform(to:
-                        invitation.model.save(on: connection)
+                        invitationmodel.save(on: connection)
                     )
                     .mapToEntity()
             }
             else {
                 // invitation update
-                return invitation.model.save(on: connection)
+                return invitationmodel.save(on: connection)
                     .mapToEntity()
             }
         }

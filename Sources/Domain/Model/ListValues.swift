@@ -123,7 +123,7 @@ public struct ListValues: Values, ValueValidatable {
         if let list = list {
             // validate against given list:
             // list id must exist
-            guard let listID = list.listID else {
+            guard let listID = list.id else {
                 throw EntityError<List>.requiredIDMissing
             }
             return repository

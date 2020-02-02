@@ -30,7 +30,7 @@ public struct InvitationRepresentation: Encodable, Equatable {
 
     init(_ invitation: Invitation) {
         self.init(
-            id: invitation.invitationID,
+            id: invitation.id,
             code: invitation.code,
             status: String(invitation.status),
             email: String(invitation.email),

@@ -12,8 +12,11 @@ import FluentMySQL
 
 // MARK: FluentItem
 
-/// This generated type is based on the Domain‘s FluentItem model type and is used for
-/// storing data to and retrieving data from a SQL database using Fluent.
+/// This generated type is based on the Domain‘s Item model type and is used for
+/// storing data into and retrieving data from a SQL database using Fluent.
+///
+/// The Domain builds relations between models using model identifiers (UserID, ListID, ...).
+/// This will translate model identifiers to UUIDs and vice versa to handle relations using UUIDs.
 public struct FluentItem: ItemModel,
     Fluent.Model,
     Fluent.Migration,
@@ -23,11 +26,12 @@ public struct FluentItem: ItemModel,
 
     public typealias Database = MySQLDatabase
     public typealias ID = UUID
-    public static let idKey: IDKey = \.id
+    public static let idKey: IDKey = \.uuid
     public static let name = "Item"
     public static let migrationName = "Item"
 
-    public var id: UUID?
+    public var uuid: UUID?
+    public var id: ItemID? { ItemID(uuid: uuid) }
     public var title: Title
     public var text: Text
     public var preference: Item.Preference
@@ -36,10 +40,13 @@ public struct FluentItem: ItemModel,
     public var createdAt: Date
     public var modifiedAt: Date
     public var localImageURL: URL?
-    public var listID: UUID
+    public var listKey: UUID
+    public var listID: ListID { ListID(uuid: listKey) }
 
+    /// Initializes a SQL layer's `FluentItem`. Usually not called directly.
+    /// To create this object a getter `model` is provided on the Domain entity `Item`.
     init(
-        id: UUID?,
+        uuid: UUID?,
         title: Title,
         text: Text,
         preference: Item.Preference,
@@ -48,9 +55,9 @@ public struct FluentItem: ItemModel,
         createdAt: Date,
         modifiedAt: Date,
         localImageURL: URL?,
-        listID: UUID
+        listKey: UUID
     ) {
-        self.id = id
+        self.uuid = uuid
         self.title = title
         self.text = text
         self.preference = preference
@@ -59,14 +66,27 @@ public struct FluentItem: ItemModel,
         self.createdAt = createdAt
         self.modifiedAt = modifiedAt
         self.localImageURL = localImageURL
-        self.listID = listID
+        self.listKey = listKey
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case uuid = "id"
+        case title
+        case text
+        case preference
+        case url
+        case imageURL
+        case createdAt
+        case modifiedAt
+        case localImageURL
+        case listKey = "listID"
     }
 
     // MARK: Fluent.Migration
 
     public static func prepare(on connection: Database.Connection) -> EventLoopFuture<Void> {
         return Database.create(self, on: connection) { builder in
-            builder.field(for: \.id)
+            builder.field(for: \.uuid)
             builder.field(for: \.title)
             builder.field(for: \.text)
             builder.field(for: \.preference)
@@ -75,15 +95,15 @@ public struct FluentItem: ItemModel,
             builder.field(for: \.createdAt)
             builder.field(for: \.modifiedAt)
             builder.field(for: \.localImageURL)
-            builder.field(for: \.listID)
-            builder.reference(from: \.listID, to: \FluentList.id, onDelete: .cascade)
+            builder.field(for: \.listKey)
+            builder.reference(from: \.listKey, to: \FluentList.id, onDelete: .cascade)
         }
     }
 
     // MARK: Relations
 
     var list: Parent<FluentItem, FluentList> {
-        return parent(\FluentItem.listID)
+        return parent(\FluentItem.listKey)
     }
 
     func requireList(on container: Container) throws -> EventLoopFuture<List> {
@@ -95,7 +115,7 @@ public struct FluentItem: ItemModel,
     // MARK: Equatable
 
     public static func == (lhs: FluentItem, rhs: FluentItem) -> Bool {
-        guard lhs.id == rhs.id else {
+        guard lhs.uuid == rhs.uuid else {
             return false
         }
         guard lhs.title == rhs.title else {
@@ -122,7 +142,7 @@ public struct FluentItem: ItemModel,
         guard lhs.localImageURL == rhs.localImageURL else {
             return false
         }
-        guard lhs.listID == rhs.listID else {
+        guard lhs.listKey == rhs.listKey else {
             return false
         }
         return true
@@ -136,7 +156,7 @@ extension Item {
 
     var model: FluentItem {
         return .init(
-            id: id,
+            uuid: id?.uuid,
             title: title,
             text: text,
             preference: preference,
@@ -145,7 +165,7 @@ extension Item {
             createdAt: createdAt,
             modifiedAt: modifiedAt,
             localImageURL: localImageURL,
-            listID: listID
+            listKey: listID.uuid
         )
     }
 
@@ -153,8 +173,22 @@ extension Item {
 
 // MARK: - EventLoopFuture
 
+extension EventLoopFuture where Expectation == FluentItem {
+
+    /// Maps this future‘s expectation from an SQL layer's `FluentItem`
+    /// to the Domain entity `Item`.
+    func mapToEntity() -> EventLoopFuture<Item> {
+        return self.map { model in
+            return Item(from: model)
+        }
+    }
+
+}
+
 extension EventLoopFuture where Expectation == FluentItem? {
 
+    /// Maps this future‘s expectation from an SQL layer's optional `FluentItem`
+    /// to the optional Domain entity `Item`.
     func mapToEntity() -> EventLoopFuture<Item?> {
         return self.map { model in
             guard let model = model else {
@@ -166,18 +200,10 @@ extension EventLoopFuture where Expectation == FluentItem? {
 
 }
 
-extension EventLoopFuture where Expectation == FluentItem {
-
-    func mapToEntity() -> EventLoopFuture<Item> {
-        return self.map { model in
-            return Item(from: model)
-        }
-    }
-
-}
-
 extension EventLoopFuture where Expectation == [FluentItem] {
 
+    /// Maps this future‘s expectation from an array of SQL layer's `FluentItem`s
+    /// to an array of the Domain entities `Item`s.
     func mapToEntities() -> EventLoopFuture<[Item]> {
         return self.map { models in
             return models.map { model in Item(from: model) }

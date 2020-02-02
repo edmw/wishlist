@@ -17,15 +17,12 @@ public final class Reservation: Entity,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {
-    public var id: UUID? {
-        didSet { reservationID = ReservationID(uuid: id) }
-    }
-    public lazy var reservationID = ReservationID(uuid: id)
+    public var id: ReservationID?
 
     public var createdAt: Date
 
     /// Item (what item is reserved)
-    public var itemID: UUID
+    public var itemID: ItemID
 
     /// Holder (who reserved that item)
     public var holder: Identification
@@ -46,7 +43,7 @@ public final class Reservation: Entity,
             throw EntityError<Item>.requiredIDMissing
         }
 
-        self.id = id?.uuid
+        self.id = id
 
         self.createdAt = Date()
 
@@ -67,14 +64,14 @@ public final class Reservation: Entity,
     // MARK: CustomStringConvertible
 
     public var description: String {
-        return "Reservation[\(id ??? "???"):\(reservationID ??? "???")]" +
+        return "Reservation[\(id ??? "???")]" +
             "(item:\(itemID)|holder:\(holder))"
     }
 
     // MARK: CustomDebugStringConvertible
 
     public var debugDescription: String {
-        return "Reservation[\(id ??? "???"):\(reservationID ??? "???")]" +
+        return "Reservation[\(id ??? "???")]" +
             "(item:\(itemID))|holder:\(holder))"
     }
 

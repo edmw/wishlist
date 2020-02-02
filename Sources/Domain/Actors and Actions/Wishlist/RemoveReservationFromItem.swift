@@ -100,7 +100,7 @@ extension DomainWishlistActor {
                     .unwrap(or: WishlistActorError.invalidReservation)
                     .flatMap { arguments in let (reservation, item) = arguments
                         // remove reservation
-                        let id = reservation.reservationID
+                        let id = reservation.id
                         return try RemoveReservationFromItem(actor: self)
                             .execute(for: reservation, on: item, for: identification)
                             .logMessage(.removeReservationFromItem(with: id), using: logging)

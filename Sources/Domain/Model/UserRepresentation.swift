@@ -53,7 +53,7 @@ public struct UserRepresentation: Encodable, Equatable,
 
     init(_ user: User) {
         self.init(
-            id: user.userID,
+            id: user.id,
             nickName: user.nickName,
             displayName: user.displayName,
             fullName: user.fullName,

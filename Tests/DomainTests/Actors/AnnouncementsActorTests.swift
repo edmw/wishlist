@@ -32,9 +32,9 @@ final class AnnouncementsActorTests : XCTestCase, HasAllTests {
     /// corresponding user.
     func testPresentPubliclyWithUser() throws {
         let user = try! userRepository.save(user: UserSupport.randomUser()).wait()
-        XCTAssertNotNil(user.userID)
+        XCTAssertNotNil(user.id)
         let result = try! actor.presentPublicly(
-            .specification(userBy: user.userID),
+            .specification(userBy: user.id),
             .boundaries(worker: eventLoop)
         ).wait()
         XCTAssertNotNil(result.user)

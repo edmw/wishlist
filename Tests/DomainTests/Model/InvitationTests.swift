@@ -30,7 +30,7 @@ final class InvitationTests: XCTestCase, HasAllTests {
 
     func testCreationWithUser() throws {
         let user = try userRepository.save(user: UserSupport.randomUser()).wait()
-        XCTAssertNotNil(user.userID)
+        XCTAssertNotNil(user.id)
         let invitation = try Invitation(email: "email@host.invalid", user: user)
         let owner = try invitationRepository.owner(of: invitation).wait()
         XCTAssertEqual(user, owner)
@@ -38,7 +38,7 @@ final class InvitationTests: XCTestCase, HasAllTests {
 
     func testCreationWithInvalidUser() throws {
         let user = UserSupport.randomUser()
-        XCTAssertNil(user.userID)
+        XCTAssertNil(user.id)
         assert(
             try Invitation(email: "email@host.invalid", user: user),
             throws: EntityError<User>.requiredIDMissing

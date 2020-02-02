@@ -27,10 +27,7 @@ public final class List: ListModel, Viewable,
     public static let minimumLengthOfTitle = 4
     public static let maximumLengthOfTitle = 100
 
-    public var id: UUID? {
-        didSet { listID = ListID(uuid: id) }
-    }
-    public lazy var listID = ListID(uuid: id)
+    public var id: ListID?
 
     public var title: Title
     public var visibility: Visibility
@@ -41,7 +38,7 @@ public final class List: ListModel, Viewable,
     public var itemsSorting: ItemsSorting?
 
     /// Parent
-    public var userID: UUID
+    public var userID: UserID
 
     public init<T: ListModel>(from other: T) {
         self.id = other.id
@@ -67,7 +64,7 @@ public final class List: ListModel, Viewable,
             throw EntityError<User>.requiredIDMissing
         }
 
-        self.id = id?.uuid
+        self.id = id
 
         self.title = title
         self.visibility = visibility
@@ -96,13 +93,13 @@ public final class List: ListModel, Viewable,
     // MARK: CustomStringConvertible
 
     public var description: String {
-        return "List[\(id ??? "???"):\(listID ??? "???")]"
+        return "List[\(id ??? "???")]"
     }
 
     // MARK: CustomDebugStringConvertible
 
     public var debugDescription: String {
-        return "List[\(id ??? "???"):\(listID ??? "???")](\(title))"
+        return "List[\(id ??? "???")](\(title))"
     }
 
     // MARK: - Options

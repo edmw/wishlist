@@ -56,7 +56,7 @@ extension DomainUserListsActor {
                     .logMessage(.deleteListItems, using: self.logging)
                     .flatMap { _ in
                         // delete list
-                        let id = list.listID
+                        let id = list.id
                         return try self.listRepository
                             .delete(list: list, for: user)
                             .unwrap(or: UserListsActorError.invalidList)

@@ -29,10 +29,7 @@ public final class Item: ItemModel, Imageable,
 
     public static let maximumLengthOfURL = 2_000
 
-    public var id: UUID? {
-        didSet { itemID = ItemID(uuid: id) }
-    }
-    public lazy var itemID = ItemID(uuid: id)
+    public var id: ItemID?
 
     public var title: Title
     public var text: Text
@@ -45,7 +42,7 @@ public final class Item: ItemModel, Imageable,
     public var localImageURL: URL?
 
     /// Parent
-    public var listID: UUID
+    public var listID: ListID
 
     public init<T: ItemModel>(from other: T) {
         self.id = other.id
@@ -61,7 +58,7 @@ public final class Item: ItemModel, Imageable,
     }
 
     init(
-        id: UUID? = nil,
+        id: ItemID? = nil,
         title: Title,
         text: Text,
         preference: Item.Preference? = nil,
@@ -91,11 +88,14 @@ public final class Item: ItemModel, Imageable,
     // MARK: Imagable
 
     public var imageableEntityGroupKey: String? {
-        return listID.base62String
+        return String(listID)
     }
 
     public var imageableEntityKey: String? {
-        return id?.base62String
+        guard let id = id else {
+            return nil
+        }
+        return String(id)
     }
 
     public var imageableSize: ImageableSize {

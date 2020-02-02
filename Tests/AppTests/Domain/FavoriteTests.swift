@@ -22,9 +22,9 @@ final class FavoriteTests: XCTestCase, HasEntityTestSupport, HasAllTests {
 
     func testMapping() {
         let model = FluentReservation(
-            id: UUID(),
+            uuid: UUID(),
             createdAt: Date(),
-            itemID: UUID(),
+            itemKey: UUID(),
             holder: Identification()
         )
         let entity = Reservation(from: model)

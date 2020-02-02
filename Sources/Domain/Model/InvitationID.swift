@@ -10,4 +10,11 @@ public struct InvitationID: Identifier {
         self.rawValue = uuid
     }
 
+    public init?(uuid: UUID?) {
+        guard let uuid = uuid else {
+            return nil
+        }
+        self.rawValue = uuid
+    }
+
 }

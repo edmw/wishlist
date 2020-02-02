@@ -18,15 +18,6 @@ final class FluentListRepository: ListRepository, FluentRepository {
         self.db = db
     }
 
-    // default sort order
-    static let orderByNameKeyPath = \List.title
-    static let orderByNameDirection = EntitySortingDirection.ascending
-    static let orderByName = ListsSorting(orderByNameKeyPath, orderByNameDirection)
-    static let orderByNameSql = MySQLDatabase.querySort(
-        MySQLDatabase.queryField(.keyPath(orderByNameKeyPath)),
-        orderByNameDirection.sqlDirection
-    )
-
     func find(by id: ListID) -> EventLoopFuture<List?> {
         return db.withConnection { connection in
             return FluentList.find(id.uuid, on: connection)
@@ -37,7 +28,7 @@ final class FluentListRepository: ListRepository, FluentRepository {
     func find(by id: ListID, for user: User) throws -> EventLoopFuture<List?> {
         return db.withConnection { connection in
             return try user.model.lists.query(on: connection)
-                .filter(\.id == id.uuid)
+                .filter(\.uuid == id.uuid)
                 .first()
                 .mapToEntity()
         }
@@ -66,9 +57,9 @@ final class FluentListRepository: ListRepository, FluentRepository {
     {
         return db.withConnection { connection in
             return FluentUser.query(on: connection)
-                .join(\FluentList.userID, to: \FluentUser.id)
-                .filter(\FluentUser.id == userid.uuid)
-                .filter(\FluentList.id == listid.uuid)
+                .join(\FluentList.userKey, to: \FluentUser.uuid)
+                .filter(\FluentUser.uuid == userid.uuid)
+                .filter(\FluentList.uuid == listid.uuid)
                 .alsoDecode(FluentList.self)
                 .first()
                 .mapToEntities()
@@ -85,7 +76,7 @@ final class FluentListRepository: ListRepository, FluentRepository {
     }
 
     func all(for user: User) throws -> EventLoopFuture<[List]> {
-        return try all(for: user, sort: FluentListRepository.orderByName)
+        return try all(for: user, sort: sortingDefault)
     }
 
     func all(
@@ -107,12 +98,12 @@ final class FluentListRepository: ListRepository, FluentRepository {
     }
 
     func count(for user: User) throws -> EventLoopFuture<Int> {
-        guard let userid = user.userID else {
+        guard let userid = user.id else {
             throw EntityError<User>.requiredIDMissing
         }
         return db.withConnection { connection in
             return FluentList.query(on: connection)
-                .filter(\.userID == userid.uuid)
+                .filter(\.userKey == userid.uuid)
                 .count()
         }
     }
@@ -134,21 +125,22 @@ final class FluentListRepository: ListRepository, FluentRepository {
 
     func save(list: List) -> EventLoopFuture<List> {
         return db.withConnection { connection in
-            if list.id == nil {
+            let listmodel = list.model
+            if listmodel.id == nil {
                 // list create
                 let limit = List.maximumNumberOfListsPerUser
                 return FluentList.query(on: connection)
-                    .filter(\.userID == list.userID)
+                    .filter(\.userKey == listmodel.userKey)
                     .count()
                     .max(limit, or: EntityError<List>.limitReached(maximum: limit))
                     .transform(to:
-                        list.model.save(on: connection)
+                        listmodel.save(on: connection)
                     )
                     .mapToEntity()
             }
             else {
                 // list update
-                return list.model.save(on: connection)
+                return listmodel.save(on: connection)
                     .mapToEntity()
             }
         }
@@ -156,7 +148,7 @@ final class FluentListRepository: ListRepository, FluentRepository {
 
     func delete(list: List, for user: User) throws -> EventLoopFuture<List?> {
         return db.withConnection { connection in
-            guard let userid = user.userID, userid == list.userID else {
+            guard let userid = user.id, userid == list.userID else {
                 return connection.future(nil)
             }
             return list.model.delete(on: connection)
@@ -167,32 +159,31 @@ final class FluentListRepository: ListRepository, FluentRepository {
     // Returns an available list title for a user based on the specified title
     // by appending an increasing counter to it.
     func available(title: String, for user: User) throws -> EventLoopFuture<String?> {
-        return try all(for: user)
-            .map { lists in
-                var candidate = title
+        return try all(for: user).map { lists in
+            var candidate = title
 
-                // build list of existing titles
-                let titles = lists.map { list in String(list.title) }
+            // build list of existing titles
+            let titles = lists.map { list in String(list.title) }
 
-                if titles.contains(candidate) {
-                    let prefix = String(title.prefix(List.maximumLengthOfTitle - 4))
+            if titles.contains(candidate) {
+                let prefix = String(title.prefix(List.maximumLengthOfTitle - 4))
 
-                    // append increasing number to title until unique title is found
-                    // (counts up to 99)
-                    var counter = 0
-                    repeat {
-                        counter += 1
-                        candidate = "\(prefix)_\(counter)"
-                    } while titles.contains(candidate) && counter < 99
+                // append increasing number to title until unique title is found
+                // (counts up to 99)
+                var counter = 0
+                repeat {
+                    counter += 1
+                    candidate = "\(prefix)_\(counter)"
+                } while titles.contains(candidate) && counter < 99
 
-                    guard counter < 99 else {
-                        // counter outrun (no unique name found)
-                        return nil
-                    }
+                guard counter < 99 else {
+                    // counter outrun (no unique name found)
+                    return nil
                 }
-
-                return candidate
             }
+
+            return candidate
+        }
     }
 
 }

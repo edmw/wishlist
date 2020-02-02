@@ -19,15 +19,6 @@ final class FluentItemRepository: ItemRepository, FluentRepository {
         self.db = db
     }
 
-    // default sort order
-    static let orderByNameKeyPath = \Item.title
-    static let orderByNameDirection = EntitySortingDirection.ascending
-    static let orderByName = ItemsSorting(orderByNameKeyPath, orderByNameDirection)
-    static let orderByNameSql = MySQLDatabase.querySort(
-        MySQLDatabase.queryField(.keyPath(orderByNameKeyPath)),
-        orderByNameDirection.sqlDirection
-    )
-
     func find(by id: ItemID) -> EventLoopFuture<Item?> {
         return db.withConnection { connection in
             return FluentItem.find(id.uuid, on: connection)
@@ -38,7 +29,7 @@ final class FluentItemRepository: ItemRepository, FluentRepository {
     func find(by id: ItemID, in list: List) throws -> EventLoopFuture<Item?> {
         return db.withConnection { connection in
             return try list.model.items.query(on: connection)
-                .filter(\.id == id.uuid)
+                .filter(\.uuid == id.uuid)
                 .first()
                 .mapToEntity()
         }
@@ -49,13 +40,14 @@ final class FluentItemRepository: ItemRepository, FluentRepository {
     {
         return db.withConnection { connection in
             return try list.model.items.query(on: connection)
-                .filter(\.id == id.uuid)
-                .join(\FluentReservation.itemID, to: \FluentItem.id, method: .left)
+                .filter(\.uuid == id.uuid)
+                .join(\FluentReservation.itemKey, to: \FluentItem.uuid, method: .left)
                 .decodeRaw()
                 .all()
                 .flatMap { results -> EventLoopFuture<(Item, Reservation?)?> in
                     return self.decodeItemsWithReservations(results, on: connection)
                         .map { $0.first }
+                        .mapToEntities()
                 }
         }
     }
@@ -65,11 +57,11 @@ final class FluentItemRepository: ItemRepository, FluentRepository {
     {
         return db.withConnection { connection in
             return FluentUser.query(on: connection)
-                .join(\FluentList.userID, to: \FluentUser.id)
-                .join(\FluentItem.listID, to: \FluentList.id)
-                .filter(\.id == userid.uuid)
-                .filter(\FluentList.id == listid.uuid)
-                .filter(\FluentItem.id == itemid.uuid)
+                .join(\FluentList.userKey, to: \FluentUser.uuid)
+                .join(\FluentItem.listKey, to: \FluentList.uuid)
+                .filter(\.uuid == userid.uuid)
+                .filter(\FluentList.uuid == listid.uuid)
+                .filter(\FluentItem.uuid == itemid.uuid)
                 .alsoDecode(FluentList.self)
                 .alsoDecode(FluentItem.self)
                 .first()
@@ -78,7 +70,7 @@ final class FluentItemRepository: ItemRepository, FluentRepository {
     }
 
     func all(for list: List) throws -> EventLoopFuture<[Item]> {
-        return try all(for: list, sort: FluentItemRepository.orderByName)
+        return try all(for: list, sort: sortingDefault)
     }
 
     func all(
@@ -102,9 +94,9 @@ final class FluentItemRepository: ItemRepository, FluentRepository {
     func all(for list: List, reserved: Bool) throws -> EventLoopFuture<[Item]> {
         return db.withConnection { connection -> EventLoopFuture<[Item]> in
             let filterReserved: FilterOperator<MySQLDatabase, FluentReservation>
-                = .make(\FluentReservation.id, reserved ? .notEqual : .equal, [UUID?.none])
+                = .make(\FluentReservation.uuid, reserved ? .notEqual : .equal, [UUID?.none])
             return try list.model.items.query(on: connection)
-                .join(\FluentReservation.id, to: \FluentItem.id)
+                .join(\FluentReservation.uuid, to: \FluentItem.uuid)
                 .filter(filterReserved)
                 .sort(\.title, .ascending)
                 .all()
@@ -115,7 +107,7 @@ final class FluentItemRepository: ItemRepository, FluentRepository {
     func allAndReservations(
         for list: List
     ) throws -> EventLoopFuture<[(Item, Reservation?)]> {
-        return try allAndReservations(for: list, sort: FluentItemRepository.orderByName)
+        return try allAndReservations(for: list, sort: sortingDefault)
     }
 
     func allAndReservations(
@@ -132,14 +124,14 @@ final class FluentItemRepository: ItemRepository, FluentRepository {
 // with no reservation linked to an item, which will crash in `alsoDecode`.
 //
 //            return try list.items.query(on: connection)
-//                .join(\FluentReservation.id, to: \FluentItem.id, method: .left)
+//                .join(\FluentReservation.uuid, to: \FluentItem.uuid, method: .left)
 //                .alsoDecode(FluentReservation.self)
 //                .all()
 //
 // WORKAROUND: Let's roll up our sleeves:
 // Get raw data from query and decode the model ourself.
             var query = try list.model.items.query(on: connection)
-                .join(\FluentReservation.itemID, to: \FluentItem.id, method: .left)
+                .join(\FluentReservation.itemKey, to: \FluentItem.uuid, method: .left)
             if let orderBy = orderBy {
                 query = query.sort(orderBy)
             }
@@ -149,6 +141,7 @@ final class FluentItemRepository: ItemRepository, FluentRepository {
                 .all()
                 .flatMap { results -> EventLoopFuture<[(Item, Reservation?)]> in
                     return self.decodeItemsWithReservations(results, on: connection)
+                        .mapToEntities()
                 }
 // /TASK
         }
@@ -171,21 +164,22 @@ final class FluentItemRepository: ItemRepository, FluentRepository {
 
     func save(item: Item) -> EventLoopFuture<Item> {
         return db.withConnection { connection in
-            if item.id == nil {
+            let itemmodel = item.model
+            if itemmodel.id == nil {
                 // item create
                 let limit = Item.maximumNumberOfItemsPerList
                 return FluentItem.query(on: connection)
-                    .filter(\.listID == item.listID)
+                    .filter(\.listKey == itemmodel.listKey)
                     .count()
                     .max(limit, or: EntityError<Item>.limitReached(maximum: limit))
                     .transform(to:
-                        item.model.save(on: connection)
+                        itemmodel.save(on: connection)
                     )
                     .mapToEntity()
             }
             else {
                 // item update
-                return item.model.save(on: connection)
+                return itemmodel.save(on: connection)
                     .mapToEntity()
             }
         }
@@ -194,7 +188,7 @@ final class FluentItemRepository: ItemRepository, FluentRepository {
     private func delete(_ item: Item, in list: List, on connection: MySQLConnection)
         throws -> EventLoopFuture<Item?>
     {
-        guard let listid = list.listID, listid == item.listID else {
+        guard let listid = list.id, listid == item.listID else {
             return connection.future(nil)
         }
         return item.model.delete(on: connection)
@@ -222,23 +216,23 @@ final class FluentItemRepository: ItemRepository, FluentRepository {
     private func decodeItemsWithReservations(
         _ results: [MySQLDatabase.Output],
         on connection: MySQLConnection
-    ) -> EventLoopFuture<[(Item, Reservation?)]> {
+    ) -> EventLoopFuture<[(FluentItem, FluentReservation?)]> {
         return db.withConnection { connection in
-            return results.map { row -> EventLoopFuture<(Item, Reservation?)> in
+            return results.map { row -> EventLoopFuture<(FluentItem, FluentReservation?)> in
                 // decode item future
                 let item = MySQLDatabase.queryDecodeItem(row, on: connection)
                 // get reservation id if any or nil
                 let reservationID = row.value(
                     forTable: FluentReservation.entity,
                     atColumn: FluentReservation.Database
-                        .queryField(.keyPath(\FluentReservation.id)).identifier.string
+                        .queryField(.keyPath(\FluentReservation.uuid)).identifier.string
                 )
                 if let id = reservationID, !id.isNull {
                     // decode reservation future
                     let reservation = MySQLDatabase.queryDecodeReservation(row, on: connection)
                     // return future of tuple from item and reservation
                     return flatMap(
-                        to: (Item, Reservation?).self, item, reservation
+                        to: (FluentItem, FluentReservation?).self, item, reservation
                     ) { item, reservation in
                         connection.future((item, reservation))
                     }
@@ -263,27 +257,25 @@ extension MySQLDatabase {
     fileprivate static func queryDecodeItem(
         _ row: [MySQLColumn: MySQLData],
         on connection: MySQLConnection
-    ) -> EventLoopFuture<Item> {
+    ) -> EventLoopFuture<FluentItem> {
         return MySQLDatabase.queryDecode(
             row,
             entity: FluentItem.entity,
             as: FluentItem.self,
             on: connection
         )
-        .mapToEntity()
     }
 
     fileprivate static func queryDecodeReservation(
         _ row: [MySQLColumn: MySQLData],
         on connection: MySQLConnection
-    ) -> EventLoopFuture<Reservation> {
+    ) -> EventLoopFuture<FluentReservation> {
         return MySQLDatabase.queryDecode(
             row,
             entity: FluentReservation.entity,
             as: FluentReservation.self,
             on: connection
         )
-        .mapToEntity()
     }
 
 }
@@ -298,6 +290,43 @@ extension EventLoopFuture where Expectation == ((FluentUser, FluentList), Fluent
                 return nil
             }
             return (Item(from: models.1), List(from: models.0.1), User(from: models.0.0))
+        }
+    }
+
+}
+
+extension EventLoopFuture where Expectation == (FluentItem, FluentReservation?)? {
+
+    func mapToEntities() -> EventLoopFuture<(Item, Reservation?)?> {
+        return self.map { model in
+            guard let model = model else {
+                return nil
+            }
+            let itemmodel = model.0
+            if let reservationmodel = model.1 {
+                return (Item(from: itemmodel), Reservation(from: reservationmodel))
+            }
+            else {
+                return (Item(from: itemmodel), nil)
+            }
+        }
+    }
+
+}
+
+extension EventLoopFuture where Expectation == [(FluentItem, FluentReservation?)] {
+
+    func mapToEntities() -> EventLoopFuture<[(Item, Reservation?)]> {
+        return self.map { models in
+            return models.map { model in
+                let itemmodel = model.0
+                if let reservationmodel = model.1 {
+                    return (Item(from: itemmodel), Reservation(from: reservationmodel))
+                }
+                else {
+                    return (Item(from: itemmodel), nil)
+                }
+            }
         }
     }
 

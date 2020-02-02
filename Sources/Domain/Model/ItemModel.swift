@@ -1,7 +1,7 @@
 import Foundation
 
 public protocol ItemModel {
-    var id: UUID? { get }
+    var id: ItemID? { get }
     var title: Title { get }
     var text: Text { get }
     var preference: Item.Preference { get }
@@ -10,5 +10,5 @@ public protocol ItemModel {
     var createdAt: Date { get }
     var modifiedAt: Date { get }
     var localImageURL: URL? { get }
-    var listID: UUID { get }
+    var listID: ListID { get }
 }

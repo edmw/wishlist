@@ -19,7 +19,7 @@ final class FluentFavoriteRepository: FavoriteRepository, FluentRepository {
     }
 
     func find(by id: FavoriteID, for user: User) throws -> EventLoopFuture<Favorite?> {
-        guard let userid = user.userID else {
+        guard let userid = user.id else {
             throw EntityError<User>.requiredIDMissing
         }
         return db.withConnection { connection in
@@ -35,7 +35,7 @@ final class FluentFavoriteRepository: FavoriteRepository, FluentRepository {
     }
 
     func find(favorite list: List, for user: User) throws -> EventLoopFuture<Favorite?> {
-        guard let listid = list.listID else {
+        guard let listid = list.id else {
             throw EntityError<List>.requiredIDMissing
         }
         return db.withConnection { connection in
@@ -46,7 +46,7 @@ final class FluentFavoriteRepository: FavoriteRepository, FluentRepository {
                     if attached {
                         // return favorite
                         return try usermodel.favorites.pivots(on: connection)
-                            .filter(\.listID == listid.uuid)
+                            .filter(\.listKey == listid.uuid)
                             .first()
                             .mapToEntity()
                     }
@@ -58,7 +58,7 @@ final class FluentFavoriteRepository: FavoriteRepository, FluentRepository {
     }
 
     func favorites(for user: User) throws -> EventLoopFuture<[List]> {
-        return try favorites(for: user, sort: FluentListRepository.orderByName)
+        return try favorites(for: user, sort: sortingDefault)
     }
 
     func favorites(
@@ -80,10 +80,10 @@ final class FluentFavoriteRepository: FavoriteRepository, FluentRepository {
     }
 
     func addFavorite(_ list: List, for user: User) throws -> EventLoopFuture<Favorite> {
-        guard let listid = list.listID else {
+        guard let listid = list.id else {
             throw EntityError<List>.requiredIDMissing
         }
-        guard let userid = user.userID else {
+        guard let userid = user.id else {
             throw EntityError<User>.requiredIDMissing
         }
         return db.withConnection { connection in
@@ -94,7 +94,7 @@ final class FluentFavoriteRepository: FavoriteRepository, FluentRepository {
                     if attached {
                         // return existing favorite
                         return try usermodel.favorites.pivots(on: connection)
-                            .filter(\.listID == listid.uuid)
+                            .filter(\.listKey == listid.uuid)
                             .first()
                             .unwrap(or: EntityError<List>.lookupFailed(for: listid))
                             .mapToEntity()
@@ -103,7 +103,7 @@ final class FluentFavoriteRepository: FavoriteRepository, FluentRepository {
                         // favorite create
                         let limit = Favorite.maximumNumberOfFavoritesPerUser
                         return FluentFavorite.query(on: connection)
-                            .filter(\.userID == userid.uuid)
+                            .filter(\.userKey == userid.uuid)
                             .count()
                             .max(limit, or: EntityError<Reservation>.limitReached(maximum: limit))
                             .transform(to:

@@ -48,16 +48,16 @@ final class TestingInvitationRepository: InvitationRepository {
     }
 
     func owner(of invitation: Invitation) -> EventLoopFuture<User> {
-        return userRepository.find(id: UserID(uuid: invitation.userID)).map { $0! }
+        return userRepository.find(id: invitation.userID).map { $0! }
     }
 
     func save(invitation: Invitation) -> EventLoopFuture<Invitation> {
-        if let id = invitation.invitationID {
+        if let id = invitation.id {
             storage[id] = invitation
         }
         else {
-            invitation.id = UUID()
-            storage[invitation.invitationID!] = invitation
+            invitation.id = InvitationID()
+            storage[invitation.id!] = invitation
         }
         return worker.newSucceededFuture(result: invitation)
     }

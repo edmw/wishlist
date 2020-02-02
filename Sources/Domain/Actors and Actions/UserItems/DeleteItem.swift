@@ -57,7 +57,7 @@ extension DomainUserItemsActor {
                         // remove images for item
                         try boundaries.imageStore.removeImages(for: item)
                         // delete item
-                        let id = item.itemID
+                        let id = item.id
                         return try self.itemRepository
                             .delete(item: item, in: list)
                             .unwrap(or: UserItemsActorError.invalidItem)
