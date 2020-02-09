@@ -7,3 +7,6 @@ public protocol EntityReflectable: Entity {
     static var propertyLabelForId: String { get }
 
 }
+
+internal protocol DomainEntityReflectable: EntityReflectable {
+}

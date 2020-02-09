@@ -19,12 +19,12 @@ extension ID {
 
     /// Maps a userid to the app id type.
     init(_ identifier: UserID) {
-        self.init(identifier.rawValue)
+        self.init(identifier.uuid)
     }
 
     /// Maps an app id to the userid type.
     init?(_ identifier: UserID?) {
-        self.init(identifier?.rawValue)
+        self.init(identifier?.uuid)
     }
 
     public static func == (lhs: ID, rhs: UserID) -> Bool {

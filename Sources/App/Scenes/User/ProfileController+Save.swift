@@ -41,7 +41,7 @@ extension ProfileController {
         formdata: ProfilePageFormData
     ) throws -> ProfileSaveOutcome {
         let user = result.user
-        let context = try ProfilePageContextBuilder()
+        let context = try ProfilePageContext.builder
             .withFormData(formdata)
             .forUser(user)
             .build()
@@ -57,7 +57,7 @@ extension ProfileController {
         if case let UserProfileActorError
             .validationError(user, error) = error
         {
-            var context = try ProfilePageContextBuilder()
+            var context = try ProfilePageContext.builder
                 .withFormData(formdata)
                 .forUser(user)
                 .build()

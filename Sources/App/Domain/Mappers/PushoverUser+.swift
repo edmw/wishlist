@@ -5,7 +5,7 @@ extension PushoverUser {
     /// Mapping from `PushoverKey` to `PushoverUser`. `PushoverKey` is the value type used in the
     /// domain layer, while `PushoverUser` is the type used in the app.
     init(key: PushoverKey) {
-        self.init(key: key.rawValue)
+        self.init(String(key))
     }
 
 }

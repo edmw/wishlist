@@ -80,8 +80,9 @@ final class FluentReservationRepository: ReservationRepository, FluentRepository
                 .flatMap { reservations in
                     let updates = reservations
                         .map { reservation -> EventLoopFuture<Reservation> in
-                            reservation.holder = target
-                            return reservation.model.update(on: connection)
+                            var model = reservation.model
+                            model.holder = target
+                            return model.update(on: connection)
                                 .mapToEntity()
                         }
                     return EventLoopFuture.andAll(updates, eventLoop: connection.eventLoop)

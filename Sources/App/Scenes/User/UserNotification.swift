@@ -93,7 +93,7 @@ class UserNotification: MultiMessage, CustomStringConvertible {
             // fallback
             return render(textTemplate, on: container)
                 .map { message in
-                    return (text: "<html>\(message.text)</html>", title: message.title)
+                    return .init(text: "<html>\(message.text)</html>", title: message.title)
                 }
         }
     }
@@ -117,7 +117,7 @@ class UserNotification: MultiMessage, CustomStringConvertible {
                     guard let text = String(data: view.data, encoding: .utf8) else {
                         throw UserNotificationError.templateInvalidEncoding
                     }
-                    return (text: text, title: title ?? "🎁")
+                    return .init(text: text, title: title ?? "🎁")
                 }
         }
         catch {

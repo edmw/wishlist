@@ -49,7 +49,7 @@ final class WishlistController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try WishlistPageContextBuilder()
+                let context = try WishlistPageContext.builder
                     .forList(result.list)
                     .forOwner(result.owner)
                     .withUser(result.user)
@@ -64,9 +64,15 @@ final class WishlistController: AuthenticatableController,
 
     // MARK: VIEWS (Reservations)
 
+    struct RenderReservationViewContext {
+        let identification: Identification
+        let item: ItemRepresentation
+        let list: ListRepresentation
+        let reservation: ReservationRepresentation?
+    }
+
     typealias RenderReservationViewCallback
-        = (Identification, ItemRepresentation, ListRepresentation, ReservationRepresentation?)
-            throws -> EventLoopFuture<View>
+        = (RenderReservationViewContext) throws -> EventLoopFuture<View>
 
     private func renderReservationView(
         on request: Request,
@@ -85,10 +91,12 @@ final class WishlistController: AuthenticatableController,
                     )
                     .flatMap { result in
                         return try render(
-                            result.identification,
-                            result.item,
-                            result.list,
-                            result.reservation
+                            .init(
+                                identification: result.identification,
+                                item: result.item,
+                                list: result.list,
+                                reservation: result.reservation
+                            )
                         )
                     }
                     .handleAuthorizationError(on: request)
@@ -100,11 +108,11 @@ final class WishlistController: AuthenticatableController,
         -> EventLoopFuture<View>
     {
         return try self.renderReservationView(on: request)
-            { identification, item, list, _ throws in
-                let context = try ReservationPageContextBuilder()
-                    .forIdentification(identification)
-                    .forItem(item)
-                    .forList(list)
+            { viewContext throws in
+                let context = try ReservationPageContext.builder
+                    .forIdentification(viewContext.identification)
+                    .forItem(viewContext.item)
+                    .forList(viewContext.list)
                     .build()
                 return try Controller.renderView(
                     "Protected/ReservationCreation",
@@ -119,12 +127,12 @@ final class WishlistController: AuthenticatableController,
         -> EventLoopFuture<View>
     {
         return try self.renderReservationView(on: request)
-            { identification, item, list, reservation throws in
-                let context = try ReservationPageContextBuilder()
-                    .forIdentification(identification)
-                    .forItem(item)
-                    .forList(list)
-                    .withReservation(reservation)
+            { viewContext throws in
+                let context = try ReservationPageContext.builder
+                    .forIdentification(viewContext.identification)
+                    .forItem(viewContext.item)
+                    .forList(viewContext.list)
+                    .withReservation(viewContext.reservation)
                     .build()
                 return try Controller.renderView(
                     "Protected/ReservationDeletion",

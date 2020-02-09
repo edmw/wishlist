@@ -2,7 +2,7 @@ import Foundation
 
 import Library
 
-// MARK: Entity
+// MARK: Item
 
 /// Item model
 /// This type represents an item on a wishlist.
@@ -10,14 +10,16 @@ import Library
 /// Relations:
 /// - Parent: List
 public final class Item: ItemModel, Imageable,
-    Entity,
-    EntityDetachable,
-    EntityReflectable,
+    DomainEntity,
+    DomainEntityDetachable,
+    DomainEntityReflectable,
     Loggable,
     Codable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {
+    // MARK: Entity
+
     // maximum number of items per list:
     // this is a hard limit (application can have soft limits, too)
     public static let maximumNumberOfItemsPerList = 1_000
@@ -29,20 +31,20 @@ public final class Item: ItemModel, Imageable,
 
     public static let maximumLengthOfURL = 2_000
 
-    public var id: ItemID?
+    public internal(set) var id: ItemID?
 
-    public var title: Title
-    public var text: Text
-    public var preference: Item.Preference
-    public var url: URL?
-    public var imageURL: URL?
-    public var createdAt: Date
-    public var modifiedAt: Date
+    public internal(set) var title: Title
+    public internal(set) var text: Text
+    public internal(set) var preference: Item.Preference
+    public internal(set) var url: URL?
+    public internal(set) var imageURL: URL?
+    public internal(set) var createdAt: Date
+    public internal(set) var modifiedAt: Date
 
-    public var localImageURL: URL?
+    public internal(set) var localImageURL: URL?
 
     /// Parent
-    public var listID: ListID
+    public internal(set) var listID: ListID
 
     public init<T: ItemModel>(from other: T) {
         self.id = other.id

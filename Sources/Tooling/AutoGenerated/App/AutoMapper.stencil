@@ -21,12 +21,12 @@ extension ID {
 
     /// Maps a {{type.name|lowercase}} to the app id type.
     init(_ identifier: {{type.name}}) {
-        self.init(identifier.rawValue)
+        self.init(identifier.uuid)
     }
 
     /// Maps an app id to the {{type.name|lowercase}} type.
     init?(_ identifier: {{type.name}}?) {
-        self.init(identifier?.rawValue)
+        self.init(identifier?.uuid)
     }
 
     public static func == (lhs: ID, rhs: {{type.name}}) -> Bool {

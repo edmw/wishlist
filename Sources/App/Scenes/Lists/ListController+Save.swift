@@ -48,7 +48,7 @@ extension ListController {
     ) throws -> ListSaveOutcome {
         let user = result.user
         let list = result.list
-        let context = try ListPageContextBuilder()
+        let context = try ListPageContext.builder
             .withFormData(formdata)
             .forUser(user)
             .withList(list)
@@ -65,7 +65,7 @@ extension ListController {
         if case let UserListsActorError
             .validationError(user, list, error) = error
         {
-            var context = try ListPageContextBuilder()
+            var context = try ListPageContext.builder
                 .withFormData(formdata)
                 .forUser(user)
                 .withList(list)

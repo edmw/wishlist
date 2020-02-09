@@ -1,10 +1,10 @@
 // MARK: EmailSpecification
 
 /// This type represents an email specification as of RFC 5322 (section 3.4.1).
-public struct EmailSpecification: StringValue {
+public struct EmailSpecification: DomainStringValue {
 
     /// Let me introduce to you: The specification itself.
-    public let rawValue: String
+    let rawValue: String
 
     /// Creates an email specification using the specified string. No checks are made on the given
     /// string. It's completely up to the caller to ensure the validity of the email specification.

@@ -20,40 +20,16 @@ public struct ListRepresentation: Encodable, Equatable {
 
     public var itemsCount: Int?
 
-    init(
-        id: ListID?,
-        title: String,
-        visibility: String,
-        createdAt: Date,
-        modifiedAt: Date,
-        maskReservations: Bool,
-        ownerName: String?,
-        itemsSorting: String?,
-        itemsCount: Int?
-    ) {
-        self.id = id
-        self.title = title
-        self.visibility = visibility
-        self.createdAt = createdAt
-        self.modifiedAt = modifiedAt
-        self.maskReservations = maskReservations
-        self.ownerName = ownerName
-        self.itemsSorting = itemsSorting
-        self.itemsCount = itemsCount
-    }
-
     init(_ list: List, ownerName: String? = nil, itemsCount: Int? = nil) {
-        self.init(
-            id: list.id,
-            title: list.title ??? "�",
-            visibility: String(describing: list.visibility),
-            createdAt: list.createdAt,
-            modifiedAt: list.modifiedAt,
-            maskReservations: list.options.contains(.maskReservations),
-            ownerName: ownerName,
-            itemsSorting: list.itemsSorting.map { String(describing: $0) },
-            itemsCount: itemsCount
-        )
+        self.id = list.id
+        self.title = list.title ??? "�"
+        self.visibility = String(list.visibility)
+        self.createdAt = list.createdAt
+        self.modifiedAt = list.modifiedAt
+        self.maskReservations = list.options.contains(.maskReservations)
+        self.ownerName = ownerName
+        self.itemsSorting = list.itemsSorting.map { String(describing: $0) }
+        self.itemsCount = itemsCount
     }
 
 }

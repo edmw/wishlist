@@ -29,7 +29,7 @@ final class ItemController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                var contextBuilder = ItemPageContextBuilder()
+                var contextBuilder = ItemPageContext.builder
                     .forUser(result.user)
                     .forList(result.list)
                 if let item = result.item {
@@ -55,7 +55,7 @@ final class ItemController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try ItemPageContextBuilder()
+                let context = try ItemPageContext.builder
                     .forUser(result.user)
                     .forList(result.list)
                     .withItem(result.item)
@@ -76,7 +76,7 @@ final class ItemController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                var context = try ItemPageContextBuilder()
+                var context = try ItemPageContext.builder
                     .forUser(result.user)
                     .forList(result.list)
                     .withItem(result.item)

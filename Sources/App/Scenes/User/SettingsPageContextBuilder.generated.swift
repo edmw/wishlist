@@ -8,6 +8,13 @@ import Foundation
 
 // MARK: SettingsPageContext
 
+extension SettingsPageContext {
+
+    static var builder: SettingsPageContextBuilder {
+        return SettingsPageContextBuilder()
+    }
+}
+
 enum SettingsPageContextBuilderError: Error {
   case missingRequiredUser
 }

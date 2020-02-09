@@ -8,6 +8,13 @@ import Foundation
 
 // MARK: ReservationPageContext
 
+extension ReservationPageContext {
+
+    static var builder: ReservationPageContextBuilder {
+        return ReservationPageContextBuilder()
+    }
+}
+
 enum ReservationPageContextBuilderError: Error {
   case missingRequiredIdentification
   case missingRequiredItem

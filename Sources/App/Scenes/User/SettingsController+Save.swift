@@ -44,7 +44,7 @@ extension SettingsController {
         formdata: SettingsPageFormData
     ) throws -> SettingsSaveOutcome {
         let user = result.user
-        let context = try SettingsPageContextBuilder()
+        let context = try SettingsPageContext.builder
             .withFormData(formdata)
             .forUser(user)
             .build()
@@ -60,7 +60,7 @@ extension SettingsController {
         if case let UserSettingsActorError
             .validationError(user, error) = error
         {
-            var context = try SettingsPageContextBuilder()
+            var context = try SettingsPageContext.builder
                 .withFormData(formdata)
                 .forUser(user)
                 .build()

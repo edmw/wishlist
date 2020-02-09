@@ -232,6 +232,8 @@ public func configure(
     config.prefer(MemoryKeyedCache.self, for: KeyedCache.self)
 }
 
+// MARK: SessionsConfig
+
 func makeSessionsConfig(_ container: Container) -> SessionsConfig {
     return SessionsConfig(
         cookieName: "wishlist-session",
@@ -249,6 +251,8 @@ func makeSessionsConfig(_ container: Container) -> SessionsConfig {
         }
     )
 }
+
+// MARK: Environment
 
 extension EnvironmentKeys {
     static let developmentLogLevel = EnvironmentKey<LogLevel>("DEVELOPMENT_LOG_LEVEL")

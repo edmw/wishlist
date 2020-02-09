@@ -9,7 +9,7 @@ extension UserID: SessionAuthenticatable {
     public typealias SessionID = UUID
 
     public var sessionID: UUID? {
-        return rawValue
+        return uuid
     }
 
     public static func authenticate(sessionID: UUID, on conn: DatabaseConnectable)

@@ -26,7 +26,7 @@ final class ListsImportController: AuthenticatableController, RouteCollection {
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try ListsPageContextBuilder()
+                let context = try ListsPageContext.builder
                     .forUser(result.user)
                     .build()
                 return try Controller.renderView("User/ListsImport", with: context, on: request)
@@ -55,7 +55,7 @@ final class ListsImportController: AuthenticatableController, RouteCollection {
             }
             .catchFlatMap { error in
                 if case let UserListsActorError.importErrorForUser(user) = error {
-                    let context = try ListsPageContextBuilder()
+                    let context = try ListsPageContext.builder
                         .forUser(user)
                         .build()
                     return try self.failure(on: request, with: context)

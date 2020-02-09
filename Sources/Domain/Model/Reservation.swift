@@ -2,30 +2,33 @@ import Foundation
 
 import Library
 
-// MARK: Entity
+// MARK: Reservation
 
 /// Reservation model
 /// This type represents a reservation of an item by a user.
 ///
 /// Relations:
 /// - Foreign: Item
-public final class Reservation: Entity,
-    EntityDetachable,
-    EntityReflectable,
+public final class Reservation: ReservationModel,
+    DomainEntity,
+    DomainEntityDetachable,
+    DomainEntityReflectable,
     Loggable,
     Codable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {
-    public var id: ReservationID?
+    // MARK: Entity
 
-    public var createdAt: Date
+    public internal(set) var id: ReservationID?
+
+    public internal(set) var createdAt: Date
 
     /// Item (what item is reserved)
-    public var itemID: ItemID
+    public internal(set) var itemID: ItemID
 
     /// Holder (who reserved that item)
-    public var holder: Identification
+    public internal(set) var holder: Identification
 
     public init<T: ReservationModel>(from other: T) {
         self.id = other.id

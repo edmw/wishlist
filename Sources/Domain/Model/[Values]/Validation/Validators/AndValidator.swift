@@ -42,7 +42,7 @@ private struct AndValidator<T>: ValueValidatorType {
 
 }
 
-private struct AndValidatorError: ValueValidationErrorType {
+struct AndValidatorError: ValueValidationErrorType {
 
     var keys: [String] = []
 

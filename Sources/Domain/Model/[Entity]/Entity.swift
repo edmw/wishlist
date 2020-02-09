@@ -25,3 +25,6 @@ extension Entity where Self: EntityReflectable {
     }
 
 }
+
+internal protocol DomainEntity: Entity {
+}

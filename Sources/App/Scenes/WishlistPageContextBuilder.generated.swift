@@ -8,6 +8,13 @@ import Foundation
 
 // MARK: WishlistPageContext
 
+extension WishlistPageContext {
+
+    static var builder: WishlistPageContextBuilder {
+        return WishlistPageContextBuilder()
+    }
+}
+
 enum WishlistPageContextBuilderError: Error {
   case missingRequiredList
   case missingRequiredOwner

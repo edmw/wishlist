@@ -32,7 +32,7 @@ final class WelcomeController: AuthenticatableController, RouteCollection {
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try WelcomePageContextBuilder()
+                let context = try WelcomePageContext.builder
                     .forUser(result.user)
                     .withLists(result.lists)
                     .withFavorites(result.favorites)

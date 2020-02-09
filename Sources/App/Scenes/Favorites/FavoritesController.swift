@@ -25,7 +25,7 @@ final class FavoritesController: AuthenticatableController, SortingController, R
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try FavoritesPageContextBuilder()
+                let context = try FavoritesPageContext.builder
                     .forUser(result.user)
                     .withFavorites(result.favorites)
                     .build()

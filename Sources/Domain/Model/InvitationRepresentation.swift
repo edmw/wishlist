@@ -12,31 +12,13 @@ public struct InvitationRepresentation: Encodable, Equatable {
     public let sentAt: Date?
     public let createdAt: Date?
 
-    init(
-        id: InvitationID?,
-        code: InvitationCode,
-        status: String,
-        email: String,
-        sentAt: Date?,
-        createdAt: Date?
-    ) {
-        self.id = id
-        self.code = code
-        self.status = status
-        self.email = email
-        self.sentAt = sentAt
-        self.createdAt = createdAt
-    }
-
     init(_ invitation: Invitation) {
-        self.init(
-            id: invitation.id,
-            code: invitation.code,
-            status: String(invitation.status),
-            email: String(invitation.email),
-            sentAt: invitation.sentAt,
-            createdAt: invitation.createdAt
-        )
+        self.id = invitation.id
+        self.code = invitation.code
+        self.status = String(invitation.status)
+        self.email = String(invitation.email)
+        self.sentAt = invitation.sentAt
+        self.createdAt = invitation.createdAt
     }
 
 }

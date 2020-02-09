@@ -10,6 +10,13 @@ import Foundation
 
 // MARK: {{type.name}}
 
+extension {{type.name}} {
+
+    static var builder: {{type.name}}Builder {
+        return {{type.name}}Builder()
+    }
+}
+
 enum {{type.name}}BuilderError: Error {
 {% for initializer in type.initializers where initializer|annotated:"AutoPageContextBuilderInitializer" %}
 {% for parameter in initializer.parameters %}

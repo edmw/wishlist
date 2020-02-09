@@ -58,7 +58,7 @@ final class LoginController: Controller, RouteCollection {
 extension InvitationCode: ControllerParameterValue {
 
     var stringValue: String {
-        return rawValue
+        return String(self)
     }
 
 }

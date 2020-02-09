@@ -8,6 +8,13 @@ import Foundation
 
 // MARK: ProfilePageContext
 
+extension ProfilePageContext {
+
+    static var builder: ProfilePageContextBuilder {
+        return ProfilePageContextBuilder()
+    }
+}
+
 enum ProfilePageContextBuilderError: Error {
   case missingRequiredUser
 }

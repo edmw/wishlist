@@ -1,7 +1,7 @@
 import Foundation
 
 /// Value type based on a string.
-public protocol StringValue: RawRepresentable,
+public protocol StringValue: ValueType,
     ExpressibleByStringLiteral,
     LosslessStringConvertible,
     Collection,
@@ -9,19 +9,30 @@ public protocol StringValue: RawRepresentable,
     Hashable
 {
 
-    var rawValue: String { get }
+    init(_ description: String)
+    init?(_ description: String?)
 
-    init(string: String)
+    // MARK: String
+
+    var hasLetters: Bool { get }
+
+    var isLetters: Bool { get }
+
+    var hasDigits: Bool { get }
+
+    var isDigits: Bool { get }
 
 }
 
-extension StringValue {
+internal protocol DomainStringValue: StringValue {
 
-    // MARK: RawRepresentable
+    init(string: String)
 
-    public init?(rawValue: String) {
-        self.init(string: rawValue)
-    }
+    var rawValue: String { get }
+
+}
+
+extension DomainStringValue {
 
     // MARK: ExpressibleByStringLiteral
 

@@ -8,19 +8,9 @@ public struct ReservationRepresentation: Encodable, Equatable {
 
     public let createdAt: Date
 
-    init(
-        id: ReservationID?,
-        createdAt: Date
-    ) {
-        self.id = id
-        self.createdAt = createdAt
-    }
-
     init(_ reservation: Reservation) {
-        self.init(
-            id: reservation.id,
-            createdAt: reservation.createdAt
-        )
+        self.id = reservation.id
+        self.createdAt = reservation.createdAt
     }
 
 }

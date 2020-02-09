@@ -19,12 +19,12 @@ extension ID {
 
     /// Maps a invitationid to the app id type.
     init(_ identifier: InvitationID) {
-        self.init(identifier.rawValue)
+        self.init(identifier.uuid)
     }
 
     /// Maps an app id to the invitationid type.
     init?(_ identifier: InvitationID?) {
-        self.init(identifier?.rawValue)
+        self.init(identifier?.uuid)
     }
 
     public static func == (lhs: ID, rhs: InvitationID) -> Bool {

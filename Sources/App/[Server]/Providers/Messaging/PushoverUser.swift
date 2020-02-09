@@ -5,8 +5,9 @@ public struct PushoverUser: ExpressibleByStringLiteral, CustomStringConvertible 
 
     let key: String
 
-    public init(key: String) {
-        self.key = key
+    /// Constructs a pushover user with the given pushover user key.
+    public init(_ string: String) {
+        self.key = string
     }
 
     public init(stringLiteral value: String) {

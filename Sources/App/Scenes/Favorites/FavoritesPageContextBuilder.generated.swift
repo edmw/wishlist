@@ -8,6 +8,13 @@ import Foundation
 
 // MARK: FavoritesPageContext
 
+extension FavoritesPageContext {
+
+    static var builder: FavoritesPageContextBuilder {
+        return FavoritesPageContextBuilder()
+    }
+}
+
 enum FavoritesPageContextBuilderError: Error {
   case missingRequiredUser
 }

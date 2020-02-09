@@ -2,7 +2,7 @@ import Foundation
 
 import Library
 
-// MARK: Entity
+// MARK: Invitation
 
 /// Invitation model
 /// This type represents an invitation for joining the site.
@@ -10,31 +10,37 @@ import Library
 /// Relations:
 /// - Parent: User
 public final class Invitation: InvitationModel, Confidental,
-    Entity,
-    EntityDetachable,
-    EntityReflectable,
+    DomainEntity,
+    DomainEntityDetachable,
+    DomainEntityReflectable,
     Loggable,
     Codable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {
+    // MARK: Confidental
+
+    public static let confidantUserID: ConfidantUserID = \.userID
+
+    // MARK: Entity
+
     // maximum number of invitations per user:
     // this is a hard limit (application can have soft limits, too)
     public static let maximumNumberOfInvitationsPerUser = 10
 
-    public var id: InvitationID?
+    public internal(set) var id: InvitationID?
 
-    public var code: InvitationCode
-    public var status: Invitation.Status
-    public var email: EmailSpecification
-    public var sentAt: Date?
-    public var createdAt: Date
+    public internal(set) var code: InvitationCode
+    public internal(set) var status: Invitation.Status
+    public internal(set) var email: EmailSpecification
+    public internal(set) var sentAt: Date?
+    public internal(set) var createdAt: Date
 
     /// User (who initiated that invitation)
-    public var userID: UserID
+    public internal(set) var userID: UserID
 
     /// User (who was invited)
-    public var inviteeID: UserID?
+    public internal(set) var inviteeID: UserID?
 
     public init<T: InvitationModel>(from other: T) {
         self.id = other.id

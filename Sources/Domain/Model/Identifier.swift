@@ -5,57 +5,56 @@ import Foundation
 public protocol Identifier: AnyIdentifier,
     Codable,
     Hashable,
-    RawRepresentable,
     LosslessStringConvertible
 {
 
-    var rawValue: UUID { get }
-    var stringValue: String { get }
+    var uuid: UUID { get }
 
     init()
 
     init(uuid: UUID)
     init?(uuid: UUID?)
 
-    init?(string: String)
-
-    init?(rawValue: UUID)
-
     init?(_ description: String)
     var description: String { get }
 
     init(from decoder: Decoder) throws
     func encode(to encoder: Encoder) throws
+
 }
 
 extension Identifier {
-
-    public var uuid: UUID {
-        return self.rawValue
-    }
-
-    public var stringValue: String {
-        return rawValue.base62String
-    }
 
     /// Generates a new identifier.
     public init() {
         self.init(uuid: UUID())
     }
 
-    /// Creates an identifier using the specified string. No checks are made on the given
-    /// string. It's completely up to the caller to ensure the validity of the identifier.
-    public init?(string: String) {
-        guard let uuid = UUID(uuidString: string) else {
-            return nil
-        }
-        self.init(uuid: uuid)
+}
+
+internal protocol DomainIdentifier: Identifier {
+
+    var rawValue: UUID { get }
+
+    init(rawValue: UUID)
+
+}
+
+extension DomainIdentifier {
+
+    public var uuid: UUID {
+        return self.rawValue
     }
 
-    // MARK: RawRepresentable
+    public init(uuid: UUID) {
+        self.init(rawValue: uuid)
+    }
 
-    public init?(rawValue: UUID) {
-        self.init(uuid: rawValue)
+    public init?(uuid: UUID?) {
+        guard let uuid = uuid else {
+            return nil
+        }
+        self.init(rawValue: uuid)
     }
 
     // MARK: LosslessStringConvertible

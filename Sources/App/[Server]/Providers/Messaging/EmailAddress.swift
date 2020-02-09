@@ -6,8 +6,9 @@ public struct EmailAddress: ExpressibleByStringLiteral, CustomStringConvertible 
     let identifier: String
     let name: String?
 
-    public init(identifier: String, name: String? = nil) {
-        self.identifier = identifier
+    /// Constructs an email address with the given email address identifier and name.
+    public init(_ string: String, name: String? = nil) {
+        self.identifier = string
         self.name = name
     }
 

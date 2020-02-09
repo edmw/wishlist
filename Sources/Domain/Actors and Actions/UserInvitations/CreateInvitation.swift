@@ -45,7 +45,7 @@ public struct CreateInvitation: Action {
         with values: InvitationValues,
         for user: User,
         in boundaries: Boundaries
-    ) throws -> EventLoopFuture<InvitationAndInviter> {
+    ) throws -> EventLoopFuture<InvitationNote> {
         let actor = self.actor()
         let invitationRepository = actor.invitationRepository
         return try values.validate(for: user, using: invitationRepository)
@@ -55,7 +55,7 @@ public struct CreateInvitation: Action {
                 return invitationRepository
                     .save(invitation: invitation)
                     .map { invitation in
-                        return (invitation: invitation, inviter: user)
+                        .init(invitation: invitation, inviter: user)
                     }
             }
             .catchFlatMap { error in
@@ -104,18 +104,17 @@ extension DomainUserInvitationsActor {
             .flatMap { user in
                 return try CreateInvitation(actor: self)
                     .execute(with: specification.values, for: user, in: boundaries)
-                    .logMessage(.createInvitation(for: user), for: { $0.0 }, using: logging)
-                    .recordEvent(
-                        for: { $0.invitation }, "created for \(user)", using: recording
-                    )
-                    .sendInvitation(
-                        when: specification.sendEmail,
-                        in: invitationRepository,
-                        on: boundaries
-                    )
-                    .logMessage(.createInvitationSent(for: user), for: { $0.0 }, using: logging)
-                    .map { invitation, user in
-                        .init(user, invitation)
+                    .logMessage(.createInvitationNote, using: logging)
+                    .recordEvent("created", using: recording)
+                    .flatMap { note in
+                        var future = boundaries.worker.makeSucceededFuture(note)
+                        if specification.sendEmail {
+                            future = future
+                                .sendInvitationNote(in: invitationRepository, on: boundaries)
+                                .logMessage(.createInvitationNoteSent, using: logging)
+                                .recordEvent("sent", using: recording)
+                        }
+                        return future.map { note in .init(note.inviter, note.invitation) }
                     }
                     .catchMap { error in
                         if let createError = error as? CreateInvitationValidationError {
@@ -135,18 +134,22 @@ extension DomainUserInvitationsActor {
 
 extension LoggingMessageRoot {
 
-    fileprivate static func createInvitation(for user: User) -> LoggingMessageRoot<Invitation> {
-        return .init({ invitation in
-            LoggingMessage(label: "Create Invitation", subject: invitation, loggables: [user])
+    fileprivate static var createInvitationNote: LoggingMessageRoot<InvitationNote> {
+        return .init({ note in
+            LoggingMessage(
+                label: "Create Invitation",
+                subject: note.invitation,
+                loggables: [note.inviter]
+            )
         })
     }
 
-    fileprivate static func createInvitationSent(for user: User) -> LoggingMessageRoot<Invitation> {
-        return .init({ invitation in
+    fileprivate static var createInvitationNoteSent: LoggingMessageRoot<InvitationNote> {
+        return .init({ note in
             LoggingMessage(
                 label: "Create Invitation (Sent)",
-                subject: invitation,
-                loggables: [user]
+                subject: note.invitation,
+                loggables: [note.inviter]
             )
         })
     }

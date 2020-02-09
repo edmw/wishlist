@@ -57,7 +57,7 @@ extension InvitationController {
         formdata: InvitationPageFormData
     ) throws -> InvitationSaveOutcome {
         let user = result.user
-        let context = try InvitationPageContextBuilder()
+        let context = try InvitationPageContext.builder
             .withFormData(formdata)
             .forUser(user)
             .build()
@@ -76,7 +76,7 @@ extension InvitationController {
         if case let UserInvitationsActorError
             .validationError(user, invitation, error) = error
         {
-            var context = try InvitationPageContextBuilder()
+            var context = try InvitationPageContext.builder
                 .withFormData(formdata)
                 .forUser(user)
                 .withInvitation(invitation)

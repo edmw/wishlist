@@ -22,7 +22,7 @@ final class ProfileController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try ProfilePageContextBuilder()
+                let context = try ProfilePageContext.builder
                     .forUser(result.user)
                     .withInvitations(result.invitations)
                     .build()
@@ -44,7 +44,7 @@ final class ProfileController: AuthenticatableController,
             )
             .flatMap { result in
                 let data = ProfilePageFormData(from: result.user)
-                let context = try ProfilePageContextBuilder()
+                let context = try ProfilePageContext.builder
                     .forUser(result.user)
                     .withFormData(data)
                     .build()

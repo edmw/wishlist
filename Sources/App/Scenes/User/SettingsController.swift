@@ -26,7 +26,7 @@ final class SettingsController: AuthenticatableController, RouteCollection {
             )
             .flatMap { result in
                 let data = SettingsPageFormData(from: result.user)
-                let context = try SettingsPageContextBuilder()
+                let context = try SettingsPageContext.builder
                     .forUser(result.user)
                     .withFormData(data)
                     .build()

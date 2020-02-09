@@ -31,7 +31,7 @@ final class FavoriteController: AuthenticatableController,
                         .boundaries(worker: request.eventLoop)
                     )
                     .flatMap { result in
-                        let context = try ListPageContextBuilder()
+                        let context = try ListPageContext.builder
                             .forUser(result.user)
                             .withList(result.list)
                             .build()
@@ -60,7 +60,7 @@ final class FavoriteController: AuthenticatableController,
                         .boundaries(worker: request.eventLoop)
                     )
                     .flatMap { result in
-                        let context = try ListPageContextBuilder()
+                        let context = try ListPageContext.builder
                             .forUser(result.user)
                             .withList(result.list)
                             .build()

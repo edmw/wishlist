@@ -23,49 +23,19 @@ public struct UserRepresentation: Encodable, Equatable,
 
     public let settings: UserSettings
 
-    init(
-        id: UserID?,
-        nickName: String?,
-        displayName: String,
-        fullName: String,
-        firstName: String,
-        lastName: String,
-        email: String,
-        language: String?,
-        confidant: Bool,
-        firstLogin: Date?,
-        lastLogin: Date?,
-        settings: UserSettings
-    ) {
-        self.id = id
-        self.nickName = nickName
-        self.displayName = displayName
-        self.fullName = fullName
-        self.firstName = firstName
-        self.lastName = lastName
-        self.email = email
-        self.language = language
-        self.confidant = confidant
-        self.firstLogin = firstLogin
-        self.lastLogin = lastLogin
-        self.settings = settings
-    }
-
     init(_ user: User) {
-        self.init(
-            id: user.id,
-            nickName: user.nickName,
-            displayName: user.displayName,
-            fullName: user.fullName,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: String(user.email),
-            language: String(user.language ?? "�"),
-            confidant: user.confidant,
-            firstLogin: user.firstLogin,
-            lastLogin: user.lastLogin,
-            settings: user.settings
-        )
+        self.id = user.id
+        self.nickName = user.nickName
+        self.displayName = user.displayName
+        self.fullName = user.fullName
+        self.firstName = user.firstName
+        self.lastName = user.lastName
+        self.email = String(user.email)
+        self.language = String(user.language ?? "�")
+        self.confidant = user.confidant
+        self.firstLogin = user.firstLogin
+        self.lastLogin = user.lastLogin
+        self.settings = user.settings
     }
 
     // MARK: CustomStringConvertible

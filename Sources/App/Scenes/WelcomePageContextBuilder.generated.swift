@@ -8,6 +8,13 @@ import Foundation
 
 // MARK: WelcomePageContext
 
+extension WelcomePageContext {
+
+    static var builder: WelcomePageContextBuilder {
+        return WelcomePageContextBuilder()
+    }
+}
+
 enum WelcomePageContextBuilderError: Error {
   case missingRequiredUser
 }

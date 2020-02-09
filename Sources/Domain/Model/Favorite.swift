@@ -2,7 +2,7 @@ import Foundation
 
 import Library
 
-// MARK: Entity
+// MARK: Favorite
 
 /// Favorite model
 /// This type represents a relation between users and lists:
@@ -13,22 +13,24 @@ import Library
 /// - Sibling: User
 /// - Sibling: List
 public final class Favorite: FavoriteModel,
-    Entity,
-    EntityDetachable,
-    EntityReflectable,
+    DomainEntity,
+    DomainEntityDetachable,
+    DomainEntityReflectable,
     Loggable,
     Codable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {
+    // MARK: Entity
+
     // maximum number of favorites per user:
     // this is a hard limit (application can have soft limits, too)
     public static let maximumNumberOfFavoritesPerUser = 100
 
-    public var id: FavoriteID?
+    public internal(set) var id: FavoriteID?
 
-    public var userID: UserID
-    public var listID: ListID
+    public internal(set) var userID: UserID
+    public internal(set) var listID: ListID
 
     public init<T: FavoriteModel>(from other: T) {
         self.id = other.id
@@ -36,7 +38,7 @@ public final class Favorite: FavoriteModel,
         self.listID = other.listID
     }
 
-    public init(
+    init(
         id: FavoriteID? = nil,
         userID: UserID,
         listID: ListID

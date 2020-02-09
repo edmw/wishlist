@@ -11,7 +11,7 @@ extension UserIdentity: MySQLType, ReflectionDecodable {
     }
 
     public func convertToMySQLData() -> MySQLData {
-        return rawValue.convertToMySQLData()
+        return String(self).convertToMySQLData()
     }
 
     public static func convertFromMySQLData(_ data: MySQLData) throws -> UserIdentity {

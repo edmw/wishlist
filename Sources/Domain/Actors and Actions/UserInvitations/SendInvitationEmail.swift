@@ -66,15 +66,13 @@ extension DomainUserInvitationsActor {
                     .find(by: specification.invitationID)
                     .unwrap(or: UserInvitationsActorError.invalidInvitation)
                     .authorize(in: invitationRepository, for: user)
-                    .map { authorization -> InvitationAndInviter in
-                        return (authorization.entity, authorization.owner)
+                    .map { authorization -> InvitationNote in
+                        .init(invitation: authorization.entity, inviter: authorization.owner)
                     }
-                    .sendInvitation(in: invitationRepository, on: boundaries)
-                    .logMessage(
-                        .sendInvitationEmail(for: user), for: { $0.invitation }, using: logging
-                    )
-                    .map { invitation, user in
-                        return .init(user, invitation)
+                    .sendInvitationNote(in: invitationRepository, on: boundaries)
+                    .logMessage(.sendInvitationNote, using: logging)
+                    .map { note in
+                        return .init(note.inviter, note.invitation)
                     }
             }
     }
@@ -83,10 +81,10 @@ extension DomainUserInvitationsActor {
 
 // MARK: send Invitation
 
-extension EventLoopFuture where Expectation == InvitationAndInviter {
+extension EventLoopFuture where Expectation == InvitationNote {
 
     /// Sends an invitation mail and updates sent date of invitation on succes.
-    func sendInvitation(
+    func sendInvitationNote(
         when enabled: Bool = true,
         in invitationRepository: InvitationRepository,
         on boundaries: SendInvitationBoundaries
@@ -119,9 +117,13 @@ extension EventLoopFuture where Expectation == InvitationAndInviter {
 
 extension LoggingMessageRoot {
 
-    fileprivate static func sendInvitationEmail(for user: User) -> LoggingMessageRoot<Invitation> {
-        return .init({ invitation in
-            LoggingMessage(label: "Send Invitation Email", subject: invitation, loggables: [user])
+    fileprivate static var sendInvitationNote: LoggingMessageRoot<InvitationNote> {
+        return .init({ note in
+            LoggingMessage(
+                label: "Send Invitation Note",
+                subject: note.invitation,
+                loggables: [note.inviter]
+            )
         })
     }
 

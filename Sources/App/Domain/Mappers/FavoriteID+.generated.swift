@@ -19,12 +19,12 @@ extension ID {
 
     /// Maps a favoriteid to the app id type.
     init(_ identifier: FavoriteID) {
-        self.init(identifier.rawValue)
+        self.init(identifier.uuid)
     }
 
     /// Maps an app id to the favoriteid type.
     init?(_ identifier: FavoriteID?) {
-        self.init(identifier?.rawValue)
+        self.init(identifier?.uuid)
     }
 
     public static func == (lhs: ID, rhs: FavoriteID) -> Bool {

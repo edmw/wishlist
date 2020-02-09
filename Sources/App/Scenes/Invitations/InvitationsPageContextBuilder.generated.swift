@@ -8,6 +8,13 @@ import Foundation
 
 // MARK: InvitationsPageContext
 
+extension InvitationsPageContext {
+
+    static var builder: InvitationsPageContextBuilder {
+        return InvitationsPageContextBuilder()
+    }
+}
+
 enum InvitationsPageContextBuilderError: Error {
   case missingRequiredUser
 }

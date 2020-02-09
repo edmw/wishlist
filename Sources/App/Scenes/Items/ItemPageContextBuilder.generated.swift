@@ -8,6 +8,13 @@ import Foundation
 
 // MARK: ItemPageContext
 
+extension ItemPageContext {
+
+    static var builder: ItemPageContextBuilder {
+        return ItemPageContextBuilder()
+    }
+}
+
 enum ItemPageContextBuilderError: Error {
   case missingRequiredUser
   case missingRequiredList

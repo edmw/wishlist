@@ -2,7 +2,7 @@ import Foundation
 
 import Library
 
-// MARK: Entity
+// MARK: User
 
 /// User model
 /// This type represents a user.
@@ -10,39 +10,41 @@ import Library
 /// Relations:
 /// - Childs: Lists
 public final class User: UserModel,
-    Entity,
-    EntityDetachable,
-    EntityReflectable,
+    DomainEntity,
+    DomainEntityDetachable,
+    DomainEntityReflectable,
     Loggable,
     Codable,
     Equatable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {
+    // MARK: Entity
+
     static let maximumLengthOfNickName = 100
 
-    public var id: UserID?
+    public internal(set) var id: UserID?
 
-    public var identification: Identification
+    public internal(set) var identification: Identification
 
-    public var email: EmailSpecification
-    public var fullName: String
-    public var firstName: String
-    public var lastName: String
-    public var nickName: String?
-    public var language: LanguageTag?
-    public var picture: URL?
+    public internal(set) var email: EmailSpecification
+    public internal(set) var fullName: String
+    public internal(set) var firstName: String
+    public internal(set) var lastName: String
+    public internal(set) var nickName: String?
+    public internal(set) var language: LanguageTag?
+    public internal(set) var picture: URL?
 
-    public var confidant: Bool
+    public internal(set) var confidant: Bool
 
-    public var settings: UserSettings
+    public internal(set) var settings: UserSettings
 
-    public var firstLogin: Date?
-    public var lastLogin: Date?
+    public internal(set) var firstLogin: Date?
+    public internal(set) var lastLogin: Date?
 
     /// authentication
-    public var identity: UserIdentity?
-    public var identityProvider: UserIdentityProvider?
+    public internal(set) var identity: UserIdentity?
+    public internal(set) var identityProvider: UserIdentityProvider?
 
     public var displayName: String {
         return nickName ?? firstName
@@ -66,7 +68,7 @@ public final class User: UserModel,
         self.identityProvider = other.identityProvider
     }
 
-    public init(
+    init(
         id: UserID? = nil,
         email: EmailSpecification,
         fullName: String,

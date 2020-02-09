@@ -28,7 +28,7 @@ final class InvitationController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try InvitationPageContextBuilder()
+                let context = try InvitationPageContext.builder
                     .forUser(result.user)
                     .build()
                 return try Controller.renderView("User/Invitation", with: context, on: request)
@@ -49,7 +49,7 @@ final class InvitationController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try InvitationPageContextBuilder()
+                let context = try InvitationPageContext.builder
                     .forUser(result.user)
                     .withInvitation(result.invitation)
                     .build()

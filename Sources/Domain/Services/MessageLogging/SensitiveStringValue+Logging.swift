@@ -1,6 +1,6 @@
 import Foundation
 
-extension SensitiveStringValue {
+extension DomainSensitiveStringValue {
 
     // MARK: Encodable
 
@@ -15,7 +15,7 @@ extension SensitiveStringValue {
             // this value is security sensitive
             // if it has to be encoded for logging,
             // strip some information from the real value
-            string = rawValue.replacingCharacters(everyNth: 3, with: "-")
+            string = rawValue.replacingCharacters(everyNth: 3, with: "X")
         }
         else {
             string = rawValue

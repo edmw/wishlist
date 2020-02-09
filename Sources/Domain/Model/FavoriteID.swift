@@ -2,19 +2,12 @@ import Foundation
 
 // MARK: FavoriteID
 
-public struct FavoriteID: Identifier {
+public struct FavoriteID: DomainIdentifier {
 
-    public let rawValue: UUID
+    let rawValue: UUID
 
-    public init(uuid: UUID) {
-        self.rawValue = uuid
-    }
-
-    public init?(uuid: UUID?) {
-        guard let uuid = uuid else {
-            return nil
-        }
-        self.rawValue = uuid
+    init(rawValue: UUID) {
+        self.rawValue = rawValue
     }
 
 }

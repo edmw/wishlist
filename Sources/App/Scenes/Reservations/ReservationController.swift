@@ -38,7 +38,7 @@ final class ReservationController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try ReservationPageContextBuilder()
+                let context = try ReservationPageContext.builder
                     .forIdentification(result.holder)
                     .forItem(result.item)
                     .forList(result.list)

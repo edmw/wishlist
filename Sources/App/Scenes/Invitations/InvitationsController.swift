@@ -23,7 +23,7 @@ final class InvitationsController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try InvitationsPageContextBuilder()
+                let context = try InvitationsPageContext.builder
                     .forUser(result.user)
                     .withInvitations(result.invitations)
                     .build()

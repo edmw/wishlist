@@ -2,15 +2,19 @@
 
 public protocol EntityDetachable: Entity {
 
-    var id: IDType? { get set }
-
     mutating func detach()
 
     func detached() -> Self
 
 }
 
-extension EntityDetachable {
+internal protocol DomainEntityDetachable: EntityDetachable {
+
+    var id: IDType? { get set }
+
+}
+
+extension DomainEntityDetachable {
 
     public mutating func detach() {
         self.id = nil

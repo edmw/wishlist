@@ -44,7 +44,7 @@ final class InvitationEmail: HTMLMessage, CustomStringConvertible {
                     guard let text = String(data: view.data, encoding: .utf8) else {
                         throw InvitationEmailError.templateInvalidEncoding
                     }
-                    return (text: text, title: title ?? "🎁")
+                    return .init(text: text, title: title ?? "🎁")
                 }
         }
         catch {
@@ -68,7 +68,7 @@ extension VaporEmailSendingProvider {
         throws -> EventLoopFuture<Bool>
     {
         var email = InvitationEmail(for: invitation, invitedBy: user)
-        email.addEmailRecipient(EmailAddress(identifier: String(invitation.email)))
+        email.addEmailRecipient(EmailAddress(String(invitation.email)))
         return try email.send(on: request)
             .map { sendResult in sendResult.success == true }
     }

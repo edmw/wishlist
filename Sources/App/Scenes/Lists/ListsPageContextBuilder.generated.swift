@@ -8,6 +8,13 @@ import Foundation
 
 // MARK: ListsPageContext
 
+extension ListsPageContext {
+
+    static var builder: ListsPageContextBuilder {
+        return ListsPageContextBuilder()
+    }
+}
+
 enum ListsPageContextBuilderError: Error {
   case missingRequiredUser
 }

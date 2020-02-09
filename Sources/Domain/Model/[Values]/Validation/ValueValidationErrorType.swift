@@ -13,7 +13,12 @@ extension ValueValidationErrorType {
     // MARK: CustomStringConvertible
 
     var description: String {
-        return "Value validation failed on '\(keys.joined(separator: "."))' with '\(reason)'"
+        if keys.isEmpty {
+            return "Value validation failed with '\(reason)'"
+        }
+        else {
+            return "Value validation failed on '\(keys.joined(separator: "."))' with '\(reason)'"
+        }
     }
 
 }

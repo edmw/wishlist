@@ -26,9 +26,6 @@ private struct OrValidator<T>: ValueValidatorType {
                 throw OrValidatorError(left, right)
             }
         }
-        catch {
-            print(error)
-        }
     }
 
     var validatorReadable: String {
@@ -37,7 +34,7 @@ private struct OrValidator<T>: ValueValidatorType {
 
 }
 
-private struct OrValidatorError: ValueValidationErrorType {
+struct OrValidatorError: ValueValidationErrorType {
 
     var keys: [String] = []
 

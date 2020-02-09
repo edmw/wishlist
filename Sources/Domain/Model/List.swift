@@ -2,7 +2,7 @@ import Foundation
 
 import Library
 
-// MARK: Entity
+// MARK: List
 
 /// List model
 /// This type represents a user’s wishlist.
@@ -11,14 +11,15 @@ import Library
 /// - Parent: User
 /// - Childs: Items
 public final class List: ListModel, Viewable,
-    Entity,
-    EntityDetachable,
-    EntityReflectable,
+    DomainEntity,
+    DomainEntityDetachable,
+    DomainEntityReflectable,
     Loggable,
     Codable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {
+    // MARK: Entity
 
     // maximum number of lists per user:
     // this is a hard limit (application can have soft limits, too)
@@ -27,18 +28,18 @@ public final class List: ListModel, Viewable,
     public static let minimumLengthOfTitle = 4
     public static let maximumLengthOfTitle = 100
 
-    public var id: ListID?
+    public internal(set) var id: ListID?
 
-    public var title: Title
-    public var visibility: Visibility
-    public var createdAt: Date
-    public var modifiedAt: Date
-    public var options: List.Options
+    public internal(set) var title: Title
+    public internal(set) var visibility: Visibility
+    public internal(set) var createdAt: Date
+    public internal(set) var modifiedAt: Date
+    public internal(set) var options: List.Options
 
-    public var itemsSorting: ItemsSorting?
+    public internal(set) var itemsSorting: ItemsSorting?
 
     /// Parent
-    public var userID: UserID
+    public internal(set) var userID: UserID
 
     public init<T: ListModel>(from other: T) {
         self.id = other.id

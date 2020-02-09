@@ -19,12 +19,12 @@ extension ID {
 
     /// Maps a reservationid to the app id type.
     init(_ identifier: ReservationID) {
-        self.init(identifier.rawValue)
+        self.init(identifier.uuid)
     }
 
     /// Maps an app id to the reservationid type.
     init?(_ identifier: ReservationID?) {
-        self.init(identifier?.rawValue)
+        self.init(identifier?.uuid)
     }
 
     public static func == (lhs: ID, rhs: ReservationID) -> Bool {

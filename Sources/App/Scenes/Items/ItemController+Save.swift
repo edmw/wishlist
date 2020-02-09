@@ -53,7 +53,7 @@ extension ItemController {
         let user = result.user
         let list = result.list
         let item = result.item
-        let context = try ItemPageContextBuilder()
+        let context = try ItemPageContext.builder
             .withFormData(formdata)
             .forUser(user)
             .forList(list)
@@ -69,7 +69,7 @@ extension ItemController {
         if case let UserItemsActorError
             .validationError(user, list, item, error) = error
         {
-            var context = try ItemPageContextBuilder()
+            var context = try ItemPageContext.builder
                 .withFormData(formdata)
                 .forUser(user)
                 .forList(list)

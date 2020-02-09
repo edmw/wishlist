@@ -1,7 +1,5 @@
 import Vapor
 
-typealias MessageContent = (text: String, title: String)
-
 // MARK: Message
 
 protocol Message {
@@ -47,6 +45,13 @@ extension Message {
         return try jobService.dispatch(AnyJob(job))
     }
 
+}
+
+// MARK: MessageContent
+
+struct MessageContent {
+    let text: String
+    let title: String
 }
 
 // MARK: - TextMessage
