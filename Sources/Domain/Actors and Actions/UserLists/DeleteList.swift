@@ -43,7 +43,7 @@ extension DomainUserListsActor {
         let userid = specification.userID
         let listid = specification.listID
         return try self.listRepository
-            .findWithUser(by: listid, for: userid)
+            .findAndUser(by: listid, for: userid)
             .unwrap(or: UserListsActorError.invalidList)
             .flatMap { arguments in let (list, user) = arguments
                 // delete items of list

@@ -14,9 +14,9 @@ public struct PresentReservation: Action {
     // MARK: Specification
 
     public struct Specification: ActionSpecification, WishlistSpecification {
-        public let identification: Identification
         public let itemID: ItemID
         public let listID: ListID
+        public let identification: Identification
         public let userID: UserID?
         public static func specification(
             _ itemid: ItemID,
@@ -25,9 +25,9 @@ public struct PresentReservation: Action {
             userBy userid: UserID?
         ) -> Self {
             return Self(
-                identification: identification,
                 itemID: itemid,
                 listID: listid,
+                identification: identification,
                 userID: userid
             )
         }
@@ -61,6 +61,7 @@ extension DomainWishlistActor {
 
     // MARK: presentReservation
 
+    // Implementation (for documentation see WishlistActor protocol)
     public func presentReservation(
         _ specification: PresentReservation.Specification,
         _ boundaries: PresentReservation.Boundaries

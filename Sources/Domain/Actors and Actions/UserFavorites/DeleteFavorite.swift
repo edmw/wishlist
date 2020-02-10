@@ -55,7 +55,7 @@ extension DomainUserFavoritesActor {
                                 // delete favorite
                                 let id = favorite.id
                                 return try favoriteRepository
-                                    .deleteFavorite(favorite)
+                                    .delete(favorite: favorite)
                                     .recordEvent("deleted for \(user)", using: recording)
                                     .logMessage(.deleteFavorite(with: id), using: logging)
                                     .map { _ in

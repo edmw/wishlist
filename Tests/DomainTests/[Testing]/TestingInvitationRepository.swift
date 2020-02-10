@@ -26,8 +26,7 @@ final class TestingInvitationRepository: InvitationRepository {
     }
 
     func find(by code: InvitationCode, status: Invitation.Status) -> EventLoopFuture<Invitation?> {
-        let result
-            = storage.values.first { $0.code == code && $0.status == status }
+        let result = storage.values.first { $0.code == code && $0.status == status }
         return worker.newSucceededFuture(result: result)
     }
 
@@ -69,6 +68,5 @@ final class TestingInvitationRepository: InvitationRepository {
     func future<T>(error: Error) -> EventLoopFuture<T> {
         return worker.newFailedFuture(error: error)
     }
-
 
 }

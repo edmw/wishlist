@@ -20,11 +20,11 @@ public protocol AnnouncementsActor: Actor {
     /// - `worker`: EventLoop
     ///
     /// The result returned by this action:
-    /// ````
+    /// ```
     /// struct Result {
     ///     let user: UserRepresentation
     /// }
-    /// ````
+    /// ```
     func presentPublicly(
         _ specification: PresentPublicly.Specification,
         _ boundaries: PresentPublicly.Boundaries

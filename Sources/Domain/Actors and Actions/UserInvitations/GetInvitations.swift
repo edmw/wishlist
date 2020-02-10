@@ -36,6 +36,7 @@ extension DomainUserInvitationsActor {
 
     // MARK: getInvitations
 
+    // Implementation (for documentation see UserInvitationsActor protocol)
     public func getInvitations(
         _ specification: GetInvitations.Specification,
         _ boundaries: GetInvitations.Boundaries

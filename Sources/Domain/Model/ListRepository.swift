@@ -13,7 +13,7 @@ public protocol ListRepository: EntityRepository {
     func find(title: Title) -> EventLoopFuture<List?>
     func find(title: Title, for user: User) throws -> EventLoopFuture<List?>
 
-    func findWithUser(by id: ListID, for userid: UserID)
+    func findAndUser(by id: ListID, for userid: UserID)
         throws -> EventLoopFuture<(List, User)?>
 
     func all() -> EventLoopFuture<[List]>

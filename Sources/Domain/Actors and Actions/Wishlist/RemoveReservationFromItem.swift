@@ -15,10 +15,10 @@ public struct RemoveReservationFromItem: Action {
     // MARK: Specification
 
     public struct Specification: ActionSpecification, WishlistSpecification {
-        public let identification: Identification
-        public let listID: ListID
-        public let userID: UserID?
         public let reservationID: ReservationID
+        public let listID: ListID
+        public let identification: Identification
+        public let userID: UserID?
         public static func specification(
             _ reservationid: ReservationID,
             in listid: ListID,
@@ -26,10 +26,10 @@ public struct RemoveReservationFromItem: Action {
             userBy userid: UserID?
         ) -> Self {
             return Self(
-                identification: identification,
+                reservationID: reservationid,
                 listID: listid,
-                userID: userid,
-                reservationID: reservationid
+                identification: identification,
+                userID: userid
             )
         }
     }

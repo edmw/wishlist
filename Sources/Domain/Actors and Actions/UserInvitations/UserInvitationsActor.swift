@@ -21,12 +21,12 @@ public protocol UserInvitationsActor: Actor {
     /// - `worker`: EventLoop
     ///
     /// The result returned by this action:
-    /// ````
+    /// ```
     /// struct Result {
     ///     let user: UserRepresentation
     ///     let invitations: [InvitationRepresentation]
     /// }
-    /// ````
+    /// ```
     func getInvitations(
         _ specification: GetInvitations.Specification,
         _ boundaries: GetInvitations.Boundaries
@@ -47,11 +47,11 @@ public protocol UserInvitationsActor: Actor {
     /// - `worker`: EventLoop
     /// 
     /// The result returned by this action:
-    /// ````
+    /// ```
     /// struct Result: ActionResult {
     ///    let user: UserRepresentation
     /// }
-    /// ````
+    /// ```
     func requestInvitationCreation(
         _ specification: RequestInvitationCreation.Specification,
         _ boundaries: RequestInvitationCreation.Boundaries
@@ -74,12 +74,12 @@ public protocol UserInvitationsActor: Actor {
     /// - `worker`: EventLoop
     ///
     /// The result returned by this action:
-    /// ````
+    /// ```
     /// struct Result: ActionResult {
     ///    let user: UserRepresentation
     ///    let invitation: InvitationRepresentation
     /// }
-    /// ````
+    /// ```
     func createInvitation(
         _ specification: CreateInvitation.Specification,
         _ boundaries: CreateInvitation.Boundaries
@@ -101,12 +101,12 @@ public protocol UserInvitationsActor: Actor {
     /// - `worker`: EventLoop
     ///
     /// The result returned by this action:
-    /// ````
+    /// ```
     /// struct Result: ActionResult {
     ///    let user: UserRepresentation
     ///    let invitation: InvitationRepresentation
     /// }
-    /// ````
+    /// ```
     func requestInvitationRevocation(
         _ specification: RequestInvitationRevocation.Specification,
         _ boundaries: RequestInvitationRevocation.Boundaries
@@ -129,12 +129,12 @@ public protocol UserInvitationsActor: Actor {
     /// - `worker`: EventLoop
     ///
     /// The result returned by this action:
-    /// ````
+    /// ```
     /// struct Result: ActionResult {
     ///    let user: UserRepresentation
     ///    let invitation: InvitationRepresentation
     /// }
-    /// ````
+    /// ```
     func revokeInvitation(
         _ specification: RevokeInvitation.Specification,
         _ boundaries: RevokeInvitation.Boundaries
@@ -157,12 +157,12 @@ public protocol UserInvitationsActor: Actor {
     /// - `worker`: EventLoop
     ///
     /// The result returned by this action:
-    /// ````
+    /// ```
     /// struct Result: ActionResult {
     ///    let user: UserRepresentation
     ///    let invitation: InvitationRepresentation
     /// }
-    /// ````
+    /// ```
     func sendInvitationEmail(
         _ specification: SendInvitationEmail.Specification,
         _ boundaries: SendInvitationEmail.Boundaries

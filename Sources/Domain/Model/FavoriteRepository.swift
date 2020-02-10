@@ -33,7 +33,7 @@ public protocol FavoriteRepository: EntityRepository {
 
     /// Deletes the specified favorite.
     /// - Parameter favorite: favorite to be deleted
-    func deleteFavorite(_ favorite: Favorite) throws -> EventLoopFuture<Favorite>
+    func delete(favorite: Favorite) throws -> EventLoopFuture<Favorite>
 
 }
 

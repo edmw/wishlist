@@ -49,6 +49,7 @@ extension DomainUserInvitationsActor {
 
     // MARK: sendInvitationEmail
 
+    // Implementation (for documentation see UserInvitationsActor protocol)
     public func sendInvitationEmail(
         _ specification: SendInvitationEmail.Specification,
         _ boundaries: SendInvitationEmail.Boundaries

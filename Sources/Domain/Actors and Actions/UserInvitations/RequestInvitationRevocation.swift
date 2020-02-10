@@ -37,6 +37,7 @@ extension DomainUserInvitationsActor {
 
     // MARK: requestInvitationRevocation
 
+    // Implementation (for documentation see UserInvitationsActor protocol)
     public func requestInvitationRevocation(
         _ specification: RequestInvitationRevocation.Specification,
         _ boundaries: RequestInvitationRevocation.Boundaries

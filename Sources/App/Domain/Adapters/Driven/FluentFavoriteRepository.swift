@@ -116,7 +116,7 @@ final class FluentFavoriteRepository: FavoriteRepository, FluentRepository {
         }
     }
 
-    func deleteFavorite(_ favorite: Favorite) throws -> EventLoopFuture<Favorite> {
+    func delete(favorite: Favorite) throws -> EventLoopFuture<Favorite> {
         return db.withConnection { connection in
             return favorite.model.delete(on: connection)
                 .transform(to: favorite.detached())

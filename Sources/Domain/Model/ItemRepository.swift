@@ -14,7 +14,7 @@ public protocol ItemRepository: EntityRepository {
     func findWithReservation(by id: ItemID, in list: List)
         throws -> EventLoopFuture<(Item, Reservation?)?>
 
-    func findWithListAndUser(by id: ItemID, in listid: ListID, for userid: UserID)
+    func findAndListAndUser(by id: ItemID, in listid: ListID, for userid: UserID)
         throws -> EventLoopFuture<(Item, List, User)?>
 
     func all() -> EventLoopFuture<[Item]>

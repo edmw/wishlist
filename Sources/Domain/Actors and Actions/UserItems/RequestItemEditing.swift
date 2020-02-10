@@ -49,7 +49,7 @@ extension DomainUserItemsActor {
         let userid = specification.userID
         let worker = boundaries.worker
         return try self.listRepository
-            .findWithUser(by: listid, for: userid)
+            .findAndUser(by: listid, for: userid)
             .unwrap(or: UserItemsActorError.invalidList)
             .flatMap { list, user in
                 if let itemid = itemid {

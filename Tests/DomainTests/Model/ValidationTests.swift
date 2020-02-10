@@ -264,7 +264,7 @@ final class ValidationTests: XCTestCase, HasAllTests {
         )
     }
 
-    func testAllTests() {
+    func testAllTests() throws {
         assertAllTests()
     }
 

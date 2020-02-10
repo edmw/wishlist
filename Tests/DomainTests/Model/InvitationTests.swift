@@ -45,7 +45,7 @@ final class InvitationTests: XCTestCase, HasAllTests {
         )
     }
 
-    func testAllTests() {
+    func testAllTests() throws {
         assertAllTests()
     }
 

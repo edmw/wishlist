@@ -44,7 +44,7 @@ extension DomainUserItemsActor {
         _ boundaries: DeleteItem.Boundaries
     ) throws -> EventLoopFuture<DeleteItem.Result> {
         return try self.listRepository
-            .findWithUser(by: specification.listID, for: specification.userID)
+            .findAndUser(by: specification.listID, for: specification.userID)
             .unwrap(or: UserItemsActorError.invalidList)
             .flatMap { list, user in
                 return try self.itemRepository

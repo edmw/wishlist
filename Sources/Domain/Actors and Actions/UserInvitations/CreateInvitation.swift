@@ -91,6 +91,7 @@ extension DomainUserInvitationsActor {
 
     // MARK: createInvitation
 
+    // Implementation (for documentation see UserInvitationsActor protocol)
     public func createInvitation(
         _ specification: CreateInvitation.Specification,
         _ boundaries: CreateInvitation.Boundaries

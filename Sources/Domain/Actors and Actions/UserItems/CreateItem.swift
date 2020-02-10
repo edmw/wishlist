@@ -127,7 +127,7 @@ extension DomainUserItemsActor {
         _ boundaries: CreateItem.Boundaries
     ) throws -> EventLoopFuture<CreateItem.Result> {
         return try self.listRepository
-            .findWithUser(by: specification.listID, for: specification.userID)
+            .findAndUser(by: specification.listID, for: specification.userID)
             .unwrap(or: UserItemsActorError.invalidList)
             .flatMap { list, user in
                 return try CreateItem(actor: self)

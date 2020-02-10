@@ -52,7 +52,7 @@ extension DomainUserReservationsActor {
         let logging = self.logging
         let recording = self.recording
         return try itemRepository
-            .findWithListAndUser(by: itemid, in: listid, for: userid)
+            .findAndListAndUser(by: itemid, in: listid, for: userid)
             .unwrap(or: UserReservationsActorError.invalidItem)
             .flatMap { item, list, user in
                 return try reservationRepository

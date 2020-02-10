@@ -34,11 +34,11 @@ public protocol EnrollmentActor: Actor {
     /// - `worker`: EventLoop
     ///
     /// The result returned by this action:
-    /// ````
+    /// ```
     /// struct Result: ActionResult {
     ///    let user: UserRepresentation
     /// }
-    /// ````
+    /// ```
     func materialiseUser(
         _ specification: MaterialiseUser.Specification,
         _ boundaries: MaterialiseUser.Boundaries

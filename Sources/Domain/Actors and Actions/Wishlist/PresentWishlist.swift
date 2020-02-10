@@ -14,9 +14,9 @@ public final class PresentWishlist: Action {
     // MARK: Specification
 
     public struct Specification: ActionSpecification, WishlistSpecification {
-        public let identification: Identification
         public let listID: ListID
         public let sorting: ItemsSorting
+        public let identification: Identification
         public let userID: UserID?
         public static func specification(
             _ listid: ListID,
@@ -25,9 +25,9 @@ public final class PresentWishlist: Action {
             userBy userid: UserID?
         ) -> Self {
             return Self(
-                identification: identification,
                 listID: listid,
                 sorting: sorting,
+                identification: identification,
                 userID: userid
             )
         }
@@ -60,6 +60,7 @@ extension DomainWishlistActor {
 
     // MARK: presentWishlist
 
+    // Implementation (for documentation see WishlistActor protocol)
     public func presentWishlist(
         _ specification: PresentWishlist.Specification,
         _ boundaries: PresentWishlist.Boundaries

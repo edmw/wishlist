@@ -42,7 +42,7 @@ extension DomainUserListsActor {
         _ boundaries: RequestListDeletion.Boundaries
     ) throws -> EventLoopFuture<RequestListDeletion.Result> {
         return try self.listRepository
-            .findWithUser(by: specification.listID, for: specification.userID)
+            .findAndUser(by: specification.listID, for: specification.userID)
             .unwrap(or: UserListsActorError.invalidList)
             .map { list, user in
                 .init(user, list)

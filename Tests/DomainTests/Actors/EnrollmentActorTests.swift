@@ -4,7 +4,7 @@ import NIO
 
 import XCTest
 
-final class EnrollmentActorTests : XCTestCase, HasAllTests {
+final class EnrollmentActorTests : ActorTestCase, HasAllTests {
 
     static var __allTests = [
         ("testMaterialiseUser", testMaterialiseUser),
@@ -15,14 +15,6 @@ final class EnrollmentActorTests : XCTestCase, HasAllTests {
         ("testMaterialiseUserWithAlreadyAcceptedInvitation", testMaterialiseUserWithAlreadyAcceptedInvitation),
         ("testAllTests", testAllTests)
     ]
-
-    var eventLoop: EventLoop!
-    var userRepository: UserRepository!
-    var invitationRepository: InvitationRepository!
-    var reservationRepository: ReservationRepository!
-    var invitationService: InvitationService!
-    var logging: TestingLoggingProvider!
-    var recording: TestingRecordingProvider!
 
     var useridentity: UserIdentity!
     var useridentityprovider: UserIdentityProvider!
@@ -36,21 +28,6 @@ final class EnrollmentActorTests : XCTestCase, HasAllTests {
 
     override func setUp() {
         super.setUp()
-
-        eventLoop = EmbeddedEventLoop()
-        userRepository = TestingUserRepository(
-            worker: eventLoop
-        )
-        invitationRepository = TestingInvitationRepository(
-            worker: eventLoop,
-            userRepository: userRepository
-        )
-        reservationRepository = TestingReservationRepository(
-            worker: eventLoop
-        )
-        invitationService = InvitationService(invitationRepository)
-        logging = TestingLoggingProvider()
-        recording = TestingRecordingProvider()
 
         useridentity = UserIdentity(string: "itsme")
         useridentityprovider = UserIdentityProvider(string: "itsus")
@@ -206,7 +183,7 @@ final class EnrollmentActorTests : XCTestCase, HasAllTests {
 
     // MARK: with Reservations
 
-    func testAllTests() {
+    func testAllTests() throws {
         assertAllTests()
     }
 

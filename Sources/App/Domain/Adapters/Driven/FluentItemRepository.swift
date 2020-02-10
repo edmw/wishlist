@@ -52,7 +52,7 @@ final class FluentItemRepository: ItemRepository, FluentRepository {
         }
     }
 
-    func findWithListAndUser(by itemid: ItemID, in listid: ListID, for userid: UserID)
+    func findAndListAndUser(by itemid: ItemID, in listid: ListID, for userid: UserID)
         -> EventLoopFuture<(Item, List, User)?>
     {
         return db.withConnection { connection in

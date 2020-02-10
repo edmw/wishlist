@@ -114,7 +114,7 @@ extension DomainUserItemsActor {
         let listid = specification.listID
         let itemid = specification.itemID
         return try self.itemRepository
-            .findWithListAndUser(by: itemid, in: listid, for: userid)
+            .findAndListAndUser(by: itemid, in: listid, for: userid)
             .unwrap(or: UserItemsActorError.invalidItem)
             .flatMap { item, list, user in
                 let itemvalues = specification.values

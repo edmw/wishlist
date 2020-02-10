@@ -6,7 +6,7 @@ import XCTest
 
 /// Testing the most simple actor. The announcement actor just takes the id of an potential
 /// user and returns a user representation then.
-final class AnnouncementsActorTests : XCTestCase, HasAllTests {
+final class AnnouncementsActorTests : ActorTestCase, HasAllTests {
 
     static var __allTests = [
         ("testPresentPubliclyWithUser", testPresentPubliclyWithUser),
@@ -15,15 +15,11 @@ final class AnnouncementsActorTests : XCTestCase, HasAllTests {
         ("testAllTests", testAllTests)
     ]
 
-    var eventLoop: EventLoop!
-    var userRepository: UserRepository!
-
     var actor: AnnouncementsActor!
 
     override func setUp() {
         super.setUp()
-        eventLoop = EmbeddedEventLoop()
-        userRepository = TestingUserRepository(worker: eventLoop)
+
         actor = DomainAnnouncementsActor(userRepository: userRepository)
     }
 
