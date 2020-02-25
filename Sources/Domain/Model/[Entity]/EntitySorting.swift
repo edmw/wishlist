@@ -49,6 +49,7 @@ public class EntitySorting<T: Entity & EntityReflectable>: AnyEntitySorting {
 
 public class AnyEntitySorting: RawRepresentable,
     Equatable,
+    Hashable,
     Codable,
     LosslessStringConvertible,
     CustomStringConvertible

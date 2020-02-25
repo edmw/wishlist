@@ -3,7 +3,7 @@ import Vapor
 import Foundation
 
 /// This is a logger coordinator which forwards each log message to every configured target logger.
-class MultiLogger: Logger, Service {
+class MultiLogger: Logger, Service, CustomStringConvertible {
 
     var targets = [Logger]()
 
@@ -44,6 +44,12 @@ class MultiLogger: Logger, Service {
                 column: column
             )
         }
+    }
+
+    // MARK: CustomStringConvertible
+
+    var description: String {
+        return String(describing: type(of: self)) + "(targets=\(targets))"
     }
 
 }

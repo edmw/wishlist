@@ -1,4 +1,5 @@
 import Domain
+import Library
 
 import Vapor
 
@@ -15,35 +16,56 @@ struct VaporImageStoreProvider: ImageStoreProvider {
         self.request = request
     }
 
-    func storeImage(for imagable: Imageable, from url: URL) throws -> EventLoopFuture<URL?> {
-        return try request.make(ImageFileMiddleware.self)
-            .upload(
+    func storeImage(for imagable: Imageable, from url: URL)
+        throws -> EventLoopFuture<ImageStoreLocator?>
+    {
+        let imageFileMiddleware = try request.make(ImageFileMiddleware.self)
+        return try imageFileMiddleware
+            .uploadImage(
                 from: url,
                 width: imagable.imageableSize.width,
                 height: imagable.imageableSize.height,
                 key: requireKey(for: imagable),
-                groupkey: requireGroupKey(for: imagable),
+                groupkeys: requireGroupKeys(for: imagable),
                 on: request
             )
+            .map { imagefilelocator in
+                guard let url = imagefilelocator?.url else {
+                    return nil
+                }
+                return ImageStoreLocator(url)
+            }
     }
 
     func removeImages(for imagable: Imageable) throws {
-        try request.make(ImageFileMiddleware.self)
-            .removeAll(
-                key: requireKey(for: imagable),
-                groupkey: requireGroupKey(for: imagable),
-                deleteDirectory: true,
+        let imageFileMiddleware = try request.make(ImageFileMiddleware.self)
+        try imageFileMiddleware.removeImages(
+            key: requireKey(for: imagable),
+            groupkeys: requireGroupKeys(for: imagable),
+            deleteParentsIfEmpty: true,
+            on: request
+        )
+    }
+
+    func removeImage(at locator: ImageStoreLocator) throws {
+        let imageFileMiddleware = try request.make(ImageFileMiddleware.self)
+        if let imageFileLocator = imageFileMiddleware.imageFileLocator(from: locator.url) {
+            try imageFileMiddleware.removeFile(
+                at: imageFileLocator,
+                deleteParentsIfEmpty: true,
                 on: request
             )
+        }
     }
+
+    private static let validCharactersForImageableKey
+        = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-"))
 
     private func requireKey(for imagable: Imageable) throws -> String {
         guard let key = imagable.imageableEntityKey else {
             throw ImageableError.keyMissing(\Imageable.imageableEntityKey)
         }
-        let validCharactersForImageableKey
-            = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-"))
-        guard validCharactersForImageableKey.isSuperset(
+        guard VaporImageStoreProvider.validCharactersForImageableKey.isSuperset(
             of: CharacterSet(charactersIn: key)
         ) else {
             throw ImageableError.keyInvalid(\Imageable.imageableEntityKey)
@@ -51,18 +73,71 @@ struct VaporImageStoreProvider: ImageStoreProvider {
         return key
     }
 
-    private func requireGroupKey(for imagable: Imageable) throws -> String {
-        guard let groupkey = imagable.imageableEntityGroupKey else {
-            throw ImageableError.keyMissing(\Imageable.imageableEntityGroupKey)
+    private static let validCharactersForImageableGroupKey
+        = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-"))
+
+    private func requireGroupKeys(for imagable: Imageable) throws -> [String] {
+        guard let groupkeys = imagable.imageableEntityGroupKeys else {
+            throw ImageableError.keyMissing(\Imageable.imageableEntityGroupKeys)
         }
-        let validCharactersForImageableGroupKey
-            = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-"))
-        guard validCharactersForImageableGroupKey.isSuperset(
-            of: CharacterSet(charactersIn: groupkey)
-        ) else {
-            throw ImageableError.keyInvalid(\Imageable.imageableEntityGroupKey)
+        for groupkey in groupkeys {
+            guard VaporImageStoreProvider.validCharactersForImageableGroupKey.isSuperset(
+                of: CharacterSet(charactersIn: groupkey)
+            ) else {
+                throw ImageableError.keyInvalid(\Imageable.imageableEntityGroupKeys)
+            }
         }
-        return groupkey
+        return groupkeys
+    }
+
+    // MARK: CleanupJob
+
+    final class CleanupJob: DispatchableJob<Bool> {
+
+        override func run(_ context: JobContext) -> EventLoopFuture<Bool> {
+            let container = context.container
+            do {
+                let itemRepository: ItemRepository = try container.make()
+                return itemRepository.all().map { items in
+                    // collect local image urls from all items into a bloom filter
+                    var bloomfilter = BloomFilter<String>(expectedNumberOfElements: items.count)
+                    for item in items {
+                        guard let localimageurl = item.localImageURL else {
+                            continue
+                        }
+                        bloomfilter.insert(localimageurl.absoluteString)
+                    }
+                    // iterate local file urls for images
+                    let now = Date()
+                    let imageFileMiddleware: ImageFileMiddleware = try container.make()
+                    for imagefilelocator in imageFileMiddleware.listFiles(createdBefore: now) {
+                        // if a image file url is not contained in the bloom filter the image is
+                        // definitely not used for an item, so it is save to delete
+                        let imagestorelocator = ImageStoreLocator(imagefilelocator.url)
+                        if bloomfilter.containsNot(imagestorelocator.absoluteString) {
+                            try imageFileMiddleware.removeFile(
+                                at: imagefilelocator,
+                                deleteParentsIfEmpty: true,
+                                on: container
+                            )
+                        }
+                    }
+                    imageFileMiddleware.purgeDirectories(on: container)
+                    return true
+                }
+            }
+            catch {
+                container.logger?.error("ImagesCleanupJob failed with \(error)")
+            }
+            return container.future(false)
+        }
+
+        // MARK: CustomStringConvertible
+
+        override var description: String {
+            return "ImagesCleanupJob(at: \(scheduled))"
+        }
+
     }
 
 }

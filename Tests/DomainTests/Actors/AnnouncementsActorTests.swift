@@ -3,6 +3,7 @@ import Foundation
 import NIO
 
 import XCTest
+import Testing
 
 /// Testing the most simple actor. The announcement actor just takes the id of an potential
 /// user and returns a user representation then.
@@ -24,10 +25,10 @@ final class AnnouncementsActorTests : ActorTestCase, HasAllTests {
     }
 
     /// Testing `PresentPublicly` action with an user id of an existing user.
-    /// Expects an user representation which matches the representation of the
+    /// Expects a user representation which matches the representation of the
     /// corresponding user.
     func testPresentPubliclyWithUser() throws {
-        let user = try! userRepository.save(user: UserSupport.randomUser()).wait()
+        let user = try! userRepository.save(user: User.randomUser()).wait()
         XCTAssertNotNil(user.id)
         let result = try! actor.presentPublicly(
             .specification(userBy: user.id),

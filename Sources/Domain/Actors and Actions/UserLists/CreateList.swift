@@ -39,7 +39,11 @@ public struct CreateList: Action {
 
     // MARK: Excecute
 
-    internal func execute(with values: ListValues, for user: User, in boundaries: Boundaries) throws
+    internal func execute(
+        for user: User,
+        createWith values: ListValues,
+        in boundaries: Boundaries
+    ) throws
         -> EventLoopFuture<(user: User, list: List)>
     {
         let actor = self.actor()
@@ -96,7 +100,7 @@ extension DomainUserListsActor {
             .unwrap(or: UserListsActorError.invalidUser)
             .flatMap { user in
                 return try CreateList(actor: self)
-                    .execute(with: specification.values, for: user, in: boundaries)
+                    .execute(for: user, createWith: specification.values, in: boundaries)
                     .logMessage(.createList(for: user), for: { $0.list }, using: self.logging)
                     .recordEvent(
                         for: { $0.list }, "created for \(user)", using: self.recording

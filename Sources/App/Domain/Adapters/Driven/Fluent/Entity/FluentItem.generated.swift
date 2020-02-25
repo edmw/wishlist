@@ -39,7 +39,7 @@ public struct FluentItem: ItemModel,
     public var imageURL: URL?
     public var createdAt: Date
     public var modifiedAt: Date
-    public var localImageURL: URL?
+    public var localImageURL: ImageStoreLocator?
     public var listKey: UUID
     public var listID: ListID { ListID(uuid: listKey) }
 
@@ -54,7 +54,7 @@ public struct FluentItem: ItemModel,
         imageURL: URL?,
         createdAt: Date,
         modifiedAt: Date,
-        localImageURL: URL?,
+        localImageURL: ImageStoreLocator?,
         listKey: UUID
     ) {
         self.uuid = uuid

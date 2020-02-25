@@ -7,15 +7,15 @@ import NIO
 /// Used for validation, importing and exporting.
 public struct ListValues: Values, ValueValidatable {
 
-    public let title: String
-    public let visibility: Visibility
-    public let createdAt: Date?
-    public let modifiedAt: Date?
-    public let options: List.Options
+    public var title: String
+    public var visibility: Visibility
+    public var createdAt: Date?
+    public var modifiedAt: Date?
+    public var options: List.Options
 
-    public let itemsSorting: ItemsSorting?
+    public var itemsSorting: ItemsSorting?
 
-    public let items: [ItemValues]?
+    public var items: [ItemValues]?
 
     public var itemsCount: Int?
 
@@ -32,6 +32,16 @@ public struct ListValues: Values, ValueValidatable {
 
         self.items = items?.map { ItemValues($0) }
         self.itemsCount = items?.count
+    }
+
+    init(_ values: PartialValues<ListValues>) throws {
+        self.title = try values.value(for: \.title)
+        self.visibility = try values.value(for: \.visibility)
+        self.createdAt = values[\.createdAt]
+        self.modifiedAt = values[\.modifiedAt]
+        self.options = try values.value(for: \.options)
+
+        self.itemsSorting = values[\.itemsSorting]
     }
 
     init(

@@ -71,13 +71,9 @@ struct Site: Codable, CustomDebugStringConvertible, ServiceType {
 
     // MARK: - Vapor Service
 
-    static var serviceSupports: [Any.Type] {
-        return [Site.self]
-    }
+    static let serviceSupports: [Any.Type] = [Site.self]
 
-    static func makeService(for container: Container) throws
-        -> Site
-    {
+    static func makeService(for container: Container) throws -> Site {
         return try .detect()
     }
 

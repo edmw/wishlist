@@ -3,7 +3,34 @@
 // swiftlint:disable file_length
 
 // MARK: DO NOT EDIT
+{#
+This template can be used to generate a static factory method for creation of an Actions‘
+specification structure. The factory method is just syntactic sugar and meant to be used when
+calling an action method of an Actor.
 
+How to enable: Conform an action specification structure to `AutoActionSpecification`
+
+Example:
+```
+public struct Specification: AutoActionSpecification {
+    public let userID: UserID
+    public let values: PartialValues<UserValues>
+}
+```
+
+Generated code:
+```
+public static func specification(
+    userBy userid: UserID,
+    from values: PartialValues<UserValues>
+) -> Self {
+    return Self(
+        userID: userid,
+        values: values
+    )
+}
+```
+#}
 import Foundation
 
 {% for type in types.implementing.AutoActionSpecification %}
@@ -31,6 +58,7 @@ extension {{type.name}} {
     }
 
 }
+
 {% endfor %}
 
 // sourcery:end

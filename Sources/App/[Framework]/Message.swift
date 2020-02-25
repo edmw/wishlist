@@ -28,7 +28,7 @@ extension Message {
     {
         let job = SendMessageJob(for: self, on: container, at: date, before: deadline)
         let jobService = try container.make(DispatchingService.self)
-        return try jobService.dispatch(AnyJob(job))
+        return try jobService.dispatch(job)
             .transform(to: job.completed)
     }
 
@@ -42,7 +42,7 @@ extension Message {
     {
         let job = SendMessageJob(for: self, on: container, at: date, before: deadline)
         let jobService = try container.make(DispatchingService.self)
-        return try jobService.dispatch(AnyJob(job))
+        return try jobService.dispatch(job)
     }
 
 }

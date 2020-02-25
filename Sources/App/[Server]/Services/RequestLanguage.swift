@@ -22,10 +22,16 @@ struct RequestLanguage: CustomStringConvertible {
     // MARK: CustomStringConvertible
 
     var description: String {
-        return "Language(\(code)"
-            + (region != nil ? ", region: \(region ??? "")" : "")
-            + (script != nil ? ", script: \(script ??? ""))" : "")
-            + ", quality: \(quality))"
+        var description = "Language(\(code)"
+        if let region = region {
+            description += ", region: \(region)"
+        }
+        if let script = script {
+            description += ", script: \(script)"
+        }
+        description += String(format: ", quality: %.1f", quality)
+        description += ")"
+        return description
     }
 
 }

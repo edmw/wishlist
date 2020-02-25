@@ -8,7 +8,7 @@ import Foundation
 /// Configuration:
 /// - Tag string
 /// - Target logger
-class TaggedLogger: Logger, Service {
+class TaggedLogger: Logger, Service, CustomStringConvertible {
 
     let target: Logger
 
@@ -16,7 +16,7 @@ class TaggedLogger: Logger, Service {
 
     init(target logger: Logger, tag: String) {
         self.target = logger
-        self.tag = "[\(tag)]"
+        self.tag = tag
     }
 
     func log(
@@ -36,6 +36,12 @@ class TaggedLogger: Logger, Service {
             line: line,
             column: column
         )
+    }
+
+    // MARK: CustomStringConvertible
+
+    var description: String {
+        return String(describing: type(of: self)) + "(tag=\(tag), target=\(target))"
     }
 
 }

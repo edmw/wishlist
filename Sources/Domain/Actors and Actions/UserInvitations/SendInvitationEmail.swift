@@ -97,7 +97,7 @@ extension EventLoopFuture where Expectation == InvitationNote {
             let invitation = note.invitation
             let inviter = note.inviter
             return try boundaries.emailSending
-                .sendInvitationEmail(invitation.representation, for: inviter.representation)
+                .dispatchSendInvitationEmail(invitation.representation, for: inviter.representation)
                 .flatMap { success in
                     if success {
                         invitation.sentAt = Date()

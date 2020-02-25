@@ -8,11 +8,21 @@ import Foundation
 /// 
 /// Note(1): For now the loggers output is fixed to use `ConsoleLogger`.
 /// Note(2): Every log message sent directly to this logger will be emitted to technical logger.
-class StandardLogger: Logger, Service {
+class StandardLogger: Logger, Service, CustomStringConvertible, CustomDebugStringConvertible {
 
     let technical: Logger
     let application: Logger
     let business: Logger
+
+    struct LoggerConfiguration {
+        let tag: String
+        let logLevel: LogLevel
+        let logLevelSymbolSet: LogLevel.SymbolSet
+    }
+
+    private let technicalConfiguration: LoggerConfiguration
+    private let applicationConfiguration: LoggerConfiguration
+    private let businessConfiguration: LoggerConfiguration
 
     private var multi: MultiLogger
 
@@ -21,24 +31,35 @@ class StandardLogger: Logger, Service {
         applicationLogLevel: LogLevel,
         businessLogLevel: LogLevel
     ) {
+        let technicalTag = "[TEC]"
+        let applicationTag = "[APP]"
+        let businessTag = "[BUS]"
+
+        self.technicalConfiguration
+            = .init(tag: technicalTag, logLevel: technicalLogLevel, logLevelSymbolSet: .hearts)
+        self.applicationConfiguration
+            = .init(tag: applicationTag, logLevel: applicationLogLevel, logLevelSymbolSet: .hands)
+        self.businessConfiguration
+            = .init(tag: businessTag, logLevel: businessLogLevel, logLevelSymbolSet: .books)
+
         self.multi = MultiLogger()
-        let technical = TaggedLogger(target: multi, tag: "TEC")
-        let application = TaggedLogger(target: multi, tag: "APP")
-        let business = TaggedLogger(target: multi, tag: "BUS")
+        let technical = TaggedLogger(target: multi, tag: technicalConfiguration.tag)
+        let application = TaggedLogger(target: multi, tag: applicationConfiguration.tag)
+        let business = TaggedLogger(target: multi, tag: businessConfiguration.tag)
         let technicalTarget = FilteredLogger(
-            target: ConsoleLogger(symbols: .hearts)
+            target: ConsoleLogger(symbols: technicalConfiguration.logLevelSymbolSet)
         ) { string, level -> Bool in
-            return level >= technicalLogLevel && string.starts(with: technical.tag)
+            level >= technicalLogLevel && string.starts(with: technicalTag)
         }
         let applicationTarget = FilteredLogger(
-            target: ConsoleLogger(symbols: .hands)
+            target: ConsoleLogger(symbols: applicationConfiguration.logLevelSymbolSet)
         ) { string, level -> Bool in
-            return level >= applicationLogLevel && string.starts(with: application.tag)
+            level >= applicationLogLevel && string.starts(with: applicationTag)
         }
         let businessTarget = FilteredLogger(
-            target: ConsoleLogger(symbols: .books)
+            target: ConsoleLogger(symbols: businessConfiguration.logLevelSymbolSet)
         ) { string, level -> Bool in
-            return level >= businessLogLevel && string.starts(with: business.tag)
+            level >= businessLogLevel && string.starts(with: businessTag)
         }
         multi.append(
             targets: [technicalTarget, applicationTarget, businessTarget]
@@ -67,6 +88,22 @@ class StandardLogger: Logger, Service {
         column: UInt
     ) {
         technical.log(string, at: level, file: file, function: function, line: line, column: column)
+    }
+
+    // MARK: CustomStringConvertible
+
+    var description: String {
+        return String(describing: type(of: self)) + "(\(technical), \(application), \(business))"
+    }
+
+    // MARK: CustomDebugStringConvertible
+
+    var debugDescription: String {
+        var properties = [String]()
+        properties.append("• Technical Logger = \(technicalConfiguration)")
+        properties.append("• Application Logger = \(applicationConfiguration)")
+        properties.append("• Business Logger = \(businessConfiguration)")
+        return properties.joined(separator: "\n")
     }
 
 }

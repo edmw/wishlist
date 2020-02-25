@@ -5,6 +5,8 @@ import Vapor
 protocol JobResult {
 }
 
+extension Bool: JobResult {}
+
 // MARK: - Some Job Result
 
 /// Wrapper type which will be used by the type-erased job, aka `AnyJob`.

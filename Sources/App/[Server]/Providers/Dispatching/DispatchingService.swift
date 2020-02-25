@@ -22,24 +22,36 @@ final class DispatchingService: Service {
     private var eventLoop: EventLoop?
     private var eventLoopTask: RepeatedTask?
 
+    private var dnaTask: RepeatedTask?
+
     private var isShuttingDown: Bool = false
 
     private var logger: Logger?
 
-    func attach(to container: Container, logger: Logger) {
-        self.container = container
-        self.eventLoop = container.next()
+    func attach(to application: Application, logger: Logger) throws {
+        precondition(
+            self.container == nil,
+            "Could not attach dispatching service when already attached."
+        )
+        self.container = application
+        self.eventLoop = application.eventLoop
         self.isShuttingDown = false
         self.logger = logger
+
+        self.dnaTask = try scheduleDNA()
     }
 
-    func dispatch(_ job: AnyJob) throws -> EventLoopFuture<Void> {
+    @discardableResult
+    func dispatch<J: Job & Equatable & CustomStringConvertible>(_ job: J)
+        throws -> EventLoopFuture<Void>
+    {
         guard let eventLoop = eventLoop else {
             throw DispatchingError.noContainer
         }
 
-        queue.enqueue(job)
-        queueDeadline.enqueue(job)
+        let anyJob = AnyJob(job)
+        queue.enqueue(anyJob)
+        queueDeadline.enqueue(anyJob)
 
         return eventLoop.future(())
     }
@@ -126,13 +138,13 @@ final class DispatchingService: Service {
     }
 
     // "I love deadlines. I like the whooshing sound they make as they fly by."
-    func scheduleDNA() throws {
+    func scheduleDNA() throws -> RepeatedTask {
         guard let container = container, let eventLoop = eventLoop, let logger = logger else {
             throw DispatchingError.noContainer
         }
 
         // start the repeated service task which will check the jobs deadlines
-        eventLoop.scheduleRepeatedTask(
+        return eventLoop.scheduleRepeatedTask(
             initialDelay: .seconds(0),
             delay: .milliseconds(1_000)
         ) { _ in

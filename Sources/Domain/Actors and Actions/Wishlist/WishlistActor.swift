@@ -133,7 +133,7 @@ public protocol WishlistActor: Actor {
 
 /// Errors thrown by the Wishlist actor.
 public enum WishlistActorError: Error {
-    case notAuthorized
+    case invalidIdentification
     case invalidList
     case invalidItem
     case invalidReservation

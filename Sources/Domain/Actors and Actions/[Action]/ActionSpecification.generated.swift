@@ -3,7 +3,6 @@
 // swiftlint:disable file_length
 
 // MARK: DO NOT EDIT
-
 import Foundation
 
 // MARK: CreateFavorite.Specification
@@ -21,6 +20,7 @@ extension CreateFavorite.Specification {
     }
 
 }
+
 // MARK: CreateInvitation.Specification
 
 extension CreateInvitation.Specification {
@@ -38,6 +38,7 @@ extension CreateInvitation.Specification {
     }
 
 }
+
 // MARK: CreateItem.Specification
 
 extension CreateItem.Specification {
@@ -55,6 +56,7 @@ extension CreateItem.Specification {
     }
 
 }
+
 // MARK: CreateList.Specification
 
 extension CreateList.Specification {
@@ -70,6 +72,7 @@ extension CreateList.Specification {
     }
 
 }
+
 // MARK: CreateOrUpdateItem.Specification
 
 extension CreateOrUpdateItem.Specification {
@@ -89,6 +92,7 @@ extension CreateOrUpdateItem.Specification {
     }
 
 }
+
 // MARK: CreateOrUpdateList.Specification
 
 extension CreateOrUpdateList.Specification {
@@ -106,6 +110,7 @@ extension CreateOrUpdateList.Specification {
     }
 
 }
+
 // MARK: DeleteFavorite.Specification
 
 extension DeleteFavorite.Specification {
@@ -121,6 +126,7 @@ extension DeleteFavorite.Specification {
     }
 
 }
+
 // MARK: DeleteItem.Specification
 
 extension DeleteItem.Specification {
@@ -138,6 +144,7 @@ extension DeleteItem.Specification {
     }
 
 }
+
 // MARK: DeleteList.Specification
 
 extension DeleteList.Specification {
@@ -153,6 +160,7 @@ extension DeleteList.Specification {
     }
 
 }
+
 // MARK: DeleteReservation.Specification
 
 extension DeleteReservation.Specification {
@@ -172,6 +180,7 @@ extension DeleteReservation.Specification {
     }
 
 }
+
 // MARK: ExportListToJSON.Specification
 
 extension ExportListToJSON.Specification {
@@ -187,6 +196,7 @@ extension ExportListToJSON.Specification {
     }
 
 }
+
 // MARK: GetInvitations.Specification
 
 extension GetInvitations.Specification {
@@ -200,6 +210,7 @@ extension GetInvitations.Specification {
     }
 
 }
+
 // MARK: GetItems.Specification
 
 extension GetItems.Specification {
@@ -217,6 +228,7 @@ extension GetItems.Specification {
     }
 
 }
+
 // MARK: GetListsAndFavorites.Specification
 
 extension GetListsAndFavorites.Specification {
@@ -230,6 +242,7 @@ extension GetListsAndFavorites.Specification {
     }
 
 }
+
 // MARK: GetProfileAndInvitations.Specification
 
 extension GetProfileAndInvitations.Specification {
@@ -243,6 +256,7 @@ extension GetProfileAndInvitations.Specification {
     }
 
 }
+
 // MARK: ImportListFromJSON.Specification
 
 extension ImportListFromJSON.Specification {
@@ -258,6 +272,7 @@ extension ImportListFromJSON.Specification {
     }
 
 }
+
 // MARK: MaterialiseUser.Specification
 
 extension MaterialiseUser.Specification {
@@ -281,6 +296,27 @@ extension MaterialiseUser.Specification {
     }
 
 }
+
+// MARK: MoveItem.Specification
+
+extension MoveItem.Specification {
+
+    public static func specification(
+          userBy userid: UserID,
+          listBy listid: ListID,
+          itemBy itemid: ItemID,
+          targetListID targetlistid: ListID
+    ) -> Self {
+        return Self(
+            userID: userid,
+            listID: listid,
+            itemID: itemid,
+            targetListID: targetlistid
+        )
+    }
+
+}
+
 // MARK: PresentPublicly.Specification
 
 extension PresentPublicly.Specification {
@@ -294,6 +330,7 @@ extension PresentPublicly.Specification {
     }
 
 }
+
 // MARK: RequestFavoriteCreation.Specification
 
 extension RequestFavoriteCreation.Specification {
@@ -309,6 +346,7 @@ extension RequestFavoriteCreation.Specification {
     }
 
 }
+
 // MARK: RequestFavoriteDeletion.Specification
 
 extension RequestFavoriteDeletion.Specification {
@@ -324,6 +362,7 @@ extension RequestFavoriteDeletion.Specification {
     }
 
 }
+
 // MARK: RequestInvitationCreation.Specification
 
 extension RequestInvitationCreation.Specification {
@@ -337,6 +376,7 @@ extension RequestInvitationCreation.Specification {
     }
 
 }
+
 // MARK: RequestInvitationRevocation.Specification
 
 extension RequestInvitationRevocation.Specification {
@@ -352,6 +392,7 @@ extension RequestInvitationRevocation.Specification {
     }
 
 }
+
 // MARK: RequestItemDeletion.Specification
 
 extension RequestItemDeletion.Specification {
@@ -369,6 +410,7 @@ extension RequestItemDeletion.Specification {
     }
 
 }
+
 // MARK: RequestItemEditing.Specification
 
 extension RequestItemEditing.Specification {
@@ -386,6 +428,7 @@ extension RequestItemEditing.Specification {
     }
 
 }
+
 // MARK: RequestItemMovement.Specification
 
 extension RequestItemMovement.Specification {
@@ -403,6 +446,7 @@ extension RequestItemMovement.Specification {
     }
 
 }
+
 // MARK: RequestListDeletion.Specification
 
 extension RequestListDeletion.Specification {
@@ -418,6 +462,7 @@ extension RequestListDeletion.Specification {
     }
 
 }
+
 // MARK: RequestListEditing.Specification
 
 extension RequestListEditing.Specification {
@@ -433,6 +478,7 @@ extension RequestListEditing.Specification {
     }
 
 }
+
 // MARK: RequestListImportFromJSON.Specification
 
 extension RequestListImportFromJSON.Specification {
@@ -446,6 +492,7 @@ extension RequestListImportFromJSON.Specification {
     }
 
 }
+
 // MARK: RequestProfileEditing.Specification
 
 extension RequestProfileEditing.Specification {
@@ -459,6 +506,7 @@ extension RequestProfileEditing.Specification {
     }
 
 }
+
 // MARK: RequestReservationDeletion.Specification
 
 extension RequestReservationDeletion.Specification {
@@ -478,6 +526,7 @@ extension RequestReservationDeletion.Specification {
     }
 
 }
+
 // MARK: RequestSettingsEditing.Specification
 
 extension RequestSettingsEditing.Specification {
@@ -491,6 +540,7 @@ extension RequestSettingsEditing.Specification {
     }
 
 }
+
 // MARK: RevokeInvitation.Specification
 
 extension RevokeInvitation.Specification {
@@ -506,6 +556,7 @@ extension RevokeInvitation.Specification {
     }
 
 }
+
 // MARK: TestNotifications.Specification
 
 extension TestNotifications.Specification {
@@ -519,6 +570,7 @@ extension TestNotifications.Specification {
     }
 
 }
+
 // MARK: UpdateItem.Specification
 
 extension UpdateItem.Specification {
@@ -538,6 +590,7 @@ extension UpdateItem.Specification {
     }
 
 }
+
 // MARK: UpdateList.Specification
 
 extension UpdateList.Specification {
@@ -555,6 +608,7 @@ extension UpdateList.Specification {
     }
 
 }
+
 // MARK: UpdateProfile.Specification
 
 extension UpdateProfile.Specification {
@@ -570,6 +624,7 @@ extension UpdateProfile.Specification {
     }
 
 }
+
 // MARK: UpdateSettings.Specification
 
 extension UpdateSettings.Specification {

@@ -10,7 +10,7 @@ import Dispatch
 ///
 /// Configuration:
 /// - Set of symbols to use for the log level
-class ConsoleLogger: Logger, Service {
+class ConsoleLogger: Logger, Service, CustomStringConvertible {
 
     static let lock = DispatchQueue(label: "de.yamanote.wl.ConsoleLogger")
 
@@ -54,6 +54,12 @@ class ConsoleLogger: Logger, Service {
         return String(
             format: "%0.2d:%0.2d:%0.2d.%03d", arguments: [hours, minutes, seconds, milliseconds]
         )
+    }
+
+    // MARK: CustomStringConvertible
+
+    var description: String {
+        return String(describing: type(of: self)) + "(symbols=\(set))"
     }
 
 }

@@ -9,16 +9,29 @@ public struct EntityKeyPath<Type: Entity>: Hashable {
     let partialKeyPath: PartialKeyPath<Type>
 
     private let comparator: (Type, Type) -> Bool
+    private let combinator: (Type, inout Hasher) -> Void
 
-    init<ValueType: Equatable>(_ keypath: KeyPath<Type, ValueType>, label: String) {
+    init<ValueType: Equatable & Hashable>(_ keypath: KeyPath<Type, ValueType>, label: String) {
         self.label = label
         self.partialKeyPath = keypath
 
-        self.comparator = { $0[keyPath: keypath] == $1[keyPath: keypath] }
+        self.comparator = {
+            (lhs: Type, rhs: Type) -> Bool in
+            return lhs[keyPath: keypath] == rhs[keyPath: keypath]
+        }
+        self.combinator = {
+            (type: Type, hasher: inout Hasher) -> Void in
+                hasher.combine(type[keyPath: keypath])
+                return
+        }
     }
 
     func isEqual(_ lhs: Type, _ rhs: Type) -> Bool {
         return comparator(lhs, rhs)
+    }
+
+    func combine(_ type: Type, into hasher: inout Hasher) {
+        combinator(type, &hasher)
     }
 
     // MARK: Hashable

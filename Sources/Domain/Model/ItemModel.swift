@@ -9,6 +9,6 @@ public protocol ItemModel {
     var imageURL: URL? { get }
     var createdAt: Date { get }
     var modifiedAt: Date { get }
-    var localImageURL: URL? { get }
+    var localImageURL: ImageStoreLocator? { get }
     var listID: ListID { get }
 }

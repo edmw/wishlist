@@ -2,8 +2,8 @@
 
 public protocol Imageable {
 
-    var imageableEntityGroupKey: String? { get }
     var imageableEntityKey: String? { get }
+    var imageableEntityGroupKeys: [String]? { get }
 
     var imageableSize: ImageableSize { get }
 

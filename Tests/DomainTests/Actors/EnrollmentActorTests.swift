@@ -3,6 +3,7 @@ import Foundation
 import NIO
 
 import XCTest
+import Testing
 
 final class EnrollmentActorTests : ActorTestCase, HasAllTests {
 
@@ -31,10 +32,10 @@ final class EnrollmentActorTests : ActorTestCase, HasAllTests {
 
         useridentity = UserIdentity(string: "itsme")
         useridentityprovider = UserIdentityProvider(string: "itsus")
-        uservalues = UserSupport.randomUserValues()
+        uservalues = User.randomUserValues()
         partialuservalues = PartialValues<UserValues>(wrapped: uservalues)
 
-        aUser = try! userRepository.save(user: UserSupport.randomUser()).wait()
+        aUser = try! userRepository.save(user: User.randomUser()).wait()
         anInvitation = try! invitationRepository
             .save(invitation: Invitation(
                     email: EmailSpecification(string: "a@b.c"),

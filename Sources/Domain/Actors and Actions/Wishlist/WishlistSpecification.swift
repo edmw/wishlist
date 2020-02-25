@@ -21,7 +21,7 @@ extension DomainWishlistActor {
         return userRepository.findIf(id: userid)
             .flatMap { user in
                 guard user == nil || identification == user?.identification else {
-                    throw WishlistActorError.notAuthorized
+                    throw WishlistActorError.invalidIdentification
                 }
                 return try listRepository.find(by: listid)
                     .unwrap(or: WishlistActorError.invalidList)

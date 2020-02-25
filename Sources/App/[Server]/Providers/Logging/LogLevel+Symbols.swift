@@ -6,11 +6,13 @@ import Foundation
 /// Unicode Emojis and different sets can be used.
 extension LogLevel {
 
-    enum SymbolSet {
+    enum SymbolSet: String, CustomStringConvertible {
         case hearts
         case books
         case hands
         case weather
+
+        var description: String { rawValue }
     }
 
     private func symbolForHearts() -> String {

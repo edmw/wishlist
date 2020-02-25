@@ -1,6 +1,6 @@
 // MARK: Entity
 
-public protocol Entity: Equatable {
+public protocol Entity: Hashable {
     associatedtype IDType
 
     var id: IDType? { get }
@@ -22,6 +22,14 @@ extension Entity where Self: EntityReflectable {
             }
         }
         return true
+    }
+
+    // MARK: Hashable
+
+    public func hash(into hasher: inout Hasher) {
+        for keypath in Self.properties {
+            keypath.combine(self, into: &hasher)
+        }
     }
 
 }

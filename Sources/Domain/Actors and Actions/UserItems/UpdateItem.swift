@@ -46,8 +46,8 @@ public struct UpdateItem: Action {
 
     internal func execute(
         on item: Item,
-        with values: ItemValues,
         in list: List,
+        updateWith values: ItemValues,
         in boundaries: Boundaries
     ) throws
         -> EventLoopFuture<(list: List, item: Item)>
@@ -110,16 +110,17 @@ extension DomainUserItemsActor {
         _ specification: UpdateItem.Specification,
         _ boundaries: UpdateItem.Boundaries
     ) throws -> EventLoopFuture<UpdateItem.Result> {
-        let userid = specification.userID
-        let listid = specification.listID
-        let itemid = specification.itemID
         return try self.itemRepository
-            .findAndListAndUser(by: itemid, in: listid, for: userid)
+            .findAndListAndUser(
+                by: specification.itemID,
+                in: specification.listID,
+                for: specification.userID
+            )
             .unwrap(or: UserItemsActorError.invalidItem)
             .flatMap { item, list, user in
                 let itemvalues = specification.values
                 return try UpdateItem(actor: self)
-                    .execute(on: item, with: itemvalues, in: list, in: boundaries)
+                    .execute(on: item, in: list, updateWith: itemvalues, in: boundaries)
                     .logMessage(
                         .updateItem(for: user, and: list), for: { $0.1 }, using: self.logging
                     )

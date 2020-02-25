@@ -13,10 +13,6 @@ struct DispatchingProvider: Provider {
     }
 
     func didBoot(_ container: Container) throws -> EventLoopFuture<Void> {
-        try service.attach(to: container, logger: container.make())
-
-        try service.scheduleDNA()
-
         return .done(on: container)
     }
 

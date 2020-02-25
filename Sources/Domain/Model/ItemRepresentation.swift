@@ -25,7 +25,7 @@ public struct ItemRepresentation: Encodable, Equatable {
         self.id = item.id
         self.title = item.title ??? "�"
         self.text = item.text ??? "�"
-        self.preference = String(item.preference)
+        self.preference = String(describing: item.preference)
         self.createdAt = item.createdAt
         self.modifiedAt = item.modifiedAt
         self.url = item.url?.absoluteString

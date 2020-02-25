@@ -3,6 +3,7 @@ import Foundation
 import NIO
 
 import XCTest
+import Testing
 
 final class InvitationTests: XCTestCase, HasAllTests {
 
@@ -29,7 +30,7 @@ final class InvitationTests: XCTestCase, HasAllTests {
     }
 
     func testCreationWithUser() throws {
-        let user = try userRepository.save(user: UserSupport.randomUser()).wait()
+        let user = try userRepository.save(user: User.randomUser()).wait()
         XCTAssertNotNil(user.id)
         let invitation = try Invitation(email: "email@host.invalid", user: user)
         let owner = try invitationRepository.owner(of: invitation).wait()
@@ -37,7 +38,7 @@ final class InvitationTests: XCTestCase, HasAllTests {
     }
 
     func testCreationWithInvalidUser() throws {
-        let user = UserSupport.randomUser()
+        let user = User.randomUser()
         XCTAssertNil(user.id)
         assert(
             try Invitation(email: "email@host.invalid", user: user),

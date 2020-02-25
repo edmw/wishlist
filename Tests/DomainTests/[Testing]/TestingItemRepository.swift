@@ -111,7 +111,10 @@ final class TestingItemRepository: ItemRepository {
     }
 
     func count(on list: List) throws -> EventLoopFuture<Int> {
-        let result = storage.count
+        guard let listid = list.id else {
+            throw EntityError<List>.requiredIDMissing
+        }
+        let result = Array(storage.values).filter { $0.listID == listid }.count
         return worker.newSucceededFuture(result: result)
     }
 

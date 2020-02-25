@@ -3,6 +3,7 @@ import Vapor
 import Fluent
 
 import XCTest
+import Testing
 
 protocol HasEntityTestSupport {
     associatedtype EntityType: Entity & EntityReflectable

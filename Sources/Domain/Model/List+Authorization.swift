@@ -21,6 +21,7 @@ extension List {
 
 extension EventLoopFuture where Expectation == List {
 
+    /// Authorizes access to this list according to the visibility of the list.
     func authorize(in listRepository: ListRepository, for user: User? = nil)
         throws -> EventLoopFuture<Authorization<List>>
     {

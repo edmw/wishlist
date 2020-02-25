@@ -27,7 +27,7 @@ enum URLType {
     /// An absolute URL contains all the information necessary to locate a resource without
     /// a fragment identifier.
     case webAbsolute
-    /// An absolute URL contains with en empty path:
+    /// An absolute URL with an empty path:
     case webAbsolutePathEmpty
 }
 

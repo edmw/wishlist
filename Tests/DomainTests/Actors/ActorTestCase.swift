@@ -3,7 +3,9 @@ import Foundation
 import NIO
 
 import XCTest
+import Testing
 
+// Base class for actor tests. Prepares repositories, services and logging for testing.
 class ActorTestCase : XCTestCase {
 
     var eventLoop: EventLoop!

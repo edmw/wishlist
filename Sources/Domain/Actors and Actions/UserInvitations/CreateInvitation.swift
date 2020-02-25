@@ -42,8 +42,8 @@ public struct CreateInvitation: Action {
     // MARK: Execute
 
     internal func execute(
-        with values: InvitationValues,
         for user: User,
+        createWith values: InvitationValues,
         in boundaries: Boundaries
     ) throws -> EventLoopFuture<InvitationNote> {
         let actor = self.actor()
@@ -104,7 +104,7 @@ extension DomainUserInvitationsActor {
             .authorize(on: Invitation.self)
             .flatMap { user in
                 return try CreateInvitation(actor: self)
-                    .execute(with: specification.values, for: user, in: boundaries)
+                    .execute(for: user, createWith: specification.values, in: boundaries)
                     .logMessage(.createInvitationNote, using: logging)
                     .recordEvent("created", using: recording)
                     .flatMap { note in

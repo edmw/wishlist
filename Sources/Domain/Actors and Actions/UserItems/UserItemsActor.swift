@@ -46,6 +46,11 @@ public protocol UserItemsActor: Actor {
         _ boundaries: RequestItemMovement.Boundaries
     ) throws -> EventLoopFuture<RequestItemMovement.Result>
 
+    func moveItem(
+        _ specification: MoveItem.Specification,
+        _ boundaries: MoveItem.Boundaries
+    ) throws -> EventLoopFuture<MoveItem.Result>
+
 }
 
 /// Errors thrown by the User Items actor.
@@ -63,7 +68,8 @@ public enum UserItemsActorError: Error {
 /// their corresponding use case methods.
 public final class DomainUserItemsActor: UserItemsActor,
     CreateItemActor,
-    UpdateItemActor
+    UpdateItemActor,
+    MoveItemActor
 {
 
     let itemRepository: ItemRepository

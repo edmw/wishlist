@@ -15,6 +15,6 @@ struct VaporEmailSendingProvider: EmailSendingProvider {
         self.request = request
     }
 
-    // func sendInvitationEmail -> implemented in file `Scenes/Invitations/InvitationEmail`
+    // func dispatchSendInvitationEmail -> implemented in file `Scenes/Invitations/InvitationEmail`
 
 }

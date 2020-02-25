@@ -43,7 +43,11 @@ public struct CreateItem: Action {
 
     // MARK: Execute
 
-    internal func execute(with values: ItemValues, for list: List, in boundaries: Boundaries) throws
+    internal func execute(
+        in list: List,
+        createWith values: ItemValues,
+        in boundaries: Boundaries
+    ) throws
         -> EventLoopFuture<(list: List, item: Item)>
     {
         let actor = self.actor()
@@ -86,6 +90,11 @@ extension EventLoopFuture where Expectation == Item {
                 .flatMap { localImageURL in
                     guard let localImageURL = localImageURL else {
                         return boundaries.worker.makeSucceededFuture(item)
+                    }
+                    if let itemLocalImageURL = item.localImageURL,
+                       itemLocalImageURL != localImageURL
+                    {
+                        try boundaries.imageStore.removeImage(at: itemLocalImageURL)
                     }
                     item.localImageURL = localImageURL
                     return itemRepository.save(item: item)
@@ -131,7 +140,7 @@ extension DomainUserItemsActor {
             .unwrap(or: UserItemsActorError.invalidList)
             .flatMap { list, user in
                 return try CreateItem(actor: self)
-                    .execute(with: specification.values, for: list, in: boundaries)
+                    .execute(in: list, createWith: specification.values, in: boundaries)
                     .logMessage(
                         .createItem(for: user, and: list), for: { $0.1 }, using: self.logging
                     )

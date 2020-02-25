@@ -9,7 +9,7 @@ import Foundation
 /// - Filter closure which will be called with the log message string and level and should
 /// return `true` if the message is to be kept, or `false` if it should be discarded.
 /// - Target logger
-class FilteredLogger: Logger, Service {
+class FilteredLogger: Logger, Service, CustomStringConvertible {
 
     let target: Logger
 
@@ -39,6 +39,12 @@ class FilteredLogger: Logger, Service {
                 column: column
             )
         }
+    }
+
+    // MARK: CustomStringConvertible
+
+    var description: String {
+        return String(describing: type(of: self)) + "(target=\(target))"
     }
 
 }

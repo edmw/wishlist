@@ -7,15 +7,15 @@ import NIO
 /// Used for validation, importing and exporting.
 public struct ItemValues: Values, ValueValidatable {
 
-    public let title: String
-    public let text: String
-    public let preference: Item.Preference
-    public let url: String?
-    public let imageURL: String?
-    public let createdAt: Date?
-    public let modifiedAt: Date?
+    public var title: String
+    public var text: String
+    public var preference: Item.Preference
+    public var url: String?
+    public var imageURL: String?
+    public var createdAt: Date?
+    public var modifiedAt: Date?
 
-    internal init(_ item: Item) {
+    init(_ item: Item) {
         self.title = String(item.title)
         self.text = String(item.text)
         self.preference = item.preference
@@ -25,7 +25,17 @@ public struct ItemValues: Values, ValueValidatable {
         self.modifiedAt = item.modifiedAt
     }
 
-    internal init(
+    init(_ values: PartialValues<ItemValues>) throws {
+        self.title = try values.value(for: \.title)
+        self.text = try values.value(for: \.text)
+        self.preference = try values.value(for: \.preference)
+        self.url = try values.value(for: \.url)
+        self.imageURL = try values.value(for: \.imageURL)
+        self.createdAt = values[\.createdAt]
+        self.modifiedAt = values[\.modifiedAt]
+    }
+
+    init(
         title: String,
         text: String,
         preference: Item.Preference,

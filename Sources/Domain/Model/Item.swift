@@ -41,7 +41,7 @@ public final class Item: ItemModel, Imageable,
     public internal(set) var createdAt: Date
     public internal(set) var modifiedAt: Date
 
-    public internal(set) var localImageURL: URL?
+    public internal(set) var localImageURL: ImageStoreLocator?
 
     /// Parent
     public internal(set) var listID: ListID
@@ -89,15 +89,28 @@ public final class Item: ItemModel, Imageable,
 
     // MARK: Imagable
 
-    public var imageableEntityGroupKey: String? {
-        return String(listID)
-    }
-
     public var imageableEntityKey: String? {
         guard let id = id else {
             return nil
         }
-        return String(id)
+        let key = String(id)
+        return key
+    }
+
+    public var imageableEntityGroupKeys: [String]? {
+        guard let id = id else {
+            return nil
+        }
+        let key = String(id)
+        let key1 = key.prefix(3)
+        guard key1.count == 3 else {
+            return nil
+        }
+        let key2 = key.dropFirst(3).prefix(3)
+        guard key2.count == 3 else {
+            return nil
+        }
+        return [String(key1), String(key2)]
     }
 
     public var imageableSize: ImageableSize {

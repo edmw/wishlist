@@ -105,7 +105,7 @@ public final class List: ListModel, Viewable,
 
     // MARK: - Options
 
-    public struct Options: OptionSet, Codable {
+    public struct Options: OptionSet, Codable, Equatable, Hashable {
         public let rawValue: Int16
 
         public static let maskReservations = List.Options(rawValue: 1 << 0)

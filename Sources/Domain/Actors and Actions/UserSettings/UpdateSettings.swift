@@ -44,7 +44,7 @@ public struct UpdateSettings: Action {
     /// Throws `ValuesError`s for invalid values or violated constraints.
     internal func execute(
         on user: User,
-        with values: PartialValues<UserSettings>,
+        updateWith values: PartialValues<UserSettings>,
         in boundaries: Boundaries
     ) throws
         -> EventLoopFuture<User>
@@ -87,7 +87,7 @@ extension DomainUserSettingsActor {
             .flatMap { user in
                 let settingsvalues = specification.values
                 return try UpdateSettings(actor: self)
-                    .execute(on: user, with: settingsvalues, in: boundaries)
+                    .execute(on: user, updateWith: settingsvalues, in: boundaries)
                     .logMessage(.updateSettings, using: logging)
                     .map { user in
                         .init(user)

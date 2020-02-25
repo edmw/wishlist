@@ -7,7 +7,7 @@ import Foundation
 /// 
 /// Optionally adds a tag to every log message.
 /// Note: For now the logger output is fixed to use `ConsoleLogger`.
-class BasicLogger: Logger, Service {
+class BasicLogger: Logger, Service, CustomStringConvertible {
 
     let logLevel: LogLevel
 
@@ -41,6 +41,12 @@ class BasicLogger: Logger, Service {
         column: UInt
     ) {
         logger.log(string, at: logLevel, file: file, function: function, line: line, column: column)
+    }
+
+    // MARK: CustomStringConvertible
+
+    var description: String {
+        return String(describing: type(of: self)) + "(Level=\(logLevel))"
     }
 
 }

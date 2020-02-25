@@ -24,6 +24,8 @@
 
 import Foundation
 
+// MARK: UUID
+
 extension UUID {
 
     public var uuidBytes: [UInt8] {

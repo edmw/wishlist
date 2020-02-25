@@ -3,6 +3,32 @@
 // sourcery:inline:{{type.name}}.AutoRepositoryService
 
 // MARK: DO NOT EDIT
+{#
+This template is been used to generate the necessary code for a FluentRepository
+type so it can be used as a Vapor Service type.
+
+How to enable: Conform any FluentRepository type to protocol `Driven`
+
+Example:
+```
+extension FluentFavoriteRepository: Driven {}
+```
+
+Generated code:
+```
+extension FluentFavoriteRepository: ServiceType {
+
+    // MARK: Service
+
+    public static let serviceSupports: [Any.Type] = [FavoriteRepository.self]
+
+    public static func makeService(for worker: Container) throws -> Self {
+        return .init(try worker.connectionPool(to: .mysql))
+    }
+
+}
+```
+#}
 
 import Domain
 

@@ -1,5 +1,6 @@
 @testable import Library
 import XCTest
+import Testing
 
 final class StringTests : XCTestCase, HasAllTests {
 
@@ -8,6 +9,7 @@ final class StringTests : XCTestCase, HasAllTests {
         ("testIsLetters", testIsLetters),
         ("testHasDigits", testHasDigits),
         ("testIsDigits", testIsDigits),
+        ("testCapitalizingFirstLetter", testCapitalizingFirstLetter),
         ("testReplacingCharacters", testReplacingCharacters),
         ("testSlugify", testSlugify),
         ("testAllTests", testAllTests)
@@ -50,6 +52,21 @@ final class StringTests : XCTestCase, HasAllTests {
         XCTAssertFalse("العظمى".isDigits)
     }
 
+    func testCapitalizingFirstLetter() throws {
+        XCTAssertEqual("abcdef".capitalizingFirstLetter(), "Abcdef")
+        XCTAssertEqual("ABCDEF".capitalizingFirstLetter(), "ABCDEF")
+        XCTAssertEqual("the quick brown fox".capitalizingFirstLetter(), "The quick brown fox")
+        var string: String = "abcdef"
+        string.capitalizeFirstLetter()
+        XCTAssertEqual(string, "Abcdef")
+        string = "ABCDEF"
+        string.capitalizeFirstLetter()
+        XCTAssertEqual(string, "ABCDEF")
+        string = "the quick brown fox"
+        string.capitalizeFirstLetter()
+        XCTAssertEqual(string, "The quick brown fox")
+    }
+
     func testReplacingCharacters() throws {
         XCTAssertEqual("1234567890".replacingCharacters(everyNth: 2, with: "-"), "-2-4-6-8-0")
         XCTAssertEqual("1234567890".replacingCharacters(everyNth: 3, with: "-"), "-23-56-89-")
@@ -68,7 +85,7 @@ final class StringTests : XCTestCase, HasAllTests {
         XCTAssertEqual("😀😁😂😃😄".slugify(), "")
     }
 
-    func testAllTests() {
+    func testAllTests() throws {
         assertAllTests()
     }
 

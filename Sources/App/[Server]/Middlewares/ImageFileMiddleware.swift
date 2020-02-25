@@ -1,12 +1,52 @@
 import Vapor
 import Crypto
 
+import Library
+
+// MARK: ImageFileURL
+
+struct ImageFileLocator {
+
+    let url: URL
+    let baseURL: URL
+
+    var absoluteURL: URL {
+        return baseURL.appendingPathComponent(url.path, isDirectory: false)
+    }
+    var absoluteString: String {
+        return absoluteURL.absoluteString
+    }
+
+    fileprivate init?(absoluteURL: URL, baseURL: URL) {
+        guard absoluteURL.isFileURL, baseURL.isFileURL else {
+            return nil
+        }
+        let baseURL = baseURL.appendingPathComponent("/", isDirectory: true)
+
+        let absolutePath = absoluteURL.standardized.path
+        let basePath = baseURL.standardized.path
+        guard absolutePath.hasPrefix(basePath) else {
+            return nil
+        }
+
+        guard let url = URL(string: String(absolutePath.dropFirst(basePath.count))) else {
+            return nil
+        }
+
+        self.url = url
+        self.baseURL = baseURL
+    }
+
+}
+
+// MARK: ImageFileMiddleware
+
 final class ImageFileMiddleware: Middleware, ServiceType {
 
-    private let imagesPath: String
+    let imagesPath: String
 
-    private let imagesDirectory: String
-    private let imagesDirectoryURL: URL
+    let imagesDirectory: String
+    let imagesDirectoryURL: URL
 
     /// Initializes a ImageFileMiddleware with the specified path in the image urls and
     /// the specified directory containing the images to handle.
@@ -45,21 +85,30 @@ final class ImageFileMiddleware: Middleware, ServiceType {
         return try request.streamFile(at: filePath)
     }
 
+    // MARK: -
+
     static let supportedMediaTypes
         = [ "jpeg", "png" ]
 
-    func upload(
+    func imageFileLocator(from url: URL) -> ImageFileLocator? {
+        return ImageFileLocator(absoluteURL: url, baseURL: self.imagesDirectoryURL)
+    }
+
+    func uploadImage(
         from url: URL,
         width: Int,
         height: Int,
         key: String,
-        groupkey: String,
+        groupkeys: [String],
         on request: Request
-    ) throws -> EventLoopFuture<URL?> {
+    ) throws -> EventLoopFuture<ImageFileLocator?> {
 
         let fileName = try SHA1.hash(url.absoluteString).base32EncodedString()
 
-        let fileDirectoryURL = try buildDirectory(for: key, and: groupkey, create: true)
+        let fileDirectoryURL = try buildDirectory(for: key, and: groupkeys, create: true)
+        guard fileDirectoryURL.hasPrefix(self.imagesDirectoryURL) else {
+            throw ImageFileMiddlewareError.invalidFileURL(fileDirectoryURL)
+        }
 
         guard try imageExists(name: fileName, in: fileDirectoryURL) == false else {
             return request.future(nil)
@@ -94,89 +143,62 @@ final class ImageFileMiddleware: Middleware, ServiceType {
                     relativeTo: fileDirectoryURL
                 )
 
-                let filePath = fileURL.path
-
-                guard filePath.hasPrefix(self.imagesDirectory),
-                      let url = URL(string: String(filePath.dropFirst(self.imagesDirectory.count)))
-                    else {
-                        return request.future(error: Abort(.internalServerError))
-                    }
-
+                guard let imagefileurl = self.imageFileLocator(from: fileURL) else {
+                    return request.future(error: Abort(.internalServerError))
+                }
                 return try self.writeData(from: response, to: fileURL, on: request)
-                    .transform(to: url)
+                    .transform(to: imagefileurl)
             }
 
     }
 
-    func removeAll(
+    func removeImages(
         key: String,
-        groupkey: String,
-        deleteDirectory: Bool = false,
-        on request: Request
+        groupkeys: [String],
+        deleteParentsIfEmpty: Bool = false,
+        on container: Container
     ) throws {
         let fileManager = FileManager.default
-
-        let fileDirectoryURL = try buildDirectory(for: key, and: groupkey)
-
-        guard fileManager.fileExists(atPath: fileDirectoryURL.path) else {
-            return
+        let fileDirectoryURL = try buildDirectory(for: key, and: groupkeys)
+        guard fileDirectoryURL.hasPrefix(self.imagesDirectoryURL) else {
+            throw ImageFileMiddlewareError.invalidFileURL(fileDirectoryURL)
         }
-
         do {
-            try fileManager
-                .contentsOfDirectory(
+            try fileManager.removeFiles(
+                at: fileDirectoryURL,
+                in: self.imagesDirectoryURL,
+                extensions: ImageFileMiddleware.supportedMediaTypes
+            )
+            if deleteParentsIfEmpty {
+                try fileManager.removeDirectories(
                     at: fileDirectoryURL,
-                    includingPropertiesForKeys: [],
-                    options: [ .skipsHiddenFiles ]
+                    in: self.imagesDirectoryURL
                 )
-                .filter {
-                    ImageFileMiddleware.supportedMediaTypes
-                        .contains($0.pathExtension.lowercased())
-                }
-                .forEach {
-                    try fileManager.removeItem(at: $0)
-                }
-
-            if deleteDirectory {
-                if try fileManager
-                    .contentsOfDirectory(
-                        at: fileDirectoryURL,
-                        includingPropertiesForKeys: []
-                    ).isEmpty {
-                        try fileManager.removeItem(at: fileDirectoryURL)
-
-                        let fileGroupDirectoryURL = fileDirectoryURL.deletingLastPathComponent()
-                        if try fileManager
-                            .contentsOfDirectory(
-                                at: fileGroupDirectoryURL,
-                                includingPropertiesForKeys: []
-                            ).isEmpty {
-                            try fileManager.removeItem(at: fileGroupDirectoryURL)
-                        }
-                }
             }
         }
         catch {
-            request.requireLogger().warning(
+            container.requireLogger().warning(
                 "Error while removing all files from directory '\(fileDirectoryURL)': \(error)"
             )
         }
     }
 
+    // MARK: -
+
     /// Builds a directory URL for the specified keys within the images directory. When
     /// specified creates the directory if it does not exist.
-    private func buildDirectory(for key: String, and groupkey: String, create: Bool = false)
+    private func buildDirectory(for key: String, and groupkeys: [String], create: Bool = false)
         throws -> URL
     {
         let fileGroupDirectoryURL = URL(
-            fileURLWithPath: "\(groupkey)",
+            fileURLWithPath: groupkeys.joined(separator: "/"),
             isDirectory: true,
             relativeTo: self.imagesDirectoryURL
         )
         if create && !FileManager.default.fileExists(atPath: fileGroupDirectoryURL.path) {
             try FileManager.default.createDirectory(
                 at: fileGroupDirectoryURL,
-                withIntermediateDirectories: false,
+                withIntermediateDirectories: true,
                 attributes: nil
             )
         }
@@ -215,23 +237,24 @@ final class ImageFileMiddleware: Middleware, ServiceType {
     private func writeData(from response: Response, to url: URL, on request: Request) throws
         -> EventLoopFuture<Bool>
     {
-        guard url.isFileURL && url.path.hasPrefix(self.imagesDirectoryURL.path) else {
-            throw ImageFileMiddlewareError.invalidFileURL(url)
-        }
-        FileManager.default.createFile(
-            atPath: url.path,
-            contents: nil,
-            attributes: [ .posixPermissions: 0o664 ]
-        )
-        return response.http.body.consumeData(max: 2_000_000, on: request).map { data in
-            if let fileHandle = FileHandle(forWritingAtPath: url.path) {
-                defer {
-                    fileHandle.closeFile()
+        if try FileManager.default.createFile(
+            at: url,
+            in: self.imagesDirectoryURL,
+            permissions: 0o664
+        ) {
+            return response.http.body.consumeData(max: 2_000_000, on: request).map { data in
+                if let fileHandle = FileHandle(forWritingAtPath: url.path) {
+                    defer {
+                        fileHandle.closeFile()
+                    }
+                    fileHandle.seekToEndOfFile()
+                    fileHandle.write(data)
                 }
-                fileHandle.seekToEndOfFile()
-                fileHandle.write(data)
+                return true
             }
-            return true
+        }
+        else {
+            throw ImageFileMiddlewareError.invalidFileURL(url)
         }
     }
 

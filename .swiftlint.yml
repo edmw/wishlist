@@ -106,4 +106,5 @@ identifier_name:
     - min
     - max
     - nil
-
+    - bit
+    - now

@@ -2,6 +2,37 @@
 // sourcery:inline:{{type.name}}.AutoActorService
 
 // MARK: DO NOT EDIT
+{#
+This template is been used to generate the necessary code for an Actor type
+so it can be used as a Vapor Service type.
+
+Note: Relies on the convention that the actual implementation of an Actor type
+is named after the actor protocol it implements prefixed with "Domain".
+
+How to enable: Conform any Actor type to protocol `Driver`
+
+Example:
+```
+extension DomainAnnouncementsActor: Driver {}
+```
+
+Generated code:
+```
+extension DomainAnnouncementsActor: ServiceType {
+
+    // MARK: Service
+
+    public static let serviceSupports: [Any.Type] = [AnnouncementsActor.self]
+
+    public static func makeService(for container: Container) throws -> Self {
+        return try .init(
+            userRepository: container.make()
+        )
+    }
+
+}
+```
+#}
 
 import Domain
 

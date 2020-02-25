@@ -3,6 +3,7 @@ import Foundation
 import NIO
 
 import XCTest
+import Testing
 
 final class ValidationTests: XCTestCase, HasAllTests {
 
@@ -85,7 +86,7 @@ final class ValidationTests: XCTestCase, HasAllTests {
         assert(
             try values.validateValues(),
             throws: ValueValidationErrors<ValidationTests.Values>.self,
-            reflection: "Value validation failed on 'lengthLimitedAlphanumericString' with 'is less than required minimum of 5', Value validation failed on 'nilOrURL' with 'is not nil and is not a valid URL', Value validation failed on 'notEmptyList' with 'is empty', Value validation failed on 'notNilAndValidEmailSpecification' with 'is not a valid email specification (pattern)', Value validation failed on 'notNilAndValidPushoverKey' with 'is not a valid pushover key (pattern)'"
+            reflection: .equals("Value validation failed on 'lengthLimitedAlphanumericString' with 'is less than required minimum of 5', Value validation failed on 'nilOrURL' with 'is not nil and is not a valid URL', Value validation failed on 'notEmptyList' with 'is empty', Value validation failed on 'notNilAndValidEmailSpecification' with 'is not a valid email specification (pattern)', Value validation failed on 'notNilAndValidPushoverKey' with 'is not a valid pushover key (pattern)'")
         )
     }
 
@@ -233,19 +234,19 @@ final class ValidationTests: XCTestCase, HasAllTests {
             try (ValueValidator<String>.alphanumeric && ValueValidator<String>.count(...6))
                 .validate("abc-+="),
             throws: AndValidatorError.self,
-            reflection: "Value validation failed with 'contains an invalid character: '-''"
+            reflection: .equals("Value validation failed with 'contains an invalid character: '-''")
         )
         assert(
             try (ValueValidator<String>.alphanumeric && ValueValidator<String>.count(...6))
                 .validate("abcdefgh"),
             throws: AndValidatorError.self,
-            reflection: "Value validation failed with 'is greater than required maximum of 6'"
+            reflection: .equals("Value validation failed with 'is greater than required maximum of 6'")
         )
         assert(
             try (ValueValidator<String>.alphanumeric && ValueValidator<String>.count(...6))
                 .validate("ab+defgh"),
             throws: AndValidatorError.self,
-            reflection: "Value validation failed with 'contains an invalid character: '+' and is greater than required maximum of 6'"
+            reflection: .equals("Value validation failed with 'contains an invalid character: '+' and is greater than required maximum of 6'")
         )
     }
 
@@ -260,7 +261,7 @@ final class ValidationTests: XCTestCase, HasAllTests {
             try (ValueValidator<String>.alphanumeric || ValueValidator<String>.count(...6))
                 .validate("ab+defgh"),
             throws: OrValidatorError.self,
-            reflection: "Value validation failed with 'contains an invalid character: '+' and is greater than required maximum of 6'"
+            reflection: .equals("Value validation failed with 'contains an invalid character: '+' and is greater than required maximum of 6'")
         )
     }
 

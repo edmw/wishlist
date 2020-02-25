@@ -5,7 +5,8 @@ import Vapor
 /// Protocol to be adopted by any type which should be runnable by the Dispatching Service.
 /// Usually you don't want to implement all functionality by yourself, but subclass any of the
 /// provided job types, for example `DispatchableJob`.
-protocol Job {
+protocol Job: AnyObject {
+
     /// The result type associated with the job and returned after successful execution.
     associatedtype ResultType: JobResult
 

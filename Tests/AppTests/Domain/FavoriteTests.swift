@@ -4,6 +4,7 @@ import Foundation
 import NIO
 
 import XCTest
+import Testing
 
 final class FavoriteTests: XCTestCase, HasEntityTestSupport, HasAllTests {
 

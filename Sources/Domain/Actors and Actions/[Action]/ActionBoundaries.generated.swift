@@ -281,6 +281,19 @@ extension MaterialiseUser.Boundaries {
     }
 
 }
+// MARK: MoveItem.Boundaries
+
+extension MoveItem.Boundaries {
+
+    public static func boundaries(
+        worker: EventLoop
+    ) -> Self {
+        return Self(
+            worker: worker
+        )
+    }
+
+}
 // MARK: PresentPublicly.Boundaries
 
 extension PresentPublicly.Boundaries {

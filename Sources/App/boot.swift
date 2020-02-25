@@ -22,10 +22,13 @@
 // SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+import Domain
+
 import Vapor
 
 public func boot(_ app: Application) throws {
     let logger = try app.makeLogger()
+    logger.application.info("LOGGING:\n\(String(reflecting: logger))\n")
 
     let environment = app.environment
     logger.application.info("ENVIRONMENT:\n\(String(reflecting: environment))\n")
@@ -34,7 +37,10 @@ public func boot(_ app: Application) throws {
     let features = try app.makeFeatures()
     logger.application.info("FEATURES:\n\(String(reflecting: features))\n")
 
-    try app.make(DispatchingService.self).start()
+    let dispatchingService = try app.make(DispatchingService.self)
+    try dispatchingService.attach(to: app, logger: logger)
+    try dispatchingService.start()
+    try dispatchingService.dispatch(VaporImageStoreProvider.CleanupJob(on: app))
 }
 
 extension Environment: CustomDebugStringConvertible {

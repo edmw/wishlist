@@ -24,6 +24,8 @@
 
 import Foundation
 
+// MARK: String
+
 extension String {
 
     private static let allowedCharacters

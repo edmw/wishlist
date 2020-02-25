@@ -52,6 +52,7 @@ extension DomainUserItemsActor {
                     .unwrap(or: UserItemsActorError.invalidItem)
                     .flatMap { item, reservation in
                         guard reservation == nil else {
+                            // reserved items can not be deleted
                             throw UserItemsActorError.itemIsReserved
                         }
                         // remove images for item

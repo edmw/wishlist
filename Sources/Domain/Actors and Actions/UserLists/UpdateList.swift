@@ -42,8 +42,8 @@ public struct UpdateList: Action {
 
     internal func execute(
         on list: List,
-        with values: ListValues,
         for user: User,
+        updateWith values: ListValues,
         in boundaries: Boundaries
     ) throws
         -> EventLoopFuture<(user: User, list: List)>
@@ -113,7 +113,7 @@ extension DomainUserListsActor {
             .flatMap { list, user in
                 let listvalues = specification.values
                 return try UpdateList(actor: self)
-                    .execute(on: list, with: listvalues, for: user, in: boundaries)
+                    .execute(on: list, for: user, updateWith: listvalues, in: boundaries)
                     .logMessage(
                         .updateList(for: user), for: { $0.1 }, using: self.logging
                     )

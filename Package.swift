@@ -67,9 +67,15 @@ let package = Package(
                 "App"
             ]
         ),
+        .target(
+            name: "Testing",
+            dependencies: [],
+            path: "Tests/Testing"
+        ),
         .testTarget(
             name: "LibraryTests",
             dependencies: [
+                "Testing",
                 "Library"
             ],
             path: "Tests/LibraryTests"
@@ -77,6 +83,7 @@ let package = Package(
         .testTarget(
             name: "DomainTests",
             dependencies: [
+                "Testing",
                 "Domain"
             ],
             path: "Tests/DomainTests"
@@ -84,6 +91,7 @@ let package = Package(
         .testTarget(
             name: "AppTests",
             dependencies: [
+                "Testing",
                 "App",
                 "VaporTestTools",
                 "LoggerAPI"

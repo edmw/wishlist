@@ -16,6 +16,7 @@ public final class User: UserModel,
     Loggable,
     Codable,
     Equatable,
+    Hashable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {

@@ -64,13 +64,13 @@ final class InvitationEmail: HTMLMessage, CustomStringConvertible {
 
 extension VaporEmailSendingProvider {
 
-    func sendInvitationEmail(_ invitation: InvitationRepresentation, for user: UserRepresentation)
-        throws -> EventLoopFuture<Bool>
-    {
+    func dispatchSendInvitationEmail(
+        _ invitation: InvitationRepresentation,
+        for user: UserRepresentation
+    ) throws -> EventLoopFuture<Bool> {
         var email = InvitationEmail(for: invitation, invitedBy: user)
-        email.addEmailRecipient(EmailAddress(String(invitation.email)))
-        return try email.send(on: request)
-            .map { sendResult in sendResult.success == true }
+        email.addEmailRecipient(EmailAddress(invitation.email))
+        return try email.dispatchSend(on: request).transform(to: true)
     }
 
 }

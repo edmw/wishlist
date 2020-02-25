@@ -3,11 +3,11 @@ import Foundation
 // MARK: UserSettings
 
 /// This type represents a users settings.
-public struct UserSettings: Codable, Equatable {
+public struct UserSettings: Codable, Equatable, Hashable {
 
     public var notifications: UserSettings.Notifications
 
-    public struct Notifications: Codable, Equatable {
+    public struct Notifications: Codable, Equatable, Hashable {
 
         public var emailEnabled: Bool = false
 

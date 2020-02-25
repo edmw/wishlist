@@ -24,6 +24,8 @@
 
 import Foundation
 
+// MARK: String
+
 extension String {
 
     public var hasLetters: Bool {
@@ -40,6 +42,14 @@ extension String {
 
     public var isDigits: Bool {
         return CharacterSet.decimalDigits.isSuperset(of: CharacterSet(charactersIn: self))
+    }
+
+    public func capitalizingFirstLetter() -> String {
+        return prefix(1).capitalized + dropFirst()
+    }
+
+    public mutating func capitalizeFirstLetter() {
+        self = self.capitalizingFirstLetter()
     }
 
 }

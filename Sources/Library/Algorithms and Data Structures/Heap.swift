@@ -21,7 +21,7 @@ public struct Heap<T> {
      * For comparable data types, > makes a max-heap, < makes a min-heap.
      */
     public init(sort: @escaping (T, T) -> Bool) {
-        self.orderCriteria = sort
+        orderCriteria = sort
     }
 
     /**
@@ -31,7 +31,7 @@ public struct Heap<T> {
      * '<' makes a min-heap.
      */
     public init(array: [T], sort: @escaping (T, T) -> Bool) {
-        self.orderCriteria = sort
+        orderCriteria = sort
         configureHeap(from: array)
     }
 
@@ -41,21 +41,21 @@ public struct Heap<T> {
      */
     private mutating func configureHeap(from array: [T]) {
         nodes = array
-        for index in stride(from: (nodes.count / 2 - 1), through: 0, by: -1) {
+        for index in stride(from: nodes.count / 2 - 1, through: 0, by: -1) {
             shiftDown(index)
         }
     }
 
     public var isEmpty: Bool {
-        return nodes.isEmpty
+        nodes.isEmpty
     }
 
     public var isNotEmpty: Bool {
-        return nodes.isNotEmpty
+        nodes.isNotEmpty
     }
 
     public var count: Int {
-        return nodes.count
+        nodes.count
     }
 
     /**
@@ -64,7 +64,7 @@ public struct Heap<T> {
      */
     @inline(__always)
     internal func parentIndex(ofIndex index: Int) -> Int {
-        return (index - 1) / 2
+        (index - 1) / 2
     }
 
     /**
@@ -74,7 +74,7 @@ public struct Heap<T> {
      */
     @inline(__always)
     internal func leftChildIndex(ofIndex index: Int) -> Int {
-        return 2 * index + 1
+        2 * index + 1
     }
 
     /**
@@ -84,7 +84,7 @@ public struct Heap<T> {
      */
     @inline(__always)
     internal func rightChildIndex(ofIndex index: Int) -> Int {
-        return 2 * index + 2
+        2 * index + 2
     }
 
     /**
@@ -92,7 +92,7 @@ public struct Heap<T> {
      * value (for a min-heap).
      */
     public func peek() -> T? {
-        return nodes.first
+        nodes.first
     }
 
     /**
@@ -139,14 +139,14 @@ public struct Heap<T> {
 
         if nodes.count == 1 {
             return nodes.removeLast()
-        } else {
-            // Use the last node to replace the first one, then fix the heap by
-            // shifting this new first node into its proper position.
-            let value = nodes[0]
-            nodes[0] = nodes.removeLast()
-            shiftDown(0)
-            return value
         }
+
+        // Use the last node to replace the first one, then fix the heap by
+        // shifting this new first node into its proper position.
+        let value = nodes[0]
+        nodes[0] = nodes.removeLast()
+        shiftDown(0)
+        return value
     }
 
     /**
@@ -177,7 +177,7 @@ public struct Heap<T> {
         let child = nodes[childIndex]
         var parentIndex = self.parentIndex(ofIndex: childIndex)
 
-        while childIndex > 0 && orderCriteria(child, nodes[parentIndex]) {
+        while childIndex > 0, orderCriteria(child, nodes[parentIndex]) {
             nodes[childIndex] = nodes[parentIndex]
             childIndex = parentIndex
             parentIndex = self.parentIndex(ofIndex: childIndex)
@@ -199,10 +199,10 @@ public struct Heap<T> {
         // first, we're done. If not, that element is out-of-place and we make
         // it "float down" the tree until the heap property is restored.
         var first = index
-        if leftChildIndex < endIndex && orderCriteria(nodes[leftChildIndex], nodes[first]) {
+        if leftChildIndex < endIndex, orderCriteria(nodes[leftChildIndex], nodes[first]) {
             first = leftChildIndex
         }
-        if rightChildIndex < endIndex && orderCriteria(nodes[rightChildIndex], nodes[first]) {
+        if rightChildIndex < endIndex, orderCriteria(nodes[rightChildIndex], nodes[first]) {
             first = rightChildIndex
         }
         if first == index {
@@ -231,7 +231,7 @@ extension Heap where T: Equatable {
 
     /** Get the index of a node in the heap. Performance: O(n). */
     public func index(of node: T) -> Int? {
-        return nodes.firstIndex(where: { $0 == node })
+        nodes.firstIndex(where: { $0 == node })
     }
 
     /** Removes the first occurrence of a node from the heap. Performance: O(n log n). */

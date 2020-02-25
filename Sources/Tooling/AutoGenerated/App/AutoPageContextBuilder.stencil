@@ -3,6 +3,18 @@
 // sourcery:inline:{{type.name}}Builder.AutoPageContextBuilder
 
 // MARK: DO NOT EDIT
+{#
+This template can be used to generate a builder type for a page context type.
+
+How to enable: Conform any page context type to `AutoPageContextBuilder`
+
+Example:
+```
+struct FavoritesPageContext: Encodable, AutoPageContextBuilder ...
+```
+
+Generated code will be a builder type `FavoritesPageContextBuilder`.
+#}
 
 import Domain
 

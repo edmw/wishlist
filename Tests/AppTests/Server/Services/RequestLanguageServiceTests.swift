@@ -1,11 +1,14 @@
 @testable import App
 import Vapor
 import VaporTestTools
+
 import XCTest
+import Testing
 
 final class RequestLanguageServiceTests : XCTestCase, HasAllTests {
 
     static var __allTests = [
+        ("testDescription", testDescription),
         ("testParseNone", testParseNone),
         ("testParseEmpty", testParseEmpty),
         ("testParseSimple", testParseSimple),
@@ -33,12 +36,30 @@ final class RequestLanguageServiceTests : XCTestCase, HasAllTests {
         app = try! Application.testable()
     }
 
-    func buildRequest(acceptLanguage header: String?) -> Request {
+    fileprivate func buildRequest(acceptLanguage header: String?) -> Request {
         let request = HTTPRequest.testable.get(
             uri: "/",
             headers: header != nil ? ["Accept-Language": header!] : [:]
         )
         return Request(http: request, using: app)
+    }
+
+    func testDescription() throws {
+        let language = RequestLanguage("de")
+        XCTAssertEqual(
+            String(describing: language),
+            "Language(de, quality: 1.0)"
+        )
+        let languageWithRegion = RequestLanguage("en", "US", nil, 0.8)
+        XCTAssertEqual(
+            String(describing: languageWithRegion),
+            "Language(en, region: US, quality: 0.8)"
+        )
+        let languageWithScript = RequestLanguage("zh", "CN", "Hant", 0.8)
+        XCTAssertEqual(
+            String(describing: languageWithScript),
+            "Language(zh, region: CN, script: Hant, quality: 0.8)"
+        )
     }
 
     func testParseNone() throws {

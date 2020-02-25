@@ -3,6 +3,31 @@
 // swiftlint:disable file_length
 
 // MARK: DO NOT EDIT
+{#
+This template can be used to generate a static factory method for creation of an Actions‘
+boundaries structure. The factory method is just syntactic sugar and meant to be used when
+calling an action method of an Actor.
+
+How to enable: Conform an action boundaries structure to `AutoActionBoundaries`
+
+Example:
+```
+public struct Boundaries: AutoActionBoundaries {
+    public let worker: EventLoop
+}
+```
+
+Generated code:
+```
+public static func boundaries(
+    worker: EventLoop
+) -> Self {
+    return Self(
+        worker: worker
+    )
+}
+```
+#}
 
 import Foundation
 import NIO
