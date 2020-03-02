@@ -10,7 +10,6 @@ public protocol StringValue: ValueType,
 {
 
     init(_ description: String)
-    init?(_ description: String?)
 
     // MARK: String
 
@@ -43,13 +42,6 @@ extension DomainStringValue {
     // MARK: LosslessStringConvertible
 
     public init(_ description: String) {
-        self.init(string: description)
-    }
-
-    public init?(_ description: String?) {
-        guard let description = description else {
-            return nil
-        }
         self.init(string: description)
     }
 

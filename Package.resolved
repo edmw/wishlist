@@ -138,11 +138,11 @@
       },
       {
         "package": "Lingo",
-        "repositoryURL": "https://github.com/miroslavkovac/Lingo.git",
+        "repositoryURL": "https://github.com/edmw/Lingo.git",
         "state": {
-          "branch": null,
-          "revision": "f21f388b04239641b3e88d14f21762125faa9857",
-          "version": "3.0.5"
+          "branch": "edmw",
+          "revision": "52c1afb3a10335af97b8444a3456bec036af3090",
+          "version": null
         }
       },
       {
@@ -168,8 +168,8 @@
         "repositoryURL": "https://github.com/vapor/mysql.git",
         "state": {
           "branch": null,
-          "revision": "8f2238dc48fa480ce6043ee0022ebe73c8ddc300",
-          "version": "3.3.0"
+          "revision": "97e9811b0b5d43d625bf5064032fe7b3b17a15f2",
+          "version": "3.3.1"
         }
       },
       {
@@ -267,8 +267,8 @@
         "repositoryURL": "https://github.com/vapor/url-encoded-form.git",
         "state": {
           "branch": null,
-          "revision": "44999b47d88ca2e0c0b893599b3240e342ba39ff",
-          "version": "1.0.7"
+          "revision": "20f68fbe7fac006d4d0617ea4edcba033227359e",
+          "version": "1.1.0"
         }
       },
       {

@@ -53,8 +53,9 @@ public struct ImportListFromJSON: Action {
         let listRepository = actor.listRepository
         return try listRepository
             .available(title: values.title, for: user)
-            .unwrap(or: ImportListFromJSONNoListNameError(user: user))
-            .flatMap { title in
+            .unwrap(or: ImportListFromJSONListNameError(user: user))
+            .flatMap { titleString in
+                let title = Title(titleString)
                 return try self.store(values.with(title: title), for: user, on: boundaries)
             }
             .catchFlatMap { error in
@@ -127,7 +128,7 @@ protocol ImportListFromJSONActor {
 protocol ImportListFromJSONError: ActionError {
 }
 
-struct ImportListFromJSONNoListNameError: ImportListFromJSONError {
+struct ImportListFromJSONListNameError: ImportListFromJSONError {
     var user: User
 }
 
@@ -164,6 +165,7 @@ extension DomainUserListsActor {
                         throw error
                     }
             }
+            .logError(.importListError, using: self.logging)
     }
 
 }
@@ -182,6 +184,12 @@ extension CreateItem.Boundaries {
 // MARK: Logging
 
 extension LoggingMessageRoot {
+
+    fileprivate static var importListError: LoggingMessageRoot<Error> {
+        return .init({ error in
+            LoggingMessage(label: "Import List", subject: error, level: .error)
+        })
+    }
 
     fileprivate static func importList(for user: User) -> LoggingMessageRoot<List> {
         return .init({ list in

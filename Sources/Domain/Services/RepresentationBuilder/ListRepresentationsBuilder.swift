@@ -43,8 +43,10 @@ class ListRepresentationsBuilder {
     }
 
     @discardableResult
-    func withSorting(_ sorting: ListsSorting) -> Self {
-        self.sorting = sorting
+    func withSorting(_ sorting: ListsSorting?) -> Self {
+        if let sorting = sorting {
+            self.sorting = sorting
+        }
         return self
     }
 

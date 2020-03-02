@@ -15,11 +15,11 @@ public final class GetLists: Action {
 
     public struct Specification: ActionSpecification {
         public let userID: UserID
-        public let sorting: ListsSorting
+        public let sorting: ListsSorting?
         public let includeItemsCount: Bool
         public static func specification(
             userBy userid: UserID,
-            with sorting: ListsSorting = .ascending(by: \List.title),
+            with sorting: ListsSorting?,
             includeItemsCount: Bool = true
         ) -> Self {
             return Self(userID: userid, sorting: sorting, includeItemsCount: includeItemsCount)

@@ -93,8 +93,17 @@ struct MessageLogging {
             logmessage = "STRING \(string)"
         }
 
-        let info = "\(message.label):\n\(logmessage)\n"
-        provider.log(info: info, file: file, function: function, line: line, column: column)
+        let text = "\(message.label):\n\(logmessage)\n"
+        switch message.level {
+        case .debug:
+            provider.log(debug: text, file: file, function: function, line: line, column: column)
+        case .info:
+            provider.log(info: text, file: file, function: function, line: line, column: column)
+        case .warning:
+            provider.log(warning: text, file: file, function: function, line: line, column: column)
+        case .error:
+            provider.log(error: text, file: file, function: function, line: line, column: column)
+        }
     }
 
     private func encodable(from any: Any) -> AnyEncodable {

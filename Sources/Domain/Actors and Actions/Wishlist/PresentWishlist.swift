@@ -15,12 +15,12 @@ public final class PresentWishlist: Action {
 
     public struct Specification: ActionSpecification, WishlistSpecification {
         public let listID: ListID
-        public let sorting: ItemsSorting
+        public let sorting: ItemsSorting?
         public let identification: Identification
         public let userID: UserID?
         public static func specification(
             _ listid: ListID,
-            with sorting: ItemsSorting = .ascending(by: \Item.title),
+            with sorting: ItemsSorting? = nil,
             for identification: Identification,
             userBy userid: UserID?
         ) -> Self {
@@ -71,10 +71,9 @@ extension DomainWishlistActor {
                 let list = authorization.entity
                 let user = authorization.subject
                 let owner = authorization.owner
-                let sorting = specification.sorting
                 return try ItemRepresentationsBuilder(itemRepository)
                     .forList(list)
-                    .withSorting(sorting)
+                    .withSorting(specification.sorting ?? list.itemsSorting)
                     .build(on: boundaries.worker)
                     .and(self.isFavorite(list, for: user))
                     .map { arguments in let (items, isFavorite) = arguments

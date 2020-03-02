@@ -3,28 +3,30 @@ import NIO
 
 // MARK: ItemValues
 
-/// Representation of an item without any internal properties and with simple types.
+/// Representation of an item without any internal properties and basic types, only.
 /// Used for validation, importing and exporting.
 public struct ItemValues: Values, ValueValidatable {
 
     public var title: String
     public var text: String
-    public var preference: Item.Preference
+    public var preference: String
     public var url: String?
     public var imageURL: String?
     public var createdAt: Date?
     public var modifiedAt: Date?
 
-    init(_ item: Item) {
+    /// Creates item values from the model type.
+    init(_ item: ItemModel) {
         self.title = String(item.title)
         self.text = String(item.text)
-        self.preference = item.preference
+        self.preference = String(item.preference)
         self.url = item.url?.absoluteString
         self.imageURL = item.imageURL?.absoluteString
         self.createdAt = item.createdAt
         self.modifiedAt = item.modifiedAt
     }
 
+    /// Creates item values from partital item values.
     init(_ values: PartialValues<ItemValues>) throws {
         self.title = try values.value(for: \.title)
         self.text = try values.value(for: \.text)
@@ -35,10 +37,30 @@ public struct ItemValues: Values, ValueValidatable {
         self.modifiedAt = values[\.modifiedAt]
     }
 
+    /// Creates list values from individual list values.
     init(
+        title: Title,
+        text: Text,
+        preference: Item.Preference,
+        url: URL?,
+        imageURL: URL?,
+        createdAt: Date?,
+        modifiedAt: Date?
+    ) {
+        self.title = String(title)
+        self.text = String(text)
+        self.preference = String(preference)
+        self.url = url?.absoluteString
+        self.imageURL = imageURL?.absoluteString
+        self.createdAt = createdAt
+        self.modifiedAt = modifiedAt
+    }
+
+    /// Creates item values from simple data types. For example from user input.
+    public init(
         title: String,
         text: String,
-        preference: Item.Preference,
+        preference: String,
         url: String?,
         imageURL: String?,
         createdAt: Date?,
@@ -53,28 +75,10 @@ public struct ItemValues: Values, ValueValidatable {
         self.modifiedAt = modifiedAt
     }
 
-    public init(
-        title: String,
-        text: String,
-        preference: String,
-        url: String?,
-        imageURL: String?,
-        createdAt: Date?,
-        modifiedAt: Date?
-    ) {
-        self.title = title
-        self.text = text
-        self.preference = Item.Preference(preference) ?? .normal
-        self.url = url
-        self.imageURL = imageURL
-        self.createdAt = createdAt
-        self.modifiedAt = modifiedAt
-    }
-
-    func with(title: String? = nil, text: String? = nil) -> ItemValues {
+    func with(title: Title? = nil, text: Text? = nil) -> ItemValues {
         return ItemValues(
-            title: title ?? self.title,
-            text: text ?? self.text,
+            title: title.flatMap(String.init) ?? self.title,
+            text: text.flatMap(String.init) ?? self.text,
             preference: self.preference,
             url: self.url,
             imageURL: self.imageURL,
@@ -149,19 +153,14 @@ public struct ItemValues: Values, ValueValidatable {
 extension Item {
 
     convenience init(for list: List, from data: ItemValues) throws {
-        try self.init(title: Title(data.title), text: Text(data.text), list: list)
-        if let urlString = data.url {
-            self.url = URL(string: urlString)
-        }
-        else {
-            self.url = nil
-        }
-        if let imageURLString = data.imageURL {
-            self.imageURL = URL(string: imageURLString)
-        }
-        else {
-            self.imageURL = nil
-        }
+        try self.init(
+            title: Title(data.title),
+            text: Text(data.text),
+            preference: Item.Preference(data.preference) ?? .normal,
+            list: list
+        )
+        self.url = data.url.flatMap(URL.init)
+        self.imageURL = data.imageURL.flatMap(URL.init)
     }
 
     func update(for list: List, from data: ItemValues) throws {
@@ -170,19 +169,9 @@ extension Item {
         }
         title = Title(data.title)
         text = Text(data.text)
-        preference = data.preference
-        if let urlString = data.url {
-            url = URL(string: urlString)
-        }
-        else {
-            url = nil
-        }
-        if let imageURLString = data.imageURL {
-            imageURL = URL(string: imageURLString)
-        }
-        else {
-            imageURL = nil
-        }
+        preference = Item.Preference(data.preference) ?? .normal
+        url = data.url.flatMap(URL.init)
+        imageURL = data.imageURL.flatMap(URL.init)
     }
 
 }

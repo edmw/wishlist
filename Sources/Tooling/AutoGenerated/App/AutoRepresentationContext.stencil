@@ -1,0 +1,77 @@
+{% for representation in types.implementing.AutoRepresentationContext %}
+{% set typeName %}{{representation.name|replace:"Representation","Context"}}{% endset %}
+{% set typeVariable %}{{representation.name|replace:"Representation",""|lowercase}}{% endset %}
+// sourcery:inline:{{representation.name}}.AutoRepresentationContext
+
+// MARK: DO NOT EDIT
+{#
+#}
+
+import Domain
+
+import Foundation
+
+// MARK: {{typeName}}
+
+/// Type which is used in a render context of a page.
+/// Encodes a `{{representation.name}}` while converting typed IDs to `ID`.
+struct {{typeName}}: Encodable {
+
+    let {{typeVariable}}: {{representation.name}}
+
+{% for variable in representation.storedVariables %}
+  {% if variable.name == "id" %}
+    let id: ID?
+  {% endif %}
+  {% if variable.typeName.name|hasSuffix:"Representation" %}
+    let {{variable.name}}: {{variable.type.name|replace:"Representation","Context"}}
+  {% endif %}
+{% endfor %}
+
+    enum Keys: String, CodingKey {
+{% for variable in representation.storedVariables %}
+        case {{variable.name}}
+{% endfor %}
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: Keys.self)
+{% for variable in representation.storedVariables %}
+  {% if variable.name == "id" %}
+        try container.encode(id?.string, forKey: .id)
+  {% else %}
+    {% if variable.typeName.name|hasSuffix:"Representation" %}
+        try container.encode({{variable.name}}, forKey: .{{variable.name}})
+    {% else %}
+      {% if variable.name|hasSuffix:"ID" %}
+        try container.encode(ID({{typeVariable}}.{{variable.name}})?.string, forKey: .{{variable.name}})
+      {% else %}
+        try container.encode({{typeVariable}}.{{variable.name}}, forKey: .{{variable.name}})
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+    }
+
+    init(_ {{typeVariable}}: {{representation.name}}) {
+        self.{{typeVariable}} = {{typeVariable}}
+{% for variable in representation.storedVariables %}
+  {% if variable.name == "id" %}
+        self.id = ID({{typeVariable}}.id)
+  {% endif %}
+  {% if variable.typeName.name|hasSuffix:"Representation" %}
+        self.{{variable.name}} = {{variable.type.name|replace:"Representation","Context"}}({{typeVariable}}.{{variable.name}})
+  {% endif %}
+{% endfor %}
+    }
+
+    init?(_ {{typeVariable}}: {{representation.name}}?) {
+        guard let {{typeVariable}} = {{typeVariable}} else {
+            return nil
+        }
+        self.init({{typeVariable}})
+    }
+
+}
+// sourcery:end
+{% endfor %}

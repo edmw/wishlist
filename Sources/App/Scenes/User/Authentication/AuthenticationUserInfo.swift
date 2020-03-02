@@ -12,7 +12,7 @@ protocol AuthenticationUserInfo {
     var name: String { get }
     var givenName: String { get }
     var familyName: String { get }
-    var picture: URL? { get }
+    var picture: String? { get }
     var language: String? { get }
 
     func validate() throws
@@ -42,11 +42,11 @@ extension PartialValues where Wrapped == UserValues {
     /// Creates user values from the given authentication user info.
     init(from userInfo: AuthenticationUserInfo) {
         self.init()
-        self[\.email] = EmailSpecification(userInfo.email)
+        self[\.email] = userInfo.email
         self[\.fullName] = userInfo.name
         self[\.firstName] = userInfo.givenName
         self[\.lastName] = userInfo.familyName
-        self[\.language] = LanguageTag(userInfo.language)
+        self[\.language] = userInfo.language
         self[\.picture] = userInfo.picture
     }
 

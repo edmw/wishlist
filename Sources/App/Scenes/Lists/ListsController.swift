@@ -20,7 +20,7 @@ final class ListsController: AuthenticatableController,
     private func renderView(on request: Request) throws -> EventLoopFuture<View> {
         let userid = try requireAuthenticatedUserID(on: request)
 
-        let sorting = getSorting(on: request) ?? .ascending(by: \List.title)
+        let sorting = getSorting(on: request)
         return try userListsActor
             .getLists(
                 .specification(userBy: userid, with: sorting),

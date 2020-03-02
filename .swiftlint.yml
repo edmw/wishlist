@@ -15,6 +15,7 @@ disabled_rules:
   - static_operator
   - opening_brace
   - statement_position
+  - discouraged_optional_boolean
 opt_in_rules:
   - anyobject_protocol
   - array_init

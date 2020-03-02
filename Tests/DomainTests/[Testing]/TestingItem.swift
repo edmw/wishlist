@@ -11,7 +11,7 @@ extension Item {
         var values = PartialValues<ItemValues>()
         values[\.title] = Lorem.randomTitle()
         values[\.text] = Lorem.randomParagraph()
-        values[\.preference] = .normal
+        values[\.preference] = [ "lowest", "low", "normal", "high", "highest" ].randomElement()
         values[\.url] = Lorem.randomURL().absoluteString
         values[\.imageURL] = Lorem.randomURL().absoluteString
         return try! ItemValues(values)

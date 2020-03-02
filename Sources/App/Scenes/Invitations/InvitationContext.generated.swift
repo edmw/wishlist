@@ -1,9 +1,15 @@
+// sourcery:inline:InvitationRepresentation.AutoRepresentationContext
+
+// MARK: DO NOT EDIT
+
 import Domain
 
 import Foundation
 
-/// Type which is used in a render context of a page. The reason why `InvitationRepresentation` is
-/// not used directly is, the id property has to be converted from `InvitationID` to `ID`.
+// MARK: InvitationContext
+
+/// Type which is used in a render context of a page.
+/// Encodes a `InvitationRepresentation` while converting typed IDs to `ID`.
 struct InvitationContext: Encodable {
 
     let invitation: InvitationRepresentation
@@ -42,3 +48,4 @@ struct InvitationContext: Encodable {
     }
 
 }
+// sourcery:end

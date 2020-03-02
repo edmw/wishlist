@@ -8,6 +8,7 @@ import Testing
 final class ItemTests: XCTestCase, HasAllTests {
 
     static var __allTests = [
+        ("testCreationFromValues", testCreationFromValues),
         ("testImaginable", testImaginable),
         ("testAllTests", testAllTests)
     ]
@@ -20,6 +21,26 @@ final class ItemTests: XCTestCase, HasAllTests {
 
         aUser = User.randomUser().withFakeID()
         aList = List.randomList(for: aUser).withFakeID()
+    }
+
+    func testCreationFromValues() throws {
+        let url = Lorem.randomURL()
+        let imageURL = Lorem.randomURL()
+        let values = ItemValues(
+            title: "aTitle",
+            text: "aText",
+            preference: "highest",
+            url: url.absoluteString,
+            imageURL: imageURL.absoluteString,
+            createdAt: nil,
+            modifiedAt: nil
+        )
+        let item = try Item(for: aList, from: values)
+        XCTAssertEqual(item.title, "aTitle")
+        XCTAssertEqual(item.text, "aText")
+        XCTAssertEqual(item.preference, Item.Preference.highest)
+        XCTAssertEqual(item.url, url)
+        XCTAssertEqual(item.imageURL, imageURL)
     }
 
     func testImaginable() throws {

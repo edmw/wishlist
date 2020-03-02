@@ -67,6 +67,7 @@ extension DomainUserListsActor {
                             }
                     }
             }
+            .logError(.deleteListError, using: self.logging)
     }
 
 }
@@ -74,6 +75,13 @@ extension DomainUserListsActor {
 // MARK: Logging
 
 extension LoggingMessageRoot {
+
+    fileprivate static var deleteListError: LoggingMessageRoot<Error> {
+        return .init({ error in
+            LoggingMessage(label: "Delete List", subject: error, level: .error)
+        })
+    }
+
 
     fileprivate static func deleteList(with id: ListID?) -> LoggingMessageRoot<List> {
         return .init({ list in

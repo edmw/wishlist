@@ -74,4 +74,28 @@ extension EventLoopFuture {
         }
     }
 
+    /// Logs a `LoggingMessage` using this future‘s error as logging subject to the specified
+    /// `MessageLogging`. The specified `LoggingMessageRoot` is used to create the logging message
+    /// from this future‘s error.
+    /// - Parameter root: Factory to create a logging message from this future‘s error.
+    /// - Parameter logging: Logging target to log into.
+    /// - Parameter file: #file
+    /// - Parameter function: #function
+    /// - Parameter line: #line
+    /// - Parameter column: #column
+    func logError(
+        _ root: LoggingMessageRoot<Error>,
+        using logging: MessageLogging,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line,
+        column: UInt = #column
+    ) -> EventLoopFuture<Expectation> {
+        return self.thenIfErrorThrowing { error in
+            let message = root.transform(error)
+            logging.message(message, file: file, function: function, line: line, column: column)
+            throw error
+        }
+    }
+
 }

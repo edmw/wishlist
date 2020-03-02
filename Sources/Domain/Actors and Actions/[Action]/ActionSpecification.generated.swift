@@ -218,7 +218,7 @@ extension GetItems.Specification {
     public static func specification(
           userBy userid: UserID,
           listBy listid: ListID,
-          with sorting: ItemsSorting
+          with sorting: ItemsSorting?
     ) -> Self {
         return Self(
             userID: userid,

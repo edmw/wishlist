@@ -39,7 +39,8 @@ extension EventLoopFuture {
         return self.thenIfError { inputError in
             do {
                 return try callback(inputError)
-            } catch {
+            }
+            catch {
                 return self.eventLoop.newFailedFuture(error: error)
             }
         }

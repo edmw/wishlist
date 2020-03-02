@@ -16,7 +16,7 @@ public final class GetItems: Action {
     public struct Specification: AutoActionSpecification {
         public let userID: UserID
         public let listID: ListID
-        public let sorting: ItemsSorting
+        public let sorting: ItemsSorting?
     }
 
     // MARK: Result
@@ -60,7 +60,7 @@ extension DomainUserItemsActor {
                         return try self.itemRepresentationsBuilder
                             .reset()
                             .forList(list)
-                            .withSorting(specification.sorting)
+                            .withSorting(specification.sorting ?? list.itemsSorting)
                             .build(on: worker)
                             .map { items in
                                 .init(user.representation, list.representation, items: items)

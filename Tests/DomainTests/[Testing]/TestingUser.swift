@@ -11,7 +11,7 @@ extension User {
         let firstName = Lorem.randomFirstName()
         let lastName = Lorem.randomLastName()
         var values = PartialValues<UserValues>()
-        values[\.email] = EmailSpecification("\(lastName)@email.invalid")
+        values[\.email] = "\(lastName)@email.invalid"
         values[\.fullName] = "\(firstName) \(lastName)"
         values[\.firstName] = firstName
         values[\.lastName] = lastName

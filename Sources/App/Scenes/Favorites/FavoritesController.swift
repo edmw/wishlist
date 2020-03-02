@@ -17,8 +17,7 @@ final class FavoritesController: AuthenticatableController, SortingController, R
     private func renderView(on request: Request) throws -> EventLoopFuture<View> {
         let userid = try requireAuthenticatedUserID(on: request)
 
-        let sorting = getSorting(on: request) ?? .ascending(by: \List.title)
-
+        let sorting = getSorting(on: request)
         return try userFavoritesActor
             .getFavorites(
                 .specification(userBy: userid, with: sorting),

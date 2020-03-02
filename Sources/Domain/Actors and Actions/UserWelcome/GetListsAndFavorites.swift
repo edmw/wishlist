@@ -55,7 +55,6 @@ extension DomainUserWelcomeActor {
             .flatMap { user in
                 let lists = try ListRepresentationsBuilder(listRepository, itemRepository)
                     .forUser(user)
-                    .withSorting(.ascending(by: \List.title))
                     .includeItemsCount(true)
                     .build(on: worker)
                 let favorites = try FavoriteRepresentationsBuilder(
@@ -64,7 +63,6 @@ extension DomainUserWelcomeActor {
                         itemRepository
                     )
                     .forUser(user)
-                    .withSorting(.ascending(by: \List.title))
                     .includeItemsCount(true)
                     .build(on: worker)
                 return lists.flatMap { lists in

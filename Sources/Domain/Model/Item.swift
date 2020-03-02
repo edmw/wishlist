@@ -146,7 +146,11 @@ public final class Item: ItemModel, Imageable,
 
     // MARK: - Preference
 
-    public enum Preference: Int, Codable, LosslessStringConvertible, CustomStringConvertible {
+    public enum Preference: Int,
+        Codable,
+        LosslessStringConvertible,
+        CustomStringConvertible
+    {
 
         case lowest = -2
         case low = -1
@@ -165,8 +169,6 @@ public final class Item: ItemModel, Imageable,
                 return nil
             }
         }
-
-        // MARK: CustomStringConvertible
 
         public var description: String {
             switch self {

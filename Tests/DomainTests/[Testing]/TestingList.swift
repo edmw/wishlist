@@ -10,8 +10,8 @@ extension List {
     static func randomListValues() -> ListValues {
         var values = PartialValues<ListValues>()
         values[\.title] = Lorem.randomTitle()
-        values[\.visibility] = .´public´
-        values[\.options] = []
+        values[\.visibility] = [ "private", "public", "users", "friends" ].randomElement()
+        values[\.options] = nil
         return try! ListValues(values)
     }
 

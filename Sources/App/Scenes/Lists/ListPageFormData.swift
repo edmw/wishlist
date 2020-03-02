@@ -5,7 +5,6 @@ import Vapor
 /// This structures holds all the input given by the user into the list form.
 /// In contrast to `ListRepresentation` and `ListData` this contains only editable properties.
 struct ListPageFormData: Content {
-    // swiftlint:disable discouraged_optional_boolean
 
     let inputTitle: String
     let inputVisibility: String
@@ -31,20 +30,13 @@ struct ListPageFormData: Content {
 extension ListValues {
 
     init(from formdata: ListPageFormData) {
-        let itemsSorting: ItemsSorting?
-        if let inputItemsSorting = formdata.inputItemsSorting {
-            itemsSorting = ItemsSorting(inputItemsSorting)
-        }
-        else {
-            itemsSorting = nil
-        }
         self.init(
             title: formdata.inputTitle,
             visibility: formdata.inputVisibility,
             createdAt: nil,
             modifiedAt: nil,
             maskReservations: formdata.inputMaskReservations ?? false,
-            itemsSorting: itemsSorting,
+            itemsSorting: formdata.inputItemsSorting,
             items: nil
         )
     }

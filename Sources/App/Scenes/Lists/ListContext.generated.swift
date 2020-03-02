@@ -1,9 +1,15 @@
+// sourcery:inline:ListRepresentation.AutoRepresentationContext
+
+// MARK: DO NOT EDIT
+
 import Domain
 
 import Foundation
 
-/// Type which is used in a render context of a page. The reason why `ListRepresentation` is not
-/// used directly is, the id property has to be converted from `ListID` to `ID`.
+// MARK: ListContext
+
+/// Type which is used in a render context of a page.
+/// Encodes a `ListRepresentation` while converting typed IDs to `ID`.
 struct ListContext: Encodable {
 
     let list: ListRepresentation
@@ -17,8 +23,8 @@ struct ListContext: Encodable {
         case createdAt
         case modifiedAt
         case maskReservations
-        case itemsSorting
         case ownerName
+        case itemsSorting
         case itemsCount
     }
 
@@ -30,8 +36,8 @@ struct ListContext: Encodable {
         try container.encode(list.createdAt, forKey: .createdAt)
         try container.encode(list.modifiedAt, forKey: .modifiedAt)
         try container.encode(list.maskReservations, forKey: .maskReservations)
-        try container.encode(list.itemsSorting, forKey: .itemsSorting)
         try container.encode(list.ownerName, forKey: .ownerName)
+        try container.encode(list.itemsSorting, forKey: .itemsSorting)
         try container.encode(list.itemsCount, forKey: .itemsCount)
     }
 
@@ -48,3 +54,4 @@ struct ListContext: Encodable {
     }
 
 }
+// sourcery:end

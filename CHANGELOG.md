@@ -10,6 +10,12 @@
 ## [..]
 - 🎁 Add functionality to move items between wishlists
 
+## [1.4.2]
+- 🛠️ Add code generation for Representation Context types
+- 🛠️ Refactor Values types
+- ☘ Fix sort order of items
+- ☘ Fix lost data at list import
+
 ## [1.4.1]
 - 🛠️ Introduce code generation
 - 🛠️ Introduce structured logging

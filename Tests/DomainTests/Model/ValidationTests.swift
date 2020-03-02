@@ -27,8 +27,8 @@ final class ValidationTests: XCTestCase, HasAllTests {
     struct Values: ValueValidatable {
 
         var lengthLimitedAlphanumericString: String
-        var notNilAndValidEmailSpecification: EmailSpecification?
         var notNilAndValidPushoverKey: PushoverKey?
+        var notNilAndValidEmail: String?
         var nilOrURL: String?
         var notEmptyList: [String]
 
@@ -40,14 +40,14 @@ final class ValidationTests: XCTestCase, HasAllTests {
                 .count(5...) && .alphanumeric
             )
             validations.add(
-                \.notNilAndValidEmailSpecification,
-                "notNilAndValidEmailSpecification",
-                !.nil && .emailSpecification
-            )
-            validations.add(
                 \.notNilAndValidPushoverKey,
                 "notNilAndValidPushoverKey",
                 .pushoverKey && !.nil
+            )
+            validations.add(
+                \.notNilAndValidEmail,
+                "notNilAndValidEmail",
+                !.nil && .email
             )
             validations.add(
                 \.nilOrURL,
@@ -67,8 +67,8 @@ final class ValidationTests: XCTestCase, HasAllTests {
     func testValidate() throws {
         let values = Values(
             lengthLimitedAlphanumericString: "ABCDEF",
-            notNilAndValidEmailSpecification: EmailSpecification(string: "someone@somewhere.us"),
             notNilAndValidPushoverKey: PushoverKey(string: "012345678901234567890123456789"),
+            notNilAndValidEmail: "someone@somewhere.us",
             nilOrURL: nil,
             notEmptyList: ["1","2"]
         )
@@ -78,23 +78,23 @@ final class ValidationTests: XCTestCase, HasAllTests {
     func testValidateWithErrors() throws {
         let values = Values(
             lengthLimitedAlphanumericString: "ABC",
-            notNilAndValidEmailSpecification: EmailSpecification(string: "someone@@somewhere.us"),
             notNilAndValidPushoverKey: PushoverKey(string: "0123456789"),
+            notNilAndValidEmail: "someone@@somewhere.us",
             nilOrURL: "notanurl",
             notEmptyList: []
         )
         assert(
             try values.validateValues(),
             throws: ValueValidationErrors<ValidationTests.Values>.self,
-            reflection: .equals("Value validation failed on 'lengthLimitedAlphanumericString' with 'is less than required minimum of 5', Value validation failed on 'nilOrURL' with 'is not nil and is not a valid URL', Value validation failed on 'notEmptyList' with 'is empty', Value validation failed on 'notNilAndValidEmailSpecification' with 'is not a valid email specification (pattern)', Value validation failed on 'notNilAndValidPushoverKey' with 'is not a valid pushover key (pattern)'")
+            reflection: .equals("Value validation failed on 'lengthLimitedAlphanumericString' with 'is less than required minimum of 5', Value validation failed on 'nilOrURL' with 'is not nil and is not a valid URL', Value validation failed on 'notEmptyList' with 'is empty', Value validation failed on 'notNilAndValidEmail' with 'is not a valid email (pattern)', Value validation failed on 'notNilAndValidPushoverKey' with 'is not a valid pushover key (pattern)'")
         )
     }
 
     func testValidateWithFailedKeyPaths() throws {
         let values = Values(
             lengthLimitedAlphanumericString: "ABCDEF",
-            notNilAndValidEmailSpecification: EmailSpecification(string: "someone@@somewhere.us"),
             notNilAndValidPushoverKey: PushoverKey(string: "012345678901234567890123456789"),
+            notNilAndValidEmail: "someone@@somewhere.us",
             nilOrURL: "notanurl",
             notEmptyList: []
         )
@@ -105,7 +105,7 @@ final class ValidationTests: XCTestCase, HasAllTests {
             assertSameElements(
                 error.failedKeyPaths,
                 [
-                    \Values.notNilAndValidEmailSpecification,
+                    \Values.notNilAndValidEmail,
                     \Values.nilOrURL,
                     \Values.notEmptyList
                 ]

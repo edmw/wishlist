@@ -6,7 +6,6 @@ import Vapor
 /// In contrast to `InvitationRepresentation` and `InvitationData` this contains only
 /// editable properties.
 struct InvitationPageFormData: Content {
-    // swiftlint:disable discouraged_optional_boolean
 
     let inputEmail: String
     let inputSendEmail: Bool?

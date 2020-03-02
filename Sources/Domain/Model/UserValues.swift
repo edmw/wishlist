@@ -3,36 +3,38 @@ import NIO
 
 // MARK: UserValues
 
-/// Representation of a user with external properties only and with simple types.
+/// Representation of a user with external properties and basic types, only.
 /// Used for validation, importing and exporting.
 public struct UserValues: Values, ValueValidatable {
 
-    public var email: EmailSpecification
+    public var email: String
     public var fullName: String
     public var firstName: String
     public var lastName: String
     public var nickName: String?
-    public var language: LanguageTag?
-    public var picture: URL?
+    public var language: String?
+    public var picture: String?
 
     public var confidant: Bool
 
     public var firstLogin: Date?
     public var lastLogin: Date?
 
+    /// Creates user values from the model type.
     init(_ user: User) {
-        self.email = user.email
+        self.email = String(user.email)
         self.fullName = user.fullName
         self.firstName = user.firstName
         self.lastName = user.lastName
         self.nickName = user.nickName
-        self.language = user.language
-        self.picture = user.picture
+        self.language = user.language.flatMap(String.init)
+        self.picture = user.picture?.absoluteString
         self.confidant = user.confidant
         self.firstLogin = user.firstLogin
         self.lastLogin = user.lastLogin
     }
 
+    /// Creates list values from partital list values.
     init(_ values: PartialValues<UserValues>) throws {
         self.email = try values.value(for: \.email)
         self.fullName = try values.value(for: \.fullName)
@@ -104,28 +106,28 @@ extension User {
 
     convenience init(from data: UserValues) throws {
         self.init(
-            email: data.email,
+            email: EmailSpecification(data.email),
             fullName: data.fullName,
             firstName: data.firstName,
             lastName: data.lastName
         )
         self.nickName = data.nickName
-        self.language = data.language
-        self.picture = data.picture
+        self.language = data.language.flatMap(LanguageTag.init)
+        self.picture = data.picture.flatMap(URL.init)
         self.confidant = data.confidant
         self.firstLogin = data.firstLogin
         self.lastLogin = data.lastLogin
     }
 
     func update(from data: UserValues) throws {
-        self.email = data.email
+        self.email = EmailSpecification(data.email)
         self.fullName = data.fullName
         self.firstName = data.firstName
         self.lastName = data.lastName
         self.confidant = data.confidant
         self.nickName = data.nickName
-        self.language = data.language
-        self.picture = data.picture
+        self.language = data.language.flatMap(LanguageTag.init)
+        self.picture = data.picture.flatMap(URL.init)
         self.confidant = data.confidant
         self.firstLogin = data.firstLogin
         self.lastLogin = data.lastLogin

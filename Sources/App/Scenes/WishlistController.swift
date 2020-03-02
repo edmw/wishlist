@@ -41,8 +41,9 @@ final class WishlistController: AuthenticatableController,
     private func renderView(on request: Request) throws -> EventLoopFuture<View> {
         let identification = try requireIdentification(on: request)
         let userid = try authenticatedUserID(on: request)
+
         let listid = try requireListID(on: request)
-        let sorting = getSorting(on: request) ?? .ascending(by: \Item.title)
+        let sorting = getSorting(on: request)
         return try wishlistActor
             .presentWishlist(
                 .specification(listid, with: sorting, for: identification, userBy: userid),

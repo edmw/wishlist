@@ -12,7 +12,7 @@ struct NetIDAuthenticationUserInfo: AuthenticationUserInfo, Content, Validatable
     var name: String {
         return [givenName, familyName].joined(separator: " ")
     }
-    var picture: URL? {
+    var picture: String? {
         return nil
     }
     var language: String? {

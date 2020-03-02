@@ -37,8 +37,10 @@ class ItemRepresentationsBuilder {
     }
 
     @discardableResult
-    func withSorting(_ sorting: ItemsSorting) -> Self {
-        self.sorting = sorting
+    func withSorting(_ sorting: ItemsSorting?) -> Self {
+        if let sorting = sorting {
+            self.sorting = sorting
+        }
         return self
     }
 

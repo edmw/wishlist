@@ -105,7 +105,14 @@ public final class List: ListModel, Viewable,
 
     // MARK: - Options
 
-    public struct Options: OptionSet, Codable, Equatable, Hashable {
+    public struct Options: OptionSet,
+        Codable,
+        Equatable,
+        Hashable,
+        LosslessStringConvertible,
+        CustomStringConvertible
+    {
+
         public let rawValue: Int16
 
         public static let maskReservations = List.Options(rawValue: 1 << 0)
@@ -113,6 +120,18 @@ public final class List: ListModel, Viewable,
         public init(rawValue: Int16) {
             self.rawValue = rawValue
         }
+
+        public init?(_ description: String) {
+            guard let rawValue = Int16(description) else {
+                return nil
+            }
+            self.rawValue = rawValue
+        }
+
+        public var description: String {
+            return String(rawValue)
+        }
+
     }
 
 }

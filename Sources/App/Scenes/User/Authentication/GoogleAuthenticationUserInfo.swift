@@ -9,7 +9,7 @@ struct GoogleAuthenticationUserInfo: AuthenticationUserInfo, Content, Validatabl
     let name: String
     let givenName: String
     let familyName: String
-    let picture: URL?
+    let picture: String?
     let locale: String
 
     var language: String? {

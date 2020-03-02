@@ -4,7 +4,6 @@ import Vapor
 
 /// This structures holds all the input given by the user into the settings form.
 struct SettingsPageFormData: Content {
-    // swiftlint:disable discouraged_optional_boolean
 
     let inputEmail: Bool?
 

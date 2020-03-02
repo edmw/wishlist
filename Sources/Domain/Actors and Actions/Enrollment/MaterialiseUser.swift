@@ -211,7 +211,7 @@ extension DomainEnrollmentActor {
 extension LoggingMessage {
 
     fileprivate static func userCreationNotAllowed(
-        _ email: EmailSpecification?
+        _ email: String?
     ) -> LoggingMessage {
         let message = "Authentication for user denied: User Creation Not Allowed."
         return Self(
@@ -222,7 +222,7 @@ extension LoggingMessage {
     }
 
     fileprivate static func invitationForUserCreationNotProvided(
-        _ email: EmailSpecification?,
+        _ email: String?,
         _ invitationCode: InvitationCode?
     ) -> LoggingMessage {
         let message = "Authentication for user denied: Invitation for User Creation not provided."

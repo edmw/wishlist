@@ -1,9 +1,15 @@
+// sourcery:inline:ItemRepresentation.AutoRepresentationContext
+
+// MARK: DO NOT EDIT
+
 import Domain
 
 import Foundation
 
-/// Type which is used in a render context of a page. The reason why `ItemRepresentation` is not
-/// used directly is, the id property has to be converted from `ItemID` to `ID`.
+// MARK: ItemContext
+
+/// Type which is used in a render context of a page.
+/// Encodes a `ItemRepresentation` while converting typed IDs to `ID`.
 struct ItemContext: Encodable {
 
     let item: ItemRepresentation
@@ -52,3 +58,4 @@ struct ItemContext: Encodable {
     }
 
 }
+// sourcery:end

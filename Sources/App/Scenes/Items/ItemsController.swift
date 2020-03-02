@@ -22,7 +22,7 @@ final class ItemsController: AuthenticatableController,
         let userid = try requireAuthenticatedUserID(on: request)
         let listid = try requireListID(on: request)
 
-        let sorting = getSorting(on: request) ?? .ascending(by: \Item.title)
+        let sorting = getSorting(on: request)
         return try userItemsActor
             .getItems(
                 .specification(userBy: userid, listBy: listid, with: sorting),
