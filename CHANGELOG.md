@@ -11,10 +11,14 @@
 - 🎁 Add functionality to move items between wishlists
 
 ## [1.4.2]
+- 🛠️ Add Swift Backtrace to automatically printing crash backtraces
 - 🛠️ Add code generation for Representation Context types
+- 🛠️ Add code generation for Domain String Value types on Linux
 - 🛠️ Refactor Values types
+- ☘ Fix references on fluent models
 - ☘ Fix sort order of items
 - ☘ Fix lost data at list import
+- ☘ Fix closures for converting in Values types on Linux
 
 ## [1.4.1]
 - 🛠️ Introduce code generation

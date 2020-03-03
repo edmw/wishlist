@@ -14,20 +14,6 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Wishlist::Run"
-               BuildableName = "Run"
-               BlueprintName = "Run"
-               ReferencedContainer = "container:Wishlist.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "Wishlist::App"
                BuildableName = "App.framework"
                BlueprintName = "App"
@@ -42,9 +28,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Wishlist::Tooling"
-               BuildableName = "Tooling.framework"
-               BlueprintName = "Tooling"
+               BlueprintIdentifier = "Wishlist::Run"
+               BuildableName = "Run"
+               BlueprintName = "Run"
                ReferencedContainer = "container:Wishlist.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -59,6 +45,20 @@
                BlueprintIdentifier = "Wishlist::Library"
                BuildableName = "Library.framework"
                BlueprintName = "Library"
+               ReferencedContainer = "container:Wishlist.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Wishlist::Tooling"
+               BuildableName = "Tooling.framework"
+               BlueprintName = "Tooling"
                ReferencedContainer = "container:Wishlist.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -102,16 +102,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Wishlist::LibraryTests"
-               BuildableName = "LibraryTests.xctest"
-               BlueprintName = "LibraryTests"
-               ReferencedContainer = "container:Wishlist.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "Wishlist::AppTests"
                BuildableName = "AppTests.xctest"
                BlueprintName = "AppTests"
@@ -125,6 +115,16 @@
                BlueprintIdentifier = "Wishlist::DomainTests"
                BuildableName = "DomainTests.xctest"
                BlueprintName = "DomainTests"
+               ReferencedContainer = "container:Wishlist.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Wishlist::LibraryTests"
+               BuildableName = "LibraryTests.xctest"
+               BlueprintName = "LibraryTests"
                ReferencedContainer = "container:Wishlist.xcodeproj">
             </BuildableReference>
          </TestableReference>

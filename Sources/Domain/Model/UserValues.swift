@@ -112,8 +112,8 @@ extension User {
             lastName: data.lastName
         )
         self.nickName = data.nickName
-        self.language = data.language.flatMap(LanguageTag.init)
-        self.picture = data.picture.flatMap(URL.init)
+        self.language = data.language.flatMap(LanguageTag.init(string:))
+        self.picture = data.picture.flatMap(URL.init(string:))
         self.confidant = data.confidant
         self.firstLogin = data.firstLogin
         self.lastLogin = data.lastLogin
@@ -126,8 +126,8 @@ extension User {
         self.lastName = data.lastName
         self.confidant = data.confidant
         self.nickName = data.nickName
-        self.language = data.language.flatMap(LanguageTag.init)
-        self.picture = data.picture.flatMap(URL.init)
+        self.language = data.language.flatMap(LanguageTag.init(string:))
+        self.picture = data.picture.flatMap(URL.init(string:))
         self.confidant = data.confidant
         self.firstLogin = data.firstLogin
         self.lastLogin = data.lastLogin

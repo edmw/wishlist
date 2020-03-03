@@ -82,7 +82,6 @@ extension LoggingMessageRoot {
         })
     }
 
-
     fileprivate static func deleteList(with id: ListID?) -> LoggingMessageRoot<List> {
         return .init({ list in
             LoggingMessage(label: "Delete List", subject: list, loggables: [id])

@@ -247,7 +247,7 @@ struct AddListForeignKeyConstraint: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(FluentList.self, on: connection) { builder in
-            builder.reference(from: \.userID, to: \FluentUser.id, onDelete: .cascade)
+            builder.reference(from: \.userKey, to: \FluentUser.uuid, onDelete: .cascade)
         }
     }
 
@@ -311,7 +311,7 @@ struct AddItemForeignKeyConstraint: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(FluentItem.self, on: connection) { builder in
-            builder.reference(from: \.listKey, to: \FluentList.id, onDelete: .cascade)
+            builder.reference(from: \.listKey, to: \FluentList.uuid, onDelete: .cascade)
         }
     }
 
@@ -371,7 +371,7 @@ struct AddReservationForeignKeyConstraint: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return Database.update(FluentReservation.self, on: connection) { builder in
-            builder.reference(from: \.itemID, to: \FluentItem.id, onDelete: .cascade)
+            builder.reference(from: \.itemKey, to: \FluentItem.uuid, onDelete: .cascade)
         }
     }
 

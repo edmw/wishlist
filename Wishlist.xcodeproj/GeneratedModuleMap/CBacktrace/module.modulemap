@@ -1,0 +1,4 @@
+module CBacktrace {
+    umbrella "/Users/Michael/Webdaten/Dropbox/MiB Wepapp Wishlist/.build/checkouts/swift-backtrace/Sources/CBacktrace/include"
+    export *
+}

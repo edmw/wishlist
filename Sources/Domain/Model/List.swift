@@ -121,11 +121,15 @@ public final class List: ListModel, Viewable,
             self.rawValue = rawValue
         }
 
-        public init?(_ description: String) {
-            guard let rawValue = Int16(description) else {
+        public init?(string: String) {
+            guard let rawValue = Int16(string) else {
                 return nil
             }
             self.rawValue = rawValue
+        }
+
+        public init?(_ description: String) {
+            self.init(string: description)
         }
 
         public var description: String {

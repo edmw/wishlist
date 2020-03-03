@@ -62,14 +62,14 @@ extension DomainStringValue {
 
     // MARK: Codable
 
-    /// Decodes the pushover key from a single value aka string.
+    /// Decodes the string value from a single value aka string.
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let value = try container.decode(String.self)
         self.init(string: value)
     }
 
-    /// Encodes the pushover key into a single value aka string.
+    /// Encodes the string value into a single value aka string.
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(rawValue)

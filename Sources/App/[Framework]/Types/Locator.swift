@@ -2,7 +2,7 @@ import Vapor
 
 import Foundation
 
-struct Locator: CustomStringConvertible, Codable {
+struct Locator: CustomStringConvertible, Codable, Hashable {
 
     let url: URL
 

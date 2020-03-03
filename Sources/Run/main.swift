@@ -1,9 +1,14 @@
 import App
 import Service
 import Vapor
+
 import Foundation
 
+import Backtrace
+
 do {
+    Backtrace.install()
+
     // update shell environment from dotenv file
     Environment.dotenv()
 

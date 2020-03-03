@@ -25,7 +25,8 @@ let package = Package(
         .package(url: "https://github.com/edmw/Lingo.git", .branch("edmw")),
         .package(url: "https://github.com/LiveUI/VaporTestTools.git", from: "0.1.7"),
         .package(url: "https://github.com/IBM-Swift/LoggerAPI.git", .exact("1.8.0")),
-        .package(url: "https://github.com/IBM-Swift/Swift-SMTP", .exact("5.1.0"))
+        .package(url: "https://github.com/IBM-Swift/Swift-SMTP", .exact("5.1.0")),
+        .package(url: "https://github.com/ianpartridge/swift-backtrace.git", from: "1.1.1")
     ],
     targets: [
         .target(
@@ -64,7 +65,8 @@ let package = Package(
         .target(
             name: "Run",
             dependencies: [
-                "App"
+                "App",
+                "Backtrace"
             ]
         ),
         .target(

@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: ImageStoreLocator
 
-public struct ImageStoreLocator: Codable, Hashable {
+public struct ImageStoreLocator: CustomStringConvertible, Codable, Hashable {
 
     public let url: URL
 
@@ -11,6 +11,12 @@ public struct ImageStoreLocator: Codable, Hashable {
     }
 
     public var absoluteString: String {
+        return url.absoluteString
+    }
+
+    // MARK: CustomStringConvertible
+
+    public var description: String {
         return url.absoluteString
     }
 

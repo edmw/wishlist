@@ -79,8 +79,8 @@ extension Invitation {
 
     convenience init(for user: User, from data: InvitationValues) throws {
         try self.init(
-            code: data.code.flatMap(InvitationCode.init),
-            status: data.status.flatMap(Invitation.Status.init),
+            code: data.code.flatMap(InvitationCode.init(string:)),
+            status: data.status.flatMap(Invitation.Status.init(string:)),
             email: EmailSpecification(data.email),
             sentAt: data.sentAt,
             user: user

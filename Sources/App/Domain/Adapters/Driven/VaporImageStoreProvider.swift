@@ -120,6 +120,7 @@ struct VaporImageStoreProvider: ImageStoreProvider {
                                 deleteParentsIfEmpty: true,
                                 on: container
                             )
+                            container.logger?.debug("ImagesCleanupJob: delete \(imagestorelocator)")
                         }
                     }
                     imageFileMiddleware.purgeDirectories(on: container)

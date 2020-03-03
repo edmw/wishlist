@@ -81,7 +81,7 @@ public struct ListValues: Values, ValueValidatable {
         self.visibility = visibility
         self.createdAt = createdAt
         self.modifiedAt = modifiedAt
-        var options = options.flatMap(List.Options.init) ?? []
+        var options = options.flatMap(List.Options.init(string:)) ?? []
         if let maskReservations = maskReservations {
             if maskReservations == true {
                 options = options.union([.maskReservations])
@@ -182,7 +182,7 @@ extension List {
         }
         title = Title(data.title)
         visibility = Visibility(data.visibility) ?? .´private´
-        options = data.options.flatMap(List.Options.init) ?? []
+        options = data.options.flatMap(List.Options.init(string:)) ?? []
         itemsSorting = data.itemsSorting.flatMap { ItemsSorting($0) }
     }
 

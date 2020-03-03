@@ -1,0 +1,40 @@
+// sourcery:inline:DomainStringValue.Linux
+#if os(Linux)
+
+// MARK: DO NOT EDIT
+{#
+This template generates generic methods for `DomainStringValue` types. This is
+necessary for Linux because the compiler will no honor the implementation in the
+protocol extension of `DomainStringValue`.
+#}
+
+// Explicit implementation for conformance with
+// - `ExpressibleByStringLiteral`
+// - `LosslessStringConvertible`
+// - `Collection`
+
+{% for type in types.implementing.DomainStringValue|struct %}
+// MARK: {{type.name}}
+
+extension {{type.name}} {
+
+    public init(stringLiteral value: String) {
+        self.init(string: value)
+    }
+
+    public init(_ description: String) {
+        self.init(string: description)
+    }
+
+    public var startIndex: String.Index { return rawValue.startIndex }
+    public var endIndex: String.Index { return rawValue.endIndex }
+
+    public subscript(index: String.Index) -> String.Element { rawValue[index] }
+
+    public func index(after index: String.Index) -> String.Index { rawValue.index(after: index) }
+
+}
+
+{% endfor %}
+#endif
+// sourcery:end

@@ -159,8 +159,8 @@ extension Item {
             preference: Item.Preference(data.preference) ?? .normal,
             list: list
         )
-        self.url = data.url.flatMap(URL.init)
-        self.imageURL = data.imageURL.flatMap(URL.init)
+        self.url = data.url.flatMap(URL.init(string:))
+        self.imageURL = data.imageURL.flatMap(URL.init(string:))
     }
 
     func update(for list: List, from data: ItemValues) throws {
@@ -170,8 +170,8 @@ extension Item {
         title = Title(data.title)
         text = Text(data.text)
         preference = Item.Preference(data.preference) ?? .normal
-        url = data.url.flatMap(URL.init)
-        imageURL = data.imageURL.flatMap(URL.init)
+        url = data.url.flatMap(URL.init(string:))
+        imageURL = data.imageURL.flatMap(URL.init(string:))
     }
 
 }
