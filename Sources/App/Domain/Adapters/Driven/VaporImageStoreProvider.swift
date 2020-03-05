@@ -220,6 +220,10 @@ struct VaporImageStoreProvider: ImageStoreProvider {
             on container: Container,
             worker: EventLoop
         ) throws -> EventLoopFuture<Void>? {
+            guard item.imageURL != nil else {
+                logger.debug("\(self): skipping \(item) [noimage]")
+                return nil
+            }
             guard let itemid = item.id else {
                 logger.debug("\(self): skipping \(item) [noid]")
                 return nil
