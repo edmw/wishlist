@@ -12,12 +12,12 @@ final class SendMessageJob: DispatchableJob<SendMessageResult> {
         on container: Container,
         at date: Date = Date(),
         before deadline: Date = .distantFuture
-    ) {
+    ) throws {
         self.message = message
-        super.init(on: container, at: date, before: deadline)
+        try super.init(on: container, at: date, before: deadline)
     }
 
-    override func run(_ context: JobContext) -> EventLoopFuture<SendMessageResult> {
+    override func work(_ context: JobContext) -> EventLoopFuture<SendMessageResult> {
         let container = context.container
 
         return message.messagings(on: container).flatMap { messagings in

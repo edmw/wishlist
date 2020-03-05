@@ -12,6 +12,8 @@ final class ImageFileMiddleware: Middleware, ServiceType {
     let imagesDirectory: String
     let imagesDirectoryURL: URL
 
+    let fileManager: FileManager
+
     /// Initializes a ImageFileMiddleware with the specified path in the image urls and
     /// the specified directory containing the images to handle.
     /// Must be absolute paths!
@@ -19,6 +21,7 @@ final class ImageFileMiddleware: Middleware, ServiceType {
         self.imagesPath = path.hasSuffix("/") ? path : path + "/"
         self.imagesDirectory = directory.hasSuffix("/") ? directory : directory + "/"
         self.imagesDirectoryURL = URL(fileURLWithPath: imagesDirectory, isDirectory: true)
+        self.fileManager = FileManager.default
     }
 
     func respond(to request: Request, chainingTo next: Responder) throws
@@ -31,19 +34,16 @@ final class ImageFileMiddleware: Middleware, ServiceType {
         }
         path = String(path.dropFirst(self.imagesPath.count))
 
-        guard !path.hasPrefix("/") else {
-            throw Abort(.forbidden)
-        }
-        guard !path.contains("../") else {
+        guard !path.hasPrefix("/")
+           && !path.contains("../")
+        else {
             throw Abort(.forbidden)
         }
 
         let filePath = imagesDirectory + path
 
-        var isDir: ObjCBool = false
-        guard FileManager.default
-            .fileExists(atPath: filePath, isDirectory: &isDir), !isDir.boolValue else {
-                return try next.respond(to: request)
+        guard self.fileManager.itemExistsAndIsFile(atPath: filePath) else {
+            return try next.respond(to: request)
         }
 
         return try request.streamFile(at: filePath)
@@ -125,19 +125,18 @@ final class ImageFileMiddleware: Middleware, ServiceType {
         deleteParentsIfEmpty: Bool = false,
         on container: Container
     ) throws {
-        let fileManager = FileManager.default
         let fileDirectoryURL = try buildDirectory(for: key, and: groupkeys)
         guard fileDirectoryURL.hasPrefix(self.imagesDirectoryURL) else {
             throw ImageFileMiddlewareError.invalidFileURL(fileDirectoryURL)
         }
         do {
-            try fileManager.removeFiles(
+            try self.fileManager.removeFiles(
                 at: fileDirectoryURL,
                 in: self.imagesDirectoryURL,
                 extensions: ImageFileMiddleware.supportedMediaTypes
             )
             if deleteParentsIfEmpty {
-                try fileManager.removeDirectories(
+                try self.fileManager.removeDirectories(
                     at: fileDirectoryURL,
                     in: self.imagesDirectoryURL
                 )
@@ -162,8 +161,8 @@ final class ImageFileMiddleware: Middleware, ServiceType {
             isDirectory: true,
             relativeTo: self.imagesDirectoryURL
         )
-        if create && !FileManager.default.fileExists(atPath: fileGroupDirectoryURL.path) {
-            try FileManager.default.createDirectory(
+        if create && !self.fileManager.fileExists(atPath: fileGroupDirectoryURL.path) {
+            try self.fileManager.createDirectory(
                 at: fileGroupDirectoryURL,
                 withIntermediateDirectories: true,
                 attributes: nil
@@ -174,8 +173,8 @@ final class ImageFileMiddleware: Middleware, ServiceType {
             isDirectory: true,
             relativeTo: fileGroupDirectoryURL
         )
-        if create && !FileManager.default.fileExists(atPath: fileDirectoryURL.path) {
-            try FileManager.default.createDirectory(
+        if create && !self.fileManager.fileExists(atPath: fileDirectoryURL.path) {
+            try self.fileManager.createDirectory(
                 at: fileDirectoryURL,
                 withIntermediateDirectories: true,
                 attributes: nil
@@ -187,7 +186,7 @@ final class ImageFileMiddleware: Middleware, ServiceType {
     /// Checks if an image with the specified name does exist in the specified directory.
     /// The given name is meant to have no path extension. 
     private func imageExists(name: String, in directory: URL) throws -> Bool {
-        return try FileManager.default
+        return try self.fileManager
             .contentsOfDirectory(
                 at: directory,
                 includingPropertiesForKeys: [],
@@ -204,7 +203,7 @@ final class ImageFileMiddleware: Middleware, ServiceType {
     private func writeData(from response: Response, to url: URL, on container: Container) throws
         -> EventLoopFuture<Bool>
     {
-        if try FileManager.default.createFile(
+        if try self.fileManager.createFile(
             at: url,
             in: self.imagesDirectoryURL,
             permissions: 0o664

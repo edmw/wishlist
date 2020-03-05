@@ -5,7 +5,7 @@ import Foundation
 // MARK: DispatchingService
 
 /// Service to schedule tasks.
-final class DispatchingService: Service {
+final class DispatchingService: Service, CustomStringConvertible {
 
     /// Jobs queue sorted ascending by scheduling date
     private var queue = DispatchingQueue(sort: { lhs, rhs in
@@ -77,7 +77,7 @@ final class DispatchingService: Service {
                 .catch { error in
                     // jobs are executed in the background with no user interface,
                     // so catch and log all possible errors
-                    logger.error("Dispatching: Failed with \(error)")
+                    logger.error("\(self): Failed with \(error)")
                 }
         }
     }
@@ -121,21 +121,37 @@ final class DispatchingService: Service {
 
         // check if the deadline of the job is elapsed
         if job.deadline < date {
-            logger.info("Dispatching: Job \(job) overdue")
+            logger.info("\(self): Job \(job) overdue")
             return job.overdue(context)
         }
 
         // execute job
-        logger.info("Dispatching: Running \(job)")
+        return execute(job, in: context)
+    }
+
+    /// Executes the specified job in the specified job context.
+    ///
+    /// - Parameter job: job to be executed
+    /// - Parameter context: context for the execution of the job
+    ///
+    /// Do **not** call this method on jobs which are enqueued in a job queue. This will result
+    /// in an illegal state of the job queue.
+    func execute<J: Job & Equatable & CustomStringConvertible>(_ job: J, in context: JobContext)
+        -> EventLoopFuture<Void>
+    {
+        context.logger.info("\(self): Execute \(job)")
         return job.run(context)
             .flatMap { result in
+                context.logger.info("\(self): \(job) succeeded with result: \(result)")
                 return job.success(context, result)
             }
             .catchFlatMap { error in
-                logger.error("Dispatching: Job \(job) failed with \(error)")
+                context.logger.error("\(self): \(job) failed with error: \(error)")
                 return job.failure(context, error)
             }
     }
+
+    // MARK: DNA
 
     // "I love deadlines. I like the whooshing sound they make as they fly by."
     func scheduleDNA() throws -> RepeatedTask {
@@ -171,7 +187,7 @@ final class DispatchingService: Service {
             let context = JobContext(eventLoop: eventLoop, container: container, logger: logger)
 
             // overdue job
-            logger.error("Dispatching: Job \(job) overdue")
+            logger.error("\(self): Job \(job) overdue")
             futures.append(
                 job.cancel(context).flatMap { _ in
                     return job.overdue(context).map { _ in
@@ -182,6 +198,12 @@ final class DispatchingService: Service {
         }
 
         return futures.flatten(on: container)
+    }
+
+    // MARK: CustomStringConvertible
+
+    var description: String {
+        return "DispatchingService"
     }
 
 }

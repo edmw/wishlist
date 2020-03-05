@@ -9,7 +9,11 @@
 
 ## [..]
 - 🎁 Add functionality to move items between wishlists
+
+## [1.4.3]
+- 🛠️ Improve docker scripts
 - 🛠️ Add job to recover missing item images
+- 🛠️ Add job to dispose redundant item images
 - ☘ Fix creation of item image
 
 ## [1.4.2]

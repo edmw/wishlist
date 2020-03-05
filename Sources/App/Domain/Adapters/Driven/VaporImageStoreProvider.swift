@@ -84,23 +84,55 @@ struct VaporImageStoreProvider: ImageStoreProvider {
         return groupkeys
     }
 
-    // MARK: CleanupJob
+    // MARK: CleanUpJob
 
-    final class CleanupJob: DispatchableJob<Bool> {
+    final class CleanUpJob: DispatchableJob<Bool> {
 
-        override func run(_ context: JobContext) -> EventLoopFuture<Bool> {
+        override func work(_ context: JobContext) -> EventLoopFuture<Bool> {
             let container = context.container
+            let logger = container.requireLogger().technical
             do {
-                let logger = container.requireLogger().technical
+                let jobService = try container.make(DispatchingService.self)
+                return
+                    try jobService.execute(DisposeJob(on: container), in: context)
+                .flatMap {
+                    try jobService.execute(RecoverJob(on: container), in: context)
+                }
+                .transform(to: true)
+
+            }
+            catch {
+                logger.error("\(self) failed with \(error)")
+            }
+            return container.future(false)
+        }
+
+        // CustomStringConvertible
+
+        override var description: String {
+            return "ImagesCleanUpJob(scheduled: \(scheduled))"
+        }
+
+    }
+
+    // MARK: DisposeJob
+
+    final class DisposeJob: DispatchableJob<Bool> {
+
+        override func work(_ context: JobContext) -> EventLoopFuture<Bool> {
+            let container = context.container
+            let logger = container.requireLogger().technical
+            logger.info("\(self) running")
+            do {
                 let itemRepository: ItemRepository = try container.make()
                 return itemRepository.all().map { items in
                     // collect local image urls from all items into a bloom filter
                     var bloomfilter = BloomFilter<String>(expectedNumberOfElements: items.count)
                     for item in items {
-                        guard let localimageurl = item.localImageURL else {
+                        guard let imagestorelocator = item.localImageURL else {
                             continue
                         }
-                        bloomfilter.insert(localimageurl.absoluteString)
+                        bloomfilter.insert(imagestorelocator.absoluteString)
                     }
                     // iterate local file urls for images
                     let now = Date()
@@ -110,12 +142,15 @@ struct VaporImageStoreProvider: ImageStoreProvider {
                         // definitely not used for an item, so it is save to delete
                         let imagestorelocator = ImageStoreLocator(imagefilelocator)
                         if bloomfilter.containsNot(imagestorelocator.absoluteString) {
+                            // remove image
+                            logger.info(
+                                "\(self): process image \(imagestorelocator)"
+                            )
                             try imageFileMiddleware.removeFile(
                                 at: imagefilelocator,
                                 deleteParentsIfEmpty: true,
                                 on: container
                             )
-                            logger.debug("ImagesCleanupJob: delete \(imagestorelocator)")
                         }
                     }
                     imageFileMiddleware.purgeDirectories(on: container)
@@ -123,7 +158,7 @@ struct VaporImageStoreProvider: ImageStoreProvider {
                 }
             }
             catch {
-                container.logger?.error("ImagesCleanupJob failed with \(error)")
+                logger.error("\(self) failed with \(error)")
             }
             return container.future(false)
         }
@@ -131,7 +166,7 @@ struct VaporImageStoreProvider: ImageStoreProvider {
         // CustomStringConvertible
 
         override var description: String {
-            return "ImagesCleanupJob(at: \(scheduled))"
+            return "ImagesDisposeJob"
         }
 
     }
@@ -140,54 +175,84 @@ struct VaporImageStoreProvider: ImageStoreProvider {
 
     final class RecoverJob: DispatchableJob<Bool> {
 
-        override func run(_ context: JobContext) -> EventLoopFuture<Bool> {
-            let container = context.container
+        let userItemsActor: UserItemsActor
+
+        let imageFileMiddleware: ImageFileMiddleware
+
+        let imageStoreProvider: ImageStoreProvider
+
+        let logger: Logger
+
+        override init(
+            on container: Container,
+            at date: Date = Date(),
+            before deadline: Date = .distantFuture
+        ) throws {
+            self.userItemsActor = try container.make()
+            self.imageFileMiddleware = try container.make()
+            self.imageStoreProvider = VaporImageStoreProvider(on: container)
+            self.logger = container.requireLogger().technical
+            try super.init(on: container, at: date, before: deadline)
+        }
+
+        override func work(_ context: JobContext) -> EventLoopFuture<Bool> {
             let worker = context.eventLoop
+            let container = context.container
+            let logger = container.requireLogger().technical
+            logger.info("\(self) running")
             do {
-                let logger = container.requireLogger().technical
-                let userItemsActor: UserItemsActor = try container.make()
                 let itemRepository: ItemRepository = try container.make()
-                let imageFileMiddleware: ImageFileMiddleware = try container.make()
-                let imageStoreProvider = VaporImageStoreProvider(on: container)
                 return itemRepository.all().flatMap { items in
-                    var results = [EventLoopFuture<Void>]()
-                    // iterate all items
-                    for item in items {
-                        guard let itemid = item.id else {
-                            continue
-                        }
-                        guard let localimageurl = item.localImageURL else {
-                            continue
-                        }
-                        let imagefilelocator = try imageFileMiddleware.imageFileLocator(
-                            from: localimageurl.url,
-                            isRelative: true
-                        )
-                        if try imageFileMiddleware.fileExists(at: imagefilelocator, on: container) {
-                            logger.debug("ImagesRecoverJob: skipping \(imagefilelocator) [exists]")
-                            continue
-                        }
-                        // setup image
-                        let result = try userItemsActor.setupItem(
-                            .specification(itemBy: itemid),
-                            .boundaries(worker: worker, imageStore: imageStoreProvider)
-                        )
-                        .transform(to: ())
-                        results.append(result)
+                    let results = try items.compactMap { item in
+                        try self.recover(item: item, on: container, worker: worker)
                     }
                     return results.flatten(on: worker).transform(to: true)
                 }
             }
             catch {
-                container.logger?.error("ImagesRecoverJob failed with \(error)")
+                logger.error("\(self) failed with \(error)")
             }
             return container.future(false)
+        }
+
+        private func recover(
+            item: Item,
+            on container: Container,
+            worker: EventLoop
+        ) throws -> EventLoopFuture<Void>? {
+            guard let itemid = item.id else {
+                logger.debug("\(self): skipping \(item) [noid]")
+                return nil
+            }
+            if let imagestorelocator = item.localImageURL {
+                // check if an image is already stored
+                let imagefilelocator = try imageFileMiddleware.imageFileLocator(
+                    from: imagestorelocator.url,
+                    isRelative: true
+                )
+                if try imageFileMiddleware.fileExists(at: imagefilelocator, on: container) {
+                    logger.debug("\(self): skipping \(item) [exists]")
+                    return nil
+                }
+            }
+            // setup image
+            logger.info("\(self): process \(item)")
+            return try userItemsActor.setupItem(
+                .specification(itemBy: itemid),
+                .boundaries(worker: worker, imageStore: imageStoreProvider)
+            )
+            .map { result in
+                let imagestorelocator = result.item.localImageURL
+                self.logger.info(
+                    "\(self): processed \(item) -> \(imagestorelocator ??? "nolocator")"
+                )
+            }
         }
 
         // CustomStringConvertible
 
         override var description: String {
-            return "ImagesRecoverJob(at: \(scheduled))"
+            return "ImagesRecoverJob"
         }
 
     }

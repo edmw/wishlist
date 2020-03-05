@@ -26,7 +26,7 @@ extension Message {
     ) throws
         -> EventLoopFuture<SendMessageResult>
     {
-        let job = SendMessageJob(for: self, on: container, at: date, before: deadline)
+        let job = try SendMessageJob(for: self, on: container, at: date, before: deadline)
         let jobService = try container.make(DispatchingService.self)
         return try jobService.dispatch(job)
             .transform(to: job.completed)
@@ -40,7 +40,7 @@ extension Message {
     ) throws
         -> EventLoopFuture<Void>
     {
-        let job = SendMessageJob(for: self, on: container, at: date, before: deadline)
+        let job = try SendMessageJob(for: self, on: container, at: date, before: deadline)
         let jobService = try container.make(DispatchingService.self)
         return try jobService.dispatch(job)
     }

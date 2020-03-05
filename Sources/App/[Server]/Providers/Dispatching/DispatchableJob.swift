@@ -1,5 +1,4 @@
 import Vapor
-import Leaf
 
 // MARK: DispatchableJob
 
@@ -17,35 +16,44 @@ class DispatchableJob<R: JobResult>: Job, Equatable, CustomStringConvertible {
 
     var cancelled: Bool = false
 
-    init(on container: Container, at date: Date = Date(), before deadline: Date = .distantFuture) {
+    init(
+        on container: Container,
+        at date: Date = Date(),
+        before deadline: Date = .distantFuture
+    ) throws {
         self.scheduled = date
         self.deadline = deadline
         self.completedPromise = container.eventLoop.newPromise(R.self)
     }
 
-    func run(_ context: JobContext) -> EventLoopFuture<R> {
-        guard !cancelled else {
-            return context.eventLoop.future(error: DispatchingError.cancelled)
-        }
+    // Dispatchable jobs override `work` to perform their work:
+    func work(_ context: JobContext) -> EventLoopFuture<R> {
         return context.eventLoop.future(error: DispatchingError.noWork)
     }
 
-    func cancel(_ context: JobContext) -> EventLoopFuture<Void> {
+    final func run(_ context: JobContext) -> EventLoopFuture<R> {
+        guard !cancelled else {
+            return context.eventLoop.future(error: DispatchingError.cancelled)
+        }
+        return work(context)
+    }
+
+    final func cancel(_ context: JobContext) -> EventLoopFuture<Void> {
         self.cancelled = true
         return context.eventLoop.future(())
     }
 
-    func success(_ context: JobContext, _ result: R) -> EventLoopFuture<Void> {
+    final func success(_ context: JobContext, _ result: R) -> EventLoopFuture<Void> {
         completedPromise.succeed(result: result)
         return context.eventLoop.future(())
     }
 
-    func failure(_ context: JobContext, _ error: Error) -> EventLoopFuture<Void> {
+    final func failure(_ context: JobContext, _ error: Error) -> EventLoopFuture<Void> {
         completedPromise.fail(error: error)
         return context.eventLoop.future(())
     }
 
-    func overdue(_ context: JobContext) -> EventLoopFuture<Void> {
+    final func overdue(_ context: JobContext) -> EventLoopFuture<Void> {
         completedPromise.fail(error: DispatchingError.overdue)
         return context.eventLoop.future(())
     }
@@ -59,7 +67,7 @@ class DispatchableJob<R: JobResult>: Job, Equatable, CustomStringConvertible {
     // MARK: CustomStringConvertible
 
     var description: String {
-        return "DispatchableJob(at: \(scheduled), before: \(deadline))"
+        return "DispatchableJob(scheduled: \(scheduled), deadline: \(deadline))"
     }
 
 }
