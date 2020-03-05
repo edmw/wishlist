@@ -557,6 +557,20 @@ extension RevokeInvitation.Specification {
 
 }
 
+// MARK: SetupItem.Specification
+
+extension SetupItem.Specification {
+
+    public static func specification(
+          itemBy itemid: ItemID
+    ) -> Self {
+        return Self(
+            itemID: itemid
+        )
+    }
+
+}
+
 // MARK: TestNotifications.Specification
 
 extension TestNotifications.Specification {

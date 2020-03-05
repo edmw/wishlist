@@ -34,19 +34,7 @@ extension FileManager {
         in containerURL: URL,
         permissions: Int16 = 0o664
     ) throws -> Bool {
-        guard targetURL.isFileURL else {
-            throw FileManagerError.invalidScheme(targetURL)
-        }
-        guard containerURL.isFileURL else {
-            throw FileManagerError.invalidScheme(containerURL)
-        }
-
-        let url = targetURL
-
-        guard url.hasPrefix(containerURL) else {
-            return false
-        }
-
+        let url = try check(targetURL, in: containerURL)
         return createFile(
             atPath: url.path,
             contents: nil,
@@ -59,19 +47,7 @@ extension FileManager {
         at targetURL: URL,
         in containerURL: URL
     ) throws {
-        guard targetURL.isFileURL else {
-            throw FileManagerError.invalidScheme(targetURL)
-        }
-        guard containerURL.isFileURL else {
-            throw FileManagerError.invalidScheme(containerURL)
-        }
-
-        let url = targetURL
-
-        guard url.hasPrefix(containerURL) else {
-            throw FileManagerError.invalidURL(url)
-        }
-
+        let url = try check(targetURL, in: containerURL)
         let path = url.path
         if fileExists(atPath: path) {
             try removeItem(atPath: path)
@@ -85,19 +61,7 @@ extension FileManager {
         in containerURL: URL,
         extensions: [String] = []
     ) throws {
-        guard targetURL.isFileURL else {
-            throw FileManagerError.invalidScheme(targetURL)
-        }
-        guard containerURL.isFileURL else {
-            throw FileManagerError.invalidScheme(containerURL)
-        }
-
-        let url = targetURL
-
-        guard url.hasPrefix(containerURL) else {
-            throw FileManagerError.invalidURL(url)
-        }
-
+        let url = try check(targetURL, in: containerURL)
         try contentsOfDirectory(
             at: url,
             includingPropertiesForKeys: [],
@@ -117,19 +81,7 @@ extension FileManager {
         at targetURL: URL,
         in containerURL: URL
     ) throws {
-        guard targetURL.isFileURL else {
-            throw FileManagerError.invalidScheme(targetURL)
-        }
-        guard containerURL.isFileURL else {
-            throw FileManagerError.invalidScheme(containerURL)
-        }
-
-        let url = targetURL
-
-        guard url.hasPrefix(containerURL) else {
-            throw FileManagerError.invalidURL(url)
-        }
-
+        let url = try check(targetURL, in: containerURL)
         let path = url.path
         if itemExistsAndIsDirectory(atPath: path) {
             try removeItem(atPath: path)
@@ -144,19 +96,7 @@ extension FileManager {
         at targetURL: URL,
         in containerURL: URL
     ) throws {
-        guard targetURL.isFileURL else {
-            throw FileManagerError.invalidScheme(targetURL)
-        }
-        guard containerURL.isFileURL else {
-            throw FileManagerError.invalidScheme(containerURL)
-        }
-
-        var url = targetURL
-
-        guard url.hasPrefix(containerURL) else {
-            throw FileManagerError.invalidURL(url)
-        }
-
+        var url = try check(targetURL, in: containerURL)
         repeat {
             let path = url.path
             if itemExistsAndIsDirectory(atPath: path) {
@@ -178,6 +118,16 @@ extension FileManager {
         } while url.hasPrefix(containerURL)
     }
 
+    /// Checks existance of a file. Succeeds if the file is contained in the specified directory,
+    /// only.
+    public func fileExists(
+        at targetURL: URL,
+        in containerURL: URL
+    ) throws -> Bool {
+        let url = try check(targetURL, in: containerURL)
+        return itemExistsAndIsFile(atPath: url.path)
+    }
+
     public func itemExistsAndIsFile(atPath path: String) -> Bool {
         var isDirectory: ObjCBool = false
         guard fileExists(atPath: path, isDirectory: &isDirectory) else {
@@ -192,6 +142,23 @@ extension FileManager {
             return false
         }
         return isDirectory.boolValue == true
+    }
+
+    private func check(_ targetURL: URL, in containerURL: URL) throws -> URL {
+        guard targetURL.isFileURL else {
+            throw FileManagerError.invalidScheme(targetURL)
+        }
+        guard containerURL.isFileURL else {
+            throw FileManagerError.invalidScheme(containerURL)
+        }
+
+        let url = targetURL
+
+        guard url.hasPrefix(containerURL) else {
+            throw FileManagerError.invalidURL(url)
+        }
+
+        return url
     }
 
 }

@@ -3,42 +3,6 @@ import Crypto
 
 import Library
 
-// MARK: ImageFileURL
-
-struct ImageFileLocator {
-
-    let url: URL
-    let baseURL: URL
-
-    var absoluteURL: URL {
-        return baseURL.appendingPathComponent(url.path, isDirectory: false)
-    }
-    var absoluteString: String {
-        return absoluteURL.absoluteString
-    }
-
-    fileprivate init?(absoluteURL: URL, baseURL: URL) {
-        guard absoluteURL.isFileURL, baseURL.isFileURL else {
-            return nil
-        }
-        let baseURL = baseURL.appendingPathComponent("/", isDirectory: true)
-
-        let absolutePath = absoluteURL.standardized.path
-        let basePath = baseURL.standardized.path
-        guard absolutePath.hasPrefix(basePath) else {
-            return nil
-        }
-
-        guard let url = URL(string: String(absolutePath.dropFirst(basePath.count))) else {
-            return nil
-        }
-
-        self.url = url
-        self.baseURL = baseURL
-    }
-
-}
-
 // MARK: ImageFileMiddleware
 
 final class ImageFileMiddleware: Middleware, ServiceType {
@@ -54,7 +18,7 @@ final class ImageFileMiddleware: Middleware, ServiceType {
     init(path: String, directory: String) {
         self.imagesPath = path.hasSuffix("/") ? path : path + "/"
         self.imagesDirectory = directory.hasSuffix("/") ? directory : directory + "/"
-        self.imagesDirectoryURL = URL(fileURLWithPath: imagesDirectory)
+        self.imagesDirectoryURL = URL(fileURLWithPath: imagesDirectory, isDirectory: true)
     }
 
     func respond(to request: Request, chainingTo next: Responder) throws
@@ -90,8 +54,13 @@ final class ImageFileMiddleware: Middleware, ServiceType {
     static let supportedMediaTypes
         = [ "jpeg", "png" ]
 
-    func imageFileLocator(from url: URL) -> ImageFileLocator? {
-        return ImageFileLocator(absoluteURL: url, baseURL: self.imagesDirectoryURL)
+    func imageFileLocator(from url: URL, isRelative: Bool = false) throws -> ImageFileLocator {
+        if isRelative {
+            return try ImageFileLocator(relativeURL: url, baseURL: self.imagesDirectoryURL)
+        }
+        else {
+            return try ImageFileLocator(absoluteURL: url, baseURL: self.imagesDirectoryURL)
+        }
     }
 
     func uploadImage(
@@ -100,7 +69,7 @@ final class ImageFileMiddleware: Middleware, ServiceType {
         height: Int,
         key: String,
         groupkeys: [String],
-        on request: Request
+        on container: Container
     ) throws -> EventLoopFuture<ImageFileLocator?> {
 
         let fileName = try SHA1.hash(url.absoluteString).base32EncodedString()
@@ -111,29 +80,29 @@ final class ImageFileMiddleware: Middleware, ServiceType {
         }
 
         guard try imageExists(name: fileName, in: fileDirectoryURL) == false else {
-            return request.future(nil)
+            return container.future(nil)
         }
 
-        return try request.imageProxy()
+        return try container.imageProxy()
             .get(
                 url: url,
                 width: width,
                 height: height,
-                on: request
+                on: container
             )
             .flatMap { response in
                 guard response.http.status == .ok else {
-                    request.requireLogger().error(
+                    container.requireLogger().error(
                         "Image proxy returned non-ok status \(response.http.status)"
                     )
-                    return request.future(error: Abort(response.http.status))
+                    return container.future(error: Abort(response.http.status))
                 }
 
                 guard let contentType = response.http.contentType,
                       contentType.type == "image",
                       ImageFileMiddleware.supportedMediaTypes.contains(contentType.subType)
                     else {
-                        return request.future(error: Abort(.unsupportedMediaType))
+                        return container.future(error: Abort(.unsupportedMediaType))
                     }
 
                 let fileExtension = contentType.subType
@@ -143,10 +112,8 @@ final class ImageFileMiddleware: Middleware, ServiceType {
                     relativeTo: fileDirectoryURL
                 )
 
-                guard let imagefileurl = self.imageFileLocator(from: fileURL) else {
-                    return request.future(error: Abort(.internalServerError))
-                }
-                return try self.writeData(from: response, to: fileURL, on: request)
+                let imagefileurl = try self.imageFileLocator(from: fileURL)
+                return try self.writeData(from: response, to: fileURL, on: container)
                     .transform(to: imagefileurl)
             }
 
@@ -234,7 +201,7 @@ final class ImageFileMiddleware: Middleware, ServiceType {
 
     /// Writes the data from the response’s body to the specified file URL.
     /// The given file URL must point to a file inside the images directory.
-    private func writeData(from response: Response, to url: URL, on request: Request) throws
+    private func writeData(from response: Response, to url: URL, on container: Container) throws
         -> EventLoopFuture<Bool>
     {
         if try FileManager.default.createFile(
@@ -242,7 +209,7 @@ final class ImageFileMiddleware: Middleware, ServiceType {
             in: self.imagesDirectoryURL,
             permissions: 0o664
         ) {
-            return response.http.body.consumeData(max: 2_000_000, on: request).map { data in
+            return response.http.body.consumeData(max: 2_000_000, on: container).map { data in
                 if let fileHandle = FileHandle(forWritingAtPath: url.path) {
                     defer {
                         fileHandle.closeFile()

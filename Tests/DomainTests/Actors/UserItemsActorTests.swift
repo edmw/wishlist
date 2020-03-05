@@ -52,6 +52,8 @@ final class UserItemsActorTests : ActorTestCase, HasAllTests {
         XCTAssertEqual(result.list, ListRepresentation(anotherList))
         XCTAssertEqual(try itemRepository.count(on: aList).wait(), count - 1)
         XCTAssertEqual(try itemRepository.count(on: anotherList).wait(), 1)
+        XCTAssertNil(try itemRepository.find(by: aItem.id!, in: aList).wait())
+        XCTAssertNotNil(try itemRepository.find(by: aItem.id!, in: anotherList).wait())
     }
 
     func testMoveItemWrongUser() throws {

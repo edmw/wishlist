@@ -1,4 +1,4 @@
-struct SettingsPageFormContext: Encodable {
+struct SettingsPageFormContext: PageFormContext {
 
     var data: SettingsPageFormData?
 

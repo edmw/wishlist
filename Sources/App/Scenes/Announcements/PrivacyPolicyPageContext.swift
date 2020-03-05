@@ -2,7 +2,7 @@ import Domain
 
 import Foundation
 
-struct PrivacyPolicyPageContext: Encodable {
+struct PrivacyPolicyPageContext: PageContext {
 
     let userID: ID?
 

@@ -29,10 +29,40 @@ import Foundation
 extension URL {
 
     public func hasPrefix(_ url: URL) -> Bool {
-        return self.scheme == url.scheme && self.host == url.host && self.path.hasPrefix(url.path)
+        return self.scheme == url.scheme
+            && self.host == url.host
+            && self.absoluteString.hasPrefix(url.absoluteString)
     }
 
     // MARK: isFileURL
+
+    public var isLocalFileURL: Bool {
+        return self.isFileURL && self.host == nil
+    }
+
+    public var isLocalFileAbsoluteURL: Bool {
+        if let scheme = self.scheme {
+            guard scheme == "file" else {
+                return false
+            }
+            return self.host == nil && self.baseURL == nil
+        }
+        else {
+            return self.host == nil && self.relativePath.hasPrefix("/")
+        }
+    }
+
+    public var isLocalFileRelativeURL: Bool {
+        if let scheme = self.scheme {
+            guard scheme == "file" else {
+                return false
+            }
+            return self.host == nil && self.baseURL != nil
+        }
+        else {
+            return self.host == nil && !self.relativePath.hasPrefix("/")
+        }
+    }
 
     /// Resource type of this URL. Returns `unknown` if unattainable.
     public var resourceType: URLFileResourceType {

@@ -2,7 +2,7 @@ import Domain
 
 import Foundation
 
-struct LegalNoticePageContext: Encodable {
+struct LegalNoticePageContext: PageContext {
 
     let userID: ID?
 

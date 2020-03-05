@@ -1,16 +1,16 @@
 import Vapor
 
-class RenderContext<PageContext>: Encodable where PageContext: Encodable {
+class RenderContext: Encodable {
 
     var request: RenderParameter
 
-    var page: PageContext?
+    var page: AnyPageContext?
 
     var site: Site
 
     var features: Features
 
-    init(_ pageContext: PageContext?, site: Site, features: Features) {
+    init(_ pageContext: AnyPageContext?, site: Site, features: Features) {
         self.request = RenderParameter()
 
         self.page = pageContext

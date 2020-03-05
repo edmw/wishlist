@@ -35,9 +35,9 @@ public struct CreateItem: Action {
 
     // MARK: -
 
-    internal let actor: () -> CreateItemActor
+    internal let actor: () -> CreateItemActor & SetupItemActor
 
-    internal init(actor: @escaping @autoclosure () -> CreateItemActor) {
+    internal init(actor: @escaping @autoclosure () -> CreateItemActor & SetupItemActor) {
         self.actor = actor
     }
 
@@ -58,7 +58,7 @@ public struct CreateItem: Action {
                 let item = try Item(for: list, from: values)
                 return itemRepository
                     .save(item: item)
-                    .setupItem(using: actor, in: boundaries)
+                    .setupItem(using: actor, in: .init(from: boundaries))
                     .map { item in
                         return (list: list, item: item)
                     }
@@ -69,41 +69,6 @@ public struct CreateItem: Action {
                 }
                 throw error
             }
-    }
-
-}
-
-// MARK: - setupItem
-
-extension EventLoopFuture where Expectation == Item {
-
-    func setupItem(using actor: CreateItemActor, in boundaries: CreateItem.Boundaries)
-        -> EventLoopFuture<Item>
-    {
-        let itemRepository = actor.itemRepository
-        let logging = actor.logging
-        return self.flatMap(to: Item.self) { item in
-            guard let imageURL = item.imageURL else {
-                return boundaries.worker.makeSucceededFuture(item)
-            }
-            return try boundaries.imageStore.storeImage(for: item, from: imageURL)
-                .flatMap { localImageURL in
-                    guard let localImageURL = localImageURL else {
-                        return boundaries.worker.makeSucceededFuture(item)
-                    }
-                    if let itemLocalImageURL = item.localImageURL,
-                       itemLocalImageURL != localImageURL
-                    {
-                        try boundaries.imageStore.removeImage(at: itemLocalImageURL)
-                    }
-                    item.localImageURL = localImageURL
-                    return itemRepository.save(item: item)
-                }
-                .catchMap { error in
-                    logging.error("Error while setting up item: \(error)")
-                    return item
-                }
-        }
     }
 
 }
@@ -161,6 +126,17 @@ extension DomainUserItemsActor {
                         throw error
                     }
             }
+    }
+
+}
+
+// MARK: -
+
+extension SetupItem.Boundaries {
+
+    init(from boundaries: CreateItem.Boundaries) {
+        self.worker = boundaries.worker
+        self.imageStore = boundaries.imageStore
     }
 
 }

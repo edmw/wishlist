@@ -36,9 +36,9 @@ public struct UpdateItem: Action {
 
     // MARK: -
 
-    internal let actor: () -> UpdateItemActor & CreateItemActor
+    internal let actor: () -> UpdateItemActor & SetupItemActor
 
-    internal init(actor: @escaping @autoclosure () -> UpdateItemActor & CreateItemActor) {
+    internal init(actor: @escaping @autoclosure () -> UpdateItemActor & SetupItemActor) {
         self.actor = actor
     }
 
@@ -148,7 +148,7 @@ extension DomainUserItemsActor {
 
 // MARK: -
 
-extension CreateItem.Boundaries {
+extension SetupItem.Boundaries {
 
     init(from boundaries: UpdateItem.Boundaries) {
         self.worker = boundaries.worker

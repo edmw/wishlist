@@ -2,7 +2,7 @@ import Domain
 
 import Foundation
 
-struct LoginPageContext: Encodable {
+struct LoginPageContext: PageContext {
 
     var authenticationParametersQuery: String?
 

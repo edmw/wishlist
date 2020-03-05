@@ -81,6 +81,18 @@ final class ItemController: AuthenticatableController,
                     .forList(result.list)
                     .withItem(result.item)
                     .build()
+
+// TODO
+//                let moveAction = PageAction.patch(
+//                    "user",
+//                    result.user.id,
+//                    "list",
+//                    result.list.id,
+//                    "item",
+//                    result.item.id
+//                )
+//                context.link("move", to: moveAction)
+
                 context.userLists = result.lists.map { ListContext($0) }
                 return try Controller.renderView("User/ItemMove", with: context, on: request)
             }

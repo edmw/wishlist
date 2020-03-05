@@ -1,4 +1,4 @@
-struct ProfilePageFormContext: Encodable {
+struct ProfilePageFormContext: PageFormContext {
 
     var data: ProfilePageFormData?
 

@@ -28,12 +28,18 @@ final class FileManagerTests : XCTestCase, HasAllTests {
         // file to be created outside parent directory
         let urlfile2 = URL(string: "file:///foo/file")!
         // should fail
-        XCTAssertFalse(try filemanager.createFile(at: urlfile2, in: url))
+        assert(
+            try filemanager.createFile(at: urlfile2, in: url),
+            throws: FileManagerError.invalidURL(urlfile2)
+        )
 
         // file to be created outside parent directory
         let urlfile3 = URL(string: "file:///foo/bur/file")!
         // should fail
-        XCTAssertFalse(try filemanager.createFile(at: urlfile3, in: url))
+        assert(
+            try filemanager.createFile(at: urlfile3, in: url),
+            throws: FileManagerError.invalidURL(urlfile3)
+        )
     }
 
     // FileManager extension adds a file creation function which works on file urls, only.

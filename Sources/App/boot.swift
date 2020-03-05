@@ -40,7 +40,8 @@ public func boot(_ app: Application) throws {
     let dispatchingService = try app.make(DispatchingService.self)
     try dispatchingService.attach(to: app, logger: logger)
     try dispatchingService.start()
-    try dispatchingService.dispatch(VaporImageStoreProvider.CleanupJob(on: app))
+//    try dispatchingService.dispatch(VaporImageStoreProvider.CleanupJob(on: app))
+    try dispatchingService.dispatch(VaporImageStoreProvider.RecoverJob(on: app))
 }
 
 extension Environment: CustomDebugStringConvertible {

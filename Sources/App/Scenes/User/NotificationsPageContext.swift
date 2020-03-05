@@ -10,7 +10,7 @@ struct NotificationResultContext: Encodable {
 
 }
 
-struct NotificationsPageContext: Encodable {
+struct NotificationsPageContext: PageContext {
 
     var userID: ID?
 

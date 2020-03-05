@@ -2,7 +2,7 @@ import Domain
 
 import Foundation
 
-struct WelcomePageContext: Encodable, AutoPageContextBuilder {
+struct WelcomePageContext: PageContext, AutoPageContextBuilder {
 
     var userID: ID?
 

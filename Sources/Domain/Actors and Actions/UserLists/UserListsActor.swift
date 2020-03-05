@@ -75,7 +75,7 @@ public final class DomainUserListsActor: UserListsActor,
     UpdateListActor,
     ImportListFromJSONActor,
     ExportListToJSONActor,
-    CreateItemActor
+    SetupItemActor
 {
 
     let userItemsActor: UserItemsActor

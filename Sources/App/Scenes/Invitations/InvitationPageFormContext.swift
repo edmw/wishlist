@@ -1,6 +1,4 @@
-import Vapor
-
-struct InvitationPageFormContext: Encodable {
+struct InvitationPageFormContext: PageFormContext {
 
     var data: InvitationPageFormData?
 

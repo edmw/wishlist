@@ -545,6 +545,21 @@ extension SendInvitationEmail.Boundaries {
     }
 
 }
+// MARK: SetupItem.Boundaries
+
+extension SetupItem.Boundaries {
+
+    public static func boundaries(
+        worker: EventLoop,
+        imageStore imagestore: ImageStoreProvider
+    ) -> Self {
+        return Self(
+            worker: worker,
+            imageStore: imagestore
+        )
+    }
+
+}
 // MARK: TestNotifications.Boundaries
 
 extension TestNotifications.Boundaries {

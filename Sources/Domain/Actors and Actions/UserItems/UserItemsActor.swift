@@ -16,6 +16,11 @@ public protocol UserItemsActor: Actor {
         _ boundaries: CreateItem.Boundaries
     ) throws -> EventLoopFuture<CreateItem.Result>
 
+    func setupItem(
+        _ specification: SetupItem.Specification,
+        _ boundaries: SetupItem.Boundaries
+    ) throws -> EventLoopFuture<SetupItem.Result>
+
     func requestItemEditing(
           _ specification: RequestItemEditing.Specification,
           _ boundaries: RequestItemEditing.Boundaries
@@ -69,7 +74,8 @@ public enum UserItemsActorError: Error {
 public final class DomainUserItemsActor: UserItemsActor,
     CreateItemActor,
     UpdateItemActor,
-    MoveItemActor
+    MoveItemActor,
+    SetupItemActor
 {
 
     let itemRepository: ItemRepository

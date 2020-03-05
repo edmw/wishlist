@@ -2,7 +2,7 @@ import Domain
 
 import Foundation
 
-struct WishlistPageContext: Encodable, AutoPageContextBuilder {
+struct WishlistPageContext: PageContext, AutoPageContextBuilder {
 
     var ownerID: ID?
     var listID: ID?

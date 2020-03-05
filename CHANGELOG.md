@@ -9,6 +9,8 @@
 
 ## [..]
 - 🎁 Add functionality to move items between wishlists
+- 🛠️ Add job to recover missing item images
+- ☘ Fix creation of item image
 
 ## [1.4.2]
 - 🛠️ Add Swift Backtrace to automatically printing crash backtraces

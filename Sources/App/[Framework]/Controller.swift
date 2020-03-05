@@ -166,27 +166,23 @@ class Controller {
     /// information for rendering the view such as the `features` path making the feature flags
     /// available to the template. Other additional information available are the site’s and the
     /// request’s parameters.
-    static func renderView<E>(
-        _ templateName: String,
-        with pageContext: E,
-        on request: Request
-    ) throws -> EventLoopFuture<View> where E: Encodable {
-        let site = try request.make(Site.self)
-        let features = try request.make(Features.self)
-        let context = RenderContext(pageContext, site: site, features: features)
-        context.request += request.queryDictionary
-        let locale = try request.make(LocalizationService.self).locale(on: request)
-        return try request.view()
-            .render(templateName, context, userInfo: ["language": locale.identifier])
-    }
-
-    /// Renders a view with the specified template and an empty page context on the
-    /// specified request.
     static func renderView(
         _ templateName: String,
+        with pageContext: PageContext? = nil,
         on request: Request
     ) throws -> EventLoopFuture<View> {
-        return try renderView(templateName, with: [String: String](), on: request)
+        let anyPageContext = pageContext.map(AnyPageContext.init)
+        let site = try request.make(Site.self)
+        let features = try request.make(Features.self)
+        let renderContext = RenderContext(anyPageContext, site: site, features: features)
+        renderContext.request += request.queryDictionary
+        let locale = try request.make(LocalizationService.self).locale(on: request)
+        return try request.view()
+            .render(
+                templateName,
+                renderContext,
+                userInfo: ["language": locale.identifier]
+            )
     }
 
     /// Renders a localized view with the specified template and the specified page context on the
@@ -194,11 +190,11 @@ class Controller {
     /// Appends the template‘s base name with the user‘s language code separated by a dot.
     /// If the user‘s language code is not in the list of supported codes the default language code
     /// will be used.
-    static func renderLocalizedView<E>(
+    static func renderLocalizedView(
         _ templateBaseName: String,
-        with pageContext: E,
+        with pageContext: PageContext? = nil,
         on request: Request
-    ) throws -> EventLoopFuture<View> where E: Encodable {
+    ) throws -> EventLoopFuture<View> {
         let templateName: String
         let localization = try request.make(LocalizationService.self)
         let locale = try localization.locale(on: request)
@@ -210,15 +206,6 @@ class Controller {
             templateName = "\(templateBaseName).\(code)"
         }
         return try renderView(templateName, with: pageContext, on: request)
-    }
-
-    /// Renders a localized view with the specified template and an empty page context on the
-    /// specified request.
-    static func renderLocalizedView(
-        _ templateBaseName: String,
-        on request: Request
-    ) throws -> EventLoopFuture<View> {
-        return try renderLocalizedView(templateBaseName, with: [String: String](), on: request)
     }
 
 }

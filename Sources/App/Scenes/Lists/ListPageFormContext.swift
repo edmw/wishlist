@@ -1,4 +1,4 @@
-struct ListPageFormContext: Encodable {
+struct ListPageFormContext: PageFormContext {
 
     var data: ListPageFormData?
 

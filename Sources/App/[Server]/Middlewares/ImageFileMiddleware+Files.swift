@@ -9,6 +9,8 @@ extension ImageFileMiddleware {
     /// To avoid race conditions a date can be specified which must be after the creation date of
     /// file file to be returned. Files neither being regular nor matching the date will be omitted.
     /// - Parameter createdBefore: Files must be created before this date to be returned.
+    /// Note: Any files which can not be represented by a valid `ImageFileLocator` will be silently
+    /// omitted.
     func listFiles(createdBefore: Date?) -> [ImageFileLocator] {
         if let directoryEnumerator = directoryEnumerator {
             return directoryEnumerator
@@ -23,10 +25,22 @@ extension ImageFileMiddleware {
                             return nil
                         }
                     }
-                    return fileURL.isRegularFile ? imageFileLocator(from: fileURL) : nil
+                    return fileURL.isRegularFile ? try? imageFileLocator(from: fileURL) : nil
                 }
         }
         return []
+    }
+
+    func fileExists(
+        at imageFileLocator: ImageFileLocator,
+        on container: Container
+    ) throws -> Bool {
+        let fileManager = FileManager.default
+        let fileURL = imageFileLocator.absoluteURL
+        return try fileManager.fileExists(
+            at: fileURL,
+            in: self.imagesDirectoryURL
+        )
     }
 
     func removeFile(

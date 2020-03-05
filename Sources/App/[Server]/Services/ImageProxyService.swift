@@ -19,14 +19,14 @@ final class ImageProxyService: ServiceType {
         self.token = token
     }
 
-    func get(url: URL, width: Int, height: Int, on request: Request) throws
+    func get(url: URL, width: Int, height: Int, on container: Container) throws
         -> EventLoopFuture<Response>
     {
         let url = "https://\(token).cloudimg.io/" +
             "crop/\(width)x\(height)/" +
-        "x/\(url.absoluteString)"
+            "x/\(url.absoluteString)"
 
-        return try request.client()
+        return try container.client()
             .get(url) { request in
                 request.http.headers.add(name: .userAgent, value: "Swift/Vapor")
                 request.http.headers.add(name: .accept, value: "image/jpeg")

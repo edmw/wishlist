@@ -32,9 +32,9 @@ public struct ImportListFromJSON: Action {
 
     // MARK: -
 
-    internal let actor: () -> ImportListFromJSONActor & CreateItemActor
+    internal let actor: () -> ImportListFromJSONActor & SetupItemActor
 
-    internal init(actor: @escaping @autoclosure () -> ImportListFromJSONActor & CreateItemActor) {
+    internal init(actor: @escaping @autoclosure () -> ImportListFromJSONActor & SetupItemActor) {
         self.actor = actor
     }
 
@@ -172,7 +172,7 @@ extension DomainUserListsActor {
 
 // MARK: -
 
-extension CreateItem.Boundaries {
+extension SetupItem.Boundaries {
 
     init(from boundaries: ImportListFromJSON.Boundaries) {
         self.worker = boundaries.worker

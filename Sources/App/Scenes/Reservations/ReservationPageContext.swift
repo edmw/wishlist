@@ -2,7 +2,7 @@ import Domain
 
 import Foundation
 
-struct ReservationPageContext: Encodable, AutoPageContextBuilder {
+struct ReservationPageContext: PageContext, AutoPageContextBuilder {
 
     var identification: ID?
 

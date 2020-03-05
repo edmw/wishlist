@@ -4,7 +4,7 @@ import Foundation
 
 // MARK: ItemPageContext
 
-struct ItemPageContext: Encodable, AutoPageContextBuilder {
+struct ItemPageContext: PageContext, AutoPageContextBuilder {
 
     var userID: ID?
     var listID: ID?

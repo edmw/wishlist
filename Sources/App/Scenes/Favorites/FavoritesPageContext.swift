@@ -2,7 +2,7 @@ import Domain
 
 import Foundation
 
-struct FavoritesPageContext: Encodable, AutoPageContextBuilder {
+struct FavoritesPageContext: PageContext, AutoPageContextBuilder {
 
     var userID: ID?
 
