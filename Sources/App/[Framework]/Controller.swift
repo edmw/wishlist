@@ -101,6 +101,19 @@ class Controller {
         return request.redirect(to: "/user/\(ID(id))/\(location)", type: type)
     }
 
+    /// Returns a redirect response as a succeeded future to the specified location
+    /// for the specified user on the specified request.
+    static func redirect(
+        for userid: UserID,
+        to location: String,
+        type: RedirectType = .normal,
+        on request: Request
+    ) -> EventLoopFuture<Response> {
+        return request.future(
+            redirect(for: userid, to: location, type: type, on: request)
+        )
+    }
+
     /// Returns a redirect response to the specified location for the specified user
     /// and list on the specified request.
     static func redirect(

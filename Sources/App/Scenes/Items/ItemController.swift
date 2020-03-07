@@ -44,7 +44,7 @@ final class ItemController: AuthenticatableController,
 
     /// Renders a view to confirm the deletion of an item.
     /// This is only accessible for an authenticated user who owns the affected item.
-    private func renderDeleteView(on request: Request) throws -> EventLoopFuture<View> {
+    private func renderDeleteView(on request: Request) throws -> EventLoopFuture<Response> {
         let userid = try requireAuthenticatedUserID(on: request)
         let listid = try requireListID(on: request)
         let itemid = try requireItemID(on: request)
@@ -61,12 +61,17 @@ final class ItemController: AuthenticatableController,
                     .withItem(result.item)
                     .build()
                 return try Controller.renderView("User/ItemDeletion", with: context, on: request)
+                    .encode(for: request)
+            }
+            .catchFlatMap(UserItemsActorError.self) { _ in
+                // Tries to redirect back to the items page.
+                return Controller.redirect(for: userid, and: listid, to: "items", on: request)
             }
     }
 
     /// Renders a view to select the target list to move an item to.
     /// This is only accessible for an authenticated user who owns the affected item.
-    private func renderMoveView(on request: Request) throws -> EventLoopFuture<View> {
+    private func renderMoveView(on request: Request) throws -> EventLoopFuture<Response> {
         let userid = try requireAuthenticatedUserID(on: request)
         let listid = try requireListID(on: request)
         let itemid = try requireItemID(on: request)
@@ -95,6 +100,11 @@ final class ItemController: AuthenticatableController,
 
                 context.userLists = result.lists.map { ListContext($0) }
                 return try Controller.renderView("User/ItemMove", with: context, on: request)
+                    .encode(for: request)
+            }
+            .catchFlatMap(UserItemsActorError.self) { _ in
+                // Tries to redirect back to the list page.
+                return Controller.redirect(for: userid, and: listid, to: "items", on: request)
             }
     }
 
@@ -125,6 +135,50 @@ final class ItemController: AuthenticatableController,
                 self.success(for: result.user, and: result.list, on: request)
             }
             .caseFailure { context in try self.failure(on: request, with: context) }
+    }
+
+    private struct Patch: Decodable {
+        let key: String
+        let value: String
+    }
+
+    // Patches the specified item with the given data. The item must be part of the specified list.
+    // The list must belong to the authenticated user.
+    // This PATCH request is a little off a standard ReST PATCH requests, because it accepts only
+    // one key and value pair and updates one value only.
+    private func patch(on request: Request) throws -> EventLoopFuture<Response> {
+        let userid = try requireAuthenticatedUserID(on: request)
+        let listid = try requireListID(on: request)
+        let itemid = try requireItemID(on: request)
+
+        let userItemsActor = self.userItemsActor
+        return try request.content.decode(Patch.self)
+            .flatMap { patch in
+                switch patch.key {
+                case "listID":
+                    // patches the list of the specified item
+                    guard let id = ID(patch.value)
+                        else {
+                            throw Abort(.badRequest)
+                        }
+                    return try userItemsActor
+                        .moveItem(
+                            .specification(
+                                userBy: userid,
+                                listBy: listid,
+                                itemBy: itemid,
+                                targetListID: ListID(id)
+                            ),
+                            .boundaries(worker: request.eventLoop)
+                        )
+                        .flatMap { result in
+                            self.success(for: result.user, and: result.list, on: request)
+                        }
+                default:
+                    throw Abort(.badRequest)
+                }
+            }
+
     }
 
     // Deletes the specified item. The item must be part of the specified list. The list must
@@ -194,6 +248,8 @@ final class ItemController: AuthenticatableController,
                 switch method {
                 case .PUT:
                     return try self.update(on: request)
+                case .PATCH:
+                    return try self.patch(on: request)
                 case .DELETE:
                     return try self.delete(on: request)
                 default:

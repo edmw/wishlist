@@ -17,9 +17,7 @@ final class InvitationController: AuthenticatableController,
 
     /// Renders a form view for creating an invitation.
     /// This is only accessible for an authenticated and authorized user.
-    private func renderCreateView(on request: Request) throws
-        -> EventLoopFuture<View>
-    {
+    private func renderCreateView(on request: Request) throws -> EventLoopFuture<View> {
         let userid = try requireAuthenticatedUserID(on: request)
 
         return try userInvitationsActor
@@ -37,9 +35,7 @@ final class InvitationController: AuthenticatableController,
 
     /// Renders a view to confirm the deletion of an invitation.
     /// This is only accessible for an authenticated and authorized user.
-    private func renderRevokeView(on request: Request) throws
-        -> EventLoopFuture<View>
-    {
+    private func renderRevokeView(on request: Request) throws -> EventLoopFuture<Response> {
         let userid = try requireAuthenticatedUserID(on: request)
         let invitationid = try requireInvitationID(on: request)
 
@@ -58,6 +54,11 @@ final class InvitationController: AuthenticatableController,
                     with: context,
                     on: request
                 )
+                .encode(for: request)
+            }
+            .catchMap(UserFavoritesActor.self) { _ in
+                // Tries to redirect back to the start page.
+                return Controller.redirect(to: "/", on: request)
             }
     }
 

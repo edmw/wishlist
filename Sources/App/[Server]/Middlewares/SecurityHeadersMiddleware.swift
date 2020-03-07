@@ -18,7 +18,7 @@ final class SecurityHeadersMiddleware: Middleware, ServiceType {
     ) throws -> EventLoopFuture<Response> {
         let response = try next.respond(to: request)
 
-        return response.map(to: Response.self) { response in
+        return response.map { response in
             for configuration in self.configurations {
                 configuration.setHeader(on: response, from: request)
             }

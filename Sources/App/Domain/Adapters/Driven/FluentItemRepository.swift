@@ -231,17 +231,11 @@ final class FluentItemRepository: ItemRepository, FluentRepository {
                     // decode reservation future
                     let reservation = MySQLDatabase.queryDecodeReservation(row, on: connection)
                     // return future of tuple from item and reservation
-                    return flatMap(
-                        to: (FluentItem, FluentReservation?).self, item, reservation
-                    ) { item, reservation in
-                        connection.future((item, reservation))
-                    }
+                    return item.and(reservation).map { item, reservation in (item, reservation) }
                 }
                 else {
                     // return future of tuple from item and nil
-                    return item.flatMap { item in
-                        connection.future((item, nil))
-                    }
+                    return item.map { item in (item, nil) }
                 }
             }
             .flatten(on: connection) // flatten [F<()>] to F<[()]>

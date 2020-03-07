@@ -17,9 +17,7 @@ final class FavoriteController: AuthenticatableController,
     // MARK: - VIEWS
 
     /// Renders a view to confirm the creation of a favorite.
-    private func renderCreationView(on request: Request) throws
-        -> EventLoopFuture<View>
-    {
+    private func renderCreationView(on request: Request) throws -> EventLoopFuture<View> {
         let userid = try requireAuthenticatedUserID(on: request)
 
         let userFavoritesActor = self.userFavoritesActor
@@ -46,9 +44,7 @@ final class FavoriteController: AuthenticatableController,
     }
 
     /// Renders a view to confirm the deletion of a favorite.
-    private func renderDeletionView(on request: Request) throws
-        -> EventLoopFuture<View>
-    {
+    private func renderDeletionView(on request: Request) throws -> EventLoopFuture<Response> {
         let userid = try requireAuthenticatedUserID(on: request)
 
         let userFavoritesActor = self.userFavoritesActor
@@ -69,6 +65,11 @@ final class FavoriteController: AuthenticatableController,
                             with: context,
                             on: request
                         )
+                        .encode(for: request)
+                    }
+                    .catchMap(UserFavoritesActorError.self) { _ in
+                        // Tries to redirect back to the start page.
+                        return Controller.redirect(to: "/", on: request)
                     }
                     .handleAuthorizationError(on: request)
             }

@@ -34,7 +34,7 @@ public protocol UserFavoritesActor: Actor {
 }
 
 /// Errors thrown by the User Favorites actor.
-enum UserFavoritesActorError: Error {
+public enum UserFavoritesActorError: Error {
     /// An invalid user id was specified. There is no user with the given id.
     case invalidUser
     /// An invalid list id was specified. There is no list with the given id user.
@@ -45,6 +45,10 @@ enum UserFavoritesActorError: Error {
     /// An invalid favorite id was specified. There is no favorite with the given id for the
     /// specified user.
     case invalidFavoriteForUser
+    /// Favorite exists already
+    case favoriteExisting
+    /// Favorite does not exist
+    case favoriteNotExisting
 }
 
 /// This is the domain’s implementation of the Favorites use cases. Actions will extend this by

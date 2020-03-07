@@ -43,7 +43,7 @@ final class LocalizationTag: TagRenderer {
         }
         else {
             return tag.serializer.serialize(ast: body)
-                .map(to: TemplateData.self) { body in
+                .map { body in
                     return .string(String(data: body.data, encoding: .utf8) ?? "")
                 }
         }

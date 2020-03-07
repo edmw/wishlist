@@ -6,7 +6,7 @@ extension EventLoopFuture where Expectation: OptionalType {
 
     /// returns an error if the future’s result optional is not nil
     func `nil`(or error: @autoclosure @escaping () -> Error) -> EventLoopFuture<Void> {
-        return map(to: Void.self) { optional in
+        return map { optional in
             guard optional.wrapped == nil else {
                 throw error()
             }
@@ -27,7 +27,7 @@ extension EventLoopFuture where Expectation == Int {
 
     /// returns an error if the future’s result integer is not null
     func `null`(or error: @autoclosure @escaping () -> Error) -> EventLoopFuture<Void> {
-        return map(to: Void.self) { result in
+        return map { result in
             guard result == 0 else {
                 throw error()
             }
@@ -51,7 +51,7 @@ extension EventLoopFuture where Expectation == Int {
         _ value: Int,
         or error: @autoclosure @escaping () -> Error
     ) -> EventLoopFuture<Expectation> {
-        return map(to: Expectation.self) { expectation in
+        return map { expectation in
             guard expectation == value else {
                 throw error()
             }
@@ -68,7 +68,7 @@ extension EventLoopFuture where Expectation == Int {
         _ maximum: Int,
         or error: @autoclosure @escaping () -> Error
     ) -> EventLoopFuture<Expectation> {
-        return map(to: Expectation.self) { expectation in
+        return map { expectation in
             guard expectation <= maximum else {
                 throw error()
             }
@@ -85,7 +85,7 @@ extension EventLoopFuture where Expectation == Int {
         _ minimum: Int,
         or error: @autoclosure @escaping () -> Error
     ) -> EventLoopFuture<Expectation> {
-        return map(to: Expectation.self) { expectation in
+        return map { expectation in
             guard expectation >= minimum else {
                 throw error()
             }

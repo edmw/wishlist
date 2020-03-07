@@ -8,7 +8,7 @@ final class CachingHeadersMiddleware: Middleware, ServiceType {
     ) throws -> EventLoopFuture<Response> {
         let response = try next.respond(to: request)
 
-        return response.map(to: Response.self) { response in
+        return response.map { response in
             response.http.headers.replaceOrAdd(
                 name: HTTPHeaderName("Cache-Control"),
                 value: "no-cache, no-store, must-revalidate"

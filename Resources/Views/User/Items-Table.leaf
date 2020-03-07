@@ -26,8 +26,8 @@
             <td data-label="#L10N("item-state"){Status}">#if(page.maskReservations) {???} else {#if(item.reservationHolderID) {#L10N("item-reserved"){reserved}} else {#L10N("item-wanted"){wanted}}}</td>
             <td class="wl-actions" data-label="">
                 <div class="btn-group" role="group">
-                    #if(features.moveItem.enabled) {
-                    <a class="btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/move" title="#L10N("move-item"){Move item}"><svg class="feather"><use xlink:href="/icons/feather.svg#clipboard"/></svg></a>
+                    #if(features.moveItem.enabled && item.reservationID == nil) {
+                    <a class="btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/move" title="#L10N("move-item"){Move item}"><svg class="feather"><use xlink:href="/icons/feather.svg#log-in"/></svg></a>
                     }
                     <a class="btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/edit" title="#L10N("edit-item"){Edit item}"><svg class="feather"><use xlink:href="/icons/feather.svg#edit"/></svg></a>
                     #if(item.reservationID) {

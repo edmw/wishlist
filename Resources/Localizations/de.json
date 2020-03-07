@@ -130,7 +130,7 @@
     "list-field-maskreservations-description": "Die Einstellung \"Verderbe nicht meine Überraschung\" ist in der Voreinstellung nicht ausgewählt. Damit werden Dir alle Reservierungen von diesem Wunschzettel angezeigt. Wenn du die Reservierungen für Dich geheim halten möchtest, wähle diese Einstellung. Diese Einstellung betrifft nur die Ansicht zum Bearbeiten des Wunschzettels. In der Präsentationsansicht werden die aktuellen Reservierungen immer angezeigt.",
     "delete-list": "Zettel löschen",
     "//": "1: list’s name",
-    "to-delete-list": ".... daß du den Zettel <strong>%{value1}</strong> <span class='text-danger'>löschen</span> möchtest?",
+    "to-delete-list": "... daß du den Zettel <strong>%{value1}</strong> <span class='text-danger'>löschen</span> möchtest?",
     "export-list": "Zettel exportieren",
     "import-list": "Zettel importieren",
     "list-import": "Zettel importieren",
@@ -141,9 +141,9 @@
     "favorites": "Favoriten",
     "list-your-favorites": "Deine Favoriten",
     "add-favorite": "Favorit hinzufügen",
-    "to-add-favorite": ".... den Zettel <strong>%{value1}</strong> zu deinen Favoriten hinzufügen?",
+    "to-add-favorite": "... den Zettel <strong>%{value1}</strong> zu deinen Favoriten hinzufügen?",
     "remove-favorite": "Favorit entfernen",
-    "to-remove-favorite": ".... daß du den Zettel <strong>%{value1}</strong> aus deinen Favoriten <span class='text-danger'>entfernen</span> möchtest?",
+    "to-remove-favorite": "... daß du den Zettel <strong>%{value1}</strong> aus deinen Favoriten <span class='text-danger'>entfernen</span> möchtest?",
 
     "//": "Item pages",
 
@@ -185,13 +185,17 @@
     "item-field-image-url-description": "Optionale URL auf ein Bild für den Wunsch.",
     "delete-item": "Wunsch löschen",
     "//": "1: item’s name, 2: list’s name",
-    "to-delete-item": ".... daß du den Wunsch <strong>%{value1}</strong> von der Liste <strong>%{value2}</strong> <span class='text-danger'>löschen</span> möchtest?",
-    
+    "to-delete-item": "... daß du den Wunsch <strong>%{value1}</strong> von der Liste <strong>%{value2}</strong> <span class='text-danger'>löschen</span> möchtest?",
+    "move-item": "Wunsch verschieben",
+    "//": "1: item’s name",
+    "to-move-item": "... den Wunsch <strong>%{value1}</strong> auf eine andere Liste verschieben?",
+    "move-item-select": "Wähle eine Liste aus, um deinen Wunsch dorthin zu verschieben",
+
     "//": "Reservation pages",
 
     "delete-reservation": "Reservierung löschen",
     "//": "1: item’s name, 2: list’s name",
-    "to-delete-reservation": ".... daß du die Reservierung für den Wunsch <strong>%{value1}</strong> von der Liste <strong>%{value2}</strong> <span class='text-danger'>löschen</span> möchtest?",
+    "to-delete-reservation": "... daß du die Reservierung für den Wunsch <strong>%{value1}</strong> von der Liste <strong>%{value2}</strong> <span class='text-danger'>löschen</span> möchtest?",
     "delete-reservation-warning": "<strong>Bitte beachte:</strong> Der Nutzer, der diesen Wunsch reserviert hat, wird <strong>nicht</strong> benachrichtigt, wenn du dich entscheidest diese Reservierung zu löschen.",
 
     "reservations-notifications-create-title": "🎁 Wunsch reserviert",

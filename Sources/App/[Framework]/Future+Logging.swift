@@ -13,7 +13,7 @@ extension EventLoopFuture {
         line: UInt = #line,
         column: UInt = #column
     ) -> EventLoopFuture<Expectation> {
-        return self.map(to: Expectation.self) { value in
+        return self.map { value in
             let log: Bool
             if let condition = condition {
                 log = condition(value)

@@ -57,7 +57,7 @@ struct Features: Encodable, CustomDebugStringConvertible, ServiceType {
     let createItem               = Feature(date: "2018-10-29", version: "1.0")
     let limitNumberOfItems       = Feature(date: "2018-12-10", version: "1.0")
     let deleteItem               = Feature(date: "2018-10-29", version: "1.0")
-    let moveItem                 = Feature.inDevelopment(false)
+    let moveItem                 = Feature.inDevelopment(true)
     let archiveItem              = Feature.inPlanning(.normal)
     let showItems                = Feature(date: "2018-10-29", version: "1.0")
     let sortOrderForItemsOnList  = Feature(date: "2019-04-22", version: "1.0")

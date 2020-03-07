@@ -42,17 +42,22 @@ extension DomainUserFavoritesActor {
         _ boundaries: RequestFavoriteDeletion.Boundaries
     ) throws -> EventLoopFuture<RequestFavoriteDeletion.Result> {
         let listRepository = self.listRepository
+        let favoriteRepository = self.favoriteRepository
         return userRepository.find(id: specification.userID)
             .unwrap(or: UserFavoritesActorError.invalidUser)
             .flatMap { user in
                 return listRepository.find(by: specification.listID)
                     .unwrap(or: UserFavoritesActorError.invalidList)
-                    .map { list in
+                    .flatMap { list in
                         // list must be owned by the user
                         guard list.userID == user.id else {
                             throw UserFavoritesActorError.invalidListForUser
                         }
-                        return .init(user, list)
+                        return try favoriteRepository.find(favorite: list, for: user)
+                            .unwrap(or: UserFavoritesActorError.favoriteNotExisting)
+                            .map { _ in
+                                return .init(user, list)
+                            }
                     }
             }
     }

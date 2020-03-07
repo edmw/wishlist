@@ -80,7 +80,7 @@ final class ErrorRendererMiddleware: Middleware, ServiceType {
             return try renderer
                 .render(template404, context, request: request, status: status)
                 .encode(for: request)
-                .map(to: Response.self) { response in
+                .map { response in
                     response.http.status = status
                     return response
                 }
@@ -95,7 +95,7 @@ final class ErrorRendererMiddleware: Middleware, ServiceType {
             return try renderer
                 .render(template401, context, request: request, status: status)
                 .encode(for: request)
-                .map(to: Response.self) { response in
+                .map { response in
                     response.http.status = status
                     return response
                 }
@@ -121,7 +121,7 @@ final class ErrorRendererMiddleware: Middleware, ServiceType {
         return try renderer
             .render(templateServer, context, request: request, status: status)
             .encode(for: request)
-            .map(to: Response.self) { response in
+            .map { response in
                 response.http.status = status
                 return response
             }
@@ -133,7 +133,7 @@ final class ErrorRendererMiddleware: Middleware, ServiceType {
 
                 return try body
                     .encode(for: request)
-                    .map(to: Response.self) { response in
+                    .map { response in
                         response.http.status = status
                         response.http.headers.replaceOrAdd(
                             name: .contentType,

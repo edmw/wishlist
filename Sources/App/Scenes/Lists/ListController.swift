@@ -17,9 +17,7 @@ final class ListController: AuthenticatableController,
 
     /// Renders a form view for creating or updating a list.
     /// This is only accessible for an authenticated user.
-    private func renderFormView(on request: Request) throws
-        -> EventLoopFuture<View>
-    {
+    private func renderFormView(on request: Request) throws -> EventLoopFuture<View> {
         let userid = try requireAuthenticatedUserID(on: request)
         let listid = try listID(on: request)
 
@@ -43,9 +41,7 @@ final class ListController: AuthenticatableController,
 
     /// Renders a view to confirm the deletion of a list.
     /// This is only accessible for an authenticated user who owns the affected item.
-    private func renderDeleteView(on request: Request) throws
-        -> EventLoopFuture<View>
-    {
+    private func renderDeleteView(on request: Request) throws -> EventLoopFuture<Response> {
         let userid = try requireAuthenticatedUserID(on: request)
         let listid = try requireListID(on: request)
 
@@ -60,6 +56,11 @@ final class ListController: AuthenticatableController,
                     .withList(result.list)
                     .build()
                 return try Controller.renderView("User/ListDeletion", with: context, on: request)
+                    .encode(for: request)
+            }
+            .catchMap(UserListsActorError.self) { _ in
+                // Tries to redirect back to the lists page.
+                return Controller.redirect(for: userid, to: "lists", on: request)
             }
     }
 

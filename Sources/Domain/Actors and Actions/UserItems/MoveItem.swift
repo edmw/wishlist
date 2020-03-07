@@ -93,7 +93,7 @@ extension DomainUserItemsActor {
                     .unwrap(or: UserItemsActorError.invalidItem)
                     .flatMap { item, reservation in
                         guard reservation == nil else {
-                            // reserved items can not be move
+                            // reserved items can not be moved
                             throw UserItemsActorError.itemIsReserved
                         }
                         return try self.listRepository
