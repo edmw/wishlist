@@ -126,6 +126,10 @@ struct VaporImageStoreProvider: ImageStoreProvider {
             do {
                 let itemRepository: ItemRepository = try container.make()
                 return itemRepository.all().map { items in
+                    guard items.isNotEmpty else {
+                        // no items, all done
+                        return true
+                    }
                     // collect local image urls from all items into a bloom filter
                     var bloomfilter = BloomFilter<String>(expectedNumberOfElements: items.count)
                     for item in items {

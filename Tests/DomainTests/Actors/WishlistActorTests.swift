@@ -5,7 +5,7 @@ import NIO
 import XCTest
 import Testing
 
-final class WishlistActorTests : ActorTestCase, HasAllTests {
+final class WishlistActorTests : ActorTestCase, DomainTestCase, HasAllTests {
 
     static var __allTests = [
         ("testPresentWishlist", testPresentWishlist),

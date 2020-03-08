@@ -6,7 +6,7 @@ import NIO
 import XCTest
 import Testing
 
-final class ItemTests: XCTestCase, HasEntityTestSupport, HasAllTests {
+final class ItemTests: XCTestCase, AppTestCase, HasEntityTestSupport, HasAllTests {
 
     static var __allTests = [
         ("testProperties", testProperties),

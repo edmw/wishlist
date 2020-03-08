@@ -86,7 +86,7 @@ public struct FluentList: ListModel,
             builder.field(for: \.options)
             builder.field(for: \.itemsSorting)
             builder.field(for: \.userKey)
-            builder.reference(from: \.userKey, to: \FluentUser.id, onDelete: .cascade)
+            builder.reference(from: \.userKey, to: \FluentUser.uuid, onDelete: .cascade)
         }
     }
 

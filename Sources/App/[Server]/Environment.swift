@@ -24,7 +24,7 @@ extension Environment {
         return try get(key).value(or:
             VaporError(
                 identifier: "MissingEnvVar",
-                reason: "Required environment variable `\(key)` missing."
+                reason: "Required environment variable '\(key)' missing."
             )
         )
     }
@@ -38,7 +38,7 @@ extension Environment {
         return try Int(value).value(or:
             VaporError(
                 identifier: "InvalidEnvVar",
-                reason: "Value `\(value)` of environment variable `\(key)` is not a valid Integer."
+                reason: "Value '\(value)' of environment variable '\(key)' is not a valid Integer."
             )
         )
     }
@@ -48,7 +48,7 @@ extension Environment {
         return try URL(string: value).value(or:
             VaporError(
                 identifier: "InvalidEnvVar",
-                reason: "Value `\(value)` of environment variable `\(key)` is not a valid URL."
+                reason: "Value '\(value)' of environment variable '\(key)' is not a valid URL."
             )
         )
     }
@@ -90,7 +90,7 @@ extension Environment {
         guard siteURL.validate(is: .webAbsolutePathEmpty) else {
             throw VaporError(
                 identifier: "InvalidEnvVarSiteURL",
-                reason: "`\(siteURL)` from environment is not a valid absolute web URL" +
+                reason: "'\(siteURL)' from environment is not a valid absolute web URL" +
                     " without path."
             )
         }

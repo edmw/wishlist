@@ -2,7 +2,7 @@
 import XCTest
 import Testing
 
-final class URLTests : XCTestCase, HasAllTests {
+final class URLTests : XCTestCase, LibraryTestCase, HasAllTests {
 
     static var __allTests = [
         ("testHasPrefix", testHasPrefix),

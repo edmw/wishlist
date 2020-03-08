@@ -2,7 +2,7 @@
 import XCTest
 import Testing
 
-final class BitArrayTests : XCTestCase, HasAllTests {
+final class BitArrayTests : XCTestCase, LibraryTestCase, HasAllTests {
 
     static var __allTests = [
         ("testCreate", testCreate),

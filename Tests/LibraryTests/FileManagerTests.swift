@@ -2,7 +2,7 @@
 import XCTest
 import Testing
 
-final class FileManagerTests : XCTestCase, HasAllTests {
+final class FileManagerTests : XCTestCase, LibraryTestCase, HasAllTests {
 
     static var __allTests = [
         ("testCreateFile", testCreateFile),

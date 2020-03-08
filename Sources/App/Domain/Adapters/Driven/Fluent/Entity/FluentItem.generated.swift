@@ -96,7 +96,7 @@ public struct FluentItem: ItemModel,
             builder.field(for: \.modifiedAt)
             builder.field(for: \.localImageURL)
             builder.field(for: \.listKey)
-            builder.reference(from: \.listKey, to: \FluentList.id, onDelete: .cascade)
+            builder.reference(from: \.listKey, to: \FluentList.uuid, onDelete: .cascade)
         }
     }
 

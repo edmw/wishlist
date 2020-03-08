@@ -19,7 +19,7 @@ struct TestEntity: Entity, EntityReflectable {
 
 }
 
-final class EntityTests: XCTestCase, HasAllTests {
+final class EntityTests: XCTestCase, DomainTestCase, HasAllTests {
 
     static var __allTests = [
         ("testEntityEquatable", testEntityEquatable),

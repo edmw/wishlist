@@ -5,7 +5,7 @@ import XCTest
 import Testing
 
 
-final class ImageFileLocatorTests: XCTestCase, HasAllTests {
+final class ImageFileLocatorTests: XCTestCase, AppTestCase, HasAllTests {
 
     static var __allTests = [
         ("testCreation", testCreation),

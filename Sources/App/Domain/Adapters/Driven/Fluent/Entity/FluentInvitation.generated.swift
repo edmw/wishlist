@@ -88,7 +88,7 @@ public struct FluentInvitation: InvitationModel,
             builder.field(for: \.createdAt)
             builder.field(for: \.userKey)
             builder.field(for: \.inviteeKey)
-            builder.reference(from: \.userKey, to: \FluentUser.id)
+            builder.reference(from: \.userKey, to: \FluentUser.uuid)
         }
     }
 

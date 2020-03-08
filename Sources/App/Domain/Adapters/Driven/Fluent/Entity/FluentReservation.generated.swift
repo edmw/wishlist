@@ -66,7 +66,7 @@ public struct FluentReservation: ReservationModel,
             builder.field(for: \.createdAt)
             builder.field(for: \.itemKey)
             builder.field(for: \.holder)
-            builder.reference(from: \.itemKey, to: \FluentItem.id, onDelete: .cascade)
+            builder.reference(from: \.itemKey, to: \FluentItem.uuid, onDelete: .cascade)
         }
     }
 

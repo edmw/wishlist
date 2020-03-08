@@ -71,7 +71,9 @@ let package = Package(
         ),
         .target(
             name: "Testing",
-            dependencies: [],
+            dependencies: [
+                "Library"
+            ],
             path: "Tests/Testing"
         ),
         .testTarget(

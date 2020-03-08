@@ -10,8 +10,4 @@ extension Visibility: MySQLEnumType {
         return .tinyint
     }
 
-    public static func reflectDecoded() throws -> (Visibility, Visibility) {
-        return (.´private´, .friends)
-    }
-
 }

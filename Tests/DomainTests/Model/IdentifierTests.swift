@@ -5,7 +5,7 @@ import NIO
 import XCTest
 import Testing
 
-final class IdentifierTests: XCTestCase, HasAllTests {
+final class IdentifierTests: XCTestCase, DomainTestCase, HasAllTests {
 
     struct AnIdentifier: DomainIdentifier {
         let rawValue: UUID

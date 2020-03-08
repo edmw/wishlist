@@ -2,7 +2,7 @@
 import XCTest
 import Testing
 
-final class StringTests : XCTestCase, HasAllTests {
+final class StringTests : XCTestCase, LibraryTestCase, HasAllTests {
 
     static var __allTests = [
         ("testHasLetters", testHasLetters),

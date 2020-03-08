@@ -37,28 +37,16 @@ func databasesMigrations(
 ) throws {
     // User
     config.add(model: FluentUser.self, database: .mysql)
-    config.add(migration: AddUserSettings.self, database: .mysql)
-    config.add(migration: RenameUserName.self, database: .mysql)
-    config.add(migration: RenameSubjectId.self, database: .mysql)
-    config.add(migration: AddUserIdentityProvider.self, database: .mysql)
-    config.add(migration: ModifyUserLanguageColumn.self, database: .mysql)
     // List
     config.add(model: FluentList.self, database: .mysql)
-    config.add(migration: AddListOptions.self, database: .mysql)
-    config.add(migration: RenameListName.self, database: .mysql)
-    config.add(migration: ModifyListTitleColumn.self, database: .mysql)
     // Item
     config.add(model: FluentItem.self, database: .mysql)
-    config.add(migration: RenameItemName.self, database: .mysql)
-    config.add(migration: ModifyItemTitleColumn.self, database: .mysql)
     // Favorite
-    config.add(migration: RenameFavoriteTable.self, database: .mysql)
     config.add(model: FluentFavorite.self, database: .mysql)
     // Reservation
     config.add(model: FluentReservation.self, database: .mysql)
     // Invitation
     config.add(model: FluentInvitation.self, database: .mysql)
-    config.add(migration: RenameInvitationInviteeColumn.self, database: .mysql)
 }
 
 // MARK: - User

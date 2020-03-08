@@ -4,7 +4,7 @@ import Vapor
 import Fluent
 import FluentMySQL
 
-extension Text: MySQLType, ReflectionDecodable {
+extension Text: MySQLType {
 
     public static var mysqlDataType: MySQLDataType {
         return .longtext
@@ -16,10 +16,6 @@ extension Text: MySQLType, ReflectionDecodable {
 
     public static func convertFromMySQLData(_ data: MySQLData) throws -> Text {
         return try self.init(string: .convertFromMySQLData(data))
-    }
-
-    public static func reflectDecoded() throws -> (Text, Text) {
-        return ("0", "1")
     }
 
 }

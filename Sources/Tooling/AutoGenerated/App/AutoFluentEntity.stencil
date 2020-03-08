@@ -179,9 +179,9 @@ public struct {{typeName}}: {{entity.name}}Model,
 {% endfor %}
 {% if parentEntity %}
   {% if entity.annotations.AutoFluentEntityParentOnDeleteCascade %}
-            builder.reference(from: \.{{parentEntityKey}}, to: \{{typePrefix}}{{parentEntity}}.id, onDelete: .cascade)
+            builder.reference(from: \.{{parentEntityKey}}, to: \{{typePrefix}}{{parentEntity}}.uuid, onDelete: .cascade)
   {% else %}
-            builder.reference(from: \.{{parentEntityKey}}, to: \{{typePrefix}}{{parentEntity}}.id)
+            builder.reference(from: \.{{parentEntityKey}}, to: \{{typePrefix}}{{parentEntity}}.uuid)
   {% endif %}
 {% endif %}
         }

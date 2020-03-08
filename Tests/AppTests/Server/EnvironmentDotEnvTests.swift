@@ -6,7 +6,7 @@ import Vapor
 import XCTest
 import Testing
 
-final class EnvironmentDotEnvTests: XCTestCase, HasAllTests {
+final class EnvironmentDotEnvTests: XCTestCase, AppTestCase, HasAllTests {
 
     static var __allTests = [
         ("testKeyValue", testKeyValue),

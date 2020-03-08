@@ -1,4 +1,0 @@
-module CNIOAtomics {
-    umbrella header "/Users/Michael/Webdaten/Dropbox/MiB Wepapp Wishlist/.build/checkouts/swift-nio.git--2481707225297366997/Sources/CNIOAtomics/include/CNIOAtomics.h"
-    export *
-}

@@ -10,8 +10,4 @@ extension Invitation.Status: MySQLEnumType {
         return .tinyint
     }
 
-    public static func reflectDecoded() throws -> (Invitation.Status, Invitation.Status) {
-        return (.open, .revoked)
-    }
-
 }

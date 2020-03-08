@@ -54,7 +54,7 @@ extension Environment {
         return try SiteRelease(string: value).value(or:
             VaporError(
                 identifier: "InvalidEnvVar",
-                reason: "Value `\(value)` of environment variable `\(key)`" +
+                reason: "Value '\(value)' of environment variable '\(key)'" +
                     " is not a valid release setting."
             )
         )

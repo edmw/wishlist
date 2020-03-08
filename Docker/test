@@ -23,3 +23,8 @@ out=$(docker build -f Docker/docker.test -t "$label:$version-test" . 2>&1)
 
 image=$(docker image ls | grep " $version-test " | tr -s ' ' | cut -d' ' -f 1,2,3)
 echo "😎 BUILD $image"
+
+echo "🐳 RUNNING Docker TEST compose for project $project with version $version"
+
+SOURCE=`pwd` APPVERSION=$version DBHOST=db-test docker-compose -p $label -f Docker/docker-compose.test up
+#--abort-on-container-exit

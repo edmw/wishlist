@@ -9,6 +9,9 @@
 
 ## [..]
 - 🎁 Add functionality to move items between wishlists
+- 🛠️ Change handling of .env files: already existing env values will have precedence
+- 🛠️ Add automatic generation of LinuxMain.swift
+- ☘ Fix references on fluent models (again)
 
 ## [1.4.3]
 - 🛠️ Improve docker scripts

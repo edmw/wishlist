@@ -4,7 +4,7 @@ import Vapor
 import Fluent
 import FluentMySQL
 
-extension UserSettings: MySQLType, ReflectionDecodable {
+extension UserSettings: MySQLType {
 
     public static var mysqlDataType: MySQLDataType {
         return .json
@@ -23,12 +23,6 @@ extension UserSettings: MySQLType, ReflectionDecodable {
             // better return default settings than run into an error
             return UserSettings()
         }
-    }
-
-    public static func reflectDecoded() throws -> (UserSettings, UserSettings) {
-        var userSettings = UserSettings()
-        userSettings.notifications.pushoverEnabled = true
-        return (UserSettings(), userSettings)
     }
 
 }

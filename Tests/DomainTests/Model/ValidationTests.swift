@@ -5,7 +5,7 @@ import NIO
 import XCTest
 import Testing
 
-final class ValidationTests: XCTestCase, HasAllTests {
+final class ValidationTests: XCTestCase, DomainTestCase, HasAllTests {
 
     static var __allTests = [
         ("testValidate", testValidate),

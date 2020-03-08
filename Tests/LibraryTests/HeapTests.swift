@@ -8,7 +8,28 @@
 import Testing
 import XCTest
 
-class HeapTests: XCTestCase {
+final class HeapTests: XCTestCase, LibraryTestCase, HasAllTests {
+
+    static var __allTests = [
+        ("testEmptyHeap", testEmptyHeap),
+        ("testIsEmpty", testIsEmpty),
+        ("testCount", testCount),
+        ("testMaxHeapOneElement", testMaxHeapOneElement),
+        ("testCreateMaxHeap", testCreateMaxHeap),
+        ("testCreateMinHeap", testCreateMinHeap),
+        ("testCreateMaxHeapEqualnodes", testCreateMaxHeapEqualnodes),
+        ("testCreateMinHeapEqualnodes", testCreateMinHeapEqualnodes),
+        ("testCreateRandomMaxHeap", testCreateRandomMaxHeap),
+        ("testCreateRandomMinHeap", testCreateRandomMinHeap),
+        ("testRemoving", testRemoving),
+        ("testRemoveEmpty", testRemoveEmpty),
+        ("testRemoveRoot", testRemoveRoot),
+        ("testRemoveRandomItems", testRemoveRandomItems),
+        ("testInsert", testInsert),
+        ("testInsertArrayAndRemove", testInsertArrayAndRemove),
+        ("testReplace", testReplace),
+        ("testAllTests", testAllTests)
+    ]
 
     fileprivate func verifyMaxHeap(_ h: Heap<Int>) -> Bool {
         for i in 0 ..< h.count {
@@ -172,7 +193,7 @@ class HeapTests: XCTestCase {
     fileprivate func randomArray(_ n: Int) -> [Int] {
         var a = [Int]()
         for _ in 0 ..< n {
-            a.append(Int(arc4random()))
+            a.append(Int.random(in: 0 ..< Int.max))
         }
         return a
     }
@@ -277,7 +298,7 @@ class HeapTests: XCTestCase {
 
             let m = (n + 1) / 2
             for k in 1 ... m {
-                let i = Int(arc4random_uniform(UInt32(n - k + 1)))
+                let i = Int(Int.random(in: 0 ..< (n - k + 1)))
                 let v = h.remove(at: i)!
                 let j = a.firstIndex(of: v)!
                 a.remove(at: j)
@@ -324,6 +345,10 @@ class HeapTests: XCTestCase {
         // test index out of bounds
         h.replace(index: 20, value: 2)
         XCTAssertTrue(verifyMaxHeap(h))
+    }
+
+    func testAllTests() throws {
+        assertAllTests()
     }
 
 }

@@ -23,6 +23,11 @@ extension Environment {
         }
 
         for record in parseRecords(of: contents) {
+            // check if value for key is either non-existing or empty
+            guard get(record.key).map({ value in value.isEmpty }) ?? true else {
+                // do not use value from .env file otherwise
+                continue
+            }
             setenv(record.key, record.value, 1)
         }
     }

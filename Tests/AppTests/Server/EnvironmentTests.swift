@@ -12,7 +12,7 @@ extension EnvironmentKeys {
     static let urlValue = EnvironmentKey<URL>("URL")
 }
 
-final class EnvironmentTests: XCTestCase, HasAllTests {
+final class EnvironmentTests: XCTestCase, AppTestCase, HasAllTests {
 
     static var __allTests = [
         ("testStringValue", testStringValue),

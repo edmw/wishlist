@@ -2,7 +2,7 @@
 import XCTest
 import Testing
 
-final class UUIDTests : XCTestCase, HasAllTests {
+final class UUIDTests : XCTestCase, LibraryTestCase, HasAllTests {
 
     static var __allTests = [
         ("testEncode", testEncodeBase62),

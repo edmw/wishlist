@@ -1,0 +1,29 @@
+// sourcery:inline:AutoLinuxMain
+
+// MARK: DO NOT EDIT
+
+import XCTest
+@testable import AppTests
+@testable import DomainTests
+@testable import LibraryTests
+
+XCTMain([
+    // AppTests
+{% for type in types.classes|based:"XCTestCase"|implements:"AppTestCase" %}
+    testCase(AppTests.{{type.name}}.__allTests),
+{% endfor %}
+    // DomainTests
+{% for type in types.classes|based:"XCTestCase"|implements:"DomainTestCase" %}
+    testCase(DomainTests.{{type.name}}.__allTests),
+{% endfor %}
+    // LibraryTests
+{% for type in types.classes|based:"XCTestCase"|implements:"LibraryTestCase" %}
+    testCase(LibraryTests.{{type.name}}.__allTests),
+{% endfor %}
+    // Other
+{% for type in types.classes|based:"XCTestCase"|implements:"HasAllTests"|!implements:"AppTestCase"|!implements:"DomainTestCase"|!implements:"LibraryTestCase" %}
+    testCase({{type.name}}.__allTests){% if not forloop.last %},{% endif %}
+{% endfor %}
+])
+
+// sourcery:end

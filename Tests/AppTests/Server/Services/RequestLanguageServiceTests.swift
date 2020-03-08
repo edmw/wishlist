@@ -5,7 +5,7 @@ import VaporTestTools
 import XCTest
 import Testing
 
-final class RequestLanguageServiceTests : XCTestCase, HasAllTests {
+final class RequestLanguageServiceTests : XCTestCase, AppTestCase, HasAllTests {
 
     static var __allTests = [
         ("testDescription", testDescription),

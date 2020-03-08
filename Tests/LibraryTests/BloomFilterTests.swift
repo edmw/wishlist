@@ -2,7 +2,7 @@
 import XCTest
 import Testing
 
-final class BloomFilterTests : XCTestCase, HasAllTests {
+final class BloomFilterTests : XCTestCase, LibraryTestCase, HasAllTests {
 
     static var __allTests = [
         ("testInsertAndContains", testInsertAndContains),

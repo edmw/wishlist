@@ -10,8 +10,4 @@ extension Item.Preference: MySQLEnumType {
         return .tinyint
     }
 
-    public static func reflectDecoded() throws -> (Item.Preference, Item.Preference) {
-        return (.low, .high)
-    }
-
 }

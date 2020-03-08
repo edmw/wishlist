@@ -7,7 +7,7 @@ import Testing
 
 /// Testing the most simple actor. The announcement actor just takes the id of an potential
 /// user and returns a user representation then.
-final class AnnouncementsActorTests : ActorTestCase, HasAllTests {
+final class AnnouncementsActorTests : ActorTestCase, DomainTestCase, HasAllTests {
 
     static var __allTests = [
         ("testPresentPubliclyWithUser", testPresentPubliclyWithUser),

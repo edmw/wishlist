@@ -1,6 +1,8 @@
 version: "3.3"
 services:
   app-test:
+    stdin_open: true
+    tty: true
     container_name: wishlist-app-test
     image: "wishlist:${APPVERSION}-test"
     environment:
@@ -25,6 +27,9 @@ services:
       PUSHOVER_APPLICATION_TOKEN: "${PUSHOVER_APPLICATION_TOKEN}"
       DEVELOPMENT_LOG_LEVEL: "${DEVELOPMENT_LOG_LEVEL}"
       RELEASE_LOG_LEVEL: "${RELEASE_LOG_LEVEL}"
+    working_dir: /app
+    volumes:
+      - ../:/app
     links:
       - db-test
     depends_on:
