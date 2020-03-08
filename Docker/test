@@ -2,29 +2,47 @@
 project=Wishlist
 version=$1
 label=$(echo "$project" | tr "[:upper:]" "[:lower:]")
-
 echo
+source "./Docker/functions"
+check_version
 
-if [[ ! -d "./$project.xcodeproj" ]] ; then
-  echo "🤔 Script must be run in project directory ..."; exit 1
-fi
-if [[ ! $version =~ ^[0-9]+(\.[0-9]+){2,2}(\-RC[0-9]+){0,1}$ ]];
-then
-  echo "🤔 Script must be run with version number as argument ..."; exit 1
-fi
+docker_build_swift
 
-echo "🐳 BUILDING Docker TEST image for project $project with version $version"
+echo "🐳 RUNNING TESTS: Project $project with version $version"
 
-out=$(docker build -f Docker/docker.test -t "$label:$version-test" . 2>&1)
+docker_compose_in="$(cat <<-EOF
+version: "3.3"
+services:
+  app-test:
+    container_name: wishlist-app-test
+    command: sh -c 'swift build --configuration debug -Xswiftc "-suppress-warnings" -Xswiftc "-g" --build-path "./.build_docker_test" && swift test --skip-update --build-path "./.build_docker_test"'
+    image: "wishlist:swift"
+    environment:
+      SITE_URL: "http://localhost:8080"
+      SITE_RELEASE: "beta"
+      SITE_ACCESS: "all"
+      DBHOST: "db-test"
+    working_dir: /app
+    volumes:
+      - ./:/app
+    links:
+      - db-test
+    depends_on:
+      - db-test
+  db-test:
+    container_name: wishlist-db-test
+    image: mysql:5
+    environment:
+      MYSQL_ROOT_PASSWORD: wishlist
+      MYSQL_USER: wishlist
+      MYSQL_PASSWORD: wishlist
+      MYSQL_DATABASE: wishlist
+EOF
+)"
+
+echo "$docker_compose_in" | APPVERSION=$version docker-compose -p $label -f - up --abort-on-container-exit
 [ $? -ne 0 ] \
-    && echo "$out" \
-    && echo "⛔ Docker build command failed!" \
+    && echo "⛔ Docker compose command failed!" \
     && exit 1
 
-image=$(docker image ls | grep " $version-test " | tr -s ' ' | cut -d' ' -f 1,2,3)
-echo "😎 BUILD $image"
-
-echo "🐳 RUNNING Docker TEST compose for project $project with version $version"
-
-SOURCE=`pwd` APPVERSION=$version DBHOST=db-test docker-compose -p $label -f Docker/docker-compose.test up
-#--abort-on-container-exit
+echo "😎 RUN TESTS: Project $project with version $version"

@@ -44,7 +44,10 @@ struct VaporImageStoreProvider: ImageStoreProvider {
 
     func removeImage(at locator: ImageStoreLocator) throws {
         let imageFileMiddleware = try container.make(ImageFileMiddleware.self)
-        let imageFileLocator = try imageFileMiddleware.imageFileLocator(from: locator.url)
+        let imageFileLocator = try imageFileMiddleware.imageFileLocator(
+            from: locator.url,
+            isRelative: true
+        )
         try imageFileMiddleware.removeFile(
             at: imageFileLocator,
             deleteParentsIfEmpty: true,

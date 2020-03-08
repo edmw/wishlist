@@ -2,18 +2,13 @@
 project=Wishlist
 version=$1
 label=$(echo "$project" | tr "[:upper:]" "[:lower:]")
-
 echo
+source "./Docker/functions"
+check_version
 
-if [[ ! -d "./$project.xcodeproj" ]] ; then
-  echo "🤔 Script must be run in project directory ..."; exit 1
-fi
-if [[ ! $version =~ ^[0-9]+(\.[0-9]+){2,2}(\-RC[0-9]+){0,1}$ ]];
-then
-  echo "🤔 Script must be run with version number as argument ..."; exit 1
-fi
+docker_build_swift
 
-echo "🐳 BUILDING Docker image for project $project with version $version"
+echo "🐳 BUILDING IMAGE: Project $project with version $version"
 
 out=$(docker build -f Docker/docker -t "$label:$version" . 2>&1)
 [ $? -ne 0 ] \
@@ -21,5 +16,5 @@ out=$(docker build -f Docker/docker -t "$label:$version" . 2>&1)
     && echo "⛔ Docker build command failed!" \
     && exit 1
 
-image=$(docker image ls | grep " $version " | tr -s ' ' | cut -d' ' -f 1,2,3)
-echo "😎 BUILD $image"
+image=$(docker image ls | grep -E "^$label\s+$version " | tr -s ' ' | cut -d' ' -f 1,2,3)
+echo "😎 BUILD IMAGE: $image"

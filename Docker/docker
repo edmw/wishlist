@@ -1,14 +1,6 @@
-FROM swift:5.1.4 AS builder
-RUN apt-get -qq update \
-    && apt-get -q -y install \
-        libssl-dev \
-        openssl \
-        tzdata \
-        zlib1g-dev \
-    && rm -r /var/lib/apt/lists/*
+FROM wishlist:swift AS builder
 WORKDIR /app
 COPY . .
-RUN mkdir -p /build/lib && cp -R /usr/lib/swift/linux/lib* /build/lib
 RUN swift build --configuration release --product "Wishlist" -Xswiftc "-suppress-warnings" -Xswiftc "-g" && mv `swift build --configuration release --show-bin-path` /build/bin
 
 FROM ubuntu:18.04

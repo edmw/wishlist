@@ -27,7 +27,7 @@ final class EnvironmentTests: XCTestCase, AppTestCase, HasAllTests {
         assert(
             try Environment.require(.stringValue),
             throws: VaporError.self,
-            reflection: .contains("Required environment variable `STRING` missing.")
+            reflection: .contains("Required environment variable 'STRING' missing.")
         )
         setenv("STRING", "hi there", 1)
         XCTAssertEqual(Environment.get(.stringValue)!, "hi there")
@@ -39,7 +39,7 @@ final class EnvironmentTests: XCTestCase, AppTestCase, HasAllTests {
         assert(
             try Environment.require(.intValue),
             throws: VaporError.self,
-            reflection: .contains("Required environment variable `INT` missing.")
+            reflection: .contains("Required environment variable 'INT' missing.")
         )
         setenv("INT", "24", 1)
         XCTAssertEqual(Environment.get(.intValue)!, 24)
@@ -59,7 +59,7 @@ final class EnvironmentTests: XCTestCase, AppTestCase, HasAllTests {
         assert(
             try Environment.require(.urlValue),
             throws: VaporError.self,
-            reflection: .contains("Required environment variable `URL` missing.")
+            reflection: .contains("Required environment variable 'URL' missing.")
         )
         setenv("URL", "http://example.com/path", 1)
         XCTAssertEqual(
