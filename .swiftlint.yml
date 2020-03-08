@@ -97,6 +97,7 @@ identifier_name:
     - for
     - on
     - new
+    - old
     - log
     - low
     - lhs

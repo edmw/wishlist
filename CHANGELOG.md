@@ -8,8 +8,11 @@
 - [x.y.z] released version x.y.z
 
 ## [..]
+
+## [1.5.0]
 - 🎁 Add functionality to move items between wishlists
 - 🛠️ Change handling of .env files: already existing env values will have precedence
+- 🛠️ Enable test runs for Linux
 - 🛠️ Add automatic generation of LinuxMain.swift
 - 🛠️ Improve docker scripts
 - ☘ Fix references on fluent models (again)
