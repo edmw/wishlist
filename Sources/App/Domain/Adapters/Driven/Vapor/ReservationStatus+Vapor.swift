@@ -2,10 +2,10 @@ import Domain
 
 import Vapor
 
-extension Visibility: ReflectionDecodable {
+extension Reservation.Status: ReflectionDecodable {
 
     public static func reflectDecoded() throws -> (Self, Self) {
-        return (.´private´, .friends)
+        return (.open, .closed)
     }
 
 }

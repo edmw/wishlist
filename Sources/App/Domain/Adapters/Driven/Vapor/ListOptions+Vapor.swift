@@ -4,7 +4,7 @@ import Vapor
 
 extension List.Options: ReflectionDecodable {
 
-    public static func reflectDecoded() throws -> (List.Options, List.Options) {
+    public static func reflectDecoded() throws -> (Self, Self) {
         return ([], [.maskReservations])
     }
 

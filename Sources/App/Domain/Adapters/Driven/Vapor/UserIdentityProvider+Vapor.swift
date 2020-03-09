@@ -4,7 +4,7 @@ import Vapor
 
 extension UserIdentityProvider: ReflectionDecodable {
 
-    public static func reflectDecoded() throws -> (UserIdentityProvider, UserIdentityProvider) {
+    public static func reflectDecoded() throws -> (Self, Self) {
         return ("0", "1")
     }
 

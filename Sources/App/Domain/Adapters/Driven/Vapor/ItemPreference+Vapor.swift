@@ -4,7 +4,7 @@ import Vapor
 
 extension Item.Preference: ReflectionDecodable {
 
-    public static func reflectDecoded() throws -> (Item.Preference, Item.Preference) {
+    public static func reflectDecoded() throws -> (Self, Self) {
         return (.low, .high)
     }
 

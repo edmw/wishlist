@@ -4,7 +4,7 @@ import Vapor
 
 extension LanguageTag: ReflectionDecodable {
 
-    public static func reflectDecoded() throws -> (LanguageTag, LanguageTag) {
+    public static func reflectDecoded() throws -> (Self, Self) {
         return ("0", "1")
     }
 

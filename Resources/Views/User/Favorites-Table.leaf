@@ -16,7 +16,7 @@
             <td class="wl-owner" data-label="#L10N("list-owner"){Owner}">#(favorite.list.ownerName)</td>
             <td class="wl-actions" data-label="">
                 <div class="btn-group" role="group">
-                    <a class="btn btn-link ml-3" href="/user/#(page.userID)/favorites/delete?listid=#(favorite.list.id)#if(location){&p=#(location)}" title="#L10N("remove-favorite"){Remove favorite}"><svg class="feather"><use xlink:href="/icons/feather.svg#x-circle"/></svg></a>
+                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/favorites/delete?listid=#(favorite.list.id)#if(location){&p=#(location)}" title="#L10N("remove-favorite"){Remove favorite}"><svg class="feather"><use xlink:href="/icons/feather.svg#x-circle"/></svg></a>
                 </div>
             </td>
         </tr>

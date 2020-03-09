@@ -72,6 +72,7 @@ struct Features: Encodable, CustomDebugStringConvertible, ServiceType {
     let undoReservation          = Feature(date: "2018-11-19", version: "1.0")
     let notifyCreateReservation  = Feature(date: "2019-10-15", version: "1.3")
     let notifyDeleteReservation  = Feature(date: "2019-10-15", version: "1.3")
+    let reservationStatus        = Feature.inDevelopment(true)
     // presentation
     let showWishlist             = Feature(date: "2018-11-19", version: "1.0")
     // technical

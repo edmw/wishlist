@@ -12,7 +12,7 @@
         <tr>
             <td class="wl-code">
                 #if(invitation.status != "revoked") {
-                <a class="btn btn-link mr-2" href="/signin/?invitation=#(invitation.code)" title="#L10N("invitation-link"){Invitation link}"><svg class="feather"><use xlink:href="/icons/feather.svg#share"/></svg></a>#(invitation.code)</a>
+                <a class="btn btn-action mr-2" href="/signin/?invitation=#(invitation.code)" title="#L10N("invitation-link"){Invitation link}"><svg class="feather"><use xlink:href="/icons/feather.svg#share"/></svg></a>#(invitation.code)</a>
                 } else {
                     <svg class="feather"><use xlink:href="/icons/feather.svg#share"/></svg>
                 }
@@ -21,7 +21,7 @@
             <td class="wl-sent-at">
                 #if(invitation.status == "open") {
                 <form method="POST" action="/user/#(page.userID)/invitation/#(invitation.id)/send#if(location){?p=#(location)}" accept-charset="UTF-8" class="form-inline d-inline-flex">
-                <button class="btn btn-link mr-2" title="#L10N("resend-invitation"){Resend invitation}"><svg class="feather"><use xlink:href="/icons/feather.svg#rotate-ccw"/></svg></button>
+                <button class="btn btn-action btn-link mr-2" title="#L10N("resend-invitation"){Resend invitation}"><svg class="feather"><use xlink:href="/icons/feather.svg#rotate-ccw"/></svg></button>
                 </form>
                 }
                 #if(invitation.sentAt == nil) {#L10N("never"){never}}else{#L10NDate(invitation.sentAt)}
@@ -30,7 +30,7 @@
             <td class="wl-actions">
                 <div class="btn-group" role="group">
                     #if(invitation.status == "open") {
-                    <a class="btn btn-link ml-3" href="/user/#(page.userID)/invitation/#(invitation.id)/revoke#if(location){?p=#(location)}" title="#L10N("revoke-invitation"){Revoke invitation}"><svg class="feather"><use xlink:href="/icons/feather.svg#slash"/></svg></a>
+                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/invitation/#(invitation.id)/revoke#if(location){?p=#(location)}" title="#L10N("revoke-invitation"){Revoke invitation}"><svg class="feather"><use xlink:href="/icons/feather.svg#slash"/></svg></a>
                     }
                 </div>
             </td>

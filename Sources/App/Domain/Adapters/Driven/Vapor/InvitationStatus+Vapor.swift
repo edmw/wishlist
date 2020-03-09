@@ -4,7 +4,7 @@ import Vapor
 
 extension Invitation.Status: ReflectionDecodable {
 
-    public static func reflectDecoded() throws -> (Invitation.Status, Invitation.Status) {
+    public static func reflectDecoded() throws -> (Self, Self) {
         return (.open, .revoked)
     }
 

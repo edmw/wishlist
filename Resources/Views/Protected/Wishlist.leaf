@@ -39,9 +39,9 @@ you're viewing <strong>#(page.ownerName)'s #(page.listTitle) Wishlist</strong>. 
                     </div>
                     <div class="btn-group #if(item.url) {justify-content-between} else {justify-content-end}" role="group">
                         #if(item.url) {
-                        <a class="btn btn-link text-light" href="#(item.url)" title="#L10N("wish-open-link"){Open link to wish}"><svg class="feather"><use xlink:href="/icons/feather.svg#external-link"/></svg></a>
+                        <a class="btn text-light" href="#(item.url)" title="#L10N("wish-open-link"){Open link to wish}"><svg class="feather"><use xlink:href="/icons/feather.svg#external-link"/></svg></a>
                         }
-                        <a class="wl-item-btn-flip btn btn-link text-light" title="#L10N("wish-show-details"){Show details for wish}"><svg class="feather"><use xlink:href="/icons/feather.svg#book-open"/></svg></a>
+                        <a class="wl-item-btn-flip btn text-light" title="#L10N("wish-show-details"){Show details for wish}"><svg class="feather"><use xlink:href="/icons/feather.svg#book-open"/></svg></a>
                     </div>
                 </div>
                 <div class="back bg-dark p-2">
@@ -51,7 +51,7 @@ you're viewing <strong>#(page.ownerName)'s #(page.listTitle) Wishlist</strong>. 
                         <p class="text-light mt-2">#(item.text)</p>
                     </div>
                     <div class="btn-group justify-content-end" role="group">
-                        <a class="wl-item-btn-flip btn btn-link text-light"><svg class="feather"><use xlink:href="/icons/feather.svg#book"/></svg></a>
+                        <a class="wl-item-btn-flip btn text-light"><svg class="feather"><use xlink:href="/icons/feather.svg#book"/></svg></a>
                     </div>
                 </div>
                 #if(item.reservationHolderID) {

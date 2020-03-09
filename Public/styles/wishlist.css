@@ -517,6 +517,13 @@ h2, .h2, h3, h4 {
     padding: .25rem .75rem;
     font-size: 0.875rem;
 }
+.btn-action {
+    width: 30px;
+    height: 30px;
+    background-color: #eee;
+    box-shadow: 0 0 0 4px #eee;
+    border-radius: 50vh !important;
+}
 .btn-link .btn-label {
     font-size: 1.0rem;
     font-weight: 400;

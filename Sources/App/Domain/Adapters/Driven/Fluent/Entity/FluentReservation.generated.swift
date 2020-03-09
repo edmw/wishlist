@@ -32,6 +32,7 @@ public struct FluentReservation: ReservationModel,
 
     public var uuid: UUID?
     public var id: ReservationID? { ReservationID(uuid: uuid) }
+    public var status: Reservation.Status
     public var createdAt: Date
     public var itemKey: UUID
     public var itemID: ItemID { ItemID(uuid: itemKey) }
@@ -41,11 +42,13 @@ public struct FluentReservation: ReservationModel,
     /// To create this object a getter `model` is provided on the Domain entity `Reservation`.
     init(
         uuid: UUID?,
+        status: Reservation.Status,
         createdAt: Date,
         itemKey: UUID,
         holder: Identification
     ) {
         self.uuid = uuid
+        self.status = status
         self.createdAt = createdAt
         self.itemKey = itemKey
         self.holder = holder
@@ -53,6 +56,7 @@ public struct FluentReservation: ReservationModel,
 
     enum CodingKeys: String, CodingKey {
         case uuid = "id"
+        case status
         case createdAt
         case itemKey = "itemID"
         case holder
@@ -63,6 +67,7 @@ public struct FluentReservation: ReservationModel,
     public static func prepare(on connection: Database.Connection) -> EventLoopFuture<Void> {
         return Database.create(self, on: connection) { builder in
             builder.field(for: \.uuid)
+            builder.field(for: \.status)
             builder.field(for: \.createdAt)
             builder.field(for: \.itemKey)
             builder.field(for: \.holder)
@@ -88,6 +93,9 @@ public struct FluentReservation: ReservationModel,
         guard lhs.uuid == rhs.uuid else {
             return false
         }
+        guard lhs.status == rhs.status else {
+            return false
+        }
         guard lhs.createdAt == rhs.createdAt else {
             return false
         }
@@ -109,6 +117,7 @@ extension Reservation {
     var model: FluentReservation {
         return .init(
             uuid: id?.uuid,
+            status: status,
             createdAt: createdAt,
             itemKey: itemID.uuid,
             holder: holder

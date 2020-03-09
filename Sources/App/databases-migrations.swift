@@ -45,13 +45,14 @@ func databasesMigrations(
     config.add(model: FluentFavorite.self, database: .mysql)
     // Reservation
     config.add(model: FluentReservation.self, database: .mysql)
+    config.add(migration: AddReservationStatus.self, database: .mysql)
     // Invitation
     config.add(model: FluentInvitation.self, database: .mysql)
 }
 
 // MARK: - User
 
-struct ModifyUserLanguageColumn: MySQLForwardMigration {
+struct ModifyUserLanguage: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
@@ -167,7 +168,7 @@ struct AddUserIdentificationIndex: MySQLForwardMigration {
 
 // MARK: - List
 
-struct ModifyListTitleColumn: MySQLForwardMigration {
+struct ModifyListTitle: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
@@ -211,7 +212,7 @@ struct AddListItemsSorting: MySQLForwardMigration {
 
 }
 
-struct RenameListModifiedOnColumn: MySQLForwardMigration {
+struct RenameListModifiedOn: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
@@ -221,7 +222,7 @@ struct RenameListModifiedOnColumn: MySQLForwardMigration {
 
 }
 
-struct RenameListCreatedOnColumn: MySQLForwardMigration {
+struct RenameListCreatedOn: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
@@ -243,7 +244,7 @@ struct AddListForeignKeyConstraint: MySQLForwardMigration {
 
 // MARK: - Item
 
-struct ModifyItemTitleColumn: MySQLForwardMigration {
+struct ModifyItemTitle: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
@@ -275,7 +276,7 @@ struct AddItemPreference: MySQLForwardMigration {
 
 }
 
-struct RenameItemModifiedOnColumn: MySQLForwardMigration {
+struct RenameItemModifiedOn: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
@@ -285,7 +286,7 @@ struct RenameItemModifiedOnColumn: MySQLForwardMigration {
 
 }
 
-struct RenameItemCreatedOnColumn: MySQLForwardMigration {
+struct RenameItemCreatedOn: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
@@ -321,7 +322,7 @@ struct RenameFavoriteTable: MySQLForwardMigration {
 
 // MARK: - Invitation
 
-struct RenameInvitationInviteeColumn: MySQLForwardMigration {
+struct RenameInvitationInvitee: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection.assertFieldMustNotExist(\FluentInvitation.inviteeKey) {
@@ -345,7 +346,7 @@ struct AddInvitationInvitee: MySQLForwardMigration {
 
 // MARK: - Reservation
 
-struct RenameReservationCreatedOnColumn: MySQLForwardMigration {
+struct RenameReservationCreatedOn: MySQLForwardMigration {
 
     static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
         return connection
@@ -361,6 +362,23 @@ struct AddReservationForeignKeyConstraint: MySQLForwardMigration {
         return Database.update(FluentReservation.self, on: connection) { builder in
             builder.reference(from: \.itemKey, to: \FluentItem.uuid, onDelete: .cascade)
         }
+    }
+
+}
+
+struct AddReservationStatus: MySQLForwardMigration {
+
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
+        return connection
+            .assertFieldMustNotExist(\FluentReservation.status) {
+                return Database.update(FluentReservation.self, on: connection) { builder in
+                    builder.field(
+                        for: \.status,
+                        type: Reservation.Status.mysqlDataType,
+                        .default(.literal(0))
+                    )
+                }
+            }
     }
 
 }

@@ -22,6 +22,7 @@ public final class Reservation: ReservationModel,
 
     public internal(set) var id: ReservationID?
 
+    public internal(set) var status: Reservation.Status
     public internal(set) var createdAt: Date
 
     /// Item (what item is reserved)
@@ -32,6 +33,7 @@ public final class Reservation: ReservationModel,
 
     public init<T: ReservationModel>(from other: T) {
         self.id = other.id
+        self.status = other.status
         self.createdAt = other.createdAt
         self.itemID = other.itemID
         self.holder = other.holder
@@ -48,6 +50,7 @@ public final class Reservation: ReservationModel,
 
         self.id = id
 
+        self.status = .open
         self.createdAt = Date()
 
         self.itemID = itemid
@@ -59,6 +62,7 @@ public final class Reservation: ReservationModel,
 
     public static var properties: EntityProperties<Reservation> = .build(
         .init(\Reservation.id, label: "id"),
+        .init(\Reservation.status, label: "status"),
         .init(\Reservation.createdAt, label: "createdAt"),
         .init(\Reservation.itemID, label: "itemID"),
         .init(\Reservation.holder, label: "holder")
@@ -76,6 +80,49 @@ public final class Reservation: ReservationModel,
     public var debugDescription: String {
         return "Reservation[\(id ??? "???")]" +
             "(item:\(itemID))|holder:\(holder))"
+    }
+
+    // MARK: - Status
+
+    /// Status of an reservation. Can be one of `open`, `closed`.
+    public enum Status: Int, Codable, CustomStringConvertible, LosslessStringConvertible {
+
+        /// A open reservation can be deleted. Items with an open reservation attached can not be
+        /// moved or archived.
+        case open = 0
+        /// A closed reservation can not be deleted. A reservation can not be reopened. Items with
+        /// a closed reservation attached can be moved or archived.
+        case closed = 1
+
+        public init?(string value: String?) {
+            guard let value = value else {
+                return nil
+            }
+            switch value {
+            case "open":     self = .open
+            case "closed":   self = .closed
+            default:
+                return nil
+            }
+        }
+
+        // MARK: CustomStringConvertible
+
+        public var description: String {
+            switch self {
+            case .open:
+                return "open"
+            case .closed:
+                return "closed"
+            }
+        }
+
+        // MARK: LosslessStringConvertible
+
+        public init?(_ string: String) {
+            self.init(string: string)
+        }
+
     }
 
 }

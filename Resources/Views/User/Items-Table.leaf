@@ -17,7 +17,7 @@
             <td class="wl-actions" data-label="">
                 <div class="btn-group" role="group">
                     #if(item.url) {
-                    <a class="btn btn-link ml-3" href="#(item.url)" title="#L10N("open-item-url"){Open external item URL}"><svg class="feather"><use xlink:href="/icons/feather.svg#external-link"/></svg></a>
+                    <a class="btn btn-action ml-3" href="#(item.url)" title="#L10N("open-item-url"){Open external item URL}"><svg class="feather"><use xlink:href="/icons/feather.svg#external-link"/></svg></a>
                     }
                 </div>
             </td>
@@ -27,13 +27,13 @@
             <td class="wl-actions" data-label="">
                 <div class="btn-group" role="group">
                     #if(features.moveItem.enabled && item.reservationID == nil) {
-                    <a class="btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/move" title="#L10N("move-item"){Move item}"><svg class="feather"><use xlink:href="/icons/feather.svg#log-in"/></svg></a>
+                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/move" title="#L10N("move-item"){Move item}"><svg class="feather"><use xlink:href="/icons/feather.svg#log-in"/></svg></a>
                     }
-                    <a class="btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/edit" title="#L10N("edit-item"){Edit item}"><svg class="feather"><use xlink:href="/icons/feather.svg#edit"/></svg></a>
+                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/edit" title="#L10N("edit-item"){Edit item}"><svg class="feather"><use xlink:href="/icons/feather.svg#edit"/></svg></a>
                     #if(item.reservationID) {
-                    <a class="btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/reservation/#(item.reservationID)/delete" title="#L10N("release-item"){Release item}"><svg class="feather"><use xlink:href="/icons/feather.svg#x-circle"/></svg></a>
+                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/reservation/#(item.reservationID)/delete" title="#L10N("release-item"){Release item}"><svg class="feather"><use xlink:href="/icons/feather.svg#x-circle"/></svg></a>
                     } else {
-                    <a class="btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/delete" title="#L10N("delete-item"){Delete item}"><svg class="feather"><use xlink:href="/icons/feather.svg#delete"/></svg></a>
+                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/delete" title="#L10N("delete-item"){Delete item}"><svg class="feather"><use xlink:href="/icons/feather.svg#delete"/></svg></a>
                     }
                 </div>
             </td>
