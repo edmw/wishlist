@@ -81,6 +81,8 @@ final class EnvironmentTests: XCTestCase, AppTestCase, HasAllTests {
     }
 
     func testSiteURL() throws {
+        // remember orginal value
+        let siteurl = Environment.get(.siteURL)
         // valid
         let url = "https://localhost:12345"
         setenv("SITE_URL", url, 1)
@@ -104,6 +106,8 @@ final class EnvironmentTests: XCTestCase, AppTestCase, HasAllTests {
             throws: VaporError.self,
             reflection: .contains("is not a valid URL")
         )
+        // set orginal value
+        setenv("SITE_URL", siteurl?.absoluteString ?? "", 1)
     }
 
     func testAllTests() throws {

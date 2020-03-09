@@ -10,6 +10,7 @@
 ## [..]
 - 🛠️ Add status field to Reservation
 - 🛠️ Improve button design
+- 🛠️ Setup Travis CI
 
 ## [1.5.0]
 - 🖌 Add functionality to move items between wishlists
