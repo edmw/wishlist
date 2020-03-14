@@ -13,6 +13,7 @@ extension WishlistPageContext {
     static var builder: WishlistPageContextBuilder {
         return WishlistPageContextBuilder()
     }
+
 }
 
 enum WishlistPageContextBuilderError: Error {
@@ -23,6 +24,8 @@ enum WishlistPageContextBuilderError: Error {
 }
 
 class WishlistPageContextBuilder {
+
+    var actions = PageActions()
 
     var list: ListRepresentation?
     var owner: UserRepresentation?
@@ -67,6 +70,12 @@ class WishlistPageContextBuilder {
         return self
     }
 
+    @discardableResult
+    func setAction(_ key: String, _ action: PageAction) -> Self {
+        self.actions[key] = action
+        return self
+    }
+
     func build() throws -> WishlistPageContext {
         guard let list = list else {
             throw WishlistPageContextBuilderError.missingRequiredList
@@ -77,7 +86,7 @@ class WishlistPageContextBuilder {
         guard let identification = identification else {
             throw WishlistPageContextBuilderError.missingRequiredIdentification
         }
-        return .init(
+        var context = WishlistPageContext(
             for: list,
             of: owner,
             with: items,
@@ -85,6 +94,8 @@ class WishlistPageContextBuilder {
             isFavorite: isFavorite,
             identification: identification
         )
+        context.actions = actions
+        return context
     }
 
 }

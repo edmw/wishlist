@@ -9,7 +9,7 @@ import Library
 ///
 /// Relations:
 /// - Parent: User
-public final class Invitation: InvitationModel, Confidental,
+public final class Invitation: InvitationModel, Confidental, Representable,
     DomainEntity,
     DomainEntityDetachable,
     DomainEntityReflectable,

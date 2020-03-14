@@ -29,15 +29,7 @@ final class FavoriteController: AuthenticatableController,
                         .boundaries(worker: request.eventLoop)
                     )
                     .flatMap { result in
-                        let context = try ListPageContext.builder
-                            .forUser(result.user)
-                            .withList(result.list)
-                            .build()
-                        return try Controller.renderView(
-                            "User/FavoriteCreation",
-                            with: context,
-                            on: request
-                        )
+                        try Controller.render(page: .favoriteCreation(with: result), on: request)
                     }
                     .handleAuthorizationError(on: request)
             }
@@ -56,20 +48,12 @@ final class FavoriteController: AuthenticatableController,
                         .boundaries(worker: request.eventLoop)
                     )
                     .flatMap { result in
-                        let context = try ListPageContext.builder
-                            .forUser(result.user)
-                            .withList(result.list)
-                            .build()
-                        return try Controller.renderView(
-                            "User/FavoriteDeletion",
-                            with: context,
-                            on: request
-                        )
-                        .encode(for: request)
+                        try Controller.render(page: .favoriteDeletion(with: result), on: request)
+                            .encode(for: request)
                     }
                     .catchMap(UserFavoritesActorError.self) { _ in
                         // Tries to redirect back to the start page.
-                        return Controller.redirect(to: "/", on: request)
+                        Controller.redirect(to: "/", on: request)
                     }
                     .handleAuthorizationError(on: request)
             }

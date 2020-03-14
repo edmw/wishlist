@@ -1,5 +1,5 @@
 {% for type in types.implementing.AutoPageContextBuilder %}
-{% macro builder_methodname_for_parameter parameter %}{% if parameter.typeName.name == "Bool" %}{{parameter.name}}{% else %}{% if parameter.isOptional %}with{% else %}for{% endif %}{{parameter.name|upperFirstLetter}}{% endif %}{% endmacro %}
+{% macro builder_methodname_for_parameter parameter %}{% if parameter.typeName.name == "Bool" %}{{parameter.name}}{% else %}{% if parameter.isOptional %}with{% else %}for{% endif %}{{parameter.name|upperFirstLetter|replace:"Context",""}}{% endif %}{% endmacro %}
 // sourcery:inline:{{type.name}}Builder.AutoPageContextBuilder
 
 // MARK: DO NOT EDIT
@@ -27,6 +27,7 @@ extension {{type.name}} {
     static var builder: {{type.name}}Builder {
         return {{type.name}}Builder()
     }
+
 }
 
 enum {{type.name}}BuilderError: Error {
@@ -40,6 +41,8 @@ enum {{type.name}}BuilderError: Error {
 }
 
 class {{type.name}}Builder {
+
+    var actions = PageActions()
 
 {% for initializer in type.initializers where initializer|annotated:"AutoPageContextBuilderInitializer" %}
 {% for parameter in initializer.parameters %}
@@ -57,6 +60,12 @@ class {{type.name}}Builder {
 {% endfor %}
 {% endfor %}
 
+    @discardableResult
+    func setAction(_ key: String, _ action: PageAction) -> Self {
+        self.actions[key] = action
+        return self
+    }
+
     func build() throws -> {{type.name}} {
       {% for initializer in type.initializers where initializer|annotated:"AutoPageContextBuilderInitializer" %}
       {% for parameter in initializer.parameters %}
@@ -66,11 +75,13 @@ class {{type.name}}Builder {
         }
         {% endif %}
       {% endfor %}
-        return .init(
+        var context = {{type.name}}(
         {% for parameter in initializer.parameters %}
             {{parameter.argumentLabel}}: {{parameter.name}}{% if not forloop.last %},{% endif %}
         {% endfor %}
         )
+        context.actions = actions
+        return context
       {% endfor %}
     }
 

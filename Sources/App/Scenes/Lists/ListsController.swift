@@ -27,11 +27,7 @@ final class ListsController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try ListsPageContext.builder
-                    .forUser(result.user)
-                    .withLists(result.lists)
-                    .build()
-                return try Controller.renderView("User/Lists", with: context, on: request)
+                try Controller.render(page: .lists(with: result), on: request)
             }
     }
 

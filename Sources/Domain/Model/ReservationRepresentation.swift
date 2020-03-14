@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: ReservationRepresentation
 
-public struct ReservationRepresentation: Encodable, Equatable {
+public struct ReservationRepresentation: Representation, Encodable, Equatable {
 
     public let id: ReservationID?
 

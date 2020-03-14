@@ -1,7 +1,8 @@
 #set("title") {#L10N("list-import"){Import a list}}
 #//
 #set("content") {
-<form method="POST" action="/user/#(page.userID)/lists/import#if(request.parameter.p){?p=#(request.parameter.p)}" enctype="multipart/form-data">
+<form method="POST" action="#(page.actions.form.reference)#if(request.parameter.p){?p=#(request.parameter.p)}" enctype="multipart/form-data">
+#if(page.actions.form.method != "POST") {<input type="hidden" name="__method" value="#(page.actions.form.method)">}
 <div class="form-group">
     <label id="fileUploadLabel" for="fileUpload"><h2>#L10N("list-import-choose"){Please choose file file to import}</h2></label>
     <input type="file" name="file" class="form-control-file" id="fileUpload" aria-describedby="fileUploadLabel">

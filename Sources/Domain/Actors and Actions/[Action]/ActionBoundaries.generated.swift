@@ -439,6 +439,19 @@ extension RequestItemMovement.Boundaries {
     }
 
 }
+// MARK: RequestItemReceiving.Boundaries
+
+extension RequestItemReceiving.Boundaries {
+
+    public static func boundaries(
+        worker: EventLoop
+    ) -> Self {
+        return Self(
+            worker: worker
+        )
+    }
+
+}
 // MARK: RequestListDeletion.Boundaries
 
 extension RequestListDeletion.Boundaries {

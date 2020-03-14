@@ -32,16 +32,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "Wishlist::LibraryTests"
-               BuildableName = "LibraryTests.xctest"
-               BlueprintName = "LibraryTests"
-               ReferencedContainer = "container:Wishlist.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "Wishlist::AppTests"
                BuildableName = "AppTests.xctest"
                BlueprintName = "AppTests"
@@ -55,6 +45,16 @@
                BlueprintIdentifier = "Wishlist::DomainTests"
                BuildableName = "DomainTests.xctest"
                BlueprintName = "DomainTests"
+               ReferencedContainer = "container:Wishlist.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Wishlist::LibraryTests"
+               BuildableName = "LibraryTests.xctest"
+               BlueprintName = "LibraryTests"
                ReferencedContainer = "container:Wishlist.xcodeproj">
             </BuildableReference>
          </TestableReference>

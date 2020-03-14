@@ -5,14 +5,8 @@
 }
 #//
 #set("content") {
-#if(page.list.id == nil) {
-#// form action and method to create a new list
-<form method="POST" action="/user/#(page.userID)/lists#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="wl-list">
-} else {
-#// form action and method to update an existing list
-<form method="POST" action="/user/#(page.userID)/list/#(page.list.id)/#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="wl-list">
-<input name="__method" type="hidden" value="PUT">
-}
+<form method="POST" action="#(page.actions.form.reference)#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="wl-form wl-list">
+#if(page.actions.form.method != "POST") {<input type="hidden" name="__method" value="#(page.actions.form.method)">}
     <div class="form-group">
         <label for="inputTitle">#L10N("list-title"){Name}</label>
         <input type="text" class="form-control#if(page.form.invalidTitle){ is-invalid}" id="inputTitle" name="inputTitle"  maxlength="100" placeholder="#L10N("list-field-title-placeholder"){Enter list’s name}" aria-describedby="descriptionName"#if(page.form.data.inputTitle){ value="#(page.form.data.inputTitle)"}>

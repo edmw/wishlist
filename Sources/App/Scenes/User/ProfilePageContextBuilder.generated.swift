@@ -13,6 +13,7 @@ extension ProfilePageContext {
     static var builder: ProfilePageContextBuilder {
         return ProfilePageContextBuilder()
     }
+
 }
 
 enum ProfilePageContextBuilderError: Error {
@@ -21,9 +22,11 @@ enum ProfilePageContextBuilderError: Error {
 
 class ProfilePageContextBuilder {
 
+    var actions = PageActions()
+
     var user: UserRepresentation?
     var invitations: [InvitationRepresentation]?
-    var formData: ProfilePageFormData?
+    var editingContext: ProfileEditingContext?
 
     @discardableResult
     func forUser(_ user: UserRepresentation) -> Self {
@@ -38,8 +41,14 @@ class ProfilePageContextBuilder {
     }
 
     @discardableResult
-    func withFormData(_ formData: ProfilePageFormData?) -> Self {
-        self.formData = formData
+    func withEditing(_ editingContext: ProfileEditingContext?) -> Self {
+        self.editingContext = editingContext
+        return self
+    }
+
+    @discardableResult
+    func setAction(_ key: String, _ action: PageAction) -> Self {
+        self.actions[key] = action
         return self
     }
 
@@ -47,11 +56,13 @@ class ProfilePageContextBuilder {
         guard let user = user else {
             throw ProfilePageContextBuilderError.missingRequiredUser
         }
-        return .init(
+        var context = ProfilePageContext(
             for: user,
             invitations: invitations,
-            from: formData
+            from: editingContext
         )
+        context.actions = actions
+        return context
     }
 
 }

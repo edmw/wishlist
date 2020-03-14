@@ -2,7 +2,11 @@ import Domain
 
 import Foundation
 
+// MARK: ListsPageContext
+
 struct ListsPageContext: PageContext, AutoPageContextBuilder {
+
+    var actions = PageActions()
 
     var userID: ID?
 

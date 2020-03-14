@@ -2,7 +2,11 @@ import Domain
 
 import Foundation
 
+// MARK: InvitationsPageContext
+
 struct InvitationsPageContext: PageContext, AutoPageContextBuilder {
+
+    var actions = PageActions()
 
     var userID: ID?
 

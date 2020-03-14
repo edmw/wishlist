@@ -24,7 +24,7 @@ final class WelcomeController: AuthenticatableController, RouteCollection {
 
     func renderView(on request: Request) throws -> EventLoopFuture<View> {
         guard let userid = try authenticatedUserID(on: request) else {
-            return try WelcomeController.renderView("Public/Welcome", on: request)
+            return try WelcomeController.render(page: .welcome(), on: request)
         }
         return try userWelcomeActor
             .getListsAndFavorites(
@@ -32,12 +32,7 @@ final class WelcomeController: AuthenticatableController, RouteCollection {
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try WelcomePageContext.builder
-                    .forUser(result.user)
-                    .withLists(result.lists)
-                    .withFavorites(result.favorites)
-                    .build()
-                return try Controller.renderView("User/Welcome", with: context, on: request)
+                try Controller.render(page: .welcome(with: result), on: request)
             }
     }
 

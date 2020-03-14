@@ -2,7 +2,11 @@ import Domain
 
 import Foundation
 
+// MARK: WelcomePageContext
+
 struct WelcomePageContext: PageContext, AutoPageContextBuilder {
+
+    var actions = PageActions()
 
     var userID: ID?
 

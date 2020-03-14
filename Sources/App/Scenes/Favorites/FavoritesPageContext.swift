@@ -2,7 +2,11 @@ import Domain
 
 import Foundation
 
+// MARK: FavoritesPageContext
+
 struct FavoritesPageContext: PageContext, AutoPageContextBuilder {
+
+    var actions = PageActions()
 
     var userID: ID?
 

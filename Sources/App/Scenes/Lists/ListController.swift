@@ -27,15 +27,7 @@ final class ListController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                var contextBuilder = ListPageContext.builder
-                    .forUser(result.user)
-                if let list = result.list {
-                    contextBuilder = contextBuilder
-                        .withList(list)
-                        .withFormData(ListPageFormData(from: list))
-                }
-                let context = try contextBuilder.build()
-                return try Controller.renderView("User/List", with: context, on: request)
+                try Controller.render(page: .listEditing(with: result), on: request)
             }
     }
 
@@ -51,16 +43,12 @@ final class ListController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try ListPageContext.builder
-                    .forUser(result.user)
-                    .withList(result.list)
-                    .build()
-                return try Controller.renderView("User/ListDeletion", with: context, on: request)
+                try Controller.render(page: .listDeletion(with: result), on: request)
                     .encode(for: request)
             }
             .catchMap(UserListsActorError.self) { _ in
                 // Tries to redirect back to the lists page.
-                return Controller.redirect(for: userid, to: "lists", on: request)
+                Controller.redirect(for: userid, to: "lists", on: request)
             }
     }
 
@@ -72,7 +60,9 @@ final class ListController: AuthenticatableController,
 
         return try save(from: request, for: userid)
             .caseSuccess { result in self.success(for: result.user, on: request) }
-            .caseFailure { context in try self.failure(on: request, with: context) }
+            .caseFailure { result, context in
+                try self.failure(for: result.user, and: result.list, with: context, on: request)
+            }
     }
 
     private func update(on request: Request) throws -> EventLoopFuture<Response> {
@@ -81,7 +71,9 @@ final class ListController: AuthenticatableController,
 
         return try save(from: request, for: userid, this: listid)
             .caseSuccess { result in self.success(for: result.user, on: request) }
-            .caseFailure { context in try self.failure(on: request, with: context) }
+            .caseFailure { result, context in
+                try self.failure(for: result.user, and: result.list, with: context, on: request)
+            }
     }
 
     private func delete(on request: Request) throws -> EventLoopFuture<Response> {
@@ -147,14 +139,17 @@ final class ListController: AuthenticatableController,
     /// Returns a failure response on a CRUD request.
     /// Not implemented yet: REST response
     private func failure(
-        on request: Request,
-        with context: ListPageContext
+        for user: UserRepresentation,
+        and list: ListRepresentation?,
+        with editingContext: ListEditingContext,
+        on request: Request
     ) throws -> EventLoopFuture<Response> {
         // to add real REST support, check the accept header for json and output a json response
-        return try Controller.renderView("User/List", with: context, on: request)
-            .flatMap { view in
-                return try view.encode(for: request)
-            }
+        return try Controller.render(
+            page: .listEditing(with: user, and: list, editingContext: editingContext),
+            on: request
+        )
+        .encode(for: request)
     }
 
     // MARK: -

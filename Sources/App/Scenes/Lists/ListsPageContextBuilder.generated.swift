@@ -13,6 +13,7 @@ extension ListsPageContext {
     static var builder: ListsPageContextBuilder {
         return ListsPageContextBuilder()
     }
+
 }
 
 enum ListsPageContextBuilderError: Error {
@@ -20,6 +21,8 @@ enum ListsPageContextBuilderError: Error {
 }
 
 class ListsPageContextBuilder {
+
+    var actions = PageActions()
 
     var user: UserRepresentation?
     var lists: [ListRepresentation]?
@@ -36,14 +39,22 @@ class ListsPageContextBuilder {
         return self
     }
 
+    @discardableResult
+    func setAction(_ key: String, _ action: PageAction) -> Self {
+        self.actions[key] = action
+        return self
+    }
+
     func build() throws -> ListsPageContext {
         guard let user = user else {
             throw ListsPageContextBuilderError.missingRequiredUser
         }
-        return .init(
+        var context = ListsPageContext(
             for: user,
             with: lists
         )
+        context.actions = actions
+        return context
     }
 
 }

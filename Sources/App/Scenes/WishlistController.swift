@@ -50,15 +50,7 @@ final class WishlistController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try WishlistPageContext.builder
-                    .forList(result.list)
-                    .forOwner(result.owner)
-                    .withUser(result.user)
-                    .isFavorite(result.isFavorite)
-                    .withItems(result.items)
-                    .forIdentification(result.identification)
-                    .build()
-                return try Controller.renderView("Protected/Wishlist", with: context, on: request)
+                try Controller.render(page: .wishlist(with: result), on: request)
             }
             .handleAuthorizationError(on: request)
     }
@@ -108,18 +100,8 @@ final class WishlistController: AuthenticatableController,
     private func renderCreateReservationView(on request: Request) throws
         -> EventLoopFuture<View>
     {
-        return try self.renderReservationView(on: request)
-            { viewContext throws in
-                let context = try ReservationPageContext.builder
-                    .forIdentification(viewContext.identification)
-                    .forItem(viewContext.item)
-                    .forList(viewContext.list)
-                    .build()
-                return try Controller.renderView(
-                    "Protected/ReservationCreation",
-                    with: context,
-                    on: request
-                )
+        return try self.renderReservationView(on: request) { viewContext throws in
+            try Controller.render(page: .reservationCreation(with: viewContext), on: request)
         }
     }
 
@@ -127,19 +109,8 @@ final class WishlistController: AuthenticatableController,
     private func renderDeleteReservationView(on request: Request) throws
         -> EventLoopFuture<View>
     {
-        return try self.renderReservationView(on: request)
-            { viewContext throws in
-                let context = try ReservationPageContext.builder
-                    .forIdentification(viewContext.identification)
-                    .forItem(viewContext.item)
-                    .forList(viewContext.list)
-                    .withReservation(viewContext.reservation)
-                    .build()
-                return try Controller.renderView(
-                    "Protected/ReservationDeletion",
-                    with: context,
-                    on: request
-                )
+        return try self.renderReservationView(on: request) { viewContext throws in
+            try Controller.render(page: .reservationDeletion(with: viewContext), on: request)
         }
     }
 

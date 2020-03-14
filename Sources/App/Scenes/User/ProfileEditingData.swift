@@ -1,10 +1,10 @@
 import Domain
 
-import Vapor
+// MARK: ProfileEditingData
 
 /// This structures holds all the input given by the user into the profile form.
 /// In contrast to `UserRepresentation` and `UserData` this contains only editable properties.
-struct ProfilePageFormData: Content {
+struct ProfileEditingData: Codable {
 
     let inputNickName: String
 

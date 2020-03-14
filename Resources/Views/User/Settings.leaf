@@ -2,8 +2,8 @@
 #//
 #set("content") {
 #// form action and method to update a users settings
-<form method="POST" action="/user/#(page.userID)/settings#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="wl-list">
-<input name="__method" type="hidden" value="PUT">
+<form method="POST" action="#(page.actions.form.reference)#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="wl-form wl-settings">
+#if(page.actions.form.method != "POST") {<input type="hidden" name="__method" value="#(page.actions.form.method)">}
 <div class="form-group">
 <label>#L10N("settings-notifications-services"){Notification Services}</label>
 <div class="row">

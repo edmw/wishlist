@@ -1,6 +1,12 @@
 <div class="table-responsive">
-<table class="table wl-lists">
+<table class="table wl-table wl-favorites wl-lists">
 #if(count(page.favorites) > 0) {
+    <colgroup>
+        <col>
+        <col>
+        <col>
+        <col>
+    </colgroup>
     <thead>
     <tr>
         <th>#L10N("list-title"){Name}</th>

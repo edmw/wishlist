@@ -447,6 +447,24 @@ extension RequestItemMovement.Specification {
 
 }
 
+// MARK: RequestItemReceiving.Specification
+
+extension RequestItemReceiving.Specification {
+
+    public static func specification(
+          userBy userid: UserID,
+          listBy listid: ListID,
+          itemBy itemid: ItemID
+    ) -> Self {
+        return Self(
+            userID: userid,
+            listID: listid,
+            itemID: itemid
+        )
+    }
+
+}
+
 // MARK: RequestListDeletion.Specification
 
 extension RequestListDeletion.Specification {

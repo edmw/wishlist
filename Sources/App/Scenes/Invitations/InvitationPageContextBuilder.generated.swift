@@ -13,6 +13,7 @@ extension InvitationPageContext {
     static var builder: InvitationPageContextBuilder {
         return InvitationPageContextBuilder()
     }
+
 }
 
 enum InvitationPageContextBuilderError: Error {
@@ -21,9 +22,11 @@ enum InvitationPageContextBuilderError: Error {
 
 class InvitationPageContextBuilder {
 
+    var actions = PageActions()
+
     var user: UserRepresentation?
     var invitation: InvitationRepresentation?
-    var formData: InvitationPageFormData?
+    var editingContext: InvitationEditingContext?
 
     @discardableResult
     func forUser(_ user: UserRepresentation) -> Self {
@@ -38,8 +41,14 @@ class InvitationPageContextBuilder {
     }
 
     @discardableResult
-    func withFormData(_ formData: InvitationPageFormData?) -> Self {
-        self.formData = formData
+    func withEditing(_ editingContext: InvitationEditingContext?) -> Self {
+        self.editingContext = editingContext
+        return self
+    }
+
+    @discardableResult
+    func setAction(_ key: String, _ action: PageAction) -> Self {
+        self.actions[key] = action
         return self
     }
 
@@ -47,11 +56,13 @@ class InvitationPageContextBuilder {
         guard let user = user else {
             throw InvitationPageContextBuilderError.missingRequiredUser
         }
-        return .init(
+        var context = InvitationPageContext(
             for: user,
             with: invitation,
-            from: formData
+            from: editingContext
         )
+        context.actions = actions
+        return context
     }
 
 }

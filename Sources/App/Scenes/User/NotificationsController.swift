@@ -27,12 +27,7 @@ final class NotificationsController: AuthenticatableController, RouteCollection 
                 )
             )
             .flatMap { result in
-                let context = NotificationsPageContext(result, for: result.user)
-                return try Controller.renderView(
-                    "User/SettingsNotificationsSent",
-                    with: context,
-                    on: request
-                )
+                try Controller.render(page: .testNotifications(with: result), on: request)
             }
     }
 

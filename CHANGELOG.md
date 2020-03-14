@@ -9,6 +9,8 @@
 
 ## [..]
 - 🛠️ Add status field to Reservation
+- 🛠️ Extend PageContext to hold actions aka links for templates
+- 🛠️ Unify page generation in controller
 - 🛠️ Improve button design
 - 🛠️ Setup Travis CI
 

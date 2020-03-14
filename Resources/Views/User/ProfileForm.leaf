@@ -2,8 +2,8 @@
 #//
 #set("content") {
 #// form action and method to update an profile
-<form method="POST" action="/user/#(page.userID)/#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="wl-list">
-<input name="__method" type="hidden" value="PUT">
+<form method="POST" action="#(page.actions.form.reference)#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="wl-form wl-profile">
+#if(page.actions.form.method != "POST") {<input type="hidden" name="__method" value="#(page.actions.form.method)">}
 <div class="form-group">
 <label for="inputNickName">#L10N("nick-name"){Nickname}</label>
 <input type="text" class="form-control#if(page.form.invalidNickName){ is-invalid}" id="inputNickName" name="inputNickName" maxlength="100" placeholder="#L10N("profile-field-nickname-placeholder"){Enter your nickname}" aria-describedby="descriptionNickName"#if(page.form.data.inputNickName){ value="#(page.form.data.inputNickName)"}>

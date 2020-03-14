@@ -14,6 +14,10 @@ class StandardLogger: Logger, Service, CustomStringConvertible, CustomDebugStrin
     let application: Logger
     let business: Logger
 
+    var technicalLogLevel: LogLevel { technicalConfiguration.logLevel }
+    var applicationLogLevel: LogLevel { applicationConfiguration.logLevel }
+    var businessLogLevel: LogLevel { businessConfiguration.logLevel }
+
     struct LoggerConfiguration {
         let tag: String
         let logLevel: LogLevel

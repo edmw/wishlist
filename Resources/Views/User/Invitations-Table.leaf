@@ -1,6 +1,14 @@
 <div class="table-responsive">
-<table class="table wl-invitations">
+<table class="table wl-table wl-invitations">
 #if(count(page.invitations) > 0) {
+    <colgroup>
+        <col>
+        <col>
+        <col>
+        <col>
+        <col>
+    </colgroup>
+    <thead>
     <tr>
         <th>#L10N("invitation-code"){Code}</th>
         <th>#L10N("invitation-email"){Email}</th>
@@ -8,17 +16,18 @@
         <th>#L10N("status"){Status}</th>
         <th></th>
     </tr>
+    </thead>
     #for(invitation in page.invitations) {
         <tr>
-            <td class="wl-code">
+            <td class="wl-code" data-label="#L10N("invitation-code"){Code}">
                 #if(invitation.status != "revoked") {
                 <a class="btn btn-action mr-2" href="/signin/?invitation=#(invitation.code)" title="#L10N("invitation-link"){Invitation link}"><svg class="feather"><use xlink:href="/icons/feather.svg#share"/></svg></a>#(invitation.code)</a>
                 } else {
                     <svg class="feather"><use xlink:href="/icons/feather.svg#share"/></svg>
                 }
             </td>
-            <td class="wl-email">#(invitation.email)</a></td>
-            <td class="wl-sent-at">
+            <td class="wl-email" data-label="#L10N("invitation-email"){Email}">#(invitation.email)</a></td>
+            <td class="wl-sent-at" data-label="#L10N("invitation-sent-at"){Sent at}">
                 #if(invitation.status == "open") {
                 <form method="POST" action="/user/#(page.userID)/invitation/#(invitation.id)/send#if(location){?p=#(location)}" accept-charset="UTF-8" class="form-inline d-inline-flex">
                 <button class="btn btn-action btn-link mr-2" title="#L10N("resend-invitation"){Resend invitation}"><svg class="feather"><use xlink:href="/icons/feather.svg#rotate-ccw"/></svg></button>
@@ -26,7 +35,7 @@
                 }
                 #if(invitation.sentAt == nil) {#L10N("never"){never}}else{#L10NDate(invitation.sentAt)}
             </td>
-            <td class="wl-status">#L10N("#(invitation.status)"){}</td>
+            <td class="wl-status" data-label="#L10N("status"){Status}">#L10N("#(invitation.status)"){}</td>
             <td class="wl-actions">
                 <div class="btn-group" role="group">
                     #if(invitation.status == "open") {

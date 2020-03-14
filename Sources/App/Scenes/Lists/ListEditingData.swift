@@ -1,10 +1,10 @@
 import Domain
 
-import Vapor
+// MARK: ListEditingData
 
 /// This structures holds all the input given by the user into the list form.
 /// In contrast to `ListRepresentation` and `ListData` this contains only editable properties.
-struct ListPageFormData: Content {
+struct ListEditingData: Codable {
 
     let inputTitle: String
     let inputVisibility: String
@@ -29,14 +29,14 @@ struct ListPageFormData: Content {
 
 extension ListValues {
 
-    init(from formdata: ListPageFormData) {
+    init(from data: ListEditingData) {
         self.init(
-            title: formdata.inputTitle,
-            visibility: formdata.inputVisibility,
+            title: data.inputTitle,
+            visibility: data.inputVisibility,
             createdAt: nil,
             modifiedAt: nil,
-            maskReservations: formdata.inputMaskReservations ?? false,
-            itemsSorting: formdata.inputItemsSorting,
+            maskReservations: data.inputMaskReservations ?? false,
+            itemsSorting: data.inputItemsSorting,
             items: nil
         )
     }

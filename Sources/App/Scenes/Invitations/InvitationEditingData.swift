@@ -1,11 +1,11 @@
 import Domain
 
-import Vapor
+// MARK: InvitationEditingData
 
 /// This structures holds all the input given by the user into the invitation form.
 /// In contrast to `InvitationRepresentation` and `InvitationData` this contains only
 /// editable properties.
-struct InvitationPageFormData: Content {
+struct InvitationEditingData: Codable {
 
     let inputEmail: String
     let inputSendEmail: Bool?
@@ -19,11 +19,11 @@ struct InvitationPageFormData: Content {
 
 extension InvitationValues {
 
-    init(from formdata: InvitationPageFormData) {
+    init(from data: InvitationEditingData) {
         self.init(
             code: nil,
             status: nil,
-            email: formdata.inputEmail,
+            email: data.inputEmail,
             sentAt: nil,
             createdAt: nil
         )

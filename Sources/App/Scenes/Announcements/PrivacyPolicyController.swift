@@ -19,12 +19,7 @@ final class PrivacyPolicyController: AuthenticatableController, RouteCollection 
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = PrivacyPolicyPageContext(for: result.user)
-                return try Controller.renderLocalizedView(
-                    "Public/PrivacyPolicy",
-                    with: context,
-                    on: request
-                )
+                try Controller.render(page: .privacyPolicy(with: result), on: request)
             }
     }
 

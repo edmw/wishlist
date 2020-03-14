@@ -5,14 +5,8 @@
 }
 #//
 #set("content") {
-#if(page.item == nil) {
-#// form action and method to create a new item
-<form method="POST" action="/user/#(page.userID)/list/#(page.listID)/items" accept-charset="UTF-8" class="wl-item">
-} else {
-#// form action and method to update an existing item
-<form method="POST" action="/user/#(page.userID)/list/#(page.listID)/item/#(page.item.id)/" accept-charset="UTF-8" class="wl-item">
-<input name="__method" type="hidden" value="PUT">
-}
+<form method="POST" action="#(page.actions.form.reference)" accept-charset="UTF-8" class="wl-form wl-item">
+#if(page.actions.form.method != "POST") {<input type="hidden" name="__method" value="#(page.actions.form.method)">}
     <div class="form-group">
         <label for="inputTitle">#L10N("item-title"){Name}</label>
         <input type="text" class="form-control#if(page.form.invalidTitle){ is-invalid}" id="inputTitle" name="inputTitle" maxlength="100" placeholder="#L10N("item-field-title-placeholder"){Enter item’s name}" aria-describedby="descriptionName"#if(page.form.data.inputTitle){ value="#(page.form.data.inputTitle)"}>

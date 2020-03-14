@@ -2,13 +2,17 @@ import Domain
 
 import Foundation
 
+// MARK: InvitationPageContext
+
 struct InvitationPageContext: PageContext, AutoPageContextBuilder {
+
+    var actions = PageActions()
 
     var userID: ID?
 
     var invitation: InvitationContext?
 
-    var form: InvitationPageFormContext
+    var form: InvitationEditingContext
 
     var sendSuccess: Bool = false
 
@@ -16,13 +20,13 @@ struct InvitationPageContext: PageContext, AutoPageContextBuilder {
     init(
         for user: UserRepresentation,
         with invitation: InvitationRepresentation? = nil,
-        from formData: InvitationPageFormData? = nil
+        from editingContext: InvitationEditingContext? = nil
     ) {
         self.userID = ID(user.id)
 
         self.invitation = InvitationContext(invitation)
 
-        self.form = InvitationPageFormContext(from: formData)
+        self.form = editingContext ?? .empty
     }
 
 }

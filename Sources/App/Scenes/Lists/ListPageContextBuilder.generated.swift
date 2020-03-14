@@ -13,6 +13,7 @@ extension ListPageContext {
     static var builder: ListPageContextBuilder {
         return ListPageContextBuilder()
     }
+
 }
 
 enum ListPageContextBuilderError: Error {
@@ -21,9 +22,11 @@ enum ListPageContextBuilderError: Error {
 
 class ListPageContextBuilder {
 
+    var actions = PageActions()
+
     var user: UserRepresentation?
     var list: ListRepresentation?
-    var formData: ListPageFormData?
+    var editingContext: ListEditingContext?
 
     @discardableResult
     func forUser(_ user: UserRepresentation) -> Self {
@@ -38,8 +41,14 @@ class ListPageContextBuilder {
     }
 
     @discardableResult
-    func withFormData(_ formData: ListPageFormData?) -> Self {
-        self.formData = formData
+    func withEditing(_ editingContext: ListEditingContext?) -> Self {
+        self.editingContext = editingContext
+        return self
+    }
+
+    @discardableResult
+    func setAction(_ key: String, _ action: PageAction) -> Self {
+        self.actions[key] = action
         return self
     }
 
@@ -47,11 +56,13 @@ class ListPageContextBuilder {
         guard let user = user else {
             throw ListPageContextBuilderError.missingRequiredUser
         }
-        return .init(
+        var context = ListPageContext(
             for: user,
             with: list,
-            from: formData
+            from: editingContext
         )
+        context.actions = actions
+        return context
     }
 
 }

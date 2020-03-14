@@ -2,9 +2,23 @@ import Domain
 
 // MARK: PageReference
 
-struct PageReference {
+struct PageReference: Encodable {
 
     var components: [PageReferenceComponent]
+
+    var path: String {
+        "/" + components.map { component in
+            switch component {
+            case .none:
+                return ""
+            case .string(let value):
+                return value
+            case .identifier(let value):
+                return String(describing: value)
+            }
+        }
+        .joined(separator: "/")
+    }
 
     init(_ components: [PageReferenceComponent]) {
         self.components = components
@@ -14,11 +28,18 @@ struct PageReference {
         self.components = components.map { $0.pageReferenceComponent }
     }
 
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(path)
+    }
+
 }
 
 // MARK: PageReferenceComponent
 
-enum PageReferenceComponent: PageReferenceComponentRepresentable, ExpressibleByStringLiteral {
+enum PageReferenceComponent: PageReferenceComponentRepresentable,
+    ExpressibleByStringLiteral
+{
 
     var pageReferenceComponent: PageReferenceComponent { self }
 

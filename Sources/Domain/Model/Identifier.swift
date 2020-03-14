@@ -3,7 +3,6 @@ import Foundation
 // MARK: Identifier
 
 public protocol Identifier: AnyIdentifier,
-    Codable,
     Hashable,
     LosslessStringConvertible
 {
@@ -91,7 +90,7 @@ extension DomainIdentifier {
 
 // MARK: AnyIdentifier
 
-public protocol AnyIdentifier {
+public protocol AnyIdentifier: Codable {
 
     var uuid: UUID { get }
 

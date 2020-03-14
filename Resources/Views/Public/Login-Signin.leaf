@@ -15,9 +15,9 @@
 }
 #if(site.access != "nobody") {
 <ul id="signin" class="justify-content-md-start">
-<li><a id="google-signin" class="btn btn-light px-4 mb-4" href="/google/authenticate#if(page.authenticationParametersQuery){?#(page.authenticationParametersQuery)}" role="button">#L10N("signin-using-google"){Sign in using Google}</a></li>
+<li><a id="google-signin" class="btn btn-light px-4 mb-4" href="#(page.actions.google.reference)#if(page.authenticationParametersQuery){?#(page.authenticationParametersQuery)}" role="button">#L10N("signin-using-google"){Sign in using Google}</a></li>
 #if(features.signinWithNetID.enabled) {
-<li><a id="netid-signin" class="btn btn-light px-4 mb-4" href="/netid/authenticate#if(page.authenticationParametersQuery){?#(page.authenticationParametersQuery)}" role="button">#L10N("signin-using-netid"){Sign in using netID}</a></li>
+<li><a id="netid-signin" class="btn btn-light px-4 mb-4" href="#(page.actions.netid.reference)#if(page.authenticationParametersQuery){?#(page.authenticationParametersQuery)}" role="button">#L10N("signin-using-netid"){Sign in using netID}</a></li>
 }
 </ul>
 }

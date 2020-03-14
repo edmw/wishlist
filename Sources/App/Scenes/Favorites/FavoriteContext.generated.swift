@@ -1,4 +1,4 @@
-// sourcery:inline:FavoriteRepresentation.AutoRepresentationContext
+// sourcery:inline:FavoriteRepresentation.AutoContext
 
 // MARK: DO NOT EDIT
 

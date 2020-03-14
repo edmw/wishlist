@@ -1,4 +1,4 @@
-// sourcery:inline:InvitationRepresentation.AutoRepresentationContext
+// sourcery:inline:InvitationRepresentation.AutoContext
 
 // MARK: DO NOT EDIT
 

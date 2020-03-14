@@ -12,6 +12,8 @@ struct NotificationResultContext: Encodable {
 
 struct NotificationsPageContext: PageContext {
 
+    var actions = PageActions()
+
     var userID: ID?
 
     var success: Bool

@@ -1,0 +1,4 @@
+// MARK: Representation
+
+protocol Representation {
+}

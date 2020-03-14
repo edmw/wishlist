@@ -22,11 +22,7 @@ final class ProfileController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try ProfilePageContext.builder
-                    .forUser(result.user)
-                    .withInvitations(result.invitations)
-                    .build()
-                return try Controller.renderView("User/Profile", with: context, on: request)
+                try Controller.render(page: .profileAndInvitations(with: result), on: request)
             }
     }
 
@@ -43,12 +39,7 @@ final class ProfileController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let data = ProfilePageFormData(from: result.user)
-                let context = try ProfilePageContext.builder
-                    .forUser(result.user)
-                    .withFormData(data)
-                    .build()
-                return try Controller.renderView("User/ProfileForm", with: context, on: request)
+                try Controller.render(page: .profileEditing(with: result), on: request)
             }
    }
 
@@ -59,7 +50,9 @@ final class ProfileController: AuthenticatableController,
 
         return try save(from: request, for: userid)
             .caseSuccess { user in self.success(for: user, on: request) }
-            .caseFailure { context in try self.failure(on: request, with: context) }
+            .caseFailure { user, context in
+                try self.failure(for: user, with: context, on: request)
+            }
     }
 
     // MARK: - RESULT
@@ -85,14 +78,16 @@ final class ProfileController: AuthenticatableController,
     /// Returns a failure response on a CRUD request.
     /// Not implemented yet: REST response
     private func failure(
-        on request: Request,
-        with context: ProfilePageContext
+        for user: UserRepresentation,
+        with editingContext: ProfileEditingContext,
+        on request: Request
     ) throws -> EventLoopFuture<Response> {
         // to add real REST support, check the accept header for json and output a json response
-        return try Controller.renderView("User/ProfileForm", with: context, on: request)
-            .flatMap { view in
-                return try view.encode(for: request)
-            }
+        return try Controller.render(
+            page: .profileEditing(with: user, editingContext: editingContext),
+            on: request
+        )
+        .encode(for: request)
     }
 
     // MARK: -

@@ -60,12 +60,12 @@ struct VaporImageStoreProvider: ImageStoreProvider {
 
     private func requireKey(for imagable: Imageable) throws -> String {
         guard let key = imagable.imageableEntityKey else {
-            throw ImageableError.keyMissing(\Imageable.imageableEntityKey)
+            throw ImageStoreProviderError.imagableKeyMissing(\Imageable.imageableEntityKey)
         }
         guard VaporImageStoreProvider.validCharactersForImageableKey.isSuperset(
             of: CharacterSet(charactersIn: key)
         ) else {
-            throw ImageableError.keyInvalid(\Imageable.imageableEntityKey)
+            throw ImageStoreProviderError.imagableKeyInvalid(\Imageable.imageableEntityKey)
         }
         return key
     }
@@ -75,13 +75,17 @@ struct VaporImageStoreProvider: ImageStoreProvider {
 
     private func requireGroupKeys(for imagable: Imageable) throws -> [String] {
         guard let groupkeys = imagable.imageableEntityGroupKeys else {
-            throw ImageableError.keyMissing(\Imageable.imageableEntityGroupKeys)
+            throw ImageStoreProviderError.imagableKeyMissing(
+                \Imageable.imageableEntityGroupKeys
+            )
         }
         for groupkey in groupkeys {
             guard VaporImageStoreProvider.validCharactersForImageableGroupKey.isSuperset(
                 of: CharacterSet(charactersIn: groupkey)
             ) else {
-                throw ImageableError.keyInvalid(\Imageable.imageableEntityGroupKeys)
+                throw ImageStoreProviderError.imagableKeyInvalid(
+                    \Imageable.imageableEntityGroupKeys
+                )
             }
         }
         return groupkeys

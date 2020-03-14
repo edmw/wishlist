@@ -23,11 +23,7 @@ final class InvitationsController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try InvitationsPageContext.builder
-                    .forUser(result.user)
-                    .withInvitations(result.invitations)
-                    .build()
-                return try Controller.renderView("User/Invitations", with: context, on: request)
+                try Controller.render(page: .invitations(with: result), on: request)
             }
             .handleAuthorizationError(on: request)
     }

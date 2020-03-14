@@ -4,7 +4,7 @@ import Library
 
 // MARK: UserRepresentation
 
-public struct UserRepresentation: Encodable, Equatable,
+public struct UserRepresentation: Representation, Encodable, Equatable,
     CustomStringConvertible,
     CustomDebugStringConvertible
 {

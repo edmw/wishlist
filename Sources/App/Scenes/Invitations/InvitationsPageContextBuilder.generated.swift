@@ -13,6 +13,7 @@ extension InvitationsPageContext {
     static var builder: InvitationsPageContextBuilder {
         return InvitationsPageContextBuilder()
     }
+
 }
 
 enum InvitationsPageContextBuilderError: Error {
@@ -20,6 +21,8 @@ enum InvitationsPageContextBuilderError: Error {
 }
 
 class InvitationsPageContextBuilder {
+
+    var actions = PageActions()
 
     var user: UserRepresentation?
     var invitations: [InvitationRepresentation]?
@@ -36,14 +39,22 @@ class InvitationsPageContextBuilder {
         return self
     }
 
+    @discardableResult
+    func setAction(_ key: String, _ action: PageAction) -> Self {
+        self.actions[key] = action
+        return self
+    }
+
     func build() throws -> InvitationsPageContext {
         guard let user = user else {
             throw InvitationsPageContextBuilderError.missingRequiredUser
         }
-        return .init(
+        var context = InvitationsPageContext(
             for: user,
             with: invitations
         )
+        context.actions = actions
+        return context
     }
 
 }

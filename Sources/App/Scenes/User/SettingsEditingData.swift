@@ -1,9 +1,9 @@
 import Domain
 
-import Vapor
+// MARK: SettingsEditingData
 
 /// This structures holds all the input given by the user into the settings form.
-struct SettingsPageFormData: Content {
+struct SettingsEditingData: Codable {
 
     let inputEmail: Bool?
 

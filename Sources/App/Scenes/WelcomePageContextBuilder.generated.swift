@@ -13,6 +13,7 @@ extension WelcomePageContext {
     static var builder: WelcomePageContextBuilder {
         return WelcomePageContextBuilder()
     }
+
 }
 
 enum WelcomePageContextBuilderError: Error {
@@ -20,6 +21,8 @@ enum WelcomePageContextBuilderError: Error {
 }
 
 class WelcomePageContextBuilder {
+
+    var actions = PageActions()
 
     var user: UserRepresentation?
     var lists: [ListRepresentation]?
@@ -50,16 +53,24 @@ class WelcomePageContextBuilder {
         return self
     }
 
+    @discardableResult
+    func setAction(_ key: String, _ action: PageAction) -> Self {
+        self.actions[key] = action
+        return self
+    }
+
     func build() throws -> WelcomePageContext {
         guard let user = user else {
             throw WelcomePageContextBuilderError.missingRequiredUser
         }
-        return .init(
+        var context = WelcomePageContext(
             for: user,
             lists: lists,
             favorites: favorites,
             invitations: invitations
         )
+        context.actions = actions
+        return context
     }
 
 }

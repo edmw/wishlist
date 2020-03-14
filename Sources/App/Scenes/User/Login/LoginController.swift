@@ -32,10 +32,12 @@ final class LoginController: Controller, RouteCollection {
             )
         }
 
-        let context = try LoginPageContext(
+        var context = try LoginPageContext(
             authenticationParametersQuery: Controller.query(with: authenticationParameters),
             invitationCode: invitationCode
         )
+        context.actions["google"] = .get("google", "authenticate")
+        context.actions["netid"] =  .get("netid", "authenticate")
         return try Controller.renderView("Public/Login", with: context, on: request)
     }
 

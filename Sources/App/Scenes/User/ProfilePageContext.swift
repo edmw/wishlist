@@ -2,7 +2,11 @@ import Domain
 
 import Foundation
 
+// MARK: ProfilePageContext
+
 struct ProfilePageContext: PageContext, AutoPageContextBuilder {
+
+    var actions = PageActions()
 
     var userID: ID?
 
@@ -22,13 +26,13 @@ struct ProfilePageContext: PageContext, AutoPageContextBuilder {
 
     var invitations: [InvitationContext]?
 
-    var form: ProfilePageFormContext
+    var form: ProfileEditingContext
 
     // sourcery: AutoPageContextBuilderInitializer
     init(
         for user: UserRepresentation,
         invitations: [InvitationRepresentation]? = nil,
-        from formData: ProfilePageFormData? = nil
+        from editingContext: ProfileEditingContext? = nil
     ) {
         self.userID = ID(user.id)
 
@@ -48,7 +52,7 @@ struct ProfilePageContext: PageContext, AutoPageContextBuilder {
 
         self.invitations = invitations?.map { invitation in InvitationContext(invitation) }
 
-        self.form = ProfilePageFormContext(from: formData)
+        self.form = editingContext ?? .empty
     }
 
 }

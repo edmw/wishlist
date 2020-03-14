@@ -110,3 +110,5 @@ identifier_name:
     - nil
     - bit
     - now
+    - GET
+    - PUT

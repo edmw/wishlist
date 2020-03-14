@@ -1,7 +1,7 @@
-{% for representation in types.implementing.AutoRepresentationContext %}
+{% for representation in types.implementing.AutoContext where representation.implements.Representation %}
 {% set typeName %}{{representation.name|replace:"Representation","Context"}}{% endset %}
 {% set typeVariable %}{{representation.name|replace:"Representation",""|lowercase}}{% endset %}
-// sourcery:inline:{{representation.name}}.AutoRepresentationContext
+// sourcery:inline:{{representation.name}}.AutoContext
 
 // MARK: DO NOT EDIT
 {#

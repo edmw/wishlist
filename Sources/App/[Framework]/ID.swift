@@ -34,8 +34,8 @@ struct ID: Parameter, Codable, Equatable, LosslessStringConvertible, CustomStrin
     }
 
     /// Attempts to read the parameter from a base62 string into a `UUID`
-    public static func resolveParameter(_ parameter: String, on container: Container)
-        throws -> ID
+    public static func resolveParameter(_ parameter: String, on container: Container) throws
+        -> ID
     {
         guard let uuid = UUID(base62String: parameter) else {
             throw RoutingError(

@@ -6,10 +6,7 @@ import Domain
 protocol AutoContext {
 }
 
-protocol AutoRepresentationContext: AutoContext {
-}
-
-extension ItemRepresentation: AutoRepresentationContext {}
-extension ListRepresentation: AutoRepresentationContext {}
-extension FavoriteRepresentation: AutoRepresentationContext {}
-extension InvitationRepresentation: AutoRepresentationContext {}
+extension ItemRepresentation: AutoContext {}
+extension ListRepresentation: AutoContext {}
+extension FavoriteRepresentation: AutoContext {}
+extension InvitationRepresentation: AutoContext {}

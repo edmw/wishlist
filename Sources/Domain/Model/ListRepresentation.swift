@@ -4,7 +4,7 @@ import Library
 
 // MARK: ListRepresentation
 
-public struct ListRepresentation: Encodable, Equatable {
+public struct ListRepresentation: Representation, Encodable, Equatable {
 
     public let id: ListID?
 

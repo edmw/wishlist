@@ -10,7 +10,7 @@ import Library
 /// Relations:
 /// - Parent: User
 /// - Childs: Items
-public final class List: ListModel, Viewable,
+public final class List: ListModel, Viewable, Representable,
     DomainEntity,
     DomainEntityDetachable,
     DomainEntityReflectable,

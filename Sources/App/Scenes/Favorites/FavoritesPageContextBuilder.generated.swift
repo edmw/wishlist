@@ -13,6 +13,7 @@ extension FavoritesPageContext {
     static var builder: FavoritesPageContextBuilder {
         return FavoritesPageContextBuilder()
     }
+
 }
 
 enum FavoritesPageContextBuilderError: Error {
@@ -20,6 +21,8 @@ enum FavoritesPageContextBuilderError: Error {
 }
 
 class FavoritesPageContextBuilder {
+
+    var actions = PageActions()
 
     var user: UserRepresentation?
     var favorites: [FavoriteRepresentation]?
@@ -36,14 +39,22 @@ class FavoritesPageContextBuilder {
         return self
     }
 
+    @discardableResult
+    func setAction(_ key: String, _ action: PageAction) -> Self {
+        self.actions[key] = action
+        return self
+    }
+
     func build() throws -> FavoritesPageContext {
         guard let user = user else {
             throw FavoritesPageContextBuilderError.missingRequiredUser
         }
-        return .init(
+        var context = FavoritesPageContext(
             for: user,
             with: favorites
         )
+        context.actions = actions
+        return context
     }
 
 }

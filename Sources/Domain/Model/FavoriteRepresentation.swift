@@ -1,6 +1,6 @@
 // MARK: FavoriteRepresentation
 
-public struct FavoriteRepresentation: Encodable, Equatable {
+public struct FavoriteRepresentation: Representation, Encodable, Equatable {
 
     public let list: ListRepresentation
 

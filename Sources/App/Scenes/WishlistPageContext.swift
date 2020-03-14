@@ -2,7 +2,11 @@ import Domain
 
 import Foundation
 
+// MARK: WishlistPageContext
+
 struct WishlistPageContext: PageContext, AutoPageContextBuilder {
+
+    var actions = PageActions()
 
     var ownerID: ID?
     var listID: ID?

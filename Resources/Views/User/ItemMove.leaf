@@ -3,8 +3,8 @@
 #set("content") {
 <h2>#L10N("want-to"){Do you want ...}</h2>
 <h3>#L10N("to-move-item","#(page.item.title)"){... to move the wish list named <strong>#(page.item.title)</strong> to another wish list?}</h3>
-<form method="POST" action="/user/#(page.userID)/list/#(page.listID)/item/#(page.item.id)/#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="mt-4 wl-item">
-    <input name="__method" type="hidden" value="PATCH">
+<form method="POST" action="#(page.actions.form.reference)#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="mt-4 wl-item">
+#if(page.actions.form.method != "POST") {<input type="hidden" name="__method" value="#(page.actions.form.method)">}
     <input name="key" type="hidden" value="listID">
     <div class="form-group">
       <label for="inputListID">#L10N("move-item-select"){Select a list to move your wish to}</label>

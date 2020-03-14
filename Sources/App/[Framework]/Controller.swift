@@ -172,55 +172,6 @@ class Controller {
         )
     }
 
-    /// Renders a view with the specified template and the specified page context on the
-    /// specified request.
-    /// The given page context will be wrapped in a `RenderContext` and will be accessible from
-    /// within the template by using the path `page`. The render context contains additional
-    /// information for rendering the view such as the `features` path making the feature flags
-    /// available to the template. Other additional information available are the site’s and the
-    /// request’s parameters.
-    static func renderView(
-        _ templateName: String,
-        with pageContext: PageContext? = nil,
-        on request: Request
-    ) throws -> EventLoopFuture<View> {
-        let anyPageContext = pageContext.map(AnyPageContext.init)
-        let site = try request.make(Site.self)
-        let features = try request.make(Features.self)
-        let renderContext = RenderContext(anyPageContext, site: site, features: features)
-        renderContext.request += request.queryDictionary
-        let locale = try request.make(LocalizationService.self).locale(on: request)
-        return try request.view()
-            .render(
-                templateName,
-                renderContext,
-                userInfo: ["language": locale.identifier]
-            )
-    }
-
-    /// Renders a localized view with the specified template and the specified page context on the
-    /// specified request.
-    /// Appends the template‘s base name with the user‘s language code separated by a dot.
-    /// If the user‘s language code is not in the list of supported codes the default language code
-    /// will be used.
-    static func renderLocalizedView(
-        _ templateBaseName: String,
-        with pageContext: PageContext? = nil,
-        on request: Request
-    ) throws -> EventLoopFuture<View> {
-        let templateName: String
-        let localization = try request.make(LocalizationService.self)
-        let locale = try localization.locale(on: request)
-        if let code = locale.languageCode, localization.languageCodes.contains(code) {
-            templateName = "\(templateBaseName).\(code)"
-        }
-        else {
-            let code = localization.defaultLanguageCode
-            templateName = "\(templateBaseName).\(code)"
-        }
-        return try renderView(templateName, with: pageContext, on: request)
-    }
-
 }
 
 extension Request {

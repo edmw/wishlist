@@ -13,6 +13,7 @@ extension ReservationPageContext {
     static var builder: ReservationPageContextBuilder {
         return ReservationPageContextBuilder()
     }
+
 }
 
 enum ReservationPageContextBuilderError: Error {
@@ -22,6 +23,8 @@ enum ReservationPageContextBuilderError: Error {
 }
 
 class ReservationPageContextBuilder {
+
+    var actions = PageActions()
 
     var identification: Identification?
     var item: ItemRepresentation?
@@ -59,6 +62,12 @@ class ReservationPageContextBuilder {
         return self
     }
 
+    @discardableResult
+    func setAction(_ key: String, _ action: PageAction) -> Self {
+        self.actions[key] = action
+        return self
+    }
+
     func build() throws -> ReservationPageContext {
         guard let identification = identification else {
             throw ReservationPageContextBuilderError.missingRequiredIdentification
@@ -69,13 +78,15 @@ class ReservationPageContextBuilder {
         guard let list = list else {
             throw ReservationPageContextBuilderError.missingRequiredList
         }
-        return .init(
+        var context = ReservationPageContext(
             for: identification,
             and: item,
             in: list,
             with: reservation,
             user: user
         )
+        context.actions = actions
+        return context
     }
 
 }

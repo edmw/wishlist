@@ -38,18 +38,7 @@ final class ReservationController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try ReservationPageContext.builder
-                    .forIdentification(result.holder)
-                    .forItem(result.item)
-                    .forList(result.list)
-                    .withUser(result.user)
-                    .withReservation(result.reservation)
-                    .build()
-                return try Controller.renderView(
-                    "User/ReservationDeletion",
-                    with: context,
-                    on: request
-                )
+                try Controller.render(page: .reservationDeletion(with: result), on: request)
             }
     }
 

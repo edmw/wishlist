@@ -3,8 +3,8 @@
 #set("content") {
 <h2>#L10N("sure-to"){Are you sure ...}</h2>
 <h3>#L10N("to-revoke-invitation","#(page.invitation.email)"){... you want to <span class="text-danger">revoke</span> the invitation for <strong>#(page.invitation.email)</strong>?}</h3>
-<form method="POST" action="/user/#(page.userID)/invitation/#(page.invitation.id)/#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="mt-4">
-    <input name="__method" type="hidden" value="PATCH">
+<form method="POST" action="#(page.actions.form.reference)#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="mt-4">
+#if(page.actions.form.method != "POST") {<input type="hidden" name="__method" value="#(page.actions.form.method)">}
     <input name="key" type="hidden" value="status">
     <input name="value" type="hidden" value="revoked">
     <div class="form-group form-row">

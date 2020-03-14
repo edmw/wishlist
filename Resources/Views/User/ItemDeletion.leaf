@@ -3,8 +3,8 @@
 #set("content") {
 <h2>#L10N("sure-to"){Are you sure ...}</h2>
 <h3>#L10N("to-delete-item","#(page.item.title)","#(page.listTitle)"){... you want to <span class="text-danger">delete</span> the item named <strong>#(page.item.title)</strong> from list #(page.listTitle)?}</h3>
-<form method="POST" action="/user/#(page.userID)/list/#(page.listID)/item/#(page.item.id)/#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="mt-4">
-    <input name="__method" type="hidden" value="DELETE">
+<form method="POST" action="#(page.actions.form.reference)#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="mt-4">
+#if(page.actions.form.method != "POST") {<input type="hidden" name="__method" value="#(page.actions.form.method)">}
     <div class="form-group form-row">
         <button type="submit" class="btn btn-primary">#L10N("confirm"){Confirm}</button>
         <a class="nav-link btn btn-link ml-3" href="#if(request.parameter.p){#(request.parameter.p)}else{/user/#(page.userID)/list/#(page.listID)/items}">#L10N("cancel"){Cancel}</a>

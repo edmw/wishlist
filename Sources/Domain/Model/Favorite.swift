@@ -12,7 +12,7 @@ import Library
 /// Relations:
 /// - Sibling: User
 /// - Sibling: List
-public final class Favorite: FavoriteModel,
+public final class Favorite: FavoriteModel, Representable,
     DomainEntity,
     DomainEntityDetachable,
     DomainEntityReflectable,

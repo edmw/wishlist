@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: InvitationRepresentation
 
-public struct InvitationRepresentation: Encodable, Equatable {
+public struct InvitationRepresentation: Representation, Encodable, Equatable {
 
     public let id: InvitationID?
 

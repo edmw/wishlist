@@ -2,7 +2,11 @@ import Domain
 
 import Foundation
 
+// MARK: ReservationPageContext
+
 struct ReservationPageContext: PageContext, AutoPageContextBuilder {
+
+    var actions = PageActions()
 
     var identification: ID?
 

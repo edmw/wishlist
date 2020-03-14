@@ -3,7 +3,8 @@
 #set("content") {
 <h2>#L10N("want-to"){Do you want ...}</h2>
 <h3>#L10N("to-reserve-wish","#(page.itemTitle)","#(page.listTitle)"){... to reserve the wish named <strong>#(page.itemTitle)</strong> from list <strong>#(page.listTitle)</strong>?}</h3>
-<form method="POST" action="/list/#(page.listID)/reservations" accept-charset="UTF-8" class="mt-4">
+<form method="POST" action="#(page.actions.form.reference)" accept-charset="UTF-8" class="mt-4">
+#if(page.actions.form.method != "POST") {<input type="hidden" name="__method" value="#(page.actions.form.method)">}
 <input type="hidden" name="itemID" value="#(page.itemID)">
 <div class="form-group form-row">
 <button type="submit" class="btn btn-primary">#L10N("confirm"){Confirm}</button>

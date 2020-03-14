@@ -29,12 +29,7 @@ final class ItemsController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try ItemsPageContext.builder
-                    .forUser(result.user)
-                    .forList(result.list)
-                    .withItems(result.items)
-                    .build()
-                return try Controller.renderView("User/Items", with: context, on: request)
+                try Controller.render(page: .items(with: result), on: request)
             }
     }
 

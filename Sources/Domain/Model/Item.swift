@@ -9,7 +9,7 @@ import Library
 ///
 /// Relations:
 /// - Parent: List
-public final class Item: ItemModel, Imageable,
+public final class Item: ItemModel, Imageable, Representable,
     DomainEntity,
     DomainEntityDetachable,
     DomainEntityReflectable,

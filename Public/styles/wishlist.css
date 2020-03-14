@@ -1,4 +1,15 @@
-/* fonts */
+/* MARK: colors */
+
+:root {
+    --text-color: #343a40;
+    --background-color: hsla(210, 17%, 98%, 1);
+    --background-color-dark-1: hsla(210, 9%, 96%, 1);
+    --background-color-dark-2: hsla(210, 6%, 93%, 1);
+    --button-background-color: #6c757d;
+    --button-background-color-light: #dee2e6;
+}
+
+/* MARK: fonts */
 
 @font-face {
     font-family: 'Open Sans';
@@ -13,6 +24,8 @@
     src: local('Open Sans ExtraBold'), local('OpenSans-ExtraBold'), url(/fonts/OpenSans-ExtraBold.ttf) format('truetype');
 }
 
+/* MARK: body */
+
 body {
     display: flex;
     flex-direction: column;
@@ -20,28 +33,14 @@ body {
     font-size: 100%;
 }
 
-/* banner */
-#banner {
-    position: fixed;
-    z-index: 101;
-    top: 0;
-    left: 0;
+/* MARK: container: header */
+
+header {
     width: 100%;
     overflow: hidden;
     font-family: 'Open Sans', sans-serif;
     font-size: 1rem;
     font-weight: 400;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-/* header */
-header {
-	width: 100%;
-	overflow: hidden;
-	font-family: 'Open Sans', sans-serif;
-	font-size: 1rem;
-	font-weight: 400;
 }
 header .content {
     display: flex;
@@ -61,7 +60,6 @@ header .content {
         flex-wrap: nowrap;
     }
 }
-/* title inside header */
 header #title {
     display: flex;
     flex-direction: column;
@@ -97,21 +95,36 @@ header #title h1::first-letter {
         font-size: 5.625rem;
     }
 }
-/* navbar inside header */
 header .content .nav {
-    margin: 32px 0 0 0;
+    margin: 0;
+    margin-top: 32px;
     padding: 0;
     align-self: center;
     flex-wrap: nowrap;
 }
 @media (min-width: 768px) {
     header .content .nav {
-        margin: 0 20px 0 0;
+        margin: 0;
+        margin-right: 20px;
         order: 1;
     }
 }
+header #banner {
+    position: fixed;
+    z-index: 101;
+    top: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
 
-/* footer */
+/* MARK: container: footer */
+
 footer {
     width: 100%;
     overflow: hidden;
@@ -128,7 +141,8 @@ footer {
     }
 }
 
-/* main */
+/* MARK: container: main */
+
 main {
     flex: 1;
     width: 100%;
@@ -187,68 +201,136 @@ main .content section + section {
     margin-top: 2em;
 }
 
-/* inline title */
-span.title {
-    display: inline-block;
-    text-transform: uppercase;
-}
-span.title::first-letter {
-    font-size: 125%;
-}
+/* MARK: blocks: tables */
 
-/* table of lists */
-table.wl-lists {
-    table-layout: fixed;
+table.wl-table {
 }
-table.wl-lists th {
+table.wl-table col:nth-child(odd) {
+    background-color: var(--background-color-dark-1);
+}
+table.wl-table col:nth-child(even) {
+    background-color: var(--background-color-dark-2);
+}
+table.wl-table th {
     text-align: left;
 }
-table.wl-lists td.wl-visibility {
-    white-space: nowrap;
+table.wl-table td {
+    text-align: left;
 }
-table.wl-lists td.wl-actions {
+table.wl-table td:last-child {
     text-align: right;
 }
 @media only screen and (max-width: 575px) {
-
-    table.wl-lists {
+    table.wl-table {
         display: table;
+        table-layout: auto !important;
+        width: 100%;
     }
-    table.wl-lists thead {
+    table.wl-table thead {
         position: absolute;
         width: 1px;
         height: 1px;
         clip: rect(0 0 0 0);
         overflow: hidden;
     }
-    table.wl-lists tr {
+    table.wl-table tr {
         display: block;
         width: 100%;
         border-bottom: 1px solid #dee2e6;
     }
-    table.wl-lists td {
+    table.wl-table tr:nth-child(odd) {
+        background-color: var(--background-color-dark-1);
+    }
+    table.wl-table tr:nth-child(even) {
+        background-color: var(--background-color-dark-2);
+    }
+    table.wl-table td {
         display: block;
         width: 100%;
         border: none;
         text-align: right;
+        max-width: initial !important;
+        white-space: initial !important;
     }
-    table.wl-lists td:before {
+    table.wl-table td:before {
         content: attr(data-label);
         display: inline-block;
         float: left;
         padding-right: 1rem;
         font-weight: bold;
     }
-    table.wl-lists tr + tr {
+    table.wl-table tr + tr {
         margin-top: 1rem;
     }
 }
 
-/* list form */
-form.wl-list {
+/* MARK: blocks: table of lists */
+
+table.wl-lists {
+    table-layout: fixed;
+}
+table.wl-lists td.wl-visibility {
+    white-space: nowrap;
+}
+
+/* MARK: blocks: table of items */
+
+table.wl-items {
+    table-layout: auto;
+}
+table.wl-items td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+table.wl-items td.wl-description {
+    width: 100%;
+    max-width: 0;
+}
+
+/* MARK: blocks: table of favorites */
+
+table.wl-favorites {
+}
+
+/* MARK: blocks: table of invitations */
+
+table.wl-invitations {
+}
+
+/* MARK: blocks: forms */
+
+form.wl-form {
     max-width: 720px;
     margin-right: auto;
 }
+
+/* MARK: blocks: form for list */
+
+form.wl-list {
+}
+
+/* MARK: blocks: form for item */
+
+form.wl-item {
+}
+
+/* MARK: blocks: form for profile */
+
+form.wl-profile {
+}
+
+/* MARK: blocks: form for invitation */
+
+form.wl-invitation {
+}
+
+/* MARK: blocks: form for settings */
+
+form.wl-settings {
+}
+
+/* MARK: blocks: collection of items */
 
 /* collection of items */
 div.wl-items {
@@ -403,78 +485,18 @@ div.wl-item .btn-group a {
     }
 }
 
-/* table of items */
-table.wl-items th {
-    text-align: left;
-}
-table.wl-items td {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-table.wl-items td.wl-description {
-    width: 100%;
-    max-width: 0;
-}
-table.wl-items td.wl-actions {
-    text-align: right;
-}
-@media only screen and (max-width: 575px) {
+/* MARK: blocks */
 
-    table.wl-items {
-        display: table;
-    }
-    table.wl-items thead {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        clip: rect(0 0 0 0);
-        overflow: hidden;
-    }
-    table.wl-items tr {
-        display: block;
-        width: 100%;
-        border-bottom: 1px solid #dee2e6;
-    }
-    table.wl-items td {
-        display: block;
-        width: 100%;
-        border: none;
-        text-align: right;
-        max-width: initial !important;
-        white-space: initial !important;
-    }
-    table.wl-items td:before {
-        content: attr(data-label);
-        display: inline-block;
-        float: left;
-        padding-right: 1rem;
-        font-weight: bold;
-    }
-    table.wl-items tr + tr {
-        margin-top: 1rem;
-    }
+span.title {
+    display: inline-block;
+    text-transform: uppercase;
+}
+span.title::first-letter {
+    font-size: 125%;
 }
 
-/* item form */
-form.wl-item {
-    max-width: 720px;
-    margin-right: auto;
-}
+/* MARK: blocks: signin */
 
-/* profile */
-
-table.profile th {
-    text-align: right;
-}
-
-/* settings */
-
-table.settings th {
-    text-align: right;
-}
-
-/* signins */
 ul#signin {
 	display: flex;
 	flex-direction: row;
@@ -499,12 +521,12 @@ ul#signin #netid-signin {
     background-color: #76B82A;
 }
 
-/* bootstrap: headings */
+/* MARK: bootstrap */
+
 h2, .h2, h3, h4 {
     line-height: 1.5;
 }
 
-/* bootstrap: button */
 .btn {
     border: none;
     border-radius: 50vh;
@@ -520,8 +542,9 @@ h2, .h2, h3, h4 {
 .btn-action {
     width: 30px;
     height: 30px;
-    background-color: #eee;
-    box-shadow: 0 0 0 4px #eee;
+    padding: 0;
+    background-color: var(--button-background-color-light);
+    box-shadow: 0 0 0 4px var(--button-background-color-light);
     border-radius: 50vh !important;
 }
 .btn-link .btn-label {
@@ -535,12 +558,7 @@ h2, .h2, h3, h4 {
 .btn-link svg + .btn-label {
     margin-left: 0.5ex;
 }
-/* btn inside table */
-.table .btn {
-    padding: 0;
-}
 
-/* bootstrap: navbar */
 .navbar .navbar-brand {
     text-transform: uppercase;
 }

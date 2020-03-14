@@ -2,7 +2,8 @@
 #//
 #set("content") {
 #// form action and method to create a new invitation
-<form method="POST" action="/user/#(page.userID)/invitations#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="wl-list">
+<form method="POST" action="#(page.actions.form.reference)#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="wl-form wl-invitation">
+#if(page.actions.form.method != "POST") {<input type="hidden" name="__method" value="#(page.actions.form.method)">}
     <div class="form-group">
         <label for="inputEmail">#L10N("invitation-email"){Email}</label>
         <input type="text" class="form-control#if(page.form.invalidEmail){ is-invalid}" id="inputEmail" name="inputEmail" maxlength="254" placeholder="#L10N("invitation-field-email-placeholder"){Enter invitee’s email}" aria-describedby="descriptionEmail"#if(page.form.data.inputEmail){ value="#(page.form.data.inputEmail)"}>

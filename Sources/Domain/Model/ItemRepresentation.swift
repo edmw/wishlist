@@ -4,7 +4,7 @@ import Library
 
 // MARK: ItemRepresentation
 
-public struct ItemRepresentation: Encodable, Equatable {
+public struct ItemRepresentation: Representation, Encodable, Equatable {
 
     public let id: ItemID?
 
@@ -18,8 +18,14 @@ public struct ItemRepresentation: Encodable, Equatable {
     public let imageURL: String?
     public let localImageURL: String?
 
+    public let isReserved: Bool
     public let reservationID: ReservationID?
     public let reservationHolderID: Identification?
+
+    public let isDeletable: Bool
+    public let isReceivable: Bool
+    public let isArchivable: Bool
+    public let isMovable: Bool
 
     init(_ item: Item, with reservation: ReservationModel? = nil) {
         self.id = item.id
@@ -31,8 +37,13 @@ public struct ItemRepresentation: Encodable, Equatable {
         self.url = item.url?.absoluteString
         self.imageURL = item.imageURL?.absoluteString
         self.localImageURL = item.localImageURL?.absoluteString
+        self.isReserved = reservation != nil
         self.reservationID = reservation?.id
         self.reservationHolderID = reservation?.holder
+        self.isDeletable = item.isDeletable(given: reservation)
+        self.isReceivable = item.isReceivable(given: reservation)
+        self.isArchivable = item.isArchivable(given: reservation)
+        self.isMovable = item.isMovable(given: reservation)
     }
 
 }

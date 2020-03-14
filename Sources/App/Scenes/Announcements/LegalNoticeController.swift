@@ -19,8 +19,7 @@ final class LegalNoticeController: AuthenticatableController, RouteCollection {
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = LegalNoticePageContext(for: result.user)
-                return try Controller.renderView("Public/LegalNotice", with: context, on: request)
+                try Controller.render(page: .legalNotice(with: result), on: request)
             }
     }
 

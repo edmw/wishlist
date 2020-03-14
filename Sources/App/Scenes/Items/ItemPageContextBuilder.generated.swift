@@ -13,6 +13,7 @@ extension ItemPageContext {
     static var builder: ItemPageContextBuilder {
         return ItemPageContextBuilder()
     }
+
 }
 
 enum ItemPageContextBuilderError: Error {
@@ -22,10 +23,12 @@ enum ItemPageContextBuilderError: Error {
 
 class ItemPageContextBuilder {
 
+    var actions = PageActions()
+
     var user: UserRepresentation?
     var list: ListRepresentation?
     var item: ItemRepresentation?
-    var formData: ItemPageFormData?
+    var editingContext: ItemEditingContext?
 
     @discardableResult
     func forUser(_ user: UserRepresentation) -> Self {
@@ -46,8 +49,14 @@ class ItemPageContextBuilder {
     }
 
     @discardableResult
-    func withFormData(_ formData: ItemPageFormData?) -> Self {
-        self.formData = formData
+    func withEditing(_ editingContext: ItemEditingContext?) -> Self {
+        self.editingContext = editingContext
+        return self
+    }
+
+    @discardableResult
+    func setAction(_ key: String, _ action: PageAction) -> Self {
+        self.actions[key] = action
         return self
     }
 
@@ -58,12 +67,14 @@ class ItemPageContextBuilder {
         guard let list = list else {
             throw ItemPageContextBuilderError.missingRequiredList
         }
-        return .init(
+        var context = ItemPageContext(
             for: user,
             and: list,
             with: item,
-            from: formData
+            editingContext: editingContext
         )
+        context.actions = actions
+        return context
     }
 
 }

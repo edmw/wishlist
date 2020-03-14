@@ -54,14 +54,14 @@ you're viewing <strong>#(page.ownerName)'s #(page.listTitle) Wishlist</strong>. 
                         <a class="wl-item-btn-flip btn text-light"><svg class="feather"><use xlink:href="/icons/feather.svg#book"/></svg></a>
                     </div>
                 </div>
-                #if(item.reservationHolderID) {
+                #if(item.isReserved) {
                 <div class="cover p-2 bg-light">
                     <p class="my-auto text-center"><strong>#L10N("wish-already-reserved"){This wish has already been reserved.}</strong></p>
                 </div>
                 }
             </div>
             <div class="wl-item-footer text-center mb-4">
-                #if(item.reservationHolderID) {
+                #if(item.isReserved) {
                     #if(page.identification == item.reservationHolderID) {
                         <a class="btn btn-link" href="/list/#(page.listID)/reservation/#(item.reservationID)/delete?itemid=#(item.id)">#L10N("undo-reservation"){Undo reservation}</a>
                     } else {

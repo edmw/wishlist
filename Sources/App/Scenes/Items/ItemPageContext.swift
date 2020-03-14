@@ -6,6 +6,8 @@ import Foundation
 
 struct ItemPageContext: PageContext, AutoPageContextBuilder {
 
+    var actions = PageActions()
+
     var userID: ID?
     var listID: ID?
 
@@ -16,14 +18,14 @@ struct ItemPageContext: PageContext, AutoPageContextBuilder {
     // for MoveItem form
     var userLists: [ListContext]?
 
-    var form: ItemPageFormContext
+    var form: ItemEditingContext
 
     // sourcery: AutoPageContextBuilderInitializer
     init(
         for user: UserRepresentation,
         and list: ListRepresentation,
         with item: ItemRepresentation? = nil,
-        from formData: ItemPageFormData? = nil
+        editingContext: ItemEditingContext? = nil
     ) {
         self.userID = ID(user.id)
         self.listID = ID(list.id)
@@ -32,7 +34,7 @@ struct ItemPageContext: PageContext, AutoPageContextBuilder {
 
         self.listTitle = list.title
 
-        self.form = ItemPageFormContext(from: formData)
+        self.form = editingContext ?? .empty
     }
 
 }

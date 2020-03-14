@@ -1,7 +1,6 @@
 import Domain
 
 import Vapor
-import Fluent
 
 final class ItemController: AuthenticatableController,
     ItemParameterAcceptor,
@@ -29,16 +28,7 @@ final class ItemController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                var contextBuilder = ItemPageContext.builder
-                    .forUser(result.user)
-                    .forList(result.list)
-                if let item = result.item {
-                    contextBuilder = contextBuilder
-                        .withItem(item)
-                        .withFormData(ItemPageFormData(from: item))
-                }
-                let context = try contextBuilder.build()
-                return try Controller.renderView("User/Item", with: context, on: request)
+                try Controller.render(page: .itemEditing(with: result), on: request)
             }
     }
 
@@ -55,17 +45,12 @@ final class ItemController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try ItemPageContext.builder
-                    .forUser(result.user)
-                    .forList(result.list)
-                    .withItem(result.item)
-                    .build()
-                return try Controller.renderView("User/ItemDeletion", with: context, on: request)
+                try Controller.render(page: .itemDeletion(with: result), on: request)
                     .encode(for: request)
             }
             .catchFlatMap(UserItemsActorError.self) { _ in
                 // Tries to redirect back to the items page.
-                return Controller.redirect(for: userid, and: listid, to: "items", on: request)
+                Controller.redirect(for: userid, and: listid, to: "items", on: request)
             }
     }
 
@@ -81,30 +66,33 @@ final class ItemController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                var context = try ItemPageContext.builder
-                    .forUser(result.user)
-                    .forList(result.list)
-                    .withItem(result.item)
-                    .build()
-
-// TODO
-//                let moveAction = PageAction.patch(
-//                    "user",
-//                    result.user.id,
-//                    "list",
-//                    result.list.id,
-//                    "item",
-//                    result.item.id
-//                )
-//                context.link("move", to: moveAction)
-
-                context.userLists = result.lists.map { ListContext($0) }
-                return try Controller.renderView("User/ItemMove", with: context, on: request)
+                try Controller.render(page: .itemMovement(with: result), on: request)
                     .encode(for: request)
             }
             .catchFlatMap(UserItemsActorError.self) { _ in
                 // Tries to redirect back to the list page.
-                return Controller.redirect(for: userid, and: listid, to: "items", on: request)
+                Controller.redirect(for: userid, and: listid, to: "items", on: request)
+            }
+    }
+
+    /// Renders a view to confirm marking an item as received.
+    /// This is only accessible for an authenticated user who owns the affected item.
+    private func renderReceiveView(on request: Request) throws -> EventLoopFuture<Response> {
+        let userid = try requireAuthenticatedUserID(on: request)
+        let listid = try requireListID(on: request)
+        let itemid = try requireItemID(on: request)
+        return try userItemsActor
+            .requestItemReceiving(
+                .specification(userBy: userid, listBy: listid, itemBy: itemid),
+                .boundaries(worker: request.eventLoop)
+            )
+            .flatMap { result in
+                try Controller.render(page: .itemReceiving(with: result), on: request)
+                    .encode(for: request)
+            }
+            .catchFlatMap(UserItemsActorError.self) { _ in
+                // Tries to redirect back to the list page.
+                Controller.redirect(for: userid, and: listid, to: "items", on: request)
             }
     }
 
@@ -120,7 +108,15 @@ final class ItemController: AuthenticatableController,
             .caseSuccess { result, _ in
                 self.success(for: result.user, and: result.list, on: request)
             }
-            .caseFailure { context in try self.failure(on: request, with: context) }
+            .caseFailure { result, context in
+                try self.failure(
+                    for: result.user,
+                    and: result.list,
+                    and: result.item,
+                    with: context,
+                    on: request
+                )
+            }
     }
 
     // Updates the specified item with the given data. The item must be part of the specified list.
@@ -134,7 +130,15 @@ final class ItemController: AuthenticatableController,
             .caseSuccess { result, _ in
                 self.success(for: result.user, and: result.list, on: request)
             }
-            .caseFailure { context in try self.failure(on: request, with: context) }
+            .caseFailure { result, context in
+                try self.failure(
+                    for: result.user,
+                    and: result.list,
+                    and: result.item,
+                    with: context,
+                    on: request
+                )
+            }
     }
 
     private struct Patch: Decodable {
@@ -230,14 +234,18 @@ final class ItemController: AuthenticatableController,
     /// Returns a failure response on a CRUD request.
     /// Not implemented yet: REST response
     private func failure(
-        on request: Request,
-        with context: ItemPageContext
+        for user: UserRepresentation,
+        and list: ListRepresentation,
+        and item: ItemRepresentation?,
+        with editingContext: ItemEditingContext,
+        on request: Request
     ) throws -> EventLoopFuture<Response> {
         // to add real REST support, check the accept header for json and output a json response
-        return try Controller.renderView("User/Item", with: context, on: request)
-            .flatMap { view in
-                return try view.encode(for: request)
-            }
+        return try Controller.render(
+            page: .itemEditing(with: user, and: list, and: item, editingContext: editingContext),
+            on: request
+        )
+        .encode(for: request)
     }
 
     // MARK: -
@@ -282,6 +290,10 @@ final class ItemController: AuthenticatableController,
         router.get(
             "user", ID.parameter, "list", ID.parameter, "item", ID.parameter, "move",
                 use: self.renderMoveView
+        )
+        router.get(
+            "user", ID.parameter, "list", ID.parameter, "item", ID.parameter, "receive",
+                use: self.renderReceiveView
         )
         router.post(
             "user", ID.parameter, "list", ID.parameter, "item", ID.parameter,

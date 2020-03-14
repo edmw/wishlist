@@ -1,11 +1,11 @@
 import Library
 import Domain
 
-import Vapor
+// MARK: ItemEditingData
 
 /// This structures holds all the input given by the user into the item form.
 /// In contrast to `ItemRepresentation` and `ItemData` this contains only editable properties.
-struct ItemPageFormData: Content {
+struct ItemEditingData: Codable {
 
     let inputTitle: String
     let inputText: String
@@ -33,13 +33,13 @@ struct ItemPageFormData: Content {
 
 extension ItemValues {
 
-    init(from formdata: ItemPageFormData) {
+    init(from data: ItemEditingData) {
         self.init(
-            title: formdata.inputTitle,
-            text: formdata.inputText,
-            preference: formdata.inputPreference,
-            url: formdata.inputURL,
-            imageURL: formdata.inputImageURL,
+            title: data.inputTitle,
+            text: data.inputText,
+            preference: data.inputPreference,
+            url: data.inputURL,
+            imageURL: data.inputImageURL,
             createdAt: nil,
             modifiedAt: nil
         )

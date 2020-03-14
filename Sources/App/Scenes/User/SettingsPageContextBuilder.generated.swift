@@ -13,6 +13,7 @@ extension SettingsPageContext {
     static var builder: SettingsPageContextBuilder {
         return SettingsPageContextBuilder()
     }
+
 }
 
 enum SettingsPageContextBuilderError: Error {
@@ -21,8 +22,10 @@ enum SettingsPageContextBuilderError: Error {
 
 class SettingsPageContextBuilder {
 
+    var actions = PageActions()
+
     var user: UserRepresentation?
-    var formData: SettingsPageFormData?
+    var editingContext: SettingsEditingContext?
 
     @discardableResult
     func forUser(_ user: UserRepresentation) -> Self {
@@ -31,8 +34,14 @@ class SettingsPageContextBuilder {
     }
 
     @discardableResult
-    func withFormData(_ formData: SettingsPageFormData?) -> Self {
-        self.formData = formData
+    func withEditing(_ editingContext: SettingsEditingContext?) -> Self {
+        self.editingContext = editingContext
+        return self
+    }
+
+    @discardableResult
+    func setAction(_ key: String, _ action: PageAction) -> Self {
+        self.actions[key] = action
         return self
     }
 
@@ -40,10 +49,12 @@ class SettingsPageContextBuilder {
         guard let user = user else {
             throw SettingsPageContextBuilderError.missingRequiredUser
         }
-        return .init(
+        var context = SettingsPageContext(
             for: user,
-            from: formData
+            from: editingContext
         )
+        context.actions = actions
+        return context
     }
 
 }

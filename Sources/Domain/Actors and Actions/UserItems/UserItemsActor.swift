@@ -56,6 +56,11 @@ public protocol UserItemsActor: Actor {
         _ boundaries: MoveItem.Boundaries
     ) throws -> EventLoopFuture<MoveItem.Result>
 
+    func requestItemReceiving(
+        _ specification: RequestItemReceiving.Specification,
+        _ boundaries: RequestItemReceiving.Boundaries
+    ) throws -> EventLoopFuture<RequestItemReceiving.Result>
+
 }
 
 /// Errors thrown by the User Items actor.

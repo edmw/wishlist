@@ -9,7 +9,7 @@ import Library
 ///
 /// Relations:
 /// - Foreign: Item
-public final class Reservation: ReservationModel,
+public final class Reservation: ReservationModel, Representable,
     DomainEntity,
     DomainEntityDetachable,
     DomainEntityReflectable,

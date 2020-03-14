@@ -26,10 +26,7 @@ final class InvitationController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try InvitationPageContext.builder
-                    .forUser(result.user)
-                    .build()
-                return try Controller.renderView("User/Invitation", with: context, on: request)
+                try Controller.render(page: .invitationCreation(with: result), on: request)
             }
     }
 
@@ -45,20 +42,12 @@ final class InvitationController: AuthenticatableController,
                 .boundaries(worker: request.eventLoop)
             )
             .flatMap { result in
-                let context = try InvitationPageContext.builder
-                    .forUser(result.user)
-                    .withInvitation(result.invitation)
-                    .build()
-                return try Controller.renderView(
-                    "User/InvitationRevocation",
-                    with: context,
-                    on: request
-                )
-                .encode(for: request)
+                try Controller.render(page: .invitationRevocation(with: result), on: request)
+                    .encode(for: request)
             }
             .catchMap(UserFavoritesActor.self) { _ in
                 // Tries to redirect back to the start page.
-                return Controller.redirect(to: "/", on: request)
+                Controller.redirect(to: "/", on: request)
             }
     }
 
@@ -68,8 +57,10 @@ final class InvitationController: AuthenticatableController,
         let userid = try requireAuthenticatedUserID(on: request)
 
         return try save(from: request, for: userid)
-            .caseSuccess { result in self.success(for: result.user, on: request) }
-            .caseFailure { context in try self.failure(on: request, with: context) }
+            .caseSuccess { user in self.success(for: user, on: request) }
+            .caseFailure { user, context in
+                try self.failure(for: user, with: context, on: request)
+            }
     }
 
     private struct Patch: Decodable {
@@ -95,7 +86,9 @@ final class InvitationController: AuthenticatableController,
                             .specification(userBy: userid, invitationBy: invitationid),
                             .boundaries(worker: request.eventLoop)
                         )
-                        .flatMap { result in self.success(for: result.user, on: request) }
+                        .flatMap { result in
+                            self.success(for: result.user, on: request)
+                        }
                 default:
                     throw Abort(.badRequest)
                 }
@@ -148,13 +141,16 @@ final class InvitationController: AuthenticatableController,
     /// Returns a failure response on a CRUD request.
     /// Not implemented yet: REST response
     private func failure(
-        on request: Request,
-        with context: InvitationPageContext
+        for user: UserRepresentation,
+        with editingContext: InvitationEditingContext,
+        on request: Request
     ) throws -> EventLoopFuture<Response> {
-        return try Controller.renderView("User/Invitation", with: context, on: request)
-            .flatMap { view in
-                return try view.encode(for: request)
-            }
+        // to add real REST support, check the accept header for json and output a json response
+        return try Controller.render(
+            page: .invitationCreation(with: user, editingContext: editingContext),
+            on: request
+        )
+        .encode(for: request)
     }
 
     // MARK: - Routing

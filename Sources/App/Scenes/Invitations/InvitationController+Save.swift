@@ -7,11 +7,7 @@ extension InvitationController {
 
     // MARK: Save
 
-    struct InvitationSaveResult {
-        let user: UserRepresentation
-        let invitation: InvitationRepresentation
-    }
-    final class InvitationSaveOutcome: Outcome<InvitationSaveResult, InvitationPageContext> {}
+    final class InvitationSaveOutcome: Outcome<UserRepresentation, InvitationEditingContext> {}
 
     /// Saves an invitation for the specified user from the request’s data.
     /// Validates the data contained in the request, checks the constraints required for a new
@@ -27,16 +23,16 @@ extension InvitationController {
     {
         let userInvitationsActor = self.userInvitationsActor
         return try request.content
-            .decode(InvitationPageFormData.self)
-            .flatMap { formdata in
-                let values = InvitationValues(from: formdata)
+            .decode(InvitationEditingData.self)
+            .flatMap { data in
+                let values = InvitationValues(from: data)
 
                 return try userInvitationsActor
                     .createInvitation(
                         .specification(
                             userBy: userid,
                             from: values,
-                            sendEmail: formdata.inputSendEmail ?? false
+                            sendEmail: data.inputSendEmail ?? false
                         ),
                         .boundaries(
                             worker: request.eventLoop,
@@ -44,50 +40,33 @@ extension InvitationController {
                         )
                     )
                     .map { result in
-                        return try self.handleSuccessOnSave(with: result, formdata: formdata)
+                        let user = result.user
+                        let context = InvitationEditingContext(with: data)
+                        return .success(with: user, context: context)
                     }
                     .catchMap(UserInvitationsActorError.self) { error in
-                        return try self.handleErrorOnSave(with: error, formdata: formdata)
+                        return try self.handleErrorOnSave(with: error, data: data)
                     }
             }
-    }
-
-    private func handleSuccessOnSave(
-        with result: CreateInvitation.Result,
-        formdata: InvitationPageFormData
-    ) throws -> InvitationSaveOutcome {
-        let user = result.user
-        let context = try InvitationPageContext.builder
-            .withFormData(formdata)
-            .forUser(user)
-            .build()
-        return .success(
-            with: .init(user: result.user, invitation: result.invitation),
-            context: context
-        )
     }
 
     private func handleErrorOnSave(
         with error: UserInvitationsActorError,
-        formdata: InvitationPageFormData
+        data: InvitationEditingData
     ) throws
         -> InvitationSaveOutcome
     {
         if case let UserInvitationsActorError
-            .validationError(user, invitation, error) = error
+            .validationError(user, _, error) = error
         {
-            var context = try InvitationPageContext.builder
-                .withFormData(formdata)
-                .forUser(user)
-                .withInvitation(invitation)
-                .build()
+            var context = InvitationEditingContext(with: data)
             switch error {
             case .validationFailed(let properties, _):
-                context.form.invalidEmail = properties.contains(\InvitationValues.email)
+                context.invalidEmail = properties.contains(\InvitationValues.email)
             default:
                 throw error
             }
-            return .failure(with: error, context: context)
+            return .failure(with: user, context: context, has: error)
         }
         else {
             throw error

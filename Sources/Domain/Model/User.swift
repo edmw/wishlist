@@ -9,7 +9,7 @@ import Library
 ///
 /// Relations:
 /// - Childs: Lists
-public final class User: UserModel,
+public final class User: UserModel, Representable,
     DomainEntity,
     DomainEntityDetachable,
     DomainEntityReflectable,
