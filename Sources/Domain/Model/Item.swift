@@ -132,6 +132,7 @@ public final class Item: ItemModel, Imageable, Representable,
         .init(\Item.localImageURL, label: "localImageURL"),
         .init(\Item.createdAt, label: "createdAt"),
         .init(\Item.modifiedAt, label: "modifiedAt"),
+        .init(\Item.archival, label: "archival"),
         .init(\Item.listID, label: "listID")
     )
 
