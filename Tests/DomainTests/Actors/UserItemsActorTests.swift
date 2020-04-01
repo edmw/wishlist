@@ -10,6 +10,7 @@ final class UserItemsActorTests : ActorTestCase, DomainTestCase, HasAllTests {
     static var __allTests = [
         ("testMoveItem", testMoveItem),
         ("testMoveItemWrongUser", testMoveItemWrongUser),
+        ("testReceiveItem", testReceiveItem),
         ("testAllTests", testAllTests)
     ]
 
@@ -17,7 +18,8 @@ final class UserItemsActorTests : ActorTestCase, DomainTestCase, HasAllTests {
     var aList: List!
     var aItem: Item!
 
-    var actor: UserItemsActor!
+    var aReservedItem: Item!
+    var aReservation: Reservation!
 
     override func setUp() {
         super.setUp()
@@ -26,19 +28,16 @@ final class UserItemsActorTests : ActorTestCase, DomainTestCase, HasAllTests {
         aList = try! listRepository.save(list: List.randomList(for: aUser)).wait()
         aItem = try! itemRepository.save(item: Item.randomItem(for: aList)).wait()
 
-        actor = DomainUserItemsActor(
-            itemRepository: itemRepository,
-            listRepository: listRepository,
-            userRepository: userRepository,
-            logging: logging,
-            recording: recording
-        )
+        aReservedItem = try! itemRepository.save(item: Item.randomItem(for: aList)).wait()
+        aReservation = try! reservationRepository.save(
+            reservation: Reservation(item: aReservedItem, holder: aUser.identification)
+        ).wait()
     }
 
     func testMoveItem() throws {
         let anotherList = try! listRepository.save(list: List.randomList(for: aUser)).wait()
         let count = try itemRepository.count(on: aList).wait()
-        let result = try! actor.moveItem(
+        let result = try! userItemsActor.moveItem(
             .specification(
                 userBy: aUser.id!,
                 listBy: aList.id!,
@@ -47,8 +46,8 @@ final class UserItemsActorTests : ActorTestCase, DomainTestCase, HasAllTests {
             ),
             .boundaries(worker: eventLoop)
         ).wait()
-        XCTAssertEqual(result.user, UserRepresentation(aUser))
-        XCTAssertEqual(result.item, ItemRepresentation(aItem))
+        XCTAssertEqual(result.user.id, aUser.id)
+        XCTAssertEqual(result.item.id, aItem.id)
         XCTAssertEqual(result.list, ListRepresentation(anotherList))
         XCTAssertEqual(try itemRepository.count(on: aList).wait(), count - 1)
         XCTAssertEqual(try itemRepository.count(on: anotherList).wait(), 1)
@@ -60,7 +59,7 @@ final class UserItemsActorTests : ActorTestCase, DomainTestCase, HasAllTests {
         let anotherUser = try! userRepository.save(user: User.randomUser()).wait()
         let anotherList = try! listRepository.save(list: List.randomList(for: anotherUser)).wait()
         assert(
-            try actor.moveItem(
+            try userItemsActor.moveItem(
                     .specification(
                         userBy: aUser.id!,
                         listBy: aList.id!,
@@ -71,6 +70,21 @@ final class UserItemsActorTests : ActorTestCase, DomainTestCase, HasAllTests {
                 ).wait(),
             throws: UserItemsActorError.invalidList
         )
+    }
+
+    func testReceiveItem() throws {
+        let itemRepresentation = ItemRepresentation(aReservedItem, with: aReservation)
+        XCTAssertTrue(itemRepresentation.isReserved!)
+        XCTAssertTrue(itemRepresentation.receivable!)
+        let result = try userItemsActor.receiveItem(
+            .specification(userBy: aUser.id!, listBy: aList.id!, itemBy: aReservedItem.id!),
+            .boundaries(worker: eventLoop)
+        ).wait()
+        XCTAssertEqual(result.user.id, aUser.id)
+        XCTAssertEqual(result.list.id, aList.id)
+        XCTAssertEqual(result.item.id, aReservedItem.id)
+        XCTAssertTrue(result.item.isReserved!)
+        XCTAssertFalse(result.item.receivable!)
     }
 
     func testAllTests() throws {

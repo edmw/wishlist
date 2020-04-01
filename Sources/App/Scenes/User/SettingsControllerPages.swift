@@ -9,7 +9,7 @@ extension Page {
         editingContext: SettingsEditingContext
     ) throws -> Self {
         return try .init(
-            templateName: "User/ProfileForm",
+            templateName: "User/SettingsEditing",
             context: SettingsPageContext.builder
                 .forUser(user)
                 .withEditing(editingContext)

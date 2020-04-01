@@ -1,7 +1,7 @@
 #//
 #set("content") {
-<p>#L10N("welcome-catchline"){Wish lists made easy.}</p>
-<p>#L10N("welcome-catchline-2"){It's easy and fun to create your personal wish list and share it with your loved ones.}</p>
+<p>#L10N("welcome-catchline")</p>
+<p>#L10N("welcome-catchline-2")</p>
 #embed("Public/Login-Signin")
 }
 #//

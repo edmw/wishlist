@@ -45,6 +45,25 @@ extension Page {
         return try itemEditing(with: user, and: list, and: item, editingContext: editingcontext)
     }
 
+    static func itemManagement(with result: RequestItemManagement.Result) throws -> Self {
+        let user = result.user
+        let list = result.list
+        let item = result.item
+        var pageContext = try ItemPageContext.builder
+            .forUser(user)
+            .forList(list)
+            .withItem(item)
+            .setAction("move", .patch("user", user.id, "list", list.id, "item", item.id))
+            .setAction("archive", .patch("user", user.id, "list", list.id, "item", item.id))
+            .setAction("delete", .get("user", user.id, "list", list.id, "item", item.id, "delete"))
+            .build()
+        pageContext.userLists = result.lists.map { ListContext($0) }
+        return .init(
+            templateName: "User/ItemManagment",
+            context: pageContext
+        )
+    }
+
     static func itemDeletion(with result: RequestItemDeletion.Result) throws -> Self {
         let user = result.user
         let list = result.list
@@ -87,7 +106,7 @@ extension Page {
                 .forUser(user)
                 .forList(list)
                 .withItem(item)
-                .setAction("form", .get("user", user.id, "list", list.id, "item", item.id))
+                .setAction("form", .patch("user", user.id, "list", list.id, "item", item.id))
                 .build()
         )
     }

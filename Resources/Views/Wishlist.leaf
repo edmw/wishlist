@@ -11,13 +11,13 @@
 #// title
 #// -> page-title
 #if(title == nil) {
-#set("title") {#L10N("app-title"){Wishlist}}
+#set("title") {#L10N("app-title")}
 #set("genesis-page-title") {#(title)}
 } else {
     #if(subtitle) {
-        #set("genesis-page-title") {#L10N("app-title"){Wishlist} — #get(title) — #get(subtitle)}
+        #set("genesis-page-title") {#L10N("app-title") — #get(title) — #get(subtitle)}
     } else {
-        #set("genesis-page-title") {#L10N("app-title"){Wishlist} — #get(title)}
+        #set("genesis-page-title") {#L10N("app-title") — #get(title)}
     }
 }
 #//
@@ -33,12 +33,12 @@
 }
 <div class="content text-light bg-dark">
     <nav class="nav">
-        <a class="nav-link text-light" href="/">#L10N("home"){Home}</a>
+        <a class="nav-link text-light" href="/">#L10N("home")</a>
         #if(page.userID) {
-        <a class="nav-link text-light" href="/user/#(page.userID)/">#L10N("profile"){Profile}</a>
-        <a class="nav-link btn btn-light ml-3" href="/user/logout">#L10N("logout"){Logout}</a>
+        <a class="nav-link text-light" href="/user/#(page.userID)/">#L10N("profile")</a>
+        <a class="nav-link btn btn-light ml-3" href="/user/logout">#L10N("logout")</a>
         } else if(error == nil) {
-        <a class="nav-link btn btn-light ml-3" href="/signin">#L10N("signin"){Signin}</a>
+        <a class="nav-link btn btn-light ml-3" href="/signin">#L10N("signin")</a>
         }
     </nav>
     <div id="title">
@@ -55,7 +55,7 @@
 #// -> body-footer
 #set("genesis-fragment-body-footer") {
 <nav class="navbar navbar-expand navbar-dark bg-dark">
-  <a class="navbar-brand" href="/">#L10N("app-title"){Wishlist}</a>
+  <a class="navbar-brand d-none d-md-inline" href="/">#L10N("app-title")</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -63,15 +63,15 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
-        <a class="nav-link" href="/">#L10N("home"){Home}</a>
+        <a class="nav-link" href="/">#L10N("home")</a>
       </li>
     </ul>
-    <ul class="navbar-nav">
+    <ul class="navbar-nav ml-4">
       <li class="nav-item active">
-        <a class="nav-link" href="/privacy-policy">#L10N("privacy-policy"){Privacy policy}</a>
+        <a class="nav-link" href="/privacy-policy">#L10N("privacy-policy")</a>
       </li>
       <li class="nav-item active">
-        <a class="nav-link" href="/legal-notice">#L10N("legal-notice"){Legal notice}</a>
+        <a class="nav-link" href="/legal-notice">#L10N("legal-notice")</a>
       </li>
     </ul>
   </div>

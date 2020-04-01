@@ -39,6 +39,7 @@ public struct FluentItem: ItemModel,
     public var imageURL: URL?
     public var createdAt: Date
     public var modifiedAt: Date
+    public var archival: Bool
     public var localImageURL: ImageStoreLocator?
     public var listKey: UUID
     public var listID: ListID { ListID(uuid: listKey) }
@@ -54,6 +55,7 @@ public struct FluentItem: ItemModel,
         imageURL: URL?,
         createdAt: Date,
         modifiedAt: Date,
+        archival: Bool,
         localImageURL: ImageStoreLocator?,
         listKey: UUID
     ) {
@@ -65,6 +67,7 @@ public struct FluentItem: ItemModel,
         self.imageURL = imageURL
         self.createdAt = createdAt
         self.modifiedAt = modifiedAt
+        self.archival = archival
         self.localImageURL = localImageURL
         self.listKey = listKey
     }
@@ -78,6 +81,7 @@ public struct FluentItem: ItemModel,
         case imageURL
         case createdAt
         case modifiedAt
+        case archival
         case localImageURL
         case listKey = "listID"
     }
@@ -94,6 +98,7 @@ public struct FluentItem: ItemModel,
             builder.field(for: \.imageURL)
             builder.field(for: \.createdAt)
             builder.field(for: \.modifiedAt)
+            builder.field(for: \.archival)
             builder.field(for: \.localImageURL)
             builder.field(for: \.listKey)
             builder.reference(from: \.listKey, to: \FluentList.uuid, onDelete: .cascade)
@@ -139,6 +144,9 @@ public struct FluentItem: ItemModel,
         guard lhs.modifiedAt == rhs.modifiedAt else {
             return false
         }
+        guard lhs.archival == rhs.archival else {
+            return false
+        }
         guard lhs.localImageURL == rhs.localImageURL else {
             return false
         }
@@ -164,6 +172,7 @@ extension Item {
             imageURL: imageURL,
             createdAt: createdAt,
             modifiedAt: modifiedAt,
+            archival: archival,
             localImageURL: localImageURL,
             listKey: listID.uuid
         )

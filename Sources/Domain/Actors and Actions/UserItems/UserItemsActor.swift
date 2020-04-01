@@ -36,6 +36,11 @@ public protocol UserItemsActor: Actor {
         _ boundaries: CreateOrUpdateItem.Boundaries
     ) throws -> EventLoopFuture<CreateOrUpdateItem.Result>
 
+    func requestItemManagement(
+        _ specification: RequestItemManagement.Specification,
+        _ boundaries: RequestItemManagement.Boundaries
+    ) throws -> EventLoopFuture<RequestItemManagement.Result>
+
     func requestItemDeletion(
         _ specification: RequestItemDeletion.Specification,
         _ boundaries: RequestItemDeletion.Boundaries
@@ -61,6 +66,21 @@ public protocol UserItemsActor: Actor {
         _ boundaries: RequestItemReceiving.Boundaries
     ) throws -> EventLoopFuture<RequestItemReceiving.Result>
 
+    func receiveItem(
+        _ specification: ReceiveItem.Specification,
+        _ boundaries: ReceiveItem.Boundaries
+    ) throws -> EventLoopFuture<ReceiveItem.Result>
+
+    func archiveItem(
+        _ specification: ArchiveItem.Specification,
+        _ boundaries: ArchiveItem.Boundaries
+    ) throws -> EventLoopFuture<ArchiveItem.Result>
+
+    func unarchiveItem(
+        _ specification: UnarchiveItem.Specification,
+        _ boundaries: UnarchiveItem.Boundaries
+    ) throws -> EventLoopFuture<ArchiveItem.Result>
+
 }
 
 /// Errors thrown by the User Items actor.
@@ -71,7 +91,10 @@ public enum UserItemsActorError: Error {
     case validationError(
         UserRepresentation, ListRepresentation, ItemRepresentation?, ValuesError<ItemValues>
     )
-    case itemIsReserved
+    case itemNotMovable
+    case itemNotReceivable
+    case itemNotDeletable
+    case itemNotArchivable
 }
 
 /// This is the domain’s implementation of the Items use cases. Actions will extend this by
@@ -80,12 +103,16 @@ public final class DomainUserItemsActor: UserItemsActor,
     CreateItemActor,
     UpdateItemActor,
     MoveItemActor,
+    ReceiveItemActor,
+    ArchiveItemActor,
+    UnarchiveItemActor,
     SetupItemActor
 {
 
     let itemRepository: ItemRepository
     let listRepository: ListRepository
     let userRepository: UserRepository
+    let reservationRepository: ReservationRepository
 
     let logging: MessageLogging
     let recording: EventRecording
@@ -97,12 +124,14 @@ public final class DomainUserItemsActor: UserItemsActor,
         itemRepository: ItemRepository,
         listRepository: ListRepository,
         userRepository: UserRepository,
+        reservationRepository: ReservationRepository,
         logging: MessageLoggingProvider,
         recording: EventRecordingProvider
     ) {
         self.itemRepository = itemRepository
         self.userRepository = userRepository
         self.listRepository = listRepository
+        self.reservationRepository = reservationRepository
         self.logging = MessageLogging(provider: logging)
         self.recording = EventRecording(provider: recording)
         self.itemRepresentationsBuilder = .init(itemRepository)

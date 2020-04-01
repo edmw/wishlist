@@ -35,7 +35,7 @@ struct PageActions: Collection, Encodable {
 
     // Encodable
 
-    /// Encodes all key value pairs from contents dictionary as
+    /// Encodes all key value pairs from contents dictionary as single properties
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: AnyCodingKey.self)
         for key in contents.keys {

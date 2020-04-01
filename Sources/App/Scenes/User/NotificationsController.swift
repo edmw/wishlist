@@ -31,7 +31,7 @@ final class NotificationsController: AuthenticatableController, RouteCollection 
             }
     }
 
-    // MARK: -
+    // MARK: - Routing
 
     func boot(router: Router) throws {
 

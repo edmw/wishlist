@@ -59,7 +59,8 @@ struct Features: Encodable, CustomDebugStringConvertible, ServiceType {
     let limitNumberOfItems       = Feature(date: "2018-12-10", version: "1.0")
     let deleteItem               = Feature(date: "2018-10-29", version: "1.0")
     let moveItem                 = Feature(date: "2020-03-08", version: "1.5")
-    let archiveItem              = Feature.inPlanning(.normal)
+    let receiveItem              = Feature(date: "2020-03-20", version: "1.6")
+    let archiveItem              = Feature(date: "2020-04-01", version: "1.6")
     let showItems                = Feature(date: "2018-10-29", version: "1.0")
     let sortOrderForItemsOnList  = Feature(date: "2019-04-22", version: "1.0")
     let editItems                = Feature(date: "2018-10-29", version: "1.0")
@@ -67,12 +68,12 @@ struct Features: Encodable, CustomDebugStringConvertible, ServiceType {
     let itemDescription          = Feature(date: "2018-11-06", version: "1.0")
     let itemPreference           = Feature(date: "2019-04-23", version: "1.0")
     let itemPrice                = Feature.inPlanning(.low)
+    let notifyCreateItem         = Feature.inPlanning(.high)
     // reservations
     let makeReservation          = Feature(date: "2018-11-19", version: "1.0")
     let undoReservation          = Feature(date: "2018-11-19", version: "1.0")
     let notifyCreateReservation  = Feature(date: "2019-10-15", version: "1.3")
     let notifyDeleteReservation  = Feature(date: "2019-10-15", version: "1.3")
-    let reservationStatus        = Feature.inDevelopment(false)
     // presentation
     let showWishlist             = Feature(date: "2018-11-19", version: "1.0")
     // technical

@@ -1,13 +1,13 @@
-#set("title") {#L10N("delete-list"){Delete a List}}
+#set("title") {#L10N("delete-list")}
 #//
 #set("content") {
-<h2>#L10N("sure-to"){Are you sure ...}</h2>
-<h3>#L10N("to-delete-list","#(page.list.title)"){... you want to <span class="text-danger">delete</span> the list named <strong>#(page.list.title)</strong>?}</h3>
+<h2>#L10N("sure-to")</h2>
+<h3>#L10N("to-delete-list","#(page.list.title)")</h3>
 <form method="POST" action="#(page.actions.form.reference)#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="mt-4">
 #if(page.actions.form.method != "POST") {<input type="hidden" name="__method" value="#(page.actions.form.method)">}
     <div class="form-group form-row">
-        <button type="submit" class="btn btn-primary">#L10N("confirm"){Confirm}</button>
-        <a class="nav-link btn btn-link ml-3" href="#if(request.parameter.p){#(request.parameter.p)}else{/user/#(page.userID)/lists}">#L10N("cancel"){Cancel}</a>
+        <button type="submit" class="btn btn-primary">#L10N("confirm")</button>
+        <a class="nav-link btn btn-link ml-3" href="#if(request.parameter.p){#(request.parameter.p)}else{/user/#(page.userID)/lists}">#L10N("cancel")</a>
     </div>
 </form>
 

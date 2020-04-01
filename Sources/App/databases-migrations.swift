@@ -41,6 +41,7 @@ func databasesMigrations(
     config.add(model: FluentList.self, database: .mysql)
     // Item
     config.add(model: FluentItem.self, database: .mysql)
+    config.add(migration: AddItemArchival.self, database: .mysql)
     // Favorite
     config.add(model: FluentFavorite.self, database: .mysql)
     // Reservation
@@ -243,6 +244,18 @@ struct AddListForeignKeyConstraint: MySQLForwardMigration {
 }
 
 // MARK: - Item
+
+struct AddItemArchival: MySQLForwardMigration {
+
+    static func prepare(on connection: MySQLConnection) -> EventLoopFuture<Void> {
+        return connection.assertFieldMustNotExist(\FluentItem.archival) {
+            return Database.update(FluentItem.self, on: connection) { builder in
+                builder.field(for: \.archival)
+            }
+        }
+    }
+
+}
 
 struct ModifyItemTitle: MySQLForwardMigration {
 

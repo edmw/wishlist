@@ -129,7 +129,6 @@ struct VaporImageStoreProvider: ImageStoreProvider {
         override func work(_ context: JobContext) -> EventLoopFuture<Bool> {
             let container = context.container
             let logger = container.requireLogger().technical
-            logger.info("\(self) running")
             do {
                 let itemRepository: ItemRepository = try container.make()
                 return itemRepository.all().map { items in
@@ -154,9 +153,7 @@ struct VaporImageStoreProvider: ImageStoreProvider {
                         let imagestorelocator = ImageStoreLocator(imagefilelocator)
                         if bloomfilter.containsNot(imagestorelocator.absoluteString) {
                             // remove image
-                            logger.info(
-                                "\(self): process image \(imagestorelocator)"
-                            )
+                            logger.info("\(self): process image \(imagestorelocator)")
                             try imageFileMiddleware.removeFile(
                                 at: imagefilelocator,
                                 deleteParentsIfEmpty: true,
@@ -210,7 +207,6 @@ struct VaporImageStoreProvider: ImageStoreProvider {
             let worker = context.eventLoop
             let container = context.container
             let logger = container.requireLogger().technical
-            logger.info("\(self) running")
             do {
                 let itemRepository: ItemRepository = try container.make()
                 return itemRepository.all().flatMap { items in

@@ -24,22 +24,10 @@ final class WishlistActorTests : ActorTestCase, DomainTestCase, HasAllTests {
 
     var aUser: User!
 
-    var actor: WishlistActor!
-
     override func setUp() {
         super.setUp()
 
         aUser = try! userRepository.save(user: User.randomUser()).wait()
-
-        actor = DomainWishlistActor(
-            listRepository: listRepository,
-            itemRepository: itemRepository,
-            reservationRepository: reservationRepository,
-            favoriteRepository: favoriteRepository,
-            userRepository: userRepository,
-            logging: logging,
-            recording: recording
-        )
     }
 
     /// Testing `PresentWishlist` action with a public list and anonymous access.
@@ -49,13 +37,13 @@ final class WishlistActorTests : ActorTestCase, DomainTestCase, HasAllTests {
         let aList = try! listRepository.save(
             list: List(title: "a list", visibility: .´public´, user: aUser)
         ).wait()
-        let result = try! actor.presentWishlist(
+        let result = try! wishlistActor.presentWishlist(
             .specification(aList.id!, for: Identification(), userBy: nil),
             .boundaries(worker: eventLoop)
         ).wait()
-        XCTAssertEqual(result.list, ListRepresentation(aList))
+        XCTAssertEqual(result.list.id, aList.id)
         XCTAssertEqual(result.items.count, 0)
-        XCTAssertEqual(result.owner, UserRepresentation(aUser))
+        XCTAssertEqual(result.owner.id, aUser.id)
         XCTAssertNil(result.user)
     }
 
@@ -69,14 +57,14 @@ final class WishlistActorTests : ActorTestCase, DomainTestCase, HasAllTests {
         let anItem = try! itemRepository.save(
             item: Item(title: "an item", text: "with text", list: aList)
         ).wait()
-        let result = try! actor.presentWishlist(
+        let result = try! wishlistActor.presentWishlist(
             .specification(aList.id!, for: Identification(), userBy: nil),
             .boundaries(worker: eventLoop)
         ).wait()
-        XCTAssertEqual(result.list, ListRepresentation(aList))
+        XCTAssertEqual(result.list.id, aList.id)
         XCTAssertEqual(result.items.count, 1)
-        XCTAssertEqual(result.items[0], ItemRepresentation(anItem))
-        XCTAssertEqual(result.owner, UserRepresentation(aUser))
+        XCTAssertEqual(result.items[0].id, anItem.id)
+        XCTAssertEqual(result.owner.id, aUser.id)
         XCTAssertNil(result.user)
     }
 
@@ -88,24 +76,24 @@ final class WishlistActorTests : ActorTestCase, DomainTestCase, HasAllTests {
             list: List(title: "a list", visibility: .´private´, user: aUser)
         ).wait()
         assert(
-            try actor.presentWishlist(
+            try wishlistActor.presentWishlist(
                 .specification(aList.id!, for: aUser!.identification, userBy: nil),
                 .boundaries(worker: eventLoop)
             ).wait(),
             throws: AuthorizationError.authenticationRequired
         )
-        let result = try! actor.presentWishlist(
+        let result = try! wishlistActor.presentWishlist(
             .specification(aList.id!, for: aUser!.identification, userBy: aUser!.id),
             .boundaries(worker: eventLoop)
         ).wait()
-        XCTAssertEqual(result.list, ListRepresentation(aList))
+        XCTAssertEqual(result.list.id, aList.id)
     }
 
     /// Testing `PresentWishlist` action with an invalid identifiction.
     /// Expects an exeception.
     func testPresentWishlistInvalidIdentification() throws {
         assert(
-            try actor.presentWishlist(
+            try wishlistActor.presentWishlist(
                 .specification(ListID(), for: Identification(), userBy: aUser!.id),
                 .boundaries(worker: eventLoop)
             ).wait(),
@@ -117,7 +105,7 @@ final class WishlistActorTests : ActorTestCase, DomainTestCase, HasAllTests {
     /// Expects an exeception.
     func testPresentWishlistNonExistingList() throws {
         assert(
-            try actor.presentWishlist(
+            try wishlistActor.presentWishlist(
                 .specification(ListID(), for: aUser!.identification, userBy: nil),
                 .boundaries(worker: eventLoop)
             ).wait(),
@@ -127,16 +115,17 @@ final class WishlistActorTests : ActorTestCase, DomainTestCase, HasAllTests {
 
     /// Testing `AddReservationToItem` action.
     func testAddReservationToItem() throws {
-//        let aList = try! listRepository.save(
-//            list: List(title: "a list", visibility: .´public´, user: aUser)
-//        ).wait()
-//        let anItem = try! itemRepository.save(
-//            item: Item(title: "an item", text: "with text", list: aList)
-//        ).wait()
-//        let result = try! actor.addReservationToItem(
-//            .specification(anItem.id!, on: aList.id!, for: aUser!.identification, userBy: nil),
-//            .boundaries(worker: eventLoop, notificationSending: FIXME)
-//        ).wait()
+        let aList = try! listRepository.save(
+            list: List(title: "a list", visibility: .´public´, user: aUser)
+        ).wait()
+        let anItem = try! itemRepository.save(
+            item: Item(title: "an item", text: "with text", list: aList)
+        ).wait()
+        let result = try! wishlistActor.addReservationToItem(
+            .specification(anItem.id!, on: aList.id!, for: aUser!.identification, userBy: nil),
+            .boundaries(worker: eventLoop, notificationSending: notificationSendingProvider)
+        ).wait()
+        XCTAssertTrue(result.item.isReserved!)
     }
 
     func testAllTests() throws {

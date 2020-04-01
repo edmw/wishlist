@@ -16,8 +16,36 @@ class ActorTestCase : XCTestCase {
     var userRepository: UserRepository!
     var invitationRepository: InvitationRepository!
     var invitationService: InvitationService!
+    var notificationSendingProvider: NotificationSendingProvider!
     var logging: TestingLoggingProvider!
     var recording: TestingRecordingProvider!
+
+    lazy var enrollmentActor = DomainEnrollmentActor(
+        userRepository: userRepository,
+        invitationRepository: invitationRepository,
+        reservationRepository: reservationRepository,
+        logging: logging,
+        recording: recording
+    )
+
+    lazy var userItemsActor = DomainUserItemsActor(
+        itemRepository: itemRepository,
+        listRepository: listRepository,
+        userRepository: userRepository,
+        reservationRepository: reservationRepository,
+        logging: logging,
+        recording: recording
+    )
+
+    lazy var wishlistActor = DomainWishlistActor(
+        listRepository: listRepository,
+        itemRepository: itemRepository,
+        reservationRepository: reservationRepository,
+        favoriteRepository: favoriteRepository,
+        userRepository: userRepository,
+        logging: logging,
+        recording: recording
+    )
 
     override func setUp() {
         super.setUp()
@@ -48,6 +76,7 @@ class ActorTestCase : XCTestCase {
             reservationRepository: reservationRepository,
             userRepository: userRepository
         )
+        notificationSendingProvider = TestingNotificationSendingProvider(worker: eventLoop)
         logging = TestingLoggingProvider()
         recording = TestingRecordingProvider()
     }

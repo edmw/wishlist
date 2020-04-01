@@ -1,0 +1,74 @@
+#set("title") {#L10N("manage-item")}
+#//
+#set("content") {
+#if(page.item.isReserved) {
+<div class="mt-4 mb-5 alert alert-warning" role="alert">
+    #L10N("item-editing-reserved")
+</div>
+}
+<h3>#L10N("move-item")</h3>
+#if(features.moveItem.enabled && page.item.movable == true) {
+<form method="POST" action="#(page.actions.move.reference)#if(request.parameter.p){?p=#(request.parameter.p)}" class="wl-form" accept-charset="UTF-8">
+#if(page.actions.form.method != "POST") {<input type="hidden" name="__method" value="#(page.actions.move.method)">}
+    <input name="key" type="hidden" value="listID">
+    <div class="form-group">
+      <label for="inputListID">#L10N("move-item-select")</label>
+      <select class="form-control form-control-lg" id="inputListID" name="value">
+        #for(list in page.userLists) {
+            #if(list.id != page.listID) {
+            <option value="#(list.id)">#(list.title)</option>
+            }
+        }
+      </select>
+    </div>
+    <div class="form-group form-row justify-content-center justify-content-md-start">
+        <button type="submit" class="btn btn-primary"#if(count(page.userLists) < 2){ disabled}>#L10N("move-item-confirm")</button>
+    </div>
+</form>
+} else {
+<p class="text-muted">#L10N("wish-already-reserved") #L10N("move-item-reserved")</p>
+}
+#if(page.item.archival == false) {
+<h3 class="mt-5">#L10N("archive-item")</h3>
+#if(page.item.archivable == true) {
+<p>#L10N("archive-item-hint")</p>
+<form method="POST" action="#(page.actions.archive.reference)#if(request.parameter.p){?p=#(request.parameter.p)}" class="wl-form" accept-charset="UTF-8">
+#if(page.actions.form.method != "POST") {<input type="hidden" name="__method" value="#(page.actions.archive.method)">}
+    <input name="key" type="hidden" value="archived">
+    <input name="value" type="hidden" value="true">
+    <div class="form-group form-row justify-content-center justify-content-md-start">
+        <button type="submit" class="btn btn-primary">#L10N("archive-item-confirm")</button>
+    </div>
+</form>
+} else {
+<p class="text-muted">#L10N("wish-already-reserved") #L10N("archive-item-reserved")</p>
+}
+} else {
+<h3 class="mt-5">#L10N("unarchive-item")</h3>
+<p>#L10N("unarchive-item-hint")</p>
+<form method="POST" action="#(page.actions.archive.reference)#if(request.parameter.p){?p=#(request.parameter.p)}" class="wl-form" accept-charset="UTF-8">
+#if(page.actions.form.method != "POST") {<input type="hidden" name="__method" value="#(page.actions.archive.method)">}
+    <input name="key" type="hidden" value="archived">
+    <input name="value" type="hidden" value="false">
+    <div class="form-group form-row justify-content-center justify-content-md-start">
+        <button type="submit" class="btn btn-primary">#L10N("unarchive-item-confirm")</button>
+    </div>
+</form>
+}
+<h3 class="mt-5">#L10N("delete-item")</h3>
+#if(page.item.deletable == true) {
+<p>#L10N("delete-item-hint")</p>
+<form method="GET" action="#(page.actions.delete.reference)#if(request.parameter.p){?p=#(request.parameter.p)}" class="wl-form" accept-charset="UTF-8">
+    <div class="form-group form-row justify-content-center justify-content-md-start">
+        <button type="submit" class="btn btn-danger">#L10N("delete-item-confirm")</button>
+    </div>
+</form>
+} else {
+<p class="text-muted">#L10N("wish-already-reserved") #L10N("delete-item-reserved")</p>
+}
+<nav class="nav justify-content-center justify-content-md-start">
+    <a class="nav-link btn btn-link mt-5" href="#if(request.parameter.p){#(request.parameter.p)}else{/user/#(page.userID)/list/#(page.listID)/items}">#L10N("cancel")</a>
+</nav>
+}
+#//
+#embed("Wishlist")

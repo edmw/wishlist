@@ -1,7 +1,6 @@
 import Domain
 
 import Vapor
-import Fluent
 
 extension ItemController {
 

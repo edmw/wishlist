@@ -1,30 +1,28 @@
 #set("id") {wishlist}
-#set("title") {#L10N("wishlist"){Wishlist}}
-#set("subtitle") {#L10N("someones-wishlist","#(page.ownerName)"){#(page.ownerName)'s Wishlist}}
+#set("title") {#L10N("wishlist")}
+#set("subtitle") {#L10N("someones-wishlist","#(page.ownerName)")}
 #//
 #set("location"){/list/#(page.listID)}
 #set("content") {
 #if(page.userID) {
 <div>
-    #L10N("wishlist-welcome","#(page.userFirstName)","#(page.ownerName)","#(page.listTitle)"){Hello #(page.userFirstName)! You are viewing <strong>#(page.ownerName)'s #(page.listTitle) Wishlist</strong>.}
+    #L10N("wishlist-welcome","#(page.userFirstName)","#(page.ownerName)","#(page.listTitle)")
 </div>
 } else {
 #if(page.userID == nil && page.identification != nil) {
 <div class="alert alert-primary" role="alert">
-#L10N("wishlist-welcome-stranger","#(page.ownerName)","#(page.listTitle)","/signin?p=/list/#(page.listID)","/list/#(page.listID)?id=#(page.identification)"){
-    <strong>Hello Stranger,</strong><br />
-you're viewing <strong>#(page.ownerName)'s #(page.listTitle) Wishlist</strong>. You'll be able to reserve items for buying and revert your reservations as long as you'll stay with us on this page. If you want to be able to change your mind at a later time, please don't hesitate to <a href="/signin?p=/list/#(page.listID)">sign in</a> or bookmark this link for a future visit: <a href="/list/#(page.listID)?id=#(page.identification)">#(page.ownerName)'s #(page.listTitle) Wishlist</a>
-}
+#L10N("wishlist-welcome-stranger","#(page.ownerName)","#(page.listTitle)","/signin?p=/list/#(page.listID)","/list/#(page.listID)?id=#(page.identification)")
 </div>
 }}
-<div class="h2"><h2><span class="title">#(page.listTitle)</span>#if(page.userID && page.userID == page.ownerID){<a class="btn btn-link d-flex float-right" href="/user/#(page.userID)/list/#(page.listID)/items" title="#L10N("edit-list"){Edit list}"><span class="btn-label">#L10N("edit"){Edit}</span><svg class="feather"><use xlink:href="/icons/feather.svg#edit-2"/></svg></a>}</h2>#if(page.userID != nil) {#if(page.userFavorsList){★}else{<a class="btn-xlg btn-link nav-link" href="/user/#(page.userID)/favorites/create?listid=#(page.listID)#if(location){&p=#(location)}" title="#L10N("add-favorite"){Add list to favorites}">☆</a>}}</div>
+<div class="h2"><h2><span class="title">#(page.listTitle)</span>#if(page.userID && page.userID == page.ownerID){<a class="btn btn-link d-flex float-right" href="/user/#(page.userID)/list/#(page.listID)/items" title="#L10N("edit-list")"><span class="btn-label">#L10N("edit")</span><svg class="feather"><use xlink:href="/icons/feather.svg#edit-2"/></svg></a>}</h2>#if(page.userID != nil) {#if(page.userFavorsList){★}else{<a class="btn-xlg btn-link nav-link" href="/user/#(page.userID)/favorites/create?listid=#(page.listID)#if(location){&p=#(location)}" title="#L10N("favorite-add")">☆</a>}}</div>
 #if(request.parameter.m == "WAR") {
 <div class="alert alert-danger" role="alert">
-    #L10N("wishlist-message-war"){The selected wish is already reserved by someone else. May be you would like to choose another gift?}
+    #L10N("wishlist-message-war")
 </div>
 }
 <div class="wl-items">
     #for(item in page.items) {
+    #if(item.archival == false) {
     <div id="wl-item-#(item.id)" class="wl-item p-2">
             <div id="wl-item-card-#(item.id)" class="wl-item-card">
                 #if(item.imageURL) {
@@ -39,40 +37,51 @@ you're viewing <strong>#(page.ownerName)'s #(page.listTitle) Wishlist</strong>. 
                     </div>
                     <div class="btn-group #if(item.url) {justify-content-between} else {justify-content-end}" role="group">
                         #if(item.url) {
-                        <a class="btn text-light" href="#(item.url)" title="#L10N("wish-open-link"){Open link to wish}"><svg class="feather"><use xlink:href="/icons/feather.svg#external-link"/></svg></a>
+                        <a class="btn text-light" href="#(item.url)" title="#L10N("wish-open-link")"><svg class="feather"><use xlink:href="/icons/feather.svg#external-link"/></svg></a>
                         }
-                        <a class="wl-item-btn-flip btn text-light" title="#L10N("wish-show-details"){Show details for wish}"><svg class="feather"><use xlink:href="/icons/feather.svg#book-open"/></svg></a>
+                        <a class="wl-item-btn-flip btn text-light" title="#L10N("wish-show-details")"><svg class="feather"><use xlink:href="/icons/feather.svg#book-open"/></svg></a>
                     </div>
                 </div>
                 <div class="back bg-dark p-2">
                     <div class="text pb-5">
                         <h5 class="wl-label text-light m-0 px-1">#(item.title)</h5>
-                        <p class="text-light m-0 px-1"><small><em>#L10N("item-preference-#(item.preference)"){}</em></small></p>
+                        <p class="text-light m-0 px-1"><small><em>#L10N("item-preference-#(item.preference)")</em></small></p>
                         <p class="text-light mt-2">#(item.text)</p>
                     </div>
                     <div class="btn-group justify-content-end" role="group">
                         <a class="wl-item-btn-flip btn text-light"><svg class="feather"><use xlink:href="/icons/feather.svg#book"/></svg></a>
                     </div>
                 </div>
-                #if(item.isReserved) {
+                #if(item.isReserved == nil) {
                 <div class="cover p-2 bg-light">
-                    <p class="my-auto text-center"><strong>#L10N("wish-already-reserved"){This wish has already been reserved.}</strong></p>
+                    <p class="my-auto text-center"><strong>#L10N("general-error")</strong></p>
                 </div>
+                } else {
+                    #if(item.isReserved == true) {
+                    <div class="cover p-2 bg-light">
+                        <p class="my-auto text-center"><strong>#L10N("wish-already-reserved")</strong></p>
+                    </div>
+                    }
                 }
             </div>
             <div class="wl-item-footer text-center mb-4">
-                #if(item.isReserved) {
-                    #if(page.identification == item.reservationHolderID) {
-                        <a class="btn btn-link" href="/list/#(page.listID)/reservation/#(item.reservationID)/delete?itemid=#(item.id)">#L10N("undo-reservation"){Undo reservation}</a>
-                    } else {
-                        &nbsp;
-                    }
+                #if(item.isReserved == nil) {
+                    #// NOP
                 } else {
-                    <a class="btn btn-link" href="/list/#(page.listID)/reservations/create?itemid=#(item.id)">#L10N("make-reservation"){Reserve this wish}</svg></a>
+                    #if(item.isReserved == true) {
+                        #if(page.identification == item.reservationHolderID) {
+                            <a class="btn btn-link" href="/list/#(page.listID)/reservation/#(item.reservationID)/delete?itemid=#(item.id)">#L10N("undo-reservation")</a>
+                        } else {
+                            &nbsp;
+                        }
+                    } else {
+                        <a class="btn btn-link" href="/list/#(page.listID)/reservations/create?itemid=#(item.id)">#L10N("make-reservation")</svg></a>
+                    }
                 }
             </div>
         </div>
     }
+    } #// endfor
 </div>
 }
 #//

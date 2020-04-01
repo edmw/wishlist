@@ -40,6 +40,7 @@ public final class Item: ItemModel, Imageable, Representable,
     public internal(set) var imageURL: URL?
     public internal(set) var createdAt: Date
     public internal(set) var modifiedAt: Date
+    public internal(set) var archival: Bool
 
     public internal(set) var localImageURL: ImageStoreLocator?
 
@@ -55,6 +56,7 @@ public final class Item: ItemModel, Imageable, Representable,
         self.imageURL = other.imageURL
         self.createdAt = other.createdAt
         self.modifiedAt = other.modifiedAt
+        self.archival = other.archival
         self.localImageURL = other.localImageURL
         self.listID = other.listID
     }
@@ -80,6 +82,7 @@ public final class Item: ItemModel, Imageable, Representable,
         self.url = url
         self.imageURL = imageURL
         self.createdAt = Date()
+        self.archival = false
         self.modifiedAt = self.createdAt
 
         self.listID = listid

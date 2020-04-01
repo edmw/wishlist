@@ -2,7 +2,7 @@
 
 ## Status
 
-**proposed**
+**accepted**
 
 ## Context
 
@@ -36,7 +36,7 @@ There must by additional validation logic and an UI action.
 
 - Resign from the idea to have knowledge if a wish has been received:
   - Usecases like archive an item will possibly break because a user who reserved an item will
-    not be able to edit the reservation after the item has been archived, anymore.
+    not be able to edit the reservation after the item has been archived.
 - Add a status to the Item entity instead:
   - This has the disadvantage of a possible inconsistent state if an item is marked as received,
     but is missing a link to a reservation.

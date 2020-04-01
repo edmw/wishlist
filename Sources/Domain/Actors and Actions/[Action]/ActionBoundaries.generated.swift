@@ -22,6 +22,19 @@ extension AddReservationToItem.Boundaries {
     }
 
 }
+// MARK: ArchiveItem.Boundaries
+
+extension ArchiveItem.Boundaries {
+
+    public static func boundaries(
+        worker: EventLoop
+    ) -> Self {
+        return Self(
+            worker: worker
+        )
+    }
+
+}
 // MARK: CreateFavorite.Boundaries
 
 extension CreateFavorite.Boundaries {
@@ -333,6 +346,19 @@ extension PresentWishlist.Boundaries {
     }
 
 }
+// MARK: ReceiveItem.Boundaries
+
+extension ReceiveItem.Boundaries {
+
+    public static func boundaries(
+        worker: EventLoop
+    ) -> Self {
+        return Self(
+            worker: worker
+        )
+    }
+
+}
 // MARK: RemoveReservationFromItem.Boundaries
 
 extension RemoveReservationFromItem.Boundaries {
@@ -416,6 +442,19 @@ extension RequestItemDeletion.Boundaries {
 // MARK: RequestItemEditing.Boundaries
 
 extension RequestItemEditing.Boundaries {
+
+    public static func boundaries(
+        worker: EventLoop
+    ) -> Self {
+        return Self(
+            worker: worker
+        )
+    }
+
+}
+// MARK: RequestItemManagement.Boundaries
+
+extension RequestItemManagement.Boundaries {
 
     public static func boundaries(
         worker: EventLoop
@@ -584,6 +623,19 @@ extension TestNotifications.Boundaries {
         return Self(
             worker: worker,
             notificationSending: notificationsending
+        )
+    }
+
+}
+// MARK: UnarchiveItem.Boundaries
+
+extension UnarchiveItem.Boundaries {
+
+    public static func boundaries(
+        worker: EventLoop
+    ) -> Self {
+        return Self(
+            worker: worker
         )
     }
 

@@ -1,16 +1,16 @@
-#set("title") {#L10N("delete-reservation"){Delete a Reservation}}
+#set("title") {#L10N("delete-reservation")}
 #//
 #set("content") {
-<h2>#L10N("sure-to"){Are you sure ...}</h2>
-<h3>#L10N("to-delete-reservation","#(page.itemTitle)","#(page.listTitle)"){... you want to <span class="text-danger">delete</span> the reservation for the wish named <strong>#(page.itemTitle)</strong> from list #(page.listTitle)?}</h3>
+<h2>#L10N("sure-to")</h2>
+<h3>#L10N("to-delete-reservation","#(page.itemTitle)","#(page.listTitle)")</h3>
 <form method="POST" action="#(page.actions.form.reference)#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="mt-4">
 #if(page.actions.form.method != "POST") {<input type="hidden" name="__method" value="#(page.actions.form.method)">}
     <div class="form-group form-row">
-        <button type="submit" class="btn btn-primary">#L10N("confirm"){Confirm}</button>
-        <a class="nav-link btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/items">#L10N("cancel"){Cancel}</a>
+        <button type="submit" class="btn btn-primary">#L10N("confirm")</button>
+        <a class="nav-link btn btn-link ml-3" href="/user/#(page.userID)/list/#(page.listID)/items">#L10N("cancel")</a>
     </div>
     <div class="alert alert-warning" role="alert">
-        #L10N("delete-reservation-warning"){<strong>Please note:</strong> The user who reserved this item will <strong>not</strong> be notified if you'll decide to delete the reservation!}
+        #L10N("delete-reservation-warning")
     </div>
 </form>
 }

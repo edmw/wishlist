@@ -23,6 +23,8 @@ final class LegalNoticeController: AuthenticatableController, RouteCollection {
             }
     }
 
+    // MARK: - Routing
+
     func boot(router: Router) throws {
         router.get("legal-notice", use: self.renderView)
     }

@@ -10,39 +10,55 @@ public protocol ItemModel {
     var imageURL: URL? { get }
     var createdAt: Date { get }
     var modifiedAt: Date { get }
+    var archival: Bool { get }
     var localImageURL: ImageStoreLocator? { get }
     var listID: ListID { get }
 
-    func isDeletable(given reservation: ReservationModel?) -> Bool
-    func isReceivable(given reservation: ReservationModel?) -> Bool
-    func isArchivable(given reservation: ReservationModel?) -> Bool
-    func isMovable(given reservation: ReservationModel?) -> Bool
+    func isReserved(given reservation: ReservationModel?) -> Bool
+    func isReceived(given reservation: ReservationModel?) -> Bool
+    func deletable(given reservation: ReservationModel?) -> Bool
+    func receivable(given reservation: ReservationModel?) -> Bool
+    func archivable(given reservation: ReservationModel?) -> Bool
+    func movable(given reservation: ReservationModel?) -> Bool
 }
 
 extension ItemModel {
 
-    /// True, if the item with the given reservation can be deleted.
-    public func isDeletable(given reservation: ReservationModel?) -> Bool {
-        // item can be deleted if there is no reservation
-        return reservation == nil
+    /// True, if the item with the given reservation is reserved.
+    public func isReserved(given reservation: ReservationModel?) -> Bool {
+        // item is reserved if there is reservation
+        return reservation != nil
     }
 
-    /// True, if the item with the given reservation can be received.
-    public func isReceivable(given reservation: ReservationModel?) -> Bool {
-        // item can be received if there is a reservation with status open
-        return reservation.map { reservation in reservation.status == .open } ?? false
+    /// True, if the item with the given reservation is received.
+    public func isReceived(given reservation: ReservationModel?) -> Bool {
+        // item is received if there is reservation and reservation status is closed
+        return reservation.map { reservation in reservation.status == .closed } ?? false
+    }
+
+    /// True, if the item with the given reservation can be deleted.
+    public func deletable(given reservation: ReservationModel?) -> Bool {
+        // item can be deleted if there is either no reservation or reservation status is closed
+        return reservation.map { reservation in reservation.status == .closed } ?? true
     }
 
     /// True, if the item with the given reservation can be archived.
-    public func isArchivable(given reservation: ReservationModel?) -> Bool {
-        // item can be archived if there is either no reservation or if reservation status is closed
-        return reservation.map { reservation in reservation.status == .closed } ?? true
+    public func archivable(given reservation: ReservationModel?) -> Bool {
+        // item can be archived if there is either no reservation or reservation status is closed
+        return archival == false
+            && reservation.map { reservation in reservation.status == .closed } ?? true
     }
 
     /// True, if the item with the given reservation can be moved between lists.
-    public func isMovable(given reservation: ReservationModel?) -> Bool {
-        // item can be moved if there is either no reservation or if reservation status is closed
+    public func movable(given reservation: ReservationModel?) -> Bool {
+        // item can be moved if there is either no reservation or reservation status is closed
         return reservation.map { reservation in reservation.status == .closed } ?? true
+    }
+
+    /// True, if the item with the given reservation can be received.
+    public func receivable(given reservation: ReservationModel?) -> Bool {
+        // item can be received if there is a reservation with status open
+        return reservation.map { reservation in reservation.status == .open } ?? false
     }
 
 }

@@ -1,4 +1,4 @@
 <section>
-<h3>#L10N("list-your-favorites"){Your Favorites} <small class="text-muted">(#count(page.favorites)/#(page.maximumNumberOfFavorites))</small></h3>
+<h3>#L10N("list-your-favorites") <small class="text-muted">(#count(page.favorites)/#(page.maximumNumberOfFavorites))</small></h3>
 #embed("User/Favorites-Table")
 </section>

@@ -1,4 +1,4 @@
-#set("title") {#L10N("lists"){Lists}}
+#set("title") {#L10N("lists")}
 #//
 #set("content") {
 <h2>#(page.userName)</h2>

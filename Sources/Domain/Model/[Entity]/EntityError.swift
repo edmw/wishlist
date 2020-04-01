@@ -7,6 +7,7 @@ public enum EntityError<T: Entity & EntityReflectable>: AnyEntityError,
     // Properties
     case requiredIDMissing
     case requiredIDMismatch
+    case invalidRelation
     // Entities
     case lookupFailed(for: AnyIdentifier)
     case limitReached(maximum: Int)
@@ -17,6 +18,8 @@ public enum EntityError<T: Entity & EntityReflectable>: AnyEntityError,
             return "\(T.self): required ID missing"
         case .requiredIDMismatch:
             return "\(T.self): required ID mismatch"
+        case .invalidRelation:
+            return "\(T.self): invalidRelation"
         case let(.lookupFailed(id)):
             return "\(T.self): entity missing with id \(id)"
         case let(.limitReached(maximum)):
@@ -32,12 +35,15 @@ public enum EntityError<T: Entity & EntityReflectable>: AnyEntityError,
             return true
         case (.requiredIDMismatch, .requiredIDMismatch):
             return true
+        case (.invalidRelation, .invalidRelation):
+            return true
         case let (.lookupFailed(lhsid), .lookupFailed(rhsid)):
             return lhsid.uuid == rhsid.uuid
         case let (.limitReached(lhsMaximum), .limitReached(rhsMaximum)):
             return lhsMaximum == rhsMaximum
         case (.requiredIDMissing, _),
              (.requiredIDMismatch, _),
+             (.invalidRelation, _),
              (.lookupFailed, _),
              (.limitReached, _):
             return false

@@ -1,6 +1,7 @@
 import Domain
 
 import Foundation
+import Library
 
 // MARK: ItemsPageContext
 
@@ -17,6 +18,7 @@ struct ItemsPageContext: PageContext, AutoPageContextBuilder {
     var maximumNumberOfItems: Int
 
     var items: [ItemContext]?
+    var archivedItems: [ItemContext]?
 
     var maskReservations: Bool
 
@@ -34,7 +36,12 @@ struct ItemsPageContext: PageContext, AutoPageContextBuilder {
 
         self.maximumNumberOfItems = Item.maximumNumberOfItemsPerList
 
-        self.items = items?.map { item in ItemContext(item) }
+        self.items = items?.compactMap { item in
+            item.archival == false ? ItemContext(item) : nil
+        }
+        self.archivedItems = items?.compactMap { item in
+            item.archival == true ? ItemContext(item) : nil
+        }
 
         self.maskReservations = list.maskReservations
     }

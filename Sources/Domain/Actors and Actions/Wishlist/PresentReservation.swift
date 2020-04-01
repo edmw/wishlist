@@ -47,7 +47,7 @@ public struct PresentReservation: Action {
             _ reservation: Reservation?
         ) {
             self.identification = identification
-            self.item = item.representation
+            self.item = item.representation(with: reservation)
             self.list = list.representation
             self.reservation = reservation?.representation
         }

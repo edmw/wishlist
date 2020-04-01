@@ -1,7 +1,6 @@
 import Domain
 
 import Vapor
-import Fluent
 
 final class InvitationsController: AuthenticatableController,
     RouteCollection
@@ -28,7 +27,7 @@ final class InvitationsController: AuthenticatableController,
             .handleAuthorizationError(on: request)
     }
 
-    // MARK: -
+    // MARK: - Routing
 
     func boot(router: Router) throws {
         router.get("user", ID.parameter, "invitations",

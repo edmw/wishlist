@@ -1,7 +1,6 @@
 import Domain
 
 import Vapor
-import Fluent
 
 final class FavoritesController: AuthenticatableController, SortingController, RouteCollection {
     typealias Sorting = ListsSorting
@@ -28,7 +27,7 @@ final class FavoritesController: AuthenticatableController, SortingController, R
             }
     }
 
-    // MARK: -
+    // MARK: - Routing
 
     func boot(router: Router) throws {
         router.get("user", ID.parameter, "favorites",

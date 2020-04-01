@@ -9,27 +9,27 @@
     </colgroup>
     <thead>
     <tr>
-        <th>#L10N("list-title"){Name}</th>
-        <th>#L10N("list-items"){Items}</th>
-        <th>#L10N("list-owner"){Owner}</th>
+        <th>#L10N("list-title")</th>
+        <th>#L10N("list-items")</th>
+        <th>#L10N("list-owner")</th>
         <th></th>
     </tr>
     </thead>
     #for(favorite in page.favorites) {
         <tr>
-            <td class="wl-title" data-label="#L10N("list-title"){Name}"><a class="nav-link" href="/list/#(favorite.list.id)">#(favorite.list.title)</a></td>
-            <td class="wl-count" data-label="#L10N("list-items"){Items}">#(favorite.list.itemsCount)</td>
-            <td class="wl-owner" data-label="#L10N("list-owner"){Owner}">#(favorite.list.ownerName)</td>
+            <td class="wl-title" data-label="#L10N("list-title")"><a class="nav-link" href="/list/#(favorite.list.id)">#(favorite.list.title)</a></td>
+            <td class="wl-count" data-label="#L10N("list-items")">#(favorite.list.itemsCount)</td>
+            <td class="wl-owner" data-label="#L10N("list-owner")">#(favorite.list.ownerName)</td>
             <td class="wl-actions" data-label="">
                 <div class="btn-group" role="group">
-                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/favorites/delete?listid=#(favorite.list.id)#if(location){&p=#(location)}" title="#L10N("remove-favorite"){Remove favorite}"><svg class="feather"><use xlink:href="/icons/feather.svg#x-circle"/></svg></a>
+                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/favorites/delete?listid=#(favorite.list.id)#if(location){&p=#(location)}" title="#L10N("favorite-remove")"><svg class="feather"><use xlink:href="/icons/feather.svg#x-circle"/></svg></a>
                 </div>
             </td>
         </tr>
     }
 } else {
     <tr>
-        <td colspane="1">#L10N("none"){None}</td>
+        <td colspane="1">#L10N("none")</td>
     </tr>
 }
 </table>

@@ -1,20 +1,9 @@
-#set("title") {#L10N("profile"){Profile}}
+#set("title") {#L10N("profile")}
 #//
 #set("location"){/user/#(page.userID)}
 #set("content") {
 <h2>#(page.userFirstName)</h2>
-<section>
-<h3 class="clearfix">#L10N("your-data"){Your Data} <a class="btn btn-link d-flex  float-sm-right" href="/user/#(page.userID)/edit#if(location){?p=#(location)}" title="#L10N("edit-profile"){Edit profile}"><span class="btn-label">#L10N("edit"){Edit}</span><svg class="feather"><use xlink:href="/icons/feather.svg#edit-2"/></svg></a></h3>
-<div class="profile container-fluid keys-values">
-    <div class="row"><div class="col-sm-6 key">#L10N("nick-name"){Nickname}</div><div class="col-sm-6 value">#(page.userNickName)</div></div>
-    <div class="row"><div class="col-sm-6 key">#L10N("first-name"){Firstname}</div><div class="col-sm-6 value">#(page.userFirstName)</div></div>
-    <div class="row"><div class="col-sm-6 key">#L10N("last-name"){Lastname}</div><div class="col-sm-6 value">#(page.userLastName)</div></div>
-    <div class="row"><div class="col-sm-6 key">#L10N("email"){Email}</div><div class="col-sm-6 value">#(page.userEmail)</div></div>
-    <div class="row"><div class="col-sm-6 key">#L10N("language"){Language}</div><div class="col-sm-6 value">#L10NLocale(page.userLanguage)</div></div>
-    <div class="row"><div class="col-sm-6 key">#L10N("first-login"){First login}</div><div class="col-sm-6 value">#L10NDate(page.userFirstLogin)</div></div>
-    <div class="row"><div class="col-sm-6 key">#L10N("last-login"){Last login}</div><div class="col-sm-6 value">#L10NDate(page.userLastLogin)</div></div>
-</div>
-</section>
+#embed("User/Profile-Section")
 #if(features.userSettings.enabled) {
 #embed("User/Settings-Section")
 }

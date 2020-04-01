@@ -5,6 +5,24 @@
 // MARK: DO NOT EDIT
 import Foundation
 
+// MARK: ArchiveItem.Specification
+
+extension ArchiveItem.Specification {
+
+    public static func specification(
+          userBy userid: UserID,
+          listBy listid: ListID,
+          itemBy itemid: ItemID
+    ) -> Self {
+        return Self(
+            userID: userid,
+            listID: listid,
+            itemID: itemid
+        )
+    }
+
+}
+
 // MARK: CreateFavorite.Specification
 
 extension CreateFavorite.Specification {
@@ -331,6 +349,24 @@ extension PresentPublicly.Specification {
 
 }
 
+// MARK: ReceiveItem.Specification
+
+extension ReceiveItem.Specification {
+
+    public static func specification(
+          userBy userid: UserID,
+          listBy listid: ListID,
+          itemBy itemid: ItemID
+    ) -> Self {
+        return Self(
+            userID: userid,
+            listID: listid,
+            itemID: itemid
+        )
+    }
+
+}
+
 // MARK: RequestFavoriteCreation.Specification
 
 extension RequestFavoriteCreation.Specification {
@@ -419,6 +455,24 @@ extension RequestItemEditing.Specification {
           userBy userid: UserID,
           listBy listid: ListID,
           itemBy itemid: ItemID?
+    ) -> Self {
+        return Self(
+            userID: userid,
+            listID: listid,
+            itemID: itemid
+        )
+    }
+
+}
+
+// MARK: RequestItemManagement.Specification
+
+extension RequestItemManagement.Specification {
+
+    public static func specification(
+          userBy userid: UserID,
+          listBy listid: ListID,
+          itemBy itemid: ItemID
     ) -> Self {
         return Self(
             userID: userid,
@@ -598,6 +652,24 @@ extension TestNotifications.Specification {
     ) -> Self {
         return Self(
             userID: userid
+        )
+    }
+
+}
+
+// MARK: UnarchiveItem.Specification
+
+extension UnarchiveItem.Specification {
+
+    public static func specification(
+          userBy userid: UserID,
+          listBy listid: ListID,
+          itemBy itemid: ItemID
+    ) -> Self {
+        return Self(
+            userID: userid,
+            listID: listid,
+            itemID: itemid
         )
     }
 

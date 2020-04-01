@@ -76,7 +76,7 @@ final class SettingsController: AuthenticatableController, RouteCollection {
         .encode(for: request)
     }
 
-    // MARK: -
+    // MARK: - Routing
 
     private func dispatch(on request: Request) throws -> EventLoopFuture<Response> {
         return try method(of: request)

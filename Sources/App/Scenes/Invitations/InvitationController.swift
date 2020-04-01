@@ -1,7 +1,6 @@
 import Domain
 
 import Vapor
-import Fluent
 
 final class InvitationController: AuthenticatableController,
     InvitationParameterAcceptor,

@@ -1,0 +1,19 @@
+#set("title") {#L10N("profile-editing")}
+#//
+#set("content") {
+#// form action and method to update an profile
+<form method="POST" action="#(page.actions.form.reference)#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="wl-form wl-profile">
+#if(page.actions.form.method != "POST") {<input type="hidden" name="__method" value="#(page.actions.form.method)">}
+<div class="form-group">
+<label for="inputNickName">#L10N("nick-name")</label>
+<input type="text" class="form-control#if(page.form.invalidNickName){ is-invalid}" id="inputNickName" name="inputNickName" maxlength="100" placeholder="#L10N("profile-field-nickname-placeholder")" aria-describedby="descriptionNickName"#if(page.form.data.inputNickName){ value="#(page.form.data.inputNickName)"}>
+<small id="descriptionNickName" class="form-text text-muted">#if(page.form.invalidNickName){<span class="text-danger">#L10N("profile-field-nickname-invalid")</span> }#if(page.form.duplicateNickName){<span class="text-danger">#L10N("profile-field-nickname-duplicate")</span>}#L10N("profile-field-nickname-hint")</small>
+</div>
+<div class="form-group form-row mt-4">
+<button type="submit" class="btn btn-primary">#L10N("save")</button>
+<a class="nav-link btn btn-link ml-3" href="#if(request.parameter.p){#(request.parameter.p)}else{/user/#(page.userID)/}">#L10N("cancel")</a>
+</div>
+</form>
+}
+#//
+#embed("Wishlist")

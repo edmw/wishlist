@@ -23,6 +23,8 @@ final class PrivacyPolicyController: AuthenticatableController, RouteCollection 
             }
     }
 
+    // MARK: - Routing
+
     func boot(router: Router) throws {
         router.get("privacy-policy", use: self.renderView)
     }

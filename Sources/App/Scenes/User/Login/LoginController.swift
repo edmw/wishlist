@@ -41,6 +41,8 @@ final class LoginController: Controller, RouteCollection {
         return try Controller.renderView("Public/Login", with: context, on: request)
     }
 
+    // MARK: - Routing
+
     func boot(router: Router) throws {
         router.get("signin") { request -> EventLoopFuture<Response> in
             guard try request.isAuthenticated(UserID.self) == false else {

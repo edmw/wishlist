@@ -1,1 +1,1 @@
-#L10N("settings-notifications-test-message","#(userName)"){This is a test message sent from Wishlist web application for #(userName).}
+#L10N("settings-notifications-test-message","#(userName)")

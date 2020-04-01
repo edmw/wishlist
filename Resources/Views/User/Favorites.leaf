@@ -1,4 +1,4 @@
-#set("title") {#L10N("favorites"){Favorites}}
+#set("title") {#L10N("favorites")}
 #//
 #set("content") {
 <h2>#(page.userName)</h2>

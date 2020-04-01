@@ -260,7 +260,7 @@ table.wl-table td:last-child {
         font-weight: bold;
     }
     table.wl-table tr + tr {
-        margin-top: 1rem;
+        padding-top: 1rem;
     }
 }
 
@@ -286,6 +286,19 @@ table.wl-items td {
 table.wl-items td.wl-description {
     width: 100%;
     max-width: 0;
+}
+@media only screen and (max-width: 575px) {
+    table.wl-items td.wl-actions-left {
+        display: inline-block;
+        width: auto;
+        float: left;
+        text-align: left;
+    }
+    table.wl-items td.wl-actions-right {
+        display: block;
+        width: auto;
+        text-align: right;
+    }
 }
 
 /* MARK: blocks: table of favorites */

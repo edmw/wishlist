@@ -1,9 +1,9 @@
 <section>
-<h3>#L10N("your-invitations"){Your Invitations} <small class="text-muted">(#count(page.invitations)/#(page.maximumNumberOfInvitations))</small></h3>
+<h3>#L10N("your-invitations") <small class="text-muted">(#count(page.invitations)/#(page.maximumNumberOfInvitations))</small></h3>
 #embed("User/Invitations-Table")
 <div class="btn-toolbar justify-content-center justify-content-sm-start mt-4 mb-5">
 #if(count(page.invitations) < page.maximumNumberOfInvitations) {
-    <a class="nav-link btn btn-secondary mr-3#if(count(page.invitations) > page.maximumNumberOfInvitations - 1){ disabled}"#if(count(page.invitations) > page.maximumNumberOfInvitations - 1){ aria-disabled="true"} href="/user/#(page.userID)/invitations/create#if(location){?p=#(location)}">#L10N("send-invitation"){Send an invitation}</a>
+    <a class="nav-link btn btn-secondary mr-3#if(count(page.invitations) > page.maximumNumberOfInvitations - 1){ disabled}"#if(count(page.invitations) > page.maximumNumberOfInvitations - 1){ aria-disabled="true"} href="/user/#(page.userID)/invitations/create#if(location){?p=#(location)}">#L10N("send-invitation")</a>
 }
 </div>
 </section>

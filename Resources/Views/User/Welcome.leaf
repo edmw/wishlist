@@ -1,4 +1,4 @@
-#set("title") {#L10N("welcome"){Welcome}}
+#set("title") {#L10N("welcome")}
 #//
 #set("location"){/}
 #set("content") {

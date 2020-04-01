@@ -1,7 +1,6 @@
 import Domain
 
 import Vapor
-import Fluent
 
 final class ItemsController: AuthenticatableController,
     ListParameterAcceptor,
@@ -33,7 +32,7 @@ final class ItemsController: AuthenticatableController,
             }
     }
 
-    // MARK: -
+    // MARK: - Routing
 
     func boot(router: Router) throws {
         router.get("user", ID.parameter, "list", ID.parameter, "items",

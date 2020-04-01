@@ -37,6 +37,29 @@ public func boot(_ app: Application) throws {
     let features = try app.makeFeatures()
     logger.application.info("FEATURES:\n\(String(reflecting: features))\n")
 
+    let router = try app.make(Router.self)
+    var routesDescriptions = [String]()
+    for route in router.routes {
+        guard let first = route.path.first, case .constant(let method) = first else {
+            continue
+        }
+        var description = "• \(method) ".padding(toLength: 10, withPad: " ", startingAt: 0)
+        route.path[1...].forEach { comp in
+            switch comp {
+            case .constant(let const):
+                description += "/\(const)"
+            case .parameter(let param):
+                description += "/:\(param)"
+            case .anything:
+                description += "/:"
+            case .catchall:
+                description += "/*"
+            }
+        }
+        routesDescriptions.append(description)
+    }
+    logger.application.info("ROUTES:\n\(routesDescriptions.joined(separator: "\n"))\n")
+
     let dispatchingService = try app.make(DispatchingService.self)
     try dispatchingService.attach(to: app, logger: logger)
     try dispatchingService.start()

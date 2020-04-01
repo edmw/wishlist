@@ -40,7 +40,7 @@ public struct RemoveReservationFromItem: Action {
         public let item: ItemRepresentation
         public let list: ListRepresentation
         internal init(_ item: Item, _ list: List) {
-            self.item = item.representation
+            self.item = item.representation(with: nil)
             self.list = list.representation
         }
     }

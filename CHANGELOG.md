@@ -4,11 +4,13 @@
 - 🛠️ flags a technical feature
 - ☘ flags a fix
 
-- [] unreleased
-- [x.y.z] released version x.y.z
-
-## [..]
+## [1.6.0]
+- 🖌 Add functionality to put items into archive
+- 🖌 Add functionality to get items from archive
+- 🖌 Add functionality to mark items as received
 - 🛠️ Add status field to Reservation
+- 🛠️ Add archival field to Item
+- 🛠️ Extract english texts into language file
 - 🛠️ Extend PageContext to hold actions aka links for templates
 - 🛠️ Unify page generation in controller
 - 🛠️ Improve button design

@@ -51,9 +51,8 @@ extension DomainUserItemsActor {
                     .findWithReservation(by: specification.itemID, in: list)
                     .unwrap(or: UserItemsActorError.invalidItem)
                     .flatMap { item, reservation in
-                        guard reservation == nil else {
-                            // reserved items can not be deleted
-                            throw UserItemsActorError.itemIsReserved
+                        guard item.deletable(given: reservation) else {
+                            throw UserItemsActorError.itemNotDeletable
                         }
                         // remove images for item
                         try boundaries.imageStore.removeImages(for: item)

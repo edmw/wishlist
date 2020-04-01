@@ -42,7 +42,7 @@ public struct AddReservationToItem: Action {
         public let list: ListRepresentation
         internal init(_ reservation: Reservation, _ item: Item, _ list: List) {
             self.reservation = reservation.representation
-            self.item = item.representation
+            self.item = item.representation(with: reservation)
             self.list = list.representation
         }
     }

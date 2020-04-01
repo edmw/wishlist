@@ -25,8 +25,6 @@ final class EnrollmentActorTests : ActorTestCase, DomainTestCase, HasAllTests {
     var aUser: User!
     var anInvitation: Invitation!
 
-    var actor: EnrollmentActor!
-
     override func setUp() {
         super.setUp()
 
@@ -43,14 +41,6 @@ final class EnrollmentActorTests : ActorTestCase, DomainTestCase, HasAllTests {
                 )
             ).wait()
         XCTAssertEqual(anInvitation.userID, aUser.id)
-
-        actor = DomainEnrollmentActor(
-            userRepository: userRepository,
-            invitationRepository: invitationRepository,
-            reservationRepository: reservationRepository,
-            logging: logging,
-            recording: recording
-        )
     }
 
     func assertCreatedUser(_ user: UserRepresentation) {
@@ -65,7 +55,7 @@ final class EnrollmentActorTests : ActorTestCase, DomainTestCase, HasAllTests {
 
     func testMaterialiseUser() throws {
         let count = try! userRepository.count().wait()
-        let result = try! actor.materialiseUser(
+        let result = try! enrollmentActor.materialiseUser(
                 .specification(
                     options: [.createUsers],
                     userIdentity: useridentity,
@@ -99,7 +89,7 @@ final class EnrollmentActorTests : ActorTestCase, DomainTestCase, HasAllTests {
     }
 
     func testMaterialiseUserWithInvitation() throws {
-        let result = try! actor.materialiseUser(
+        let result = try! enrollmentActor.materialiseUser(
                 .specification(
                     options: [.createUsers],
                     userIdentity: useridentity,
@@ -115,7 +105,7 @@ final class EnrollmentActorTests : ActorTestCase, DomainTestCase, HasAllTests {
     }
 
     func testMaterialiseUserWithRequiredInvitation() throws {
-        let result = try! actor.materialiseUser(
+        let result = try! enrollmentActor.materialiseUser(
                 .specification(
                     options: [.createUsers, .requireInvitationToCreateUsers],
                     userIdentity: useridentity,
@@ -132,7 +122,7 @@ final class EnrollmentActorTests : ActorTestCase, DomainTestCase, HasAllTests {
 
     func testMaterialiseUserWithNoInvitation() throws {
         assert(
-            try actor.materialiseUser(
+            try enrollmentActor.materialiseUser(
                     .specification(
                         options: [.createUsers, .requireInvitationToCreateUsers],
                         userIdentity: useridentity,
@@ -149,7 +139,7 @@ final class EnrollmentActorTests : ActorTestCase, DomainTestCase, HasAllTests {
 
     func testMaterialiseUserWithInvalidInvitation() throws {
         assert(
-            try actor.materialiseUser(
+            try enrollmentActor.materialiseUser(
                     .specification(
                         options: [.createUsers, .requireInvitationToCreateUsers],
                         userIdentity: useridentity,
@@ -167,7 +157,7 @@ final class EnrollmentActorTests : ActorTestCase, DomainTestCase, HasAllTests {
     func testMaterialiseUserWithAlreadyAcceptedInvitation() throws {
         anInvitation = try! invitationService.acceptInvitation(anInvitation, for: aUser).wait()
         assert(
-            try actor.materialiseUser(
+            try enrollmentActor.materialiseUser(
                     .specification(
                         options: [.createUsers, .requireInvitationToCreateUsers],
                         userIdentity: useridentity,

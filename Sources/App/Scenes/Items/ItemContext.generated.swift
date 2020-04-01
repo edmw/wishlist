@@ -23,16 +23,18 @@ struct ItemContext: Encodable {
         case preference
         case createdAt
         case modifiedAt
+        case archival
         case url
         case imageURL
         case localImageURL
         case isReserved
         case reservationID
         case reservationHolderID
-        case isDeletable
-        case isReceivable
-        case isArchivable
-        case isMovable
+        case isReceived
+        case deletable
+        case archivable
+        case movable
+        case receivable
     }
 
     func encode(to encoder: Encoder) throws {
@@ -43,16 +45,18 @@ struct ItemContext: Encodable {
         try container.encode(item.preference, forKey: .preference)
         try container.encode(item.createdAt, forKey: .createdAt)
         try container.encode(item.modifiedAt, forKey: .modifiedAt)
+        try container.encode(item.archival, forKey: .archival)
         try container.encode(item.url, forKey: .url)
         try container.encode(item.imageURL, forKey: .imageURL)
         try container.encode(item.localImageURL, forKey: .localImageURL)
         try container.encode(item.isReserved, forKey: .isReserved)
         try container.encode(ID(item.reservationID)?.string, forKey: .reservationID)
         try container.encode(ID(item.reservationHolderID)?.string, forKey: .reservationHolderID)
-        try container.encode(item.isDeletable, forKey: .isDeletable)
-        try container.encode(item.isReceivable, forKey: .isReceivable)
-        try container.encode(item.isArchivable, forKey: .isArchivable)
-        try container.encode(item.isMovable, forKey: .isMovable)
+        try container.encode(item.isReceived, forKey: .isReceived)
+        try container.encode(item.deletable, forKey: .deletable)
+        try container.encode(item.archivable, forKey: .archivable)
+        try container.encode(item.movable, forKey: .movable)
+        try container.encode(item.receivable, forKey: .receivable)
     }
 
     init(_ item: ItemRepresentation) {

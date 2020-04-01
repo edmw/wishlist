@@ -1,19 +1,23 @@
-#set("title") {#L10N("items"){Items}}
+#set("title") {#L10N("items")}
 #//
 #set("content") {
-<div class="h2"><h2>#(page.listTitle)<a class="btn btn-link d-flex float-right" href="/list/#(page.listID)" title="#L10N("view-list"){View list}"><span class="btn-label">#L10N("view"){View}</span><svg class="feather"><use xlink:href="/icons/feather.svg#eye"/></svg></a></h2></div>
-<h3>#L10N("your-wishes"){Your Wishes} <small class="text-muted">(#count(page.items)/#(page.maximumNumberOfItems))</small></h3>
+<div class="h2"><h2>#(page.listTitle)<a class="btn btn-link d-flex float-right" href="/list/#(page.listID)" title="#L10N("view-list")"><span class="btn-label">#L10N("view")</span><svg class="feather"><use xlink:href="/icons/feather.svg#eye"/></svg></a></h2></div>
+<h3>#L10N("your-wishes") <small class="text-muted">(#count(page.items))</small></h3>
 #if(count(page.items) > 0 && count(page.items) < page.maximumNumberOfItems) {
 <div class="btn-toolbar justify-content-center justify-content-sm-start mt-4 mb-4">
-    <a class="nav-link btn btn-secondary mr-3" href="/user/#(page.userID)/list/#(page.listID)/items/create">#L10N("create-item"){Add a new item}</a>
+    <a class="nav-link btn btn-secondary mr-3" href="/user/#(page.userID)/list/#(page.listID)/items/create">#L10N("create-item")</a>
 </div>
 }
 #embed("User/Items-Table")
-<div class="btn-toolbar justify-content-center justify-content-sm-start mt-4 mb-4">
+<div class="btn-toolbar justify-content-center justify-content-sm-start mt-4 mb-5">
 #if(count(page.items) < page.maximumNumberOfItems) {
-    <a class="nav-link btn btn-secondary mr-3" href="/user/#(page.userID)/list/#(page.listID)/items/create">#L10N("create-item"){Add a new item}</a>
+    <a class="nav-link btn btn-secondary mr-3" href="/user/#(page.userID)/list/#(page.listID)/items/create">#L10N("create-item")</a>
 }
 </div>
+#if(count(page.archivedItems) > 0) {
+<h3>#L10N("your-archived-wishes") <small class="text-muted">(#count(page.archivedItems))</small></h3>
+#embed("User/Items-Archived")
+}
 }
 #//
 #embed("Wishlist")

@@ -1,9 +1,9 @@
 #if(request.parameter.welcome) {
 <div class="alert alert-success" role="alert">
-<p>#L10N("hello", "#(page.userName)"){Hello #(page.userName)! Welcome to our wish list service.}</p>
-#L10N("may-like"){You may like to ...}
+<p>#L10N("hello", "#(page.userName)")</p>
+#L10N("may-like")
 <ul>
-<li><a href="/user/#(page.userID)/lists/create">#L10N("to-create-list"){Create your first wishlist}</a>!</li>
+<li><a href="/user/#(page.userID)/lists/create">#L10N("to-create-list")</a>!</li>
 </ul>
 </div>
 }

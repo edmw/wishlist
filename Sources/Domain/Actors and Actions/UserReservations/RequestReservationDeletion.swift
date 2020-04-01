@@ -36,7 +36,7 @@ public struct RequestReservationDeletion: Action {
             holder: Identification
         ) {
             self.user = user.representation
-            self.item = item.representation
+            self.item = item.representation(with: reservation)
             self.list = list.representation
             self.reservation = reservation.representation
             self.holder = holder

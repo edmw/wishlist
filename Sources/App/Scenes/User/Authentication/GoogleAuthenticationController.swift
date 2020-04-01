@@ -2,7 +2,6 @@ import Domain
 
 import Vapor
 import Imperial
-import FluentSQLite
 
 final class GoogleAuthenticatorController: AuthenticationController, RouteCollection {
 

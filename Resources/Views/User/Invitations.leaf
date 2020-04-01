@@ -1,4 +1,4 @@
-#set("title") {#L10N("invitations"){Invitations}}
+#set("title") {#L10N("invitations")}
 #//
 #set("content") {
 <h2>#(page.userName)</h2>

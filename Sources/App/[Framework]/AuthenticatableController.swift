@@ -21,11 +21,13 @@ class AuthenticatableController: Controller {
     /// - a session must exist and a user must be attached to this session
     /// - a routing parameter matching the user id must exists
     /// Attention: Asumes that the user id is the next routing parameter!
+    @discardableResult
     func requireAuthenticatedUserID(on request: Request) throws -> UserID {
         guard let userid = try authenticatedUserID(on: request) else {
             throw Abort(.unauthorized)
         }
-        guard try userid == request.parameters.next(ID.self) else {
+        let id = try request.parameters.next(ID.self)
+        guard userid == id else {
             throw Abort(.unauthorized)
         }
         return userid

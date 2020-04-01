@@ -1,0 +1,79 @@
+<div class="table-responsive">
+<table class="table wl-table wl-items">
+#if(count(page.archivedItems) > 0) {
+    <colgroup>
+        <col span="2">
+        <col>
+        <col>
+        <col span="2">
+        <col>
+    </colgroup>
+    <thead>
+    <tr>
+        <th>#L10N("item-title")</th>
+        <th></th>
+        <th>#L10N("item-description")</th>
+        <th>#L10N("item-preference")</th>
+        <th>#L10N("item-state")</th>
+        <th></th>
+        <th></th>
+    </tr>
+    </thead>
+    #for(item in page.archivedItems) {
+        <tr>
+            <td class="wl-title" data-label="#L10N("item-title")">#(item.title)</td>
+            <td class="wl-actions" data-label="">
+                <div class="btn-group" role="group">
+                    #if(item.url) {
+                    <a class="btn btn-action ml-3" href="#(item.url)" title="#L10N("open-item-url")"><svg class="feather"><use xlink:href="/icons/feather.svg#external-link"/></svg></a>
+                    }
+                </div>
+            </td>
+            <td class="wl-description" data-label="#L10N("item-description")">#(item.text)</td>
+            <td data-label="#L10N("item-preference")">
+                #L10N("item-preference-#(item.preference)")
+            </td>
+            <td data-label="#L10N("item-state")">
+                #if(page.maskReservations) {???} else {
+                    #if(item.isReceived) {#L10N("item-received")} else {
+                        #if(item.isReserved == nil) {#L10N("unknown")}
+                        #if(item.isReserved == true) {#L10N("item-reserved")}
+                        #if(item.isReserved == false) {#L10N("item-wanted")}
+                    }
+                }
+            </td>
+            <td class="wl-actions wl-actions-left" data-label="">
+                <div class="btn-group" role="group">
+                    #if(features.receiveItem.enabled && item.receivable == true) {
+                    <a class="btn btn-action" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/receive" title="#L10N("receive-item-description")"><svg class="feather"><use xlink:href="/icons/feather.svg#gift"/></svg></a>
+                    }
+                </div>
+            </td>
+            <td class="wl-actions wl-actions-right" data-label="">
+                <div class="btn-group" role="group">
+                    #if(features.archiveItem.enabled) {
+                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/edit" title="#L10N("edit-item")"><svg class="feather"><use xlink:href="/icons/feather.svg#edit"/></svg></a>
+                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/manage" title="#L10N("manage-item")"><svg class="feather"><use xlink:href="/icons/feather.svg#more-vertical"/></svg></a>
+                    } else {
+                    #if(features.moveItem.enabled && item.movable == true) {
+                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/move" title="#L10N("item-move-description")"><svg class="feather"><use xlink:href="/icons/feather.svg#log-in"/></svg></a>
+                    }
+                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/edit" title="#L10N("edit-item")"><svg class="feather"><use xlink:href="/icons/feather.svg#edit"/></svg></a>
+                    #if(item.isReserved == true) {
+                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/reservation/#(item.reservationID)/delete" title="#L10N("release-item")"><svg class="feather"><use xlink:href="/icons/feather.svg#x-circle"/></svg></a>
+                    }
+                    #if(item.deletable == true) {
+                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/delete" title="#L10N("delete-item")"><svg class="feather"><use xlink:href="/icons/feather.svg#delete"/></svg></a>
+                    }
+                    }
+                </div>
+            </td>
+        </tr>
+    }
+} else {
+    <tr>
+        <td colspane="1">#L10N("none")</td>
+    </tr>
+}
+</table>
+</div>

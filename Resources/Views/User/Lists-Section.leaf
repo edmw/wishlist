@@ -1,10 +1,10 @@
 <section>
-<h3>#L10N("your-wishlists"){Your Wishlists} <small class="text-muted">(#count(page.lists)/#(page.maximumNumberOfLists))</small></h3>
+<h3>#L10N("your-wishlists") <small class="text-muted">(#count(page.lists)/#(page.maximumNumberOfLists))</small></h3>
 #embed("User/Lists-Table")
 <div class="btn-toolbar justify-content-center justify-content-sm-start mt-4 mb-5">
 #if(count(page.lists) < page.maximumNumberOfLists) {
-    <a class="nav-link btn btn-secondary mr-3" href="/user/#(page.userID)/lists/create#if(location){?p=#(location)}">#L10N("create-list"){Create a new list}</a>
-    <a class="nav-link text-secondary mr-3" href="/user/#(page.userID)/lists/import#if(location){?p=#(location)}">#L10N("import-list"){Import list}</a>
+    <a class="nav-link btn btn-secondary mr-3" href="/user/#(page.userID)/lists/create#if(location){?p=#(location)}">#L10N("create-list")</a>
+    <a class="nav-link text-secondary mr-3" href="/user/#(page.userID)/lists/import#if(location){?p=#(location)}">#L10N("list-import")</a>
 }
 </div>
 </section>

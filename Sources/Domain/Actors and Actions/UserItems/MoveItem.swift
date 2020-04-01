@@ -53,6 +53,12 @@ public struct MoveItem: Action {
     {
         let actor = self.actor()
         let itemRepository = actor.itemRepository
+        guard let listid = list.id else {
+            throw EntityError<List>.requiredIDMissing
+        }
+        guard item.listID == listid else {
+            throw EntityError<Item>.invalidRelation
+        }
         guard let targetlistid = targetlist.id else {
             throw EntityError<List>.requiredIDMissing
         }
@@ -92,9 +98,9 @@ extension DomainUserItemsActor {
                     .findWithReservation(by: specification.itemID, in: list)
                     .unwrap(or: UserItemsActorError.invalidItem)
                     .flatMap { item, reservation in
-                        guard reservation == nil else {
+                        guard item.movable(given: reservation) else {
                             // reserved items can not be moved
-                            throw UserItemsActorError.itemIsReserved
+                            throw UserItemsActorError.itemNotMovable
                         }
                         return try self.listRepository
                             .find(by: specification.targetListID, for: user)

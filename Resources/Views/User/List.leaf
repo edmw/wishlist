@@ -1,61 +1,61 @@
 #if(page.list.id == nil) {
-#set("title") {#L10N("list-creation"){Create a List}}
+#set("title") {#L10N("list-creation")}
 } else {
-#set("title") {#L10N("list-editing"){Edit a List}}
+#set("title") {#L10N("list-editing")}
 }
 #//
 #set("content") {
 <form method="POST" action="#(page.actions.form.reference)#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="wl-form wl-list">
 #if(page.actions.form.method != "POST") {<input type="hidden" name="__method" value="#(page.actions.form.method)">}
     <div class="form-group">
-        <label for="inputTitle">#L10N("list-title"){Name}</label>
-        <input type="text" class="form-control#if(page.form.invalidTitle){ is-invalid}" id="inputTitle" name="inputTitle"  maxlength="100" placeholder="#L10N("list-field-title-placeholder"){Enter list’s name}" aria-describedby="descriptionName"#if(page.form.data.inputTitle){ value="#(page.form.data.inputTitle)"}>
-            <small id="descriptionName" class="form-text text-muted">#if(page.form.invalidTitle){<span class="text-danger">#L10N("list-field-title-invalid"){A unique name is required. Valid names contain alphabetic characters, whitespace, punctation only and are at least 4 and at most 100 characters long.}</span> }#if(page.form.duplicateName){<span class="text-danger">#L10N("list-field-title-duplicate"){A list with the choosen name already exists. }</span>}</small>
+        <label for="inputTitle">#L10N("list-title")</label>
+        <input type="text" class="form-control#if(page.form.invalidTitle){ is-invalid}" id="inputTitle" name="inputTitle"  maxlength="100" placeholder="#L10N("list-field-title-placeholder")" aria-describedby="descriptionName"#if(page.form.data.inputTitle){ value="#(page.form.data.inputTitle)"}>
+            <small id="descriptionName" class="form-text text-muted">#if(page.form.invalidTitle){<span class="text-danger">#L10N("list-field-title-invalid")</span> }#if(page.form.duplicateName){<span class="text-danger">#L10N("list-field-title-duplicate")</span>}</small>
     </div>
     #// case ´private´ = 0
     #// case ´public´ = 1
     #// case users = 2
     #// case friends = 3
     <fieldset class="form-group">
-        <legend class="col-form-label pt-0">#L10N("visibility"){Visibility}</legend>
+        <legend class="col-form-label pt-0">#L10N("visibility")</legend>
         <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="inputVisibility" id="inputPrivate" value="private"#if(page.form.data.inputVisibility != "public" && page.form.data.inputVisibility != "users"){ checked } aria-describedby="descriptionVisibility">
-            <label class="form-check-label" for="inputPrivate">#L10N("visibility-private"){Only you}</label>
+            <label class="form-check-label" for="inputPrivate">#L10N("visibility-private")</label>
         </div>
         <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="inputVisibility" id="inputUsers" value="users"#if(page.form.data.inputVisibility == "users"){ checked } aria-describedby="descriptionVisibility">
-            <label class="form-check-label" for="inputUsers">#L10N("visibility-users"){All users}</label>
+            <label class="form-check-label" for="inputUsers">#L10N("visibility-users")</label>
         </div>
         <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="inputVisibility" id="inputPublic" value="public"#if(page.form.data.inputVisibility == "public"){ checked } aria-describedby="descriptionVisibility">
-            <label class="form-check-label" for="inputPublic">#L10N("visibility-public"){Public}</label>
+            <label class="form-check-label" for="inputPublic">#L10N("visibility-public")</label>
         </div>
-        <small id="descriptionVisibility" class="form-text text-muted">#if(page.form.invalidVisibility){<span class="text-danger">#L10N("list-field-visibility-required"){Visibility setting is required.}</span> }#L10N("list-field-visibility-description"){Visibility setting of the list. Private wishlists are not accessible for anyone but you. Select <i>All users</i> to make your list accessible to all logged-in users of this service. Public wishlists can be viewed by everybody who knows the web address of the wishlist.}</small>
+        <small id="descriptionVisibility" class="form-text text-muted">#if(page.form.invalidVisibility){<span class="text-danger">#L10N("list-field-visibility-required")</span> }#L10N("list-field-visibility-description")</small>
     </fieldset>
     <div class="form-group">
-        <label for="inputItemsSorting">#L10N("list-field-sorting"){Display order of wishes}</label>
+        <label for="inputItemsSorting">#L10N("list-field-sorting")</label>
         <select class="form-control" id="inputItemsSorting" name="inputItemsSorting">
-            <option value="+name"#if(page.form.data.inputItemsSorting == "+name"){ selected}>#L10N("sorting-name-ascending"){Name (ascending)}</option>
-            <option value="-name"#if(page.form.data.inputItemsSorting == "-name"){ selected}>#L10N("sorting-name-descending"){Name (descending)}</option>
-            <option value="+preference"#if(page.form.data.inputItemsSorting == "+preference"){ selected}>#L10N("sorting-preference-ascending"){Preference (ascending)}</option>
-            <option value="-preference"#if(page.form.data.inputItemsSorting == "-preference"){ selected}>#L10N("sorting-preference-descending"){Preference (descending)}</option>
-            <option value="+createdAt"#if(page.form.data.inputItemsSorting == "+createdAt"){ selected}>#L10N("sorting-created-at-ascending"){Added at (ascending)}</option>
-            <option value="-createdAt"#if(page.form.data.inputItemsSorting == "-createdAt"){ selected}>#L10N("sorting-created-at-descending"){Added at (descending)}</option>
-            <option value="+modifiedAt"#if(page.form.data.inputItemsSorting == "+modifiedAt"){ selected}>#L10N("sorting-modified-at-ascending"){Modified at (ascending)}</option>
-            <option value="-modifiedAt"#if(page.form.data.inputItemsSorting == "-modifiedAt"){ selected}>#L10N("sorting-modified-at-descending"){Modified at (descending)}</option>
+            <option value="+name"#if(page.form.data.inputItemsSorting == "+name"){ selected}>#L10N("sorting-name-ascending")</option>
+            <option value="-name"#if(page.form.data.inputItemsSorting == "-name"){ selected}>#L10N("sorting-name-descending")</option>
+            <option value="+preference"#if(page.form.data.inputItemsSorting == "+preference"){ selected}>#L10N("sorting-preference-ascending")</option>
+            <option value="-preference"#if(page.form.data.inputItemsSorting == "-preference"){ selected}>#L10N("sorting-preference-descending")</option>
+            <option value="+createdAt"#if(page.form.data.inputItemsSorting == "+createdAt"){ selected}>#L10N("sorting-created-at-ascending")</option>
+            <option value="-createdAt"#if(page.form.data.inputItemsSorting == "-createdAt"){ selected}>#L10N("sorting-created-at-descending")</option>
+            <option value="+modifiedAt"#if(page.form.data.inputItemsSorting == "+modifiedAt"){ selected}>#L10N("sorting-modified-at-ascending")</option>
+            <option value="-modifiedAt"#if(page.form.data.inputItemsSorting == "-modifiedAt"){ selected}>#L10N("sorting-modified-at-descending")</option>
         </select>
     </div>
     <div class="form-group">
-        <label>#L10N("list-options"){Options for this List}</label>
+        <label>#L10N("list-options")</label>
         <div class="form-check">
             <input class="form-check-input" type="checkbox" value="true" id="inputMaskReservations" name="inputMaskReservations"#if(page.form.data.inputMaskReservations){ checked } aria-describedby="descriptionMaskReservations">
-                <label class="form-check-label" for="inputMaskReservations">#L10N("list-field-maskreservations"){Don't spoil my surprises}</label>
+                <label class="form-check-label" for="inputMaskReservations">#L10N("list-field-maskreservations")</label>
         </div>
-        <small id="descriptionMaskReservations" class="form-text text-muted">#L10N("list-field-maskreservations-description"){The "Don't spoil my surprises" setting is off by default so all reservations on this wishlist will be visible to you. If you want the reservations to remain secret check this option. This option affects the edit view of this wishlist only. The presentation view will always show the current reservations.}</small>
+        <small id="descriptionMaskReservations" class="form-text text-muted">#L10N("list-field-maskreservations-description")</small>
     </div>
     <div class="form-group form-row mt-4">
-        <button type="submit" class="btn btn-primary">#L10N("save"){Save}</button>
-        <a class="nav-link btn btn-link ml-3" href="#if(request.parameter.p){#(request.parameter.p)}else{/user/#(page.userID)/lists}">#L10N("cancel"){Cancel}</a>
+        <button type="submit" class="btn btn-primary">#L10N("save")</button>
+        <a class="nav-link btn btn-link ml-3" href="#if(request.parameter.p){#(request.parameter.p)}else{/user/#(page.userID)/lists}">#L10N("cancel")</a>
     </div>
 </form>
 }

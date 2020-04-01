@@ -25,10 +25,17 @@ public struct RequestItemEditing: Action {
         public let user: UserRepresentation
         public let list: ListRepresentation
         public let item: ItemRepresentation?
-        internal init(_ user: User, _ list: List, _ item: Item? = nil) {
+        public let reservation: ReservationRepresentation?
+        internal init(
+            _ user: User,
+            _ list: List,
+            _ item: Item? = nil,
+            _ reservation: Reservation? = nil
+        ) {
             self.user = user.representation
             self.list = list.representation
-            self.item = item?.representation
+            self.item = item?.representation(with: reservation)
+            self.reservation = reservation?.representation
         }
     }
 
@@ -56,8 +63,8 @@ extension DomainUserItemsActor {
                     return try self.itemRepository
                         .findWithReservation(by: itemid, in: list)
                         .unwrap(or: UserItemsActorError.invalidItem)
-                        .map { item, _ in
-                            .init(user, list, item)
+                        .map { item, reservation in
+                            .init(user, list, item, reservation)
                         }
                 }
                 else {

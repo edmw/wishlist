@@ -4,6 +4,8 @@ import Vapor
 
 final class LogoutController: Controller, RouteCollection {
 
+    // MARK: - Routing
+
     func boot(router: Router) throws {
         router.get("user/logout") { request -> EventLoopFuture<Response> in
             try request.clearSessionFromIdentification()

@@ -1,9 +1,9 @@
 #set("title") {#(status) #(statusMessage)}
 #//
 #set("content") {
-<h2>#L10N("oops"){Oops!}</h2>
-<p>#L10N("message404"){We can’t seem to find the page you’re looking for.}</p>
-<p>#L10N("message404-tips"){Here are some useful links instead:}</p>
+<h2>#L10N("oops")</h2>
+<p>#L10N("message404")</p>
+<p>#L10N("message404-tips")</p>
 #embed("Errors/Useful")
 }
 #//

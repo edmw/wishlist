@@ -21,7 +21,7 @@ extension Page {
         editingContext: ProfileEditingContext
     ) throws -> Self {
         return try .init(
-            templateName: "User/ProfileForm",
+            templateName: "User/ProfileEditing",
             context: ProfilePageContext.builder
                 .forUser(user)
                 .withEditing(editingContext)

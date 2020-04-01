@@ -19,7 +19,6 @@ final class LocalizationTag: TagRenderer {
     }
 
     func render(tag: TagContext) throws -> EventLoopFuture<TemplateData> {
-        let body = try tag.requireBody()
         let key = tag.parameters[0].string
         let values = tag.parameters.count > 1 ? tag.parameters[1...].map { $0.string ?? "�" } : []
 
@@ -42,10 +41,18 @@ final class LocalizationTag: TagRenderer {
             return EventLoopFuture.map(on: tag) { .string(localized) }
         }
         else {
-            return tag.serializer.serialize(ast: body)
-                .map { body in
-                    return .string(String(data: body.data, encoding: .utf8) ?? "")
-                }
+            tag.container.logger?.debug(
+                "L10N: no localization\nKey: \(key ?? "no key")\nSource: \(tag.source)\n"
+            )
+            if let body = tag.body {
+                return tag.serializer.serialize(ast: body)
+                    .map { body in
+                        return .string(String(data: body.data, encoding: .utf8) ?? "")
+                    }
+            }
+            else {
+                return EventLoopFuture.map(on: tag) { .string("���") }
+            }
         }
     }
 
