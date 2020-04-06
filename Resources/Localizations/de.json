@@ -150,6 +150,8 @@
     "favorite-remove": "Favorit entfernen",
     "remove-favorite": "Favorit entfernen",
     "to-remove-favorite": "... daß du den Zettel <strong>%{value1}</strong> aus deinen Favoriten <span class='text-danger'>entfernen</span> möchtest?",
+    "favorite-notify-enable": "Benachrichtigungen freigeben",
+    "favorite-notify-disable": "Benachrichtigungen unterbinden",
 
     "//": "Item pages",
 

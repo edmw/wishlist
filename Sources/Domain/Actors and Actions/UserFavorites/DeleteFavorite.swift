@@ -47,7 +47,7 @@ extension DomainUserFavoritesActor {
             .unwrap(or: UserFavoritesActorError.invalidUser)
             .flatMap { user in
                 return try listRepository.find(by: specification.listID, for: user)
-                    .unwrap(or: UserFavoritesActorError.invalidList)
+                    .unwrap(or: UserFavoritesActorError.invalidListForUser)
                     .flatMap { list in
                         return try favoriteRepository.find(favorite: list, for: user)
                             .unwrap(or: UserFavoritesActorError.invalidFavoriteForUser)

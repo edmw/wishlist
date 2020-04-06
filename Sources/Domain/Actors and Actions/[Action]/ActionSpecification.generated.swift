@@ -199,6 +199,38 @@ extension DeleteReservation.Specification {
 
 }
 
+// MARK: DisableNotifications.Specification
+
+extension DisableNotifications.Specification {
+
+    public static func specification(
+          userBy userid: UserID,
+          favoriteBy favoriteid: FavoriteID
+    ) -> Self {
+        return Self(
+            userID: userid,
+            favoriteID: favoriteid
+        )
+    }
+
+}
+
+// MARK: EnableNotifications.Specification
+
+extension EnableNotifications.Specification {
+
+    public static func specification(
+          userBy userid: UserID,
+          favoriteBy favoriteid: FavoriteID
+    ) -> Self {
+        return Self(
+            userID: userid,
+            favoriteID: favoriteid
+        )
+    }
+
+}
+
 // MARK: ExportListToJSON.Specification
 
 extension ExportListToJSON.Specification {

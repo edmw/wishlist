@@ -149,6 +149,8 @@
     "favorite-remove": "Remove list from favorites",
     "remove-favorite": "Remove a Favorite",
     "to-remove-favorite": "... you want to <span class='text-danger'>remove</span> the wish list named <strong>%{value1}</strong> from your favorite wish lists?",
+    "favorite-notify-enable": "Enable notifications",
+    "favorite-notify-disable": "Disable notifications",
 
     "//": "Item pages",
 

@@ -145,6 +145,21 @@ public struct {{typeName}}: {{entity.name}}Model,
         }
         self.{{leftEntityKey}} = leftid.uuid
         self.{{rightEntityKey}} = rightid.uuid
+{% for variable in entity.storedVariables %}
+  {% if variable.isLazy == false %}
+    {% if variable.name == entityID
+        or variable.name == parentEntityID
+        or variable.name == leftEntityID
+        or variable.name == rightEntityID
+        or variable.name == relatedEntityID
+    %}
+    {% else %}
+      {% if variable.defaultValue != nil %}
+        self.{{variable.name}} = {{variable.defaultValue}}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
     }
 
 {% endif %}

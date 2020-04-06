@@ -31,6 +31,10 @@ public protocol FavoriteRepository: EntityRepository {
     /// - Parameter user: owner of the favorites
     func addFavorite(_ list: List, for user: User) throws -> EventLoopFuture<Favorite>
 
+    /// Saves the specified favorite.
+    /// - Parameter favorite: favorite to be saved
+    func save(favorite: Favorite) -> EventLoopFuture<Favorite>
+
     /// Deletes the specified favorite.
     /// - Parameter favorite: favorite to be deleted
     func delete(favorite: Favorite) throws -> EventLoopFuture<Favorite>

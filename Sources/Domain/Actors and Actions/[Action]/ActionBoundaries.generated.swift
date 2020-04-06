@@ -175,6 +175,32 @@ extension DeleteReservation.Boundaries {
     }
 
 }
+// MARK: DisableNotifications.Boundaries
+
+extension DisableNotifications.Boundaries {
+
+    public static func boundaries(
+        worker: EventLoop
+    ) -> Self {
+        return Self(
+            worker: worker
+        )
+    }
+
+}
+// MARK: EnableNotifications.Boundaries
+
+extension EnableNotifications.Boundaries {
+
+    public static func boundaries(
+        worker: EventLoop
+    ) -> Self {
+        return Self(
+            worker: worker
+        )
+    }
+
+}
 // MARK: ExportListToJSON.Boundaries
 
 extension ExportListToJSON.Boundaries {

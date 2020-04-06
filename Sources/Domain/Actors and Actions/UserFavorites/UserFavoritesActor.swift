@@ -31,13 +31,23 @@ public protocol UserFavoritesActor: Actor {
         _ boundaries: DeleteFavorite.Boundaries
     ) throws -> EventLoopFuture<DeleteFavorite.Result>
 
+    func enableNotifications(
+        _ specification: EnableNotifications.Specification,
+        _ boundaries: EnableNotifications.Boundaries
+    ) throws -> EventLoopFuture<EnableNotifications.Result>
+
+    func disableNotifications(
+        _ specification: DisableNotifications.Specification,
+        _ boundaries: DisableNotifications.Boundaries
+    ) throws -> EventLoopFuture<DisableNotifications.Result>
+
 }
 
 /// Errors thrown by the User Favorites actor.
 public enum UserFavoritesActorError: Error {
     /// An invalid user id was specified. There is no user with the given id.
     case invalidUser
-    /// An invalid list id was specified. There is no list with the given id user.
+    /// An invalid list id was specified. There is no list with the given id.
     case invalidList
     /// An invalid list id was specified. There is no list with the given id for the specified
     /// user.

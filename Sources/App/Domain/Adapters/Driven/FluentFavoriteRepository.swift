@@ -116,6 +116,13 @@ final class FluentFavoriteRepository: FavoriteRepository, FluentRepository {
         }
     }
 
+    func save(favorite: Favorite) -> EventLoopFuture<Favorite> {
+        return db.withConnection { connection in
+            return favorite.model.save(on: connection)
+                .mapToEntity()
+        }
+    }
+
     func delete(favorite: Favorite) throws -> EventLoopFuture<Favorite> {
         return db.withConnection { connection in
             return favorite.model.delete(on: connection)

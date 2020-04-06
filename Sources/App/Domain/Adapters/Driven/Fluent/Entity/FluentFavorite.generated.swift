@@ -33,6 +33,7 @@ public struct FluentFavorite: FavoriteModel,
 
     public var uuid: UUID?
     public var id: FavoriteID? { FavoriteID(uuid: uuid) }
+    public var notifications: Favorite.Notifications
     public var userKey: UUID
     public var userID: UserID { UserID(uuid: userKey) }
     public var listKey: UUID
@@ -42,16 +43,19 @@ public struct FluentFavorite: FavoriteModel,
     /// To create this object a getter `model` is provided on the Domain entity `Favorite`.
     init(
         uuid: UUID?,
+        notifications: Favorite.Notifications,
         userKey: UUID,
         listKey: UUID
     ) {
         self.uuid = uuid
+        self.notifications = notifications
         self.userKey = userKey
         self.listKey = listKey
     }
 
     enum CodingKeys: String, CodingKey {
         case uuid = "id"
+        case notifications
         case userKey = "userID"
         case listKey = "listID"
     }
@@ -73,6 +77,7 @@ public struct FluentFavorite: FavoriteModel,
         }
         self.userKey = leftid.uuid
         self.listKey = rightid.uuid
+        self.notifications = []
     }
 
     // MARK: Fluent.Migration
@@ -80,6 +85,7 @@ public struct FluentFavorite: FavoriteModel,
     public static func prepare(on connection: Database.Connection) -> EventLoopFuture<Void> {
         return Database.create(self, on: connection) { builder in
             builder.field(for: \.uuid)
+            builder.field(for: \.notifications)
             builder.field(for: \.userKey)
             builder.field(for: \.listKey)
         }
@@ -89,6 +95,9 @@ public struct FluentFavorite: FavoriteModel,
 
     public static func == (lhs: FluentFavorite, rhs: FluentFavorite) -> Bool {
         guard lhs.uuid == rhs.uuid else {
+            return false
+        }
+        guard lhs.notifications == rhs.notifications else {
             return false
         }
         guard lhs.userKey == rhs.userKey else {
@@ -134,6 +143,7 @@ extension Favorite {
     var model: FluentFavorite {
         return .init(
             uuid: id?.uuid,
+            notifications: notifications,
             userKey: userID.uuid,
             listKey: listID.uuid
         )

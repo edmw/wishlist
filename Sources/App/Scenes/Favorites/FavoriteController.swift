@@ -134,7 +134,7 @@ final class FavoriteController: AuthenticatableController,
 
     func boot(router: Router) throws {
 
-        // favorite creation
+        // favorite creation (by listid)
 
         router.get("user", ID.parameter, "favorites", "create",
             use: self.renderCreationView
@@ -144,6 +144,7 @@ final class FavoriteController: AuthenticatableController,
         )
 
         // favorite deletion (by listid)
+
         router.get("user", ID.parameter, "favorites", "delete",
             use: self.renderDeletionView
         )
