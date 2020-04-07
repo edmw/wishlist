@@ -131,16 +131,6 @@ public protocol WishlistActor: Actor {
 
 }
 
-/// Errors thrown by the Wishlist actor.
-public enum WishlistActorError: Error {
-    case invalidIdentification
-    case invalidList
-    case invalidItem
-    case invalidReservation
-    case itemReservationExist
-    case itemHolderMismatch
-}
-
 /// This is the domain’s implementation of the Wishlist use cases. Actions will extend this by
 /// their corresponding use case methods.
 public final class DomainWishlistActor: WishlistActor,

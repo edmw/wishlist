@@ -18,12 +18,6 @@ public protocol UserReservationsActor: Actor {
 
 }
 
-/// Errors thrown by the User Reservations actor.
-enum UserReservationsActorError: Error {
-    case invalidItem
-    case invalidReservation
-}
-
 /// This is the domain’s implementation of the Reservations use cases. Actions will extend this by
 /// their corresponding use case methods.
 public final class DomainUserReservationsActor: UserReservationsActor {

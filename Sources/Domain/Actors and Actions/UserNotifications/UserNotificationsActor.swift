@@ -13,11 +13,6 @@ public protocol UserNotificationsActor: Actor {
 
 }
 
-/// Errors thrown by the User Notifications actor.
-enum UserNotificationsActorError: Error {
-    case invalidUser
-}
-
 /// This is the domain’s implementation of the Notifications use cases. Actions will extend this by
 /// their corresponding use case methods.
 public final class DomainUserNotificationsActor: UserNotificationsActor {

@@ -170,18 +170,6 @@ public protocol UserInvitationsActor: Actor {
 
 }
 
-/// Errors thrown by the User Invitations actor.
-public enum UserInvitationsActorError: Error {
-    case invalidUser
-    case invalidInvitation
-    case invalidInvitationStatus(Invitation.Status)
-    case validationError(
-        UserRepresentation,
-        InvitationRepresentation?,
-        ValuesError<InvitationValues>
-    )
-}
-
 /// This is the domain’s implementation of the Invitations use cases. Actions will extend this by
 /// their corresponding use case methods.
 public final class DomainUserInvitationsActor: UserInvitationsActor,

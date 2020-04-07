@@ -58,16 +58,6 @@ public protocol UserListsActor: Actor {
 
 }
 
-/// Errors thrown by the User Lists actor.
-public enum UserListsActorError: Error {
-    case invalidUser
-    case invalidList
-    case validationError(UserRepresentation, ListRepresentation?, ValuesError<ListValues>)
-    case importErrorForUser(UserRepresentation)
-    case exportErrorForUser(UserRepresentation)
-    case listHasReservedItems
-}
-
 /// This is the domain’s implementation of the Lists use cases. Actions will extend this by
 /// their corresponding use case methods.
 public final class DomainUserListsActor: UserListsActor,

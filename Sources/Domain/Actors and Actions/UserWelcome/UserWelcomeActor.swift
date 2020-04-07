@@ -13,11 +13,6 @@ public protocol UserWelcomeActor: Actor {
 
 }
 
-/// Errors thrown by the User Welcome actor.
-enum UserWelcomeActorError: Error {
-    case invalidUser
-}
-
 /// This is the domain’s implementation of the Welcome use cases. Actions will extend this by
 /// their corresponding use case methods.
 public final class DomainUserWelcomeActor: UserWelcomeActor {

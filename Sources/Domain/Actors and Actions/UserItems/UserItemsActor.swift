@@ -83,20 +83,6 @@ public protocol UserItemsActor: Actor {
 
 }
 
-/// Errors thrown by the User Items actor.
-public enum UserItemsActorError: Error {
-    case invalidUser
-    case invalidList
-    case invalidItem
-    case validationError(
-        UserRepresentation, ListRepresentation, ItemRepresentation?, ValuesError<ItemValues>
-    )
-    case itemNotMovable
-    case itemNotReceivable
-    case itemNotDeletable
-    case itemNotArchivable
-}
-
 /// This is the domain’s implementation of the Items use cases. Actions will extend this by
 /// their corresponding use case methods.
 public final class DomainUserItemsActor: UserItemsActor,

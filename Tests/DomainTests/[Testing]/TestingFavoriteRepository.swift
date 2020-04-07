@@ -37,17 +37,29 @@ final class TestingFavoriteRepository: FavoriteRepository {
         return worker.newSucceededFuture(result: result.first)
     }
 
-    func favorites(for user: User) throws -> EventLoopFuture<[List]> {
+    func favorites(for user: User) throws -> EventLoopFuture<[(Favorite, List)]> {
         return try favorites(for: user, sort: sortingDefault)
     }
 
-    func favorites(for user: User, sort: ListsSorting) throws -> EventLoopFuture<[List]> {
+    func favorites(for user: User, sort: ListsSorting) throws
+        -> EventLoopFuture<[(Favorite, List)]>
+    {
         guard let id = user.id else {
             throw EntityError<User>.requiredIDMissing
         }
-        let result = try Array(storage.values.filter { $0.userID == id })
-            .compactMap { try self.listRepository.find(by: $0.listID).wait() }
-        return worker.newSucceededFuture(result: result)
+        let result = Array(storage.values.filter { $0.userID == id })
+            .map { favorite in
+                self.listRepository.find(by: favorite.listID).map { list in (list, favorite) }
+            }
+            .flatten(on: self.worker)
+            .map { $0.compactMap { list, favorite -> (Favorite, List)? in
+                guard let list = list else {
+                    return nil
+                }
+                return (favorite, list)
+            }
+        }
+        return result
     }
 
     func addFavorite(_ list: List, for user: User) throws -> EventLoopFuture<Favorite> {
@@ -64,6 +76,17 @@ final class TestingFavoriteRepository: FavoriteRepository {
         let favorite = Favorite(userID: userid, listID: listid)
         favorite.id = FavoriteID()
         storage[favorite.id!] = favorite
+        return worker.newSucceededFuture(result: favorite)
+    }
+
+    func save(favorite: Favorite) -> EventLoopFuture<Favorite> {
+        if let id = favorite.id {
+            storage[id] = favorite
+        }
+        else {
+            favorite.id = FavoriteID()
+            storage[favorite.id!] = favorite
+        }
         return worker.newSucceededFuture(result: favorite)
     }
 

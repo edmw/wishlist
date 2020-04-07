@@ -32,12 +32,6 @@ public protocol AnnouncementsActor: Actor {
 
 }
 
-/// Errors thrown by the Announcements actor.
-enum AnnouncementsActorError: Error {
-    /// An invalid user id was specified. There is no user with the given id.
-    case invalidUser
-}
-
 /// This is the domain’s implementation of the Announcements use cases. Actions will extend this by
 /// their corresponding use case methods.
 public final class DomainAnnouncementsActor: AnnouncementsActor {

@@ -23,12 +23,6 @@ public protocol UserProfileActor: Actor {
 
 }
 
-/// Errors thrown by the User Profile actor.
-public enum UserProfileActorError: Error {
-    case invalidUser
-    case validationError(UserRepresentation, ValuesError<UserValues>)
-}
-
 /// This is the domain’s implementation of the Profile use cases. Actions will extend this by
 /// their corresponding use case methods.
 public final class DomainUserProfileActor: UserProfileActor,

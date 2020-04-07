@@ -18,12 +18,6 @@ public protocol UserSettingsActor: Actor {
 
 }
 
-/// Errors thrown by the User Settings actor.
-public enum UserSettingsActorError: Error {
-    case invalidUser
-    case validationError(UserRepresentation, ValuesError<UserSettings>)
-}
-
 /// This is the domain’s implementation of the Settings use cases. Actions will extend this by
 /// their corresponding use case methods.
 public final class DomainUserSettingsActor: UserSettingsActor,
