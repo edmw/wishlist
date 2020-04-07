@@ -264,6 +264,33 @@ table.wl-table td:last-child {
     }
 }
 
+table.wl-table td.wl-actions {
+}
+
+table.wl-table td.wl-actions-left button,
+table.wl-table td.wl-actions-left a.btn {
+    margin-right: 1rem;
+}
+
+table.wl-table td.wl-actions-right button,
+table.wl-table td.wl-actions-right a.btn {
+    margin-left: 1rem;
+}
+
+@media only screen and (max-width: 575px) {
+    table.wl-table td.wl-actions-left {
+        display: inline-block;
+        width: auto;
+        float: left;
+        text-align: left;
+    }
+    table.wl-table td.wl-actions-right {
+        display: block;
+        width: auto;
+        text-align: right;
+    }
+}
+
 /* MARK: blocks: table of lists */
 
 table.wl-lists {
@@ -286,19 +313,6 @@ table.wl-items td {
 table.wl-items td.wl-description {
     width: 100%;
     max-width: 0;
-}
-@media only screen and (max-width: 575px) {
-    table.wl-items td.wl-actions-left {
-        display: inline-block;
-        width: auto;
-        float: left;
-        text-align: left;
-    }
-    table.wl-items td.wl-actions-right {
-        display: block;
-        width: auto;
-        text-align: right;
-    }
 }
 
 /* MARK: blocks: table of favorites */

@@ -25,25 +25,14 @@ final class LocalizationTag: TagRenderer {
         var localized: String?
 
         if let key = key {
-            let container = tag.container
-            let l10n = try container.make(LocalizationService.self)
-            if let language = tag.context.userInfo["language"] as? String {
-                localized = try l10n.localize(key, values: values, for: language, on: container)
-            }
-            else {
-                if let request = container as? Request {
-                    localized = try l10n.localize(key, values: values, on: request)
-                }
-            }
+            let l10n = try tag.container.make(LocalizationService.self)
+            localized = try l10n.localize(in: tag, key: key, values: values)
         }
 
         if let localized = localized {
             return EventLoopFuture.map(on: tag) { .string(localized) }
         }
         else {
-            tag.container.logger?.debug(
-                "L10N: no localization\nKey: \(key ?? "no key")\nSource: \(tag.source)\n"
-            )
             if let body = tag.body {
                 return tag.serializer.serialize(ast: body)
                     .map { body in

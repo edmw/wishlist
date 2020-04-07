@@ -218,6 +218,15 @@
         }
       },
       {
+        "package": "Html",
+        "repositoryURL": "https://github.com/pointfreeco/swift-html.git",
+        "state": {
+          "branch": null,
+          "revision": "3ffc3fc8feb5fde766f5f44fd06ebc030f0721f3",
+          "version": "0.3.1"
+        }
+      },
+      {
         "package": "swift-nio",
         "repositoryURL": "https://github.com/apple/swift-nio.git",
         "state": {
@@ -260,6 +269,15 @@
           "branch": null,
           "revision": "496f779a073991609cf3745214e49449d9b5db24",
           "version": "5.1.0"
+        }
+      },
+      {
+        "package": "SnapshotTesting",
+        "repositoryURL": "https://github.com/pointfreeco/swift-snapshot-testing.git",
+        "state": {
+          "branch": null,
+          "revision": "114882386a815f4a2e6d8f2f7ee4857acd372438",
+          "version": "1.7.2"
         }
       },
       {

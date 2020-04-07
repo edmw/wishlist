@@ -19,12 +19,12 @@ public protocol FavoriteRepository: EntityRepository {
 
     /// Returns all favorite lists for the specified user.
     /// - Parameter user: owner of the favorites
-    func favorites(for user: User) throws -> EventLoopFuture<[List]>
+    func favorites(for user: User) throws -> EventLoopFuture<[(Favorite, List)]>
     /// Returns all favorites lists for the specified user ordered by the specified
     /// sort order.
     /// - Parameter user: owner of the favorites
     /// - Parameter sort: lists sort order
-    func favorites(for user: User, sort: ListsSorting) throws -> EventLoopFuture<[List]>
+    func favorites(for user: User, sort: ListsSorting) throws -> EventLoopFuture<[(Favorite, List)]>
 
     /// Adds the specified list to the favorite lists for the specified user.
     /// - Parameter list: list to add to the favorites

@@ -29,7 +29,7 @@ extension Page {
             context: ListPageContext.builder
                 .forUser(user)
                 .withList(list)
-                .setAction("form", .delete("user", user.id, "favorites", "delete"))
+                .setAction("form", .post("user", user.id, "favorites", "delete"))
                 .build()
         )
     }

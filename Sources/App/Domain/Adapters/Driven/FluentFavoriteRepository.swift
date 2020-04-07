@@ -57,23 +57,29 @@ final class FluentFavoriteRepository: FavoriteRepository, FluentRepository {
         }
     }
 
-    func favorites(for user: User) throws -> EventLoopFuture<[List]> {
+    func favorites(for user: User) throws -> EventLoopFuture<[(Favorite, List)]> {
         return try favorites(for: user, sort: sortingDefault)
     }
 
     func favorites(
         for user: User,
         sort: ListsSorting
-    ) throws -> EventLoopFuture<[List]> {
+    ) throws -> EventLoopFuture<[(Favorite, List)]> {
+        guard let userid = user.id else {
+            throw EntityError<User>.requiredIDMissing
+        }
         let orderBy = try? sort.sqlOrderBy(on: FluentList.self)
             ?? sortingDefault.sqlOrderBy(on: FluentList.self)
         return db.withConnection { connection in
-            var query = try user.model.favorites.query(on: connection)
+            var query = FluentList.query(on: connection)
+                .join(\FluentFavorite.listKey, to: \FluentList.uuid)
+                .filter(\FluentFavorite.userKey == userid.uuid)
             if let orderBy = orderBy {
                 query = query.sort(orderBy)
             }
             return query
-                .sort(\.title, .ascending)
+                .sort(\FluentList.title, .ascending)
+                .alsoDecode(FluentFavorite.self)
                 .all()
                 .mapToEntities()
         }
@@ -127,6 +133,18 @@ final class FluentFavoriteRepository: FavoriteRepository, FluentRepository {
         return db.withConnection { connection in
             return favorite.model.delete(on: connection)
                 .transform(to: favorite.detached())
+        }
+    }
+
+}
+
+// MARK: - EventLoopFuture
+
+extension EventLoopFuture where Expectation == [(FluentList, FluentFavorite)] {
+
+    func mapToEntities() -> EventLoopFuture<[(Favorite, List)]> {
+        return self.map { models in
+            return models.map { model in (Favorite(from: model.1), List(from: model.0)) }
         }
     }
 

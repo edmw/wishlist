@@ -225,6 +225,7 @@ public func configure(
     leafTagConfig.use(LocalizationTag(), as: "L10N")
     leafTagConfig.use(LocalizationDateTag(), as: "L10NDate")
     leafTagConfig.use(LocalizationLocaleTag(), as: "L10NLocale")
+    leafTagConfig.use(IconicButtonTag(), as: "IButton")
     services.register(leafTagConfig)
 
     //

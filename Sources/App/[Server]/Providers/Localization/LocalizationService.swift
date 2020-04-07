@@ -60,6 +60,26 @@ public class LocalizationService: Service {
         return try localize(key, values: values, for: languageCode, on: request)
     }
 
+    func localize(
+        in tag: TagContext,
+        key: String,
+        values: [String] = []
+    ) throws -> String? {
+        let container = tag.container
+        if let language = tag.context.userInfo["language"] as? String {
+            return try localize(key, values: values, for: language, on: container)
+        }
+        else {
+            if let request = container as? Request {
+                return try localize(key, values: values, on: request)
+            }
+        }
+        container.logger?.debug(
+            "L10N: no localization\nKey: \(key)\nSource: \(tag.source)\n"
+        )
+        return nil
+    }
+
     // MARK: Date
 
     func localize(date: Date, for locale: Locale) -> String? {

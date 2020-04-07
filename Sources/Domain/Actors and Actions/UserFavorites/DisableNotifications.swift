@@ -15,7 +15,7 @@ public struct DisableNotifications: Action {
 
     public struct Specification: AutoActionSpecification {
         public let userID: UserID
-        public let favoriteID: FavoriteID
+        public let listID: ListID
     }
 
     // MARK: Result
@@ -40,20 +40,25 @@ extension DomainUserFavoritesActor {
         _ boundaries: DisableNotifications.Boundaries
     ) throws -> EventLoopFuture<DisableNotifications.Result> {
         let favoriteRepository = self.favoriteRepository
+        let listRepository = self.listRepository
         let logging = self.logging
         return userRepository.find(id: specification.userID)
             .unwrap(or: UserFavoritesActorError.invalidUser)
             .flatMap { user in
-                return try favoriteRepository.find(by: specification.favoriteID, for: user)
-                    .unwrap(or: UserFavoritesActorError.invalidFavoriteForUser)
-                    .flatMap { favorite in
-                        // disable notifications
-                        favorite.notifications = []
-                        return favoriteRepository
-                            .save(favorite: favorite)
-                            .logMessage(.disableNotifications(for: user), using: logging)
-                            .map { _ in
-                                .init(user)
+                return try listRepository.find(by: specification.listID, for: user)
+                    .unwrap(or: UserFavoritesActorError.invalidListForUser)
+                    .flatMap { list in
+                        return try favoriteRepository.find(favorite: list, for: user)
+                            .unwrap(or: UserFavoritesActorError.invalidFavoriteForUser)
+                            .flatMap { favorite in
+                                // disable notifications
+                                favorite.notifications = []
+                                return favoriteRepository
+                                    .save(favorite: favorite)
+                                    .logMessage(.disableNotifications(for: user), using: logging)
+                                    .map { _ in
+                                        .init(user)
+                                    }
                             }
                     }
             }

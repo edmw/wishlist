@@ -24,11 +24,11 @@ final class FavoriteNotificationController: AuthenticatableController,
         let userid = try requireAuthenticatedUserID(on: request)
 
         let userFavoritesActor = self.userFavoritesActor
-        return try self.findFavoriteID(from: request)
-            .flatMap { favoriteid in
+        return try self.findListID(from: request)
+            .flatMap { listid in
                 return try userFavoritesActor
                     .enableNotifications(
-                        .specification(userBy: userid, favoriteBy: favoriteid),
+                        .specification(userBy: userid, listBy: listid),
                         .boundaries(worker: request.eventLoop)
                     )
                     .flatMap { result in
@@ -43,11 +43,11 @@ final class FavoriteNotificationController: AuthenticatableController,
         let userid = try requireAuthenticatedUserID(on: request)
 
         let userFavoritesActor = self.userFavoritesActor
-        return try self.findFavoriteID(from: request)
-            .flatMap { favoriteid in
+        return try self.findListID(from: request)
+            .flatMap { listid in
                 return try userFavoritesActor
                     .disableNotifications(
-                        .specification(userBy: userid, favoriteBy: favoriteid),
+                        .specification(userBy: userid, listBy: listid),
                         .boundaries(worker: request.eventLoop)
                     )
                     .flatMap { result in
@@ -83,6 +83,8 @@ final class FavoriteNotificationController: AuthenticatableController,
         return try method(of: request)
             .flatMap { method -> EventLoopFuture<Response> in
                 switch method {
+                case .POST:
+                    return try self.create(on: request)
                 case .DELETE:
                     return try self.delete(on: request)
                 default:
@@ -93,20 +95,11 @@ final class FavoriteNotificationController: AuthenticatableController,
 
     func boot(router: Router) throws {
 
-//        // notification enabling
-//
-//        router.post("user", ID.parameter, "favorite", ID.parameter, "notifications",
-//            use: self.create
-//        )
-//
-//        // favorite disabling (by favoriteid)
-//
-//        router.post("user", ID.parameter, "favorite", ID.parameter, "notifications",
-//            use: self.delete
-//            use: self.dispatch
-//        )
-// FIXME
-    
+        // notification handling
+        router.post("user", ID.parameter, "favorite", "notifications",
+            use: self.dispatch
+        )
+
     }
 
 }

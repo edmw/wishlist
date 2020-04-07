@@ -71,8 +71,8 @@ class FavoriteRepresentationsBuilder {
         // (better would be: use a join on the database)
         return try self.favoriteRepository
             .favorites(for: user, sort: sorting)
-            .flatMap { lists in
-                return lists.map { list in
+            .flatMap { favorites in
+                return favorites.map { favorite, list in
                     return self.listRepository
                         .owner(of: list)
                         .flatMap { owner in
@@ -81,6 +81,7 @@ class FavoriteRepresentationsBuilder {
                                     .count(on: list)
                                     .map { itemsCount in
                                         return FavoriteRepresentation(
+                                            favorite,
                                             list,
                                             ownerName: owner.displayName,
                                             itemsCount: itemsCount
@@ -89,6 +90,7 @@ class FavoriteRepresentationsBuilder {
                             }
                             else {
                                 let representation = FavoriteRepresentation(
+                                    favorite,
                                     list,
                                     ownerName: owner.displayName
                                 )

@@ -20,18 +20,20 @@
             <td class="wl-title" data-label="#L10N("list-title")"><a class="nav-link" href="/list/#(favorite.list.id)">#(favorite.list.title)</a></td>
             <td class="wl-count" data-label="#L10N("list-items")">#(favorite.list.itemsCount)</td>
             <td class="wl-owner" data-label="#L10N("list-owner")">#(favorite.list.ownerName)</td>
-            <td class="wl-actions" data-label="">
+            <td class="wl-actions wl-actions-right" data-label="">
                 <div class="btn-group" role="group">
-                    #if(features.notifyCreateItem.enabled) {
-                    <form method="POST" action="/user/#(page.userID)/favorite/#(favorite.id)/notifications#if(location){&p=#(location)}" accept-charset="UTF-8" class="form-inline d-inline-flex">
-                    <button class="btn btn-action btn-link ml-3" title="#L10N("favorite-notify-enable")"><svg class="feather"><use xlink:href="/icons/feather.svg#bell"/></svg></button>
-                    </form>
-                    <form method="POST" action="/user/#(page.userID)/favorite/#(favorite.id)/notifications#if(location){&p=#(location)}" accept-charset="UTF-8" class="form-inline d-inline-flex">
-                    <input type="hidden" name="__method" value="DELETE">
-                    <button class="btn btn-action btn-link ml-3" title="#L10N("favorite-notify-disable")"><svg class="feather"><use xlink:href="/icons/feather.svg#bell-off"/></svg></button>
-                    </form>
+                #if(features.notifyCreateItem.enabled) {
+                #if(favorite.notificationsEnabled) {
+                    #IButton("favorite-notify-disable", "bell-off", "/user/#(page.userID)/favorite/notifications#if(location){?p=#(location)}", "DELETE") {
+                        <input type="hidden" name="listID" value="#(favorite.list.id)">
                     }
-                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/favorites/delete?listid=#(favorite.list.id)#if(location){&p=#(location)}" title="#L10N("favorite-remove")"><svg class="feather"><use xlink:href="/icons/feather.svg#x-circle"/></svg></a>
+                } else {
+                    #IButton("favorite-notify-enable", "bell", "/user/#(page.userID)/favorite/notifications#if(location){?p=#(location)}", "POST") {
+                        <input type="hidden" name="listID" value="#(favorite.list.id)">
+                    }
+                }
+                }
+                    #IButton("favorite-remove", "x-circle", "/user/#(page.userID)/favorites/delete?listid=#(favorite.list.id)#if(location){&p=#(location)}")
                 </div>
             </td>
         </tr>

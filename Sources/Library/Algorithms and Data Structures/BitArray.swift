@@ -22,6 +22,8 @@
 // SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+import Foundation
+
 // MARK: BitArray
 
 public struct BitArray: MutableCollection, Equatable, Hashable, CustomStringConvertible {

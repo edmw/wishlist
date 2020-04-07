@@ -18,11 +18,13 @@ struct FavoriteContext: Encodable {
 
     enum Keys: String, CodingKey {
         case list
+        case notificationsEnabled
     }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: Keys.self)
         try container.encode(list, forKey: .list)
+        try container.encode(favorite.notificationsEnabled, forKey: .notificationsEnabled)
     }
 
     init(_ favorite: FavoriteRepresentation) {

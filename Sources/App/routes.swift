@@ -68,6 +68,7 @@ func routes(
     let userFavoritesActor = try container.make(UserFavoritesActor.self)
     try user.register(collection: FavoritesController(userFavoritesActor))
     try user.register(collection: FavoriteController(userFavoritesActor))
+    try user.register(collection: FavoriteNotificationController(userFavoritesActor))
 
     let userInvitationsActor = try container.make(UserInvitationsActor.self)
     try user.register(collection: InvitationsController(userInvitationsActor))

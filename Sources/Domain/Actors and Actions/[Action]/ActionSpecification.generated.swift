@@ -205,11 +205,11 @@ extension DisableNotifications.Specification {
 
     public static func specification(
           userBy userid: UserID,
-          favoriteBy favoriteid: FavoriteID
+          listBy listid: ListID
     ) -> Self {
         return Self(
             userID: userid,
-            favoriteID: favoriteid
+            listID: listid
         )
     }
 
@@ -221,11 +221,11 @@ extension EnableNotifications.Specification {
 
     public static func specification(
           userBy userid: UserID,
-          favoriteBy favoriteid: FavoriteID
+          listBy listid: ListID
     ) -> Self {
         return Self(
             userID: userid,
-            favoriteID: favoriteid
+            listID: listid
         )
     }
 

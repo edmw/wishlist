@@ -26,6 +26,7 @@ let package = Package(
         .package(url: "https://github.com/LiveUI/VaporTestTools.git", from: "0.1.7"),
         .package(url: "https://github.com/IBM-Swift/LoggerAPI.git", .exact("1.8.0")),
         .package(url: "https://github.com/IBM-Swift/Swift-SMTP", .exact("5.1.0")),
+        .package(url: "https://github.com/pointfreeco/swift-html.git", from: "0.3.0"),
         .package(url: "https://github.com/ianpartridge/swift-backtrace.git", from: "1.1.1")
     ],
     targets: [
@@ -58,6 +59,7 @@ let package = Package(
                 "FluentSQLite",
                 "FluentMySQL",
                 "Imperial",
+                "Html",
                 "Lingo",
                 "SwiftSMTP"
             ]

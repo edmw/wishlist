@@ -118,20 +118,6 @@ final class FavoriteController: AuthenticatableController,
         }
     }
 
-    // MARK: - Routing
-
-    private func dispatch(on request: Request) throws -> EventLoopFuture<Response> {
-        return try method(of: request)
-            .flatMap { method -> EventLoopFuture<Response> in
-                switch method {
-                case .DELETE:
-                    return try self.delete(on: request)
-                default:
-                    throw Abort(.methodNotAllowed)
-                }
-            }
-    }
-
     func boot(router: Router) throws {
 
         // favorite creation (by listid)
@@ -152,11 +138,6 @@ final class FavoriteController: AuthenticatableController,
             use: self.delete
         )
 
-        // favorite handling
-
-        router.post("user", ID.parameter, "favorite", ID.parameter,
-            use: self.dispatch
-        )
     }
 
 }

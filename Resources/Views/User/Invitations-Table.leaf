@@ -19,27 +19,20 @@
     </thead>
     #for(invitation in page.invitations) {
         <tr>
-            <td class="wl-code" data-label="#L10N("invitation-code")">
+            <td class="wl-code wl-actions wl-actions-left" data-label="#L10N("invitation-code")">
                 #if(invitation.status != "accepted" && invitation.status != "revoked") {
-                <a class="btn btn-action mr-2" href="/signin/?invitation=#(invitation.code)" title="#L10N("invitation-link")"><svg class="feather"><use xlink:href="/icons/feather.svg#share"/></svg></a>#(invitation.code)</a>
-                } else {
-                    <svg class="feather"><use xlink:href="/icons/feather.svg#share"/></svg>
+                    #IButton("invitation-link", "share", "/signin/?invitation=#(invitation.code)")#(invitation.code)
                 }
             </td>
             <td class="wl-email" data-label="#L10N("invitation-email")">#(invitation.email)</a></td>
-            <td class="wl-sent-at" data-label="#L10N("invitation-sent-at")">
-                #if(invitation.status == "open") {
-                <form method="POST" action="/user/#(page.userID)/invitation/#(invitation.id)/send#if(location){?p=#(location)}" accept-charset="UTF-8" class="form-inline d-inline-flex">
-                <button class="btn btn-action btn-link mr-2" title="#L10N("invitation-resend")"><svg class="feather"><use xlink:href="/icons/feather.svg#rotate-ccw"/></svg></button>
-                </form>
-                }
-                #if(invitation.sentAt == nil) {#L10N("never")}else{#L10NDate(invitation.sentAt)}
+            <td class="wl-sent-at wl-actions wl-actions-left" data-label="#L10N("invitation-sent-at")">
+                #if(invitation.status == "open") {#IButton("invitation-resend", "rotate-ccw", "/user/#(page.userID)/invitation/#(invitation.id)/send#if(location){?p=#(location)}", "POST")}#if(invitation.sentAt == nil) {#L10N("never")}else{#L10NDate(invitation.sentAt)}
             </td>
             <td class="wl-status" data-label="#L10N("status")">#L10N("invitation-status-#(invitation.status)")</td>
-            <td class="wl-actions">
+            <td class="wl-actions wl-actions-right">
                 <div class="btn-group" role="group">
                     #if(invitation.status == "open") {
-                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/invitation/#(invitation.id)/revoke#if(location){?p=#(location)}" title="#L10N("invitation-revoke")"><svg class="feather"><use xlink:href="/icons/feather.svg#slash"/></svg></a>
+                        #IButton("invitation-revoke", "slash", "/user/#(page.userID)/invitation/#(invitation.id)/revoke#if(location){?p=#(location)}")
                     }
                 </div>
             </td>
