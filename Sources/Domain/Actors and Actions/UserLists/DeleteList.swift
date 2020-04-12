@@ -61,7 +61,7 @@ extension DomainUserListsActor {
                             .delete(list: list, for: user)
                             .unwrap(or: UserListsActorError.invalidList)
                             .logMessage(.deleteList(with: id), using: self.logging)
-                            .recordEvent("deleted for \(user)", using: self.recording)
+                            .recordEvent(.deleteList(with: id), using: self.recording)
                             .map { _ in
                                 .init(user)
                             }
@@ -91,6 +91,18 @@ extension LoggingMessageRoot {
     fileprivate static var deleteListItems: LoggingMessageRoot<List> {
         return .init({ list in
             LoggingMessage(label: "Delete List (Items)", subject: list)
+        })
+    }
+
+}
+
+// MARK: Recording
+
+extension RecordingEventRoot {
+
+    fileprivate static func deleteList(with id: ListID?) -> RecordingEventRoot<List> {
+        return .init({ list in
+            RecordingEvent(.DELETEENTITY, subject: list, attributes: ["id": id as Any])
         })
     }
 

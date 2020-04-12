@@ -1,0 +1,5 @@
+#if(request.parameter.m == "UND-F") {
+    #AlertDismissibleWarning() {
+        #L10N("favorite-message-und","/user/#(page.userID)/settings/edit?p=#(location)")
+    }
+}

@@ -2,6 +2,8 @@ import Domain
 
 import Vapor
 
+// MARK: FavoriteController
+
 final class FavoriteController: AuthenticatableController,
     FavoriteParameterAcceptor,
     ListParameterAcceptor,
@@ -73,7 +75,7 @@ final class FavoriteController: AuthenticatableController,
                         .boundaries(worker: request.eventLoop)
                     )
                     .flatMap { result in
-                        return self.success(for: result.user, on: request)
+                        self.success(for: result.user, on: request)
                     }
                     .handleAuthorizationError(on: request)
             }
@@ -92,7 +94,7 @@ final class FavoriteController: AuthenticatableController,
                         .boundaries(worker: request.eventLoop)
                     )
                     .flatMap { result in
-                        return self.success(for: result.user, on: request)
+                        self.success(for: result.user, on: request)
                     }
                     .handleAuthorizationError(on: request)
             }
@@ -106,16 +108,10 @@ final class FavoriteController: AuthenticatableController,
         -> EventLoopFuture<Response>
     {
         // to add real REST support, check the accept header for json and output a json response
-        if let locator = request.query.getLocator(is: .local) {
-            return request.eventLoop.newSucceededFuture(
-                result: Controller.redirect(to: locator.locationString, on: request)
-            )
-        }
-        else {
-            return request.eventLoop.newSucceededFuture(
-                result: Controller.redirect(to: "/", on: request)
-            )
-        }
+        let location = request.query.getLocator(is: .local)?.locationString ?? "/"
+        return request.eventLoop.newSucceededFuture(
+            result: Controller.redirect(to: location, on: request)
+        )
     }
 
     func boot(router: Router) throws {

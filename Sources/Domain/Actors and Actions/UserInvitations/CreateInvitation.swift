@@ -106,14 +106,14 @@ extension DomainUserInvitationsActor {
                 return try CreateInvitation(actor: self)
                     .execute(for: user, createWith: specification.values, in: boundaries)
                     .logMessage(.createInvitationNote, using: logging)
-                    .recordEvent("created", using: recording)
+                    .recordEvent(.createInvitationNote, using: recording)
                     .flatMap { note in
                         var future = boundaries.worker.makeSucceededFuture(note)
                         if specification.sendEmail {
                             future = future
                                 .sendInvitationNote(in: invitationRepository, on: boundaries)
                                 .logMessage(.createInvitationNoteSent, using: logging)
-                                .recordEvent("sent", using: recording)
+                                .recordEvent(.createInvitationNoteSent, using: recording)
                         }
                         return future.map { note in .init(note.inviter, note.invitation) }
                     }
@@ -151,6 +151,32 @@ extension LoggingMessageRoot {
                 label: "Create Invitation (Sent)",
                 subject: note.invitation,
                 loggables: [note.inviter]
+            )
+        })
+    }
+
+}
+
+// MARK: Recording
+
+extension RecordingEventRoot {
+
+    fileprivate static var createInvitationNote: RecordingEventRoot<InvitationNote> {
+        return .init({ note in
+            RecordingEvent(
+                .CREATEENTITY,
+                subject: note.invitation,
+                attributes: ["inviter": note.inviter]
+            )
+        })
+    }
+
+    fileprivate static var createInvitationNoteSent: RecordingEventRoot<InvitationNote> {
+        return .init({ note in
+            RecordingEvent(
+                .CREATEENTITY,
+                subject: note.invitation,
+                attributes: ["inviter": note.inviter]
             )
         })
     }

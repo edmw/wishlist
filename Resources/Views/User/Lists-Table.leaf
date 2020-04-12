@@ -19,13 +19,13 @@
         <tr>
             <td class="wl-title" data-label="#L10N("list-title")"><a class="nav-link" href="/list/#(list.id)">#(list.title)</a></td>
             <td class="wl-items wl-actions wl-actions-left" data-label="#L10N("list-items")">
-                #IButton("edit-list-items", "edit-2", "/user/#(page.userID)/list/#(list.id)/items")#(list.itemsCount)</td>
+                #ActionButton("edit-list-items", "edit-2", "/user/#(page.userID)/list/#(list.id)/items")#(list.itemsCount)</td>
             <td class="wl-visibility" data-label="#L10N("visibility")">#L10N("visibility-#(list.visibility)")</td>
             <td class="wl-actions wl-actions-right" data-label="">
                 <div class="btn-group" role="group">
-                    #IButton("list-export", "download", "/user/#(page.userID)/list/#(list.id)/export#if(location){?p=#(location)}")
-                    #IButton("edit-list", "edit", "/user/#(page.userID)/list/#(list.id)/edit#if(location){?p=#(location)}")
-                    #IButton("list-delete", "delete", "/user/#(page.userID)/list/#(list.id)/delete#if(location){?p=#(location)}")
+                    #ActionButton("list-export", "download", "/user/#(page.userID)/list/#(list.id)/export#if(location){?p=#(location)}")
+                    #ActionButton("edit-list", "edit", "/user/#(page.userID)/list/#(list.id)/edit#if(location){?p=#(location)}")
+                    #ActionButton("list-delete", "delete", "/user/#(page.userID)/list/#(list.id)/delete#if(location){?p=#(location)}")
                 </div>
             </td>
         </tr>

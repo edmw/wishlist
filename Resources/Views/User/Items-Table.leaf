@@ -25,7 +25,7 @@
             <td class="wl-actions wl-actions-right" data-label="">
                 <div class="btn-group" role="group">
                     #if(item.url) {
-                        #IButton("open-item-url", "external-link", "#(item.url)")
+                        #ActionButton("open-item-url", "external-link", "#(item.url)")
                     }
                 </div>
             </td>
@@ -45,14 +45,14 @@
             <td class="wl-actions wl-actions-right" data-label="">
                 <div class="btn-group" role="group">
                     #if(item.receivable == true) {
-                        #IButton("receive-item-description", "gift", "/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/receive")
+                        #ActionButton("receive-item-description", "gift", "/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/receive")
                     }
                 </div>
             </td>
             <td class="wl-actions wl-actions-right" data-label="">
                 <div class="btn-group" role="group">
-                    #IButton("edit-item", "edit", "/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/edit")
-                    #IButton("manage-item", "more-vertical", "/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/manage")
+                    #ActionButton("edit-item", "edit", "/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/edit")
+                    #ActionButton("manage-item", "more-vertical", "/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/manage")
                 </div>
             </td>
         </tr>

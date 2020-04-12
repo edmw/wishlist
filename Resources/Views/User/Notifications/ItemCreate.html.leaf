@@ -1,0 +1,5 @@
+<html>
+<p>#L10N("items-notifications-create-message","#(listTitle)")</p>
+<hr>
+<p>#L10N("notification-html-footer")</p>
+</html>

@@ -2,6 +2,8 @@ import Domain
 
 import Vapor
 
+// MARK: ListsController
+
 final class ListsController: AuthenticatableController,
     SortingController,
     RouteCollection

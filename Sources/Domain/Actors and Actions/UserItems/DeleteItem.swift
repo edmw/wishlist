@@ -62,7 +62,7 @@ extension DomainUserItemsActor {
                             .delete(item: item, in: list)
                             .unwrap(or: UserItemsActorError.invalidItem)
                             .logMessage(.deleteItem(with: id), using: self.logging)
-                            .recordEvent(for: item, "deleted for \(user)", using: self.recording)
+                            .recordEvent(.deleteItem(with: id), using: self.recording)
                             .map { _ in
                                 .init(user, list)
                             }
@@ -79,6 +79,18 @@ extension LoggingMessageRoot {
     fileprivate static func deleteItem(with id: ItemID?) -> LoggingMessageRoot<Item> {
         return .init({ item in
             LoggingMessage(label: "Delete Item", subject: item, loggables: [id])
+        })
+    }
+
+}
+
+// MARK: Recording
+
+extension RecordingEventRoot {
+
+    fileprivate static func deleteItem(with id: ItemID?) -> RecordingEventRoot<Item> {
+        return .init({ item in
+            RecordingEvent(.DELETEENTITY, subject: item, attributes: ["id": id as Any])
         })
     }
 

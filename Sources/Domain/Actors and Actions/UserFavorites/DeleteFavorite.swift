@@ -56,8 +56,8 @@ extension DomainUserFavoritesActor {
                                 let id = favorite.id
                                 return try favoriteRepository
                                     .delete(favorite: favorite)
-                                    .recordEvent("deleted for \(user)", using: recording)
                                     .logMessage(.deleteFavorite(with: id), using: logging)
+                                    .recordEvent(.deleteFavorite(with: id), using: recording)
                                     .map { _ in
                                         .init(user)
                                     }
@@ -68,11 +68,25 @@ extension DomainUserFavoritesActor {
 
 }
 
+// MARK: Logging
+
 extension LoggingMessageRoot {
 
     fileprivate static func deleteFavorite(with id: FavoriteID?) -> LoggingMessageRoot<Favorite> {
         return .init({ favorite in
             LoggingMessage(label: "Delete Favorite", subject: favorite, loggables: [id])
+        })
+    }
+
+}
+
+// MARK: Recording
+
+extension RecordingEventRoot {
+
+    fileprivate static func deleteFavorite(with id: FavoriteID?) -> RecordingEventRoot<Favorite> {
+        return .init({ favorite in
+            RecordingEvent(.DELETEENTITY, subject: favorite, attributes: ["id": id as Any])
         })
     }
 

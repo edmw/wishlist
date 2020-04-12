@@ -11,6 +11,7 @@ struct FavoritesPageContext: PageContext, AutoPageContextBuilder {
     var userID: ID?
 
     var userName: String
+    var userNotificationsEnabled: Bool
 
     var maximumNumberOfFavorites: Int
 
@@ -24,6 +25,7 @@ struct FavoritesPageContext: PageContext, AutoPageContextBuilder {
         self.userID = ID(user.id)
 
         self.userName = user.firstName
+        self.userNotificationsEnabled = user.settings.notifications.enabled
 
         self.maximumNumberOfFavorites = Favorite.maximumNumberOfFavoritesPerUser
 

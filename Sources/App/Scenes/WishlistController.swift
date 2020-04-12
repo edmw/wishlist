@@ -2,19 +2,17 @@ import Domain
 
 import Vapor
 
-// MARK: - Controller Parameters
-
-extension ControllerParameterKeys {
-    static let message = ControllerParameterKey<WishlistControllerParameterMValue>("m")
-}
+// MARK: Controller Parameters
 
 // messages to display
-enum WishlistControllerParameterMValue: String, ControllerParameterValue {
+extension ControllerParameterMessageValue {
+
     // Wish already reserved (this is possible because of a potential race condition)
-    case wishAlreadyReserved = "WAR"
+    static let wishAlreadyReserved = ControllerParameterMessageValue("WAR")
+
 }
 
-// MARK: - Controller
+// MARK: WishlistController
 
 /// Controller for displaying and handling a wishlist.
 final class WishlistController: AuthenticatableController,
@@ -131,7 +129,7 @@ final class WishlistController: AuthenticatableController,
                         )
                     )
                     .map { result in
-                        return self.success(for: result.list, on: request)
+                        self.success(for: result.list, on: request)
                     }
                     .catchFlatMap { error in
                         if let wishlistError = error as? WishlistActorError,
@@ -162,7 +160,7 @@ final class WishlistController: AuthenticatableController,
                 )
             )
             .map { result in
-                return self.success(for: result.list, on: request)
+                self.success(for: result.list, on: request)
             }
     }
 

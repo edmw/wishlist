@@ -56,8 +56,8 @@ extension DomainUserFavoritesActor {
                             .flatMap { _ in
                                 return try favoriteRepository
                                     .addFavorite(list, for: user)
-                                    .recordEvent("created for \(user)", using: recording)
                                     .logMessage(.createFavorite(for: user), using: logging)
+                                    .recordEvent(.createFavorite(for: user), using: recording)
                                     .map { _ in
                                         .init(user, list)
                                     }
@@ -75,6 +75,18 @@ extension LoggingMessageRoot {
     fileprivate static func createFavorite(for user: User) -> LoggingMessageRoot<Favorite> {
         return .init({ favorite in
             LoggingMessage(label: "Create Favorite", subject: favorite, loggables: [user])
+        })
+    }
+
+}
+
+// MARK: Recording
+
+extension RecordingEventRoot {
+
+    fileprivate static func createFavorite(for user: User) -> RecordingEventRoot<Favorite> {
+        return .init({ favorite in
+            RecordingEvent(.CREATEENTITY, subject: favorite, attributes: ["user": user])
         })
     }
 

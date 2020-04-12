@@ -2,6 +2,8 @@ import Domain
 
 import Vapor
 
+// MARK: ProfileController
+
 final class ProfileController: AuthenticatableController,
     RouteCollection
 {
@@ -49,7 +51,9 @@ final class ProfileController: AuthenticatableController,
         let userid = try requireAuthenticatedUserID(on: request)
 
         return try save(from: request, for: userid)
-            .caseSuccess { user in self.success(for: user, on: request) }
+            .caseSuccess { user in
+                self.success(for: user, on: request)
+            }
             .caseFailure { user, context in
                 try self.failure(for: user, with: context, on: request)
             }

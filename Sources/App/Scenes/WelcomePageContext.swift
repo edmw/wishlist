@@ -12,6 +12,7 @@ struct WelcomePageContext: PageContext, AutoPageContextBuilder {
 
     var userFullName: String
     var userFirstName: String
+    var userNotificationsEnabled: Bool
 
     var showLists: Bool
     var showFavorites: Bool
@@ -34,6 +35,7 @@ struct WelcomePageContext: PageContext, AutoPageContextBuilder {
 
         self.userFullName = user.fullName
         self.userFirstName = user.firstName
+        self.userNotificationsEnabled = user.settings.notifications.enabled
 
         self.showLists = true
         self.showFavorites = favorites != nil

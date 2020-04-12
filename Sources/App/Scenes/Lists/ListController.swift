@@ -2,6 +2,8 @@ import Domain
 
 import Vapor
 
+// MARK: ListController
+
 final class ListController: AuthenticatableController,
     ListParameterAcceptor,
     RouteCollection

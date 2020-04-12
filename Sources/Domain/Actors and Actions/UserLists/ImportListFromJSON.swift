@@ -152,8 +152,8 @@ extension DomainUserListsActor {
             .flatMap { user in
                 return try ImportListFromJSON(actor: self)
                     .execute(with: specification.json, for: user, in: boundaries)
-                    .recordEvent("imported for \(user)", using: self.recording)
                     .logMessage(.importList(for: user), using: self.logging)
+                    .recordEvent(.importList(for: user), using: self.recording)
                     .map { list in
                         .init(user, list)
                     }
@@ -194,6 +194,18 @@ extension LoggingMessageRoot {
     fileprivate static func importList(for user: User) -> LoggingMessageRoot<List> {
         return .init({ list in
             LoggingMessage(label: "Import List", subject: list, loggables: [user])
+        })
+    }
+
+}
+
+// MARK: Recording
+
+extension RecordingEventRoot {
+
+    fileprivate static func importList(for user: User) -> RecordingEventRoot<List> {
+        return .init({ list in
+            RecordingEvent(.IMPORTDATA, subject: list, attributes: ["user": user])
         })
     }
 

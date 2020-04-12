@@ -2,6 +2,18 @@ import Domain
 
 import Vapor
 
+// MARK: Controller Parameters
+
+// messages to display
+extension ControllerParameterMessageValue {
+
+    // Wish already reserved (this is possible because of a potential race condition)
+    static let userNotificationsDisabledForFavorites = ControllerParameterMessageValue("UND-F")
+
+}
+
+// MARK: FavoritesController
+
 final class FavoritesController: AuthenticatableController, SortingController, RouteCollection {
     typealias Sorting = ListsSorting
 

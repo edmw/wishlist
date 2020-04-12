@@ -123,7 +123,7 @@ struct MessageLogging {
 
 extension Dictionary where Key == String, Value == AnyEncodable {
 
-    subscript(any: Any) -> AnyEncodable? {
+    fileprivate subscript(any: Any) -> AnyEncodable? {
         get { return self[String(describing: type(of: any))] }
         set { self[String(describing: type(of: any))] = newValue }
     }

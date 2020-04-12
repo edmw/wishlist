@@ -24,6 +24,9 @@ struct VaporNotificationSendingProvider: NotificationSendingProvider {
     // func dispatchSendReservationDeleteNotification
     // -> implemented in file `Scenes/Reservations/ReservationDeleteNotification`
 
+    // func dispatchSendItemCreateNotification
+    // -> implemented in file `Scenes/Items/ItemCreateNotification`
+
     /// Sends a notification to the specified user using the specified communication channels.
     /// - Parameter notification: the notification to be sent
     /// - Parameter user: the recipient for the notification

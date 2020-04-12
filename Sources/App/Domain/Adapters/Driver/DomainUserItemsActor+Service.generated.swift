@@ -24,6 +24,7 @@ extension DomainUserItemsActor: ServiceType {
             listRepository: container.make(),
             userRepository: container.make(),
             reservationRepository: container.make(),
+            favoriteRepository: container.make(),
             logging: container.make(),
             recording: container.make()
         )

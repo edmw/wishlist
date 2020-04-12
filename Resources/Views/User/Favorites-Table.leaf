@@ -24,16 +24,19 @@
                 <div class="btn-group" role="group">
                 #if(features.notifyCreateItem.enabled) {
                 #if(favorite.notificationsEnabled) {
-                    #IButton("favorite-notify-disable", "bell-off", "/user/#(page.userID)/favorite/notifications#if(location){?p=#(location)}", "DELETE") {
+                    #ActionButton("favorite-notify-disable", "bell-off", "/user/#(page.userID)/favorite/notifications#if(location){?p=#(location)}", "DELETE") {
                         <input type="hidden" name="listID" value="#(favorite.list.id)">
+                    }
+                    #if(!page.userNotificationsEnabled) {
+                        #IconWarning("favorite-notify-warning")
                     }
                 } else {
-                    #IButton("favorite-notify-enable", "bell", "/user/#(page.userID)/favorite/notifications#if(location){?p=#(location)}", "POST") {
+                    #ActionButton("favorite-notify-enable", "bell", "/user/#(page.userID)/favorite/notifications#if(location){?p=#(location)}", "POST") {
                         <input type="hidden" name="listID" value="#(favorite.list.id)">
                     }
                 }
                 }
-                    #IButton("favorite-remove", "x-circle", "/user/#(page.userID)/favorites/delete?listid=#(favorite.list.id)#if(location){&p=#(location)}")
+                    #ActionButton("favorite-remove", "x-circle", "/user/#(page.userID)/favorites/delete?listid=#(favorite.list.id)#if(location){&p=#(location)}")
                 </div>
             </td>
         </tr>

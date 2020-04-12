@@ -69,11 +69,13 @@ extension CreateItem.Boundaries {
 
     public static func boundaries(
         worker: EventLoop,
-        imageStore imagestore: ImageStoreProvider
+        imageStore imagestore: ImageStoreProvider,
+        notificationSending notificationsending: NotificationSendingProvider
     ) -> Self {
         return Self(
             worker: worker,
-            imageStore: imagestore
+            imageStore: imagestore,
+            notificationSending: notificationsending
         )
     }
 
@@ -97,11 +99,13 @@ extension CreateOrUpdateItem.Boundaries {
 
     public static func boundaries(
         worker: EventLoop,
-        imageStore imagestore: ImageStoreProvider
+        imageStore imagestore: ImageStoreProvider,
+        notificationSending notificationsending: NotificationSendingProvider
     ) -> Self {
         return Self(
             worker: worker,
-            imageStore: imagestore
+            imageStore: imagestore,
+            notificationSending: notificationsending
         )
     }
 

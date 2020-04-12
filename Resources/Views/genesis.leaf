@@ -4,7 +4,7 @@
 <head>
     <title>#if(genesis-page-title) {#get(genesis-page-title)} else {Genesis}</title>
 
-    <link rel="stylesheet" media="all" href="/styles/bootstrap.css">
+    <link rel="stylesheet" media="all" href="/styles/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh">
     #if(genesis-fragment-head){#get(genesis-fragment-head)}
 </head>
 <body #if(genesis-body-id){id="#get(genesis-body-id)" } class="bg-light text-dark">
@@ -74,5 +74,6 @@ I::::::I:I**VFFI*NIFF*FVNVV:FNFFVIFFFFFVN*......*VFFNFF:::*:::::::::::::::::::::
         — Katsushika Hokusai
         }
     </footer>
+    <script type="text/javascript" src="/scripts/bootstrap.min.js"></script>
 </body>
 </html>

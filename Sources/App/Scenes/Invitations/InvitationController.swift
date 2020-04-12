@@ -2,6 +2,8 @@ import Domain
 
 import Vapor
 
+// MARK: InvitationController
+
 final class InvitationController: AuthenticatableController,
     InvitationParameterAcceptor,
     RouteCollection
@@ -56,7 +58,9 @@ final class InvitationController: AuthenticatableController,
         let userid = try requireAuthenticatedUserID(on: request)
 
         return try save(from: request, for: userid)
-            .caseSuccess { user in self.success(for: user, on: request) }
+            .caseSuccess { user in
+                self.success(for: user, on: request)
+            }
             .caseFailure { user, context in
                 try self.failure(for: user, with: context, on: request)
             }
@@ -113,7 +117,7 @@ final class InvitationController: AuthenticatableController,
                 )
             )
             .flatMap { result in
-                return self.success(for: result.user, on: request)
+                self.success(for: result.user, on: request)
             }
     }
 
@@ -125,16 +129,11 @@ final class InvitationController: AuthenticatableController,
         for user: UserRepresentation,
         on request: Request
     ) -> EventLoopFuture<Response> {
-        if let locator = request.query.getLocator(is: .local) {
-            return request.eventLoop.newSucceededFuture(
-                result: Controller.redirect(to: locator.locationString, on: request)
-            )
-        }
-        else {
-            return request.eventLoop.newSucceededFuture(
-                result: Controller.redirect(to: "/", on: request)
-            )
-        }
+        // to add real REST support, check the accept header for json and output a json response
+        let location = request.query.getLocator(is: .local)?.locationString ?? "/"
+        return request.eventLoop.newSucceededFuture(
+            result: Controller.redirect(to: location, on: request)
+        )
     }
 
     /// Returns a failure response on a CRUD request.

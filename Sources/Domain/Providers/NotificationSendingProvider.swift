@@ -5,6 +5,13 @@ import NIO
 
 public protocol NotificationSendingProvider {
 
+    /// Sends a notification asynchronously when an item was added to a list.
+    func dispatchSendItemCreateNotification(
+        for user: UserRepresentation,
+        on list: ListRepresentation,
+        using channels: Set<NotificationSendingChannel>
+    ) throws -> EventLoopFuture<Void>
+
     /// Sends a notification asynchronously when a reservation was added to an item.
     func dispatchSendReservationCreateNotification(
         for user: UserRepresentation,

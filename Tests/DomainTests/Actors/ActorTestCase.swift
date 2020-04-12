@@ -33,6 +33,7 @@ class ActorTestCase : XCTestCase {
         listRepository: listRepository,
         userRepository: userRepository,
         reservationRepository: reservationRepository,
+        favoriteRepository: favoriteRepository,
         logging: logging,
         recording: recording
     )

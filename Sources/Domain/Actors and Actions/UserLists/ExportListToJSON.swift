@@ -101,9 +101,11 @@ extension DomainUserListsActor {
                     .flatMap { list in
                         return try ExportListToJSON(actor: self)
                             .execute(with: list, for: user, in: boundaries)
-                            .recordEvent(for: list, "exported for \(user)", using: self.recording)
                             .logMessage(
                                 .exportList(list, user), for: { $0.0 }, using: self.logging
+                            )
+                            .recordEvent(
+                                .exportList(list, user), for: { $0.0 }, using: self.recording
                             )
                             .map { name, json in
                                 guard let json = json else {
@@ -127,6 +129,20 @@ extension LoggingMessageRoot {
     {
         return .init({ name in
             LoggingMessage(label: "Export List", subject: name, loggables: [list, user])
+        })
+    }
+
+}
+
+// MARK: Recording
+
+extension RecordingEventRoot {
+
+    fileprivate static func exportList(_ list: List, _ user: User)
+        -> RecordingEventRoot<FileName>
+    {
+        return .init({ name in
+            RecordingEvent(.EXPORTDATA, subject: name, attributes: ["list": list, "user": user])
         })
     }
 

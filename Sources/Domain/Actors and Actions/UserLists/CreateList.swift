@@ -102,9 +102,7 @@ extension DomainUserListsActor {
                 return try CreateList(actor: self)
                     .execute(for: user, createWith: specification.values, in: boundaries)
                     .logMessage(.createList(for: user), for: { $0.list }, using: self.logging)
-                    .recordEvent(
-                        for: { $0.list }, "created for \(user)", using: self.recording
-                    )
+                    .recordEvent(.createList(for: user), for: { $0.list }, using: self.recording)
                     .map { user, list in
                         .init(user, list)
                     }
@@ -129,6 +127,18 @@ extension LoggingMessageRoot {
     fileprivate static func createList(for user: User) -> LoggingMessageRoot<List> {
         return .init({ list in
             LoggingMessage(label: "Create List", subject: list, loggables: [user])
+        })
+    }
+
+}
+
+// MARK: Recording
+
+extension RecordingEventRoot {
+
+    fileprivate static func createList(for user: User) -> RecordingEventRoot<List> {
+        return .init({ list in
+            RecordingEvent(.CREATEENTITY, subject: list, attributes: ["user": user])
         })
     }
 

@@ -2,6 +2,8 @@ import Domain
 
 import Vapor
 
+// MARK: LegalNoticeController
+
 final class LegalNoticeController: AuthenticatableController, RouteCollection {
 
     let announcementsActor: AnnouncementsActor

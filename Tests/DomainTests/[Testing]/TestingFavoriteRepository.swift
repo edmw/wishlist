@@ -62,6 +62,10 @@ final class TestingFavoriteRepository: FavoriteRepository {
         return result
     }
 
+    func favoritesAndUser(for list: List) throws -> EventLoopFuture<[(Favorite, User)]> {
+        fatalError("Implementation missing!")
+    }
+
     func addFavorite(_ list: List, for user: User) throws -> EventLoopFuture<Favorite> {
         guard let listid = list.id else {
             throw EntityError<List>.requiredIDMissing

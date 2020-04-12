@@ -85,6 +85,20 @@ final class FluentFavoriteRepository: FavoriteRepository, FluentRepository {
         }
     }
 
+    func favoritesAndUser(for list: List) throws -> EventLoopFuture<[(Favorite, User)]> {
+        guard let listid = list.id else {
+            throw EntityError<List>.requiredIDMissing
+        }
+        return db.withConnection { connection in
+            return FluentFavorite.query(on: connection)
+                .join(\FluentUser.uuid, to: \FluentFavorite.userKey)
+                .filter(\FluentFavorite.listKey == listid.uuid)
+                .alsoDecode(FluentUser.self)
+                .all()
+                .mapToEntities()
+        }
+    }
+
     func addFavorite(_ list: List, for user: User) throws -> EventLoopFuture<Favorite> {
         guard let listid = list.id else {
             throw EntityError<List>.requiredIDMissing
@@ -145,6 +159,16 @@ extension EventLoopFuture where Expectation == [(FluentList, FluentFavorite)] {
     func mapToEntities() -> EventLoopFuture<[(Favorite, List)]> {
         return self.map { models in
             return models.map { model in (Favorite(from: model.1), List(from: model.0)) }
+        }
+    }
+
+}
+
+extension EventLoopFuture where Expectation == [(FluentFavorite, FluentUser)] {
+
+    func mapToEntities() -> EventLoopFuture<[(Favorite, User)]> {
+        return self.map { models in
+            return models.map { model in (Favorite(from: model.0), User(from: model.1)) }
         }
     }
 

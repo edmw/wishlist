@@ -10,6 +10,7 @@ public struct CreateOrUpdateItem: Action {
     public struct Boundaries: AutoActionBoundaries {
         public let worker: EventLoop
         public let imageStore: ImageStoreProvider
+        public let notificationSending: NotificationSendingProvider
     }
 
     // MARK: Specification
@@ -62,14 +63,21 @@ extension DomainUserItemsActor {
         if let itemid = specification.itemID {
             return try self.updateItem(
                 .specification(userBy: userid, listBy: listid, itemBy: itemid, from: itemvalues),
-                .boundaries(worker: boundaries.worker, imageStore: boundaries.imageStore)
+                .boundaries(
+                    worker: boundaries.worker,
+                    imageStore: boundaries.imageStore
+                )
             )
             .map { updateResult in .init(updateResult) }
         }
         else {
             return try self.createItem(
                 .specification(userBy: userid, listBy: listid, from: itemvalues),
-                .boundaries(worker: boundaries.worker, imageStore: boundaries.imageStore)
+                .boundaries(
+                    worker: boundaries.worker,
+                    imageStore: boundaries.imageStore,
+                    notificationSending: boundaries.notificationSending
+                )
             )
             .map { createResult in .init(createResult) }
         }

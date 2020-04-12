@@ -43,7 +43,8 @@ extension ItemController {
                         ),
                         .boundaries(
                             worker: request.eventLoop,
-                            imageStore: VaporImageStoreProvider(on: request)
+                            imageStore: VaporImageStoreProvider(on: request),
+                            notificationSending: VaporNotificationSendingProvider(on: request)
                         )
                     )
                     .map { result in

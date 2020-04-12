@@ -100,6 +100,7 @@ extension DomainWishlistActor {
         let itemRepository = self.itemRepository
         let logging = self.logging
         let recording = self.recording
+        let notificationSending = boundaries.notificationSending
         return authorizeOnWishlist(by: specification)
             .flatMap { authorization, identification in
                 let owner = authorization.owner
@@ -110,33 +111,20 @@ extension DomainWishlistActor {
                     .flatMap { item in
                         return try AddReservationToItem(actor: self)
                             .execute(for: item, on: list, for: identification)
-                            .logMessage(.addReservationToItem(for: identification), using: logging)
-                            .recordEvent("added for \(identification)", using: recording)
-                            .flatMap { reservation in
-                                return try boundaries.notificationSending
-                                    .notifyReservationCreate(for: owner, on: item, in: list)
-                                    .transform(to: reservation)
-                            }
+                            .logMessage(
+                                .addReservationToItem(for: identification), using: logging
+                            )
+                            .recordEvent(
+                                .addReservationToItem(for: identification), using: recording
+                            )
+                            .sendNotification(
+                                onCreateFor: owner, on: item, in: list, using: notificationSending
+                            )
                             .map { reservation in
                                 .init(reservation, item, list)
                             }
                     }
             }
-    }
-
-}
-
-extension NotificationSendingProvider {
-
-    fileprivate func notifyReservationCreate(for user: User, on item: Item, in list: List)
-        throws -> EventLoopFuture<Void>
-    {
-        return try self.dispatchSendReservationCreateNotification(
-            for: user.representation,
-            on: item.representation,
-            in: list.representation,
-            using: UserNotificationService.channels(for: user)
-        )
     }
 
 }
@@ -153,6 +141,24 @@ extension LoggingMessageRoot {
                 label: "Add Reservation to Item",
                 subject: reservation,
                 loggables: [identification]
+            )
+        })
+    }
+
+}
+
+// MARK: Recording
+
+extension RecordingEventRoot {
+
+    fileprivate static func addReservationToItem(for identification: Identification)
+        -> RecordingEventRoot<Reservation>
+    {
+        return .init({ reservation in
+            RecordingEvent(
+                .CREATEENTITY,
+                subject: reservation,
+                attributes: ["identification": identification]
             )
         })
     }

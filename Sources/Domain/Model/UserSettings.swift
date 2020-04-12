@@ -9,6 +9,10 @@ public struct UserSettings: Codable, Equatable, Hashable {
 
     public struct Notifications: Codable, Equatable, Hashable {
 
+        public var enabled: Bool {
+            emailEnabled || pushoverEnabled
+        }
+
         public var emailEnabled: Bool = false
 
         public var pushoverEnabled: Bool = false

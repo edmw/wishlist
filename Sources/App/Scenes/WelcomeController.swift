@@ -2,16 +2,18 @@ import Domain
 
 import Vapor
 
-// MARK: - Controller Parameters
+// MARK: Controller Parameters
 
 extension ControllerParameter {
+
     // display a welcome message on first login
     static func welcome() -> ControllerParameter {
         return ControllerParameter(key: "welcome", nil)
     }
+
 }
 
-// MARK: - Controller
+// MARK: - WelcomeController
 
 /// Controller for displaying the welcome page.
 final class WelcomeController: AuthenticatableController, RouteCollection {

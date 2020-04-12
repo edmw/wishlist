@@ -91,6 +91,7 @@ extension DomainWishlistActor {
         let reservationRepository = self.reservationRepository
         let logging = self.logging
         let recording = self.recording
+        let notificationSending = boundaries.notificationSending
         return authorizeOnWishlist(by: specification)
             .flatMap { authorization, identification in
                 let owner = authorization.owner
@@ -103,33 +104,20 @@ extension DomainWishlistActor {
                         let id = reservation.id
                         return try RemoveReservationFromItem(actor: self)
                             .execute(for: reservation, on: item, for: identification)
-                            .logMessage(.removeReservationFromItem(with: id), using: logging)
-                            .recordEvent("removed for \(identification)", using: recording)
-                            .flatMap { reservation in
-                                return try boundaries.notificationSending
-                                    .notifyReservationDelete(for: owner, on: item, in: list)
-                                    .transform(to: reservation)
-                            }
+                            .logMessage(
+                                .removeReservationFromItem(with: id), using: logging
+                            )
+                            .recordEvent(
+                                .removeReservationFromItem(with: id), using: recording
+                            )
+                            .sendNotification(
+                                onDeleteFor: owner, on: item, in: list, using: notificationSending
+                            )
                             .map { _ in
                                 return .init(item, list)
                             }
                     }
             }
-    }
-
-}
-
-extension NotificationSendingProvider {
-
-    fileprivate func notifyReservationDelete(for user: User, on item: Item, in list: List)
-        throws -> EventLoopFuture<Void>
-    {
-        return try self.dispatchSendReservationDeleteNotification(
-            for: user.representation,
-            on: item.representation,
-            in: list.representation,
-            using: UserNotificationService.channels(for: user)
-        )
     }
 
 }
@@ -147,6 +135,20 @@ extension LoggingMessageRoot {
                 subject: reservation,
                 loggables: [id]
             )
+        })
+    }
+
+}
+
+// MARK: Recording
+
+extension RecordingEventRoot {
+
+    fileprivate static func removeReservationFromItem(with id: ReservationID?)
+        -> RecordingEventRoot<Reservation>
+    {
+        return .init({ reservation in
+            RecordingEvent(.DELETEENTITY, subject: reservation, attributes: ["id": id as Any])
         })
     }
 

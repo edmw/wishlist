@@ -10,6 +10,7 @@ public struct CreateItem: Action {
     public struct Boundaries: AutoActionBoundaries {
         public let worker: EventLoop
         public let imageStore: ImageStoreProvider
+        public let notificationSending: NotificationSendingProvider
     }
 
     // MARK: Specification
@@ -35,6 +36,8 @@ public struct CreateItem: Action {
 
     // MARK: -
 
+    typealias ActorResult = (list: List, item: Item)
+
     internal let actor: () -> CreateItemActor & SetupItemActor
 
     internal init(actor: @escaping @autoclosure () -> CreateItemActor & SetupItemActor) {
@@ -48,7 +51,7 @@ public struct CreateItem: Action {
         createWith values: ItemValues,
         in boundaries: Boundaries
     ) throws
-        -> EventLoopFuture<(list: List, item: Item)>
+        -> EventLoopFuture<ActorResult>
     {
         let actor = self.actor()
         let itemRepository = actor.itemRepository
@@ -77,6 +80,7 @@ public struct CreateItem: Action {
 
 protocol CreateItemActor {
     var itemRepository: ItemRepository { get }
+    var favoriteService: FavoriteService { get }
     var logging: MessageLogging { get }
     var recording: EventRecording { get }
 }
@@ -100,24 +104,31 @@ extension DomainUserItemsActor {
         _ specification: CreateItem.Specification,
         _ boundaries: CreateItem.Boundaries
     ) throws -> EventLoopFuture<CreateItem.Result> {
-        return try self.listRepository
+        let logging = self.logging
+        let recording = self.recording
+        let favoriteService = self.favoriteService
+        let notificationSending = boundaries.notificationSending
+        return try listRepository
             .findAndUser(by: specification.listID, for: specification.userID)
             .unwrap(or: UserItemsActorError.invalidList)
             .flatMap { list, user in
                 return try CreateItem(actor: self)
                     .execute(in: list, createWith: specification.values, in: boundaries)
                     .logMessage(
-                        .createItem(for: user, and: list), for: { $0.1 }, using: self.logging
+                        .createItem(for: user, and: list), for: { $0.item }, using: logging
                     )
                     .recordEvent(
-                        for: { $0.item }, "created for \(user) in \(list)", using: self.recording
+                        .createItem(for: user, and: list), for: { $0.item }, using: recording
+                    )
+                    .sendNotifications(
+                        using: favoriteService, and: notificationSending
                     )
                     .map { list, item in
-                        .init(user, list, item)
+                        return .init(user, list, item)
                     }
                     .catchMap { error in
                         if let createError = error as? CreateItemValidationError {
-                            self.logging.debug("Item creation validation error: \(createError)")
+                            logging.debug("Item creation validation error: \(createError)")
                             let list = createError.list.representation
                             let error = createError.error
                             throw UserItemsActorError
@@ -145,10 +156,46 @@ extension SetupItem.Boundaries {
 
 extension LoggingMessageRoot {
 
-    fileprivate static func createItem(for user: User, and list: List) -> LoggingMessageRoot<Item> {
+    fileprivate static func createItem(for user: User, and list: List)
+        -> LoggingMessageRoot<Item>
+    {
         return .init({ item in
             LoggingMessage(label: "Create Item", subject: item, loggables: [user, list])
         })
+    }
+
+}
+
+// MARK: Recording
+
+extension RecordingEventRoot {
+
+    fileprivate static func createItem(for user: User, and list: List)
+        -> RecordingEventRoot<Item>
+    {
+        return .init({ item in
+            RecordingEvent(.CREATEENTITY, subject: item, attributes: ["user": user, "list": list])
+        })
+    }
+
+}
+
+// MARK: sendNotifications
+
+extension EventLoopFuture where Expectation == CreateItem.ActorResult {
+
+    func sendNotifications(
+        using favoriteService: FavoriteService,
+        and notificationSending: NotificationSendingProvider
+    ) -> EventLoopFuture<Expectation> {
+        return self.flatMap(to: Expectation.self) { result in
+            return try favoriteService.notifyUsers(
+                for: result.list,
+                using: notificationSending,
+                on: self.eventLoop
+            )
+            .transform(to: result)
+        }
     }
 
 }

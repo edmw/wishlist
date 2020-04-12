@@ -152,6 +152,8 @@
     "to-remove-favorite": "... daß du den Zettel <strong>%{value1}</strong> aus deinen Favoriten <span class='text-danger'>entfernen</span> möchtest?",
     "favorite-notify-enable": "Benachrichtigungen freigeben",
     "favorite-notify-disable": "Benachrichtigungen unterbinden",
+    "favorite-notify-warning": "Du musst eine Methode zur Benachrichtigung in deinen Einstellungen aktivieren.",
+    "favorite-message-und": "Benachrichtigungen über Änderungen an deinen favorisierten Wunschzettel können dir nur geschickt werden, wenn du in deinen Einstellungen eine oder mehrere Benachrichtigungsmethoden aktiviert hast. Gehe dazu in die <a href='%{value1}'>Einstellungen zu deinem Profil</a> und wähle die gewünschte Methode aus.",
 
     "//": "Item pages",
 
@@ -218,6 +220,9 @@
     "receive-item-description": "Wunsch als erhalten markieren",
     "to-receive-item": "... den Wunsch <strong>%{value1}</strong> von der Liste %{value2} als <strong>erhalten</strong> markieren?",
     "receive-item-warning": "<strong>Bitte beachten:</strong> Der Nutzer, der diesen Wunsch reserviert hat, wird seine Reservierung <strong>nicht</strong> nicht mehr zurücknehmen können!",
+
+    "items-notifications-create-title": "🎁 Wunsch hinzugefügt",
+    "items-notifications-create-message": "Auf der Liste <b>%{value1}</b> wurde ein neuer Wunsch hinzugefügt.",
 
     "//": "Reservation pages",
 

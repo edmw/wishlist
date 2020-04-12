@@ -2,6 +2,8 @@ import Domain
 
 import Vapor
 
+// MARK: NotificationsController
+
 final class NotificationsController: AuthenticatableController, RouteCollection {
 
     let userNotificationsActor: UserNotificationsActor

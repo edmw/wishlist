@@ -2,6 +2,8 @@ import Domain
 
 import Vapor
 
+// MARK: LogoutController
+
 final class LogoutController: Controller, RouteCollection {
 
     // MARK: - Routing

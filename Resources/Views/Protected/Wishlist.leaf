@@ -10,15 +10,13 @@
 </div>
 } else {
 #if(page.userID == nil && page.identification != nil) {
-<div class="alert alert-primary" role="alert">
-#L10N("wishlist-welcome-stranger","#(page.ownerName)","#(page.listTitle)","/signin?p=/list/#(page.listID)","/list/#(page.listID)?id=#(page.identification)")
-</div>
+    #AlertInfo(){
+        #L10N("wishlist-welcome-stranger","#(page.ownerName)","#(page.listTitle)","/signin?p=/list/#(page.listID)","/list/#(page.listID)?id=#(page.identification)")
+    }
 }}
 <div class="h2"><h2><span class="title">#(page.listTitle)</span>#if(page.userID && page.userID == page.ownerID){<a class="btn btn-link d-flex float-right" href="/user/#(page.userID)/list/#(page.listID)/items" title="#L10N("edit-list")"><span class="btn-label">#L10N("edit")</span><svg class="feather"><use xlink:href="/icons/feather.svg#edit-2"/></svg></a>}</h2>#if(page.userID != nil) {#if(page.userFavorsList){★}else{<a class="btn-xlg btn-link nav-link" href="/user/#(page.userID)/favorites/create?listid=#(page.listID)#if(location){&p=#(location)}" title="#L10N("favorite-add")">☆</a>}}</div>
 #if(request.parameter.m == "WAR") {
-<div class="alert alert-danger" role="alert">
-    #L10N("wishlist-message-war")
-</div>
+    #AlertDismissibleFailure("wishlist-message-war")
 }
 <div class="wl-items">
     #for(item in page.items) {

@@ -2,6 +2,8 @@ import Domain
 
 import Vapor
 
+// MARK: InvitationsController
+
 final class InvitationsController: AuthenticatableController,
     RouteCollection
 {

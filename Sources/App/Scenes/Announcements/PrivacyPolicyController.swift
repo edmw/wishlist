@@ -2,6 +2,8 @@ import Domain
 
 import Vapor
 
+// MARK: PrivacyPolicyController
+
 final class PrivacyPolicyController: AuthenticatableController, RouteCollection {
 
     let announcementsActor: AnnouncementsActor

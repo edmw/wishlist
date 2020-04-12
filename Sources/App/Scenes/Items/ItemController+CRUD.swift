@@ -172,7 +172,9 @@ extension ItemController {
                     imageStore: VaporImageStoreProvider(on: request)
                 )
             )
-            .flatMap { result in self.success(for: result.user, and: result.list, on: request) }
+            .flatMap { result in
+                self.success(for: result.user, and: result.list, on: request)
+            }
             .transformError(
                 when: UserItemsActorError.itemNotDeletable,
                 then: Abort(.conflict)

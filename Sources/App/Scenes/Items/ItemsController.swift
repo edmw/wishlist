@@ -2,6 +2,8 @@ import Domain
 
 import Vapor
 
+// MARK: ItemsController
+
 final class ItemsController: AuthenticatableController,
     ListParameterAcceptor,
     SortingController,

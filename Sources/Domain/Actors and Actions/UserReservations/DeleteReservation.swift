@@ -65,7 +65,7 @@ extension DomainUserReservationsActor {
                             .delete(reservation: reservation, for: item)
                             .unwrap(or: UserReservationsActorError.invalidReservation)
                             .logMessage(.deleteReservation(with: id), using: logging)
-                            .recordEvent("deleted by \(user)", using: recording)
+                            .recordEvent(.deleteReservation(with: id), using: recording)
                             .map { _ in
                                 .init(user, item, list)
                             }
@@ -84,6 +84,20 @@ extension LoggingMessageRoot {
     {
         return .init({ reservation in
             LoggingMessage(label: "Delete Reservation", subject: reservation, loggables: [id])
+        })
+    }
+
+}
+
+// MARK: Recording
+
+extension RecordingEventRoot {
+
+    fileprivate static func deleteReservation(with id: ReservationID?)
+        -> RecordingEventRoot<Reservation>
+    {
+        return .init({ reservation in
+            RecordingEvent(.DELETEENTITY, subject: reservation, attributes: ["id": id as Any])
         })
     }
 

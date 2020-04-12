@@ -9,6 +9,15 @@ struct TestingNotificationSendingProvider: NotificationSendingProvider {
         self.worker = worker
     }
 
+    func dispatchSendItemCreateNotification(
+        for user: UserRepresentation,
+        on list: ListRepresentation,
+        using channels: Set<NotificationSendingChannel>
+    ) throws -> EventLoopFuture<Void> {
+        return worker.newSucceededFuture(result: ())
+    }
+
+
     func dispatchSendReservationCreateNotification(
         for user: UserRepresentation,
         on item: ItemRepresentation,

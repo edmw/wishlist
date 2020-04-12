@@ -11,7 +11,9 @@ extension ListController {
         let userid = try requireAuthenticatedUserID(on: request)
 
         return try save(from: request, for: userid)
-            .caseSuccess { result in self.success(for: result.user, on: request) }
+            .caseSuccess { result in
+                self.success(for: result.user, on: request)
+            }
             .caseFailure { result, context in
                 try self.failure(for: result.user, and: result.list, with: context, on: request)
             }
@@ -22,7 +24,9 @@ extension ListController {
         let listid = try requireListID(on: request)
 
         return try save(from: request, for: userid, this: listid)
-            .caseSuccess { result in self.success(for: result.user, on: request) }
+            .caseSuccess { result in
+                self.success(for: result.user, on: request)
+            }
             .caseFailure { result, context in
                 try self.failure(for: result.user, and: result.list, with: context, on: request)
             }
@@ -40,7 +44,9 @@ extension ListController {
                     imageStore: VaporImageStoreProvider(on: request)
                 )
             )
-            .flatMap { result in self.success(for: result.user, on: request) }
+            .flatMap { result in
+                self.success(for: result.user, on: request)
+            }
             .transformError(
                 when: UserListsActorError.listHasReservedItems,
                 then: Abort(.conflict)

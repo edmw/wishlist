@@ -151,6 +151,8 @@
     "to-remove-favorite": "... you want to <span class='text-danger'>remove</span> the wish list named <strong>%{value1}</strong> from your favorite wish lists?",
     "favorite-notify-enable": "Enable notifications",
     "favorite-notify-disable": "Disable notifications",
+    "favorite-notify-warning": "You need to activate a notification method in your settings.",
+    "favorite-message-und": "Notifications about changes to your favoured wish lists can only be sent if you have activated at least one notification method in your settings. Go to the <a href='%{value1}'>settings in your profile</a> and select a desired method.",
 
     "//": "Item pages",
 
@@ -217,6 +219,9 @@
     "receive-item-description": "Mark item as received",
     "to-receive-item": "... to mark the item named <strong>%{value1}</strong> from list %{value2} as <strong>received</strong>?",
     "receive-item-warning": "<strong>Please note:</strong> The user who reserved this item will <strong>not</strong> be able to delete the reservation anymore!",
+
+    "items-notifications-create-title": "🎁 Wish added",
+    "items-notifications-create-message": "A new wish has been added to the list <b>%{value1}</b>.",
 
     "//": "Reservation pages",
 

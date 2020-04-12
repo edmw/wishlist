@@ -3,6 +3,8 @@ import Domain
 import Vapor
 import Imperial
 
+// MARK: NetIDAuthenticatorController
+
 final class NetIDAuthenticatorController: AuthenticationController, RouteCollection {
 
     let successPath: String

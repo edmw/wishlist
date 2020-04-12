@@ -3,13 +3,13 @@ import Domain
 import Vapor
 import Random
 
-// MARK: - Controller Parameters
+// MARK: Controller Parameters
 
 extension ControllerParameterKeys {
     static let invitationCode = ControllerParameterKey<InvitationCode>("invitation")
 }
 
-// MARK: - Controller
+// MARK: - LoginController
 
 final class LoginController: Controller, RouteCollection {
 

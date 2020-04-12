@@ -1,7 +1,9 @@
 #set("title") {#L10N("favorites")}
 #//
+#set("location"){/user/#(page.userID)/favorites}
 #set("content") {
 <h2>#(page.userName)</h2>
+#embed("User/Messages")
 #embed("User/Favorites-Section")
 }
 #//

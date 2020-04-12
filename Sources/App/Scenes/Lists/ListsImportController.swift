@@ -6,6 +6,8 @@ struct ListFileUpload: Content {
     var file: Data
 }
 
+// MARK: ListsImportController
+
 final class ListsImportController: AuthenticatableController, RouteCollection {
 
     let userListsActor: UserListsActor
@@ -47,7 +49,9 @@ final class ListsImportController: AuthenticatableController, RouteCollection {
                             imageStore: VaporImageStoreProvider(on: request)
                         )
                     )
-                    .flatMap { result in self.success(for: result.user, on: request) }
+                    .flatMap { result in
+                        self.success(for: result.user, on: request)
+                    }
             }
             .catchFlatMap { error in
                 if case let UserListsActorError.importErrorForUser(user) = error {

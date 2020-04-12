@@ -21,18 +21,18 @@
         <tr>
             <td class="wl-code wl-actions wl-actions-left" data-label="#L10N("invitation-code")">
                 #if(invitation.status != "accepted" && invitation.status != "revoked") {
-                    #IButton("invitation-link", "share", "/signin/?invitation=#(invitation.code)")#(invitation.code)
+                    #ActionButton("invitation-link", "share", "/signin/?invitation=#(invitation.code)")#(invitation.code)
                 }
             </td>
             <td class="wl-email" data-label="#L10N("invitation-email")">#(invitation.email)</a></td>
             <td class="wl-sent-at wl-actions wl-actions-left" data-label="#L10N("invitation-sent-at")">
-                #if(invitation.status == "open") {#IButton("invitation-resend", "rotate-ccw", "/user/#(page.userID)/invitation/#(invitation.id)/send#if(location){?p=#(location)}", "POST")}#if(invitation.sentAt == nil) {#L10N("never")}else{#L10NDate(invitation.sentAt)}
+                #if(invitation.status == "open") {#ActionButton("invitation-resend", "rotate-ccw", "/user/#(page.userID)/invitation/#(invitation.id)/send#if(location){?p=#(location)}", "POST")}#if(invitation.sentAt == nil) {#L10N("never")}else{#L10NDate(invitation.sentAt)}
             </td>
             <td class="wl-status" data-label="#L10N("status")">#L10N("invitation-status-#(invitation.status)")</td>
             <td class="wl-actions wl-actions-right">
                 <div class="btn-group" role="group">
                     #if(invitation.status == "open") {
-                        #IButton("invitation-revoke", "slash", "/user/#(page.userID)/invitation/#(invitation.id)/revoke#if(location){?p=#(location)}")
+                        #ActionButton("invitation-revoke", "slash", "/user/#(page.userID)/invitation/#(invitation.id)/revoke#if(location){?p=#(location)}")
                     }
                 </div>
             </td>

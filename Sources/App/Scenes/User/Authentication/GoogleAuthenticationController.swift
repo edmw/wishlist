@@ -3,6 +3,8 @@ import Domain
 import Vapor
 import Imperial
 
+// MARK: GoogleAuthenticatorController
+
 final class GoogleAuthenticatorController: AuthenticationController, RouteCollection {
 
     var google: Imperial.Google?

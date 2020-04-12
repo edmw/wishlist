@@ -32,7 +32,12 @@ final class FavoriteNotificationController: AuthenticatableController,
                         .boundaries(worker: request.eventLoop)
                     )
                     .flatMap { result in
-                        return self.success(for: result.user, on: request)
+                        let user = result.user
+                        return self.success(
+                            for: user,
+                            userNotificationsDisabled: user.settings.notifications.enabled == false,
+                            on: request
+                        )
                     }
                     .handleAuthorizationError(on: request)
             }
@@ -51,7 +56,7 @@ final class FavoriteNotificationController: AuthenticatableController,
                         .boundaries(worker: request.eventLoop)
                     )
                     .flatMap { result in
-                        return self.success(for: result.user, on: request)
+                        self.success(for: result.user, on: request)
                     }
                     .handleAuthorizationError(on: request)
             }
@@ -61,20 +66,20 @@ final class FavoriteNotificationController: AuthenticatableController,
 
     /// Returns a success response on a CRUD request.
     /// Not implemented yet: REST response
-    private func success(for user: UserRepresentation, on request: Request)
-        -> EventLoopFuture<Response>
-    {
+    private func success(
+        for user: UserRepresentation,
+        userNotificationsDisabled: Bool = false,
+        on request: Request
+    ) -> EventLoopFuture<Response> {
         // to add real REST support, check the accept header for json and output a json response
-        if let locator = request.query.getLocator(is: .local) {
-            return request.eventLoop.newSucceededFuture(
-                result: Controller.redirect(to: locator.locationString, on: request)
-            )
+        let location = request.query.getLocator(is: .local)?.locationString ?? "/"
+        var parameters = [ControllerParameter]()
+        if userNotificationsDisabled {
+            parameters.append(.value(.userNotificationsDisabledForFavorites, for: .message))
         }
-        else {
-            return request.eventLoop.newSucceededFuture(
-                result: Controller.redirect(to: "/", on: request)
-            )
-        }
+        return request.eventLoop.newSucceededFuture(
+            result: Controller.redirect(to: location, parameters: parameters, on: request)
+        )
     }
 
     // MARK: - Routing

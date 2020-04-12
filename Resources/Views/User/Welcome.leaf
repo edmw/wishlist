@@ -4,6 +4,7 @@
 #set("content") {
 <h2>#(page.userFirstName)</h2>
 #embed("User/Welcome-Message")
+#embed("User/Messages")
 #if(page.showLists) {
 #embed("User/Lists-Section")
 }

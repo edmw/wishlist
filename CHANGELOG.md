@@ -4,6 +4,13 @@
 - 🛠️ flags a technical feature
 - ☘ flags a fix
 
+## [1.7.0]
+- 🖌 Add functionality to get notifications for new items on favoured wish lists
+- 🛠️ Add template tags to render alert boxes, action buttons, icons
+- 🛠️ Refactor event recording
+- 🛠️ Add bootstrap javascript
+- 🛠️ Update bootstrap stylesheet to 4.4.1
+
 ## [1.6.0]
 - 🖌 Add functionality to put items into archive
 - 🖌 Add functionality to get items from archive

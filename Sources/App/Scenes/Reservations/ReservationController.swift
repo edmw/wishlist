@@ -2,6 +2,8 @@ import Domain
 
 import Vapor
 
+// MARK: ReservationController
+
 final class ReservationController: AuthenticatableController,
     ReservationParameterAcceptor,
     ListParameterAcceptor,
@@ -58,8 +60,8 @@ final class ReservationController: AuthenticatableController,
                 ),
                 .boundaries(worker: request.eventLoop)
             )
-            .map { result in
-                return self.success(for: result.user, and: result.list, on: request)
+            .flatMap { result in
+                self.success(for: result.user, and: result.list, on: request)
             }
     }
 
@@ -71,13 +73,17 @@ final class ReservationController: AuthenticatableController,
         for user: UserRepresentation,
         and list: ListRepresentation,
         on request: Request
-    ) -> Response {
+    ) -> EventLoopFuture<Response> {
         // to add real REST support, check the accept header for json and output a json response
         if let locator = request.query.getLocator(is: .local) {
-            return Controller.redirect(to: locator.locationString, on: request)
+            return request.eventLoop.newSucceededFuture(
+                result: Controller.redirect(to: locator.locationString, on: request)
+            )
         }
         else {
-            return Controller.redirect(for: user.id, and: list.id, to: "items", on: request)
+            return request.eventLoop.newSucceededFuture(
+                result: Controller.redirect(for: user.id, and: list.id, to: "items", on: request)
+            )
         }
     }
 

@@ -198,8 +198,8 @@ extension DomainEnrollmentActor {
 
                 return self.userRepository
                     .save(user: user)
-                    .recordEvent("materialised", using: self.recording)
                     .logMessage(.materialiseUser, using: self.logging)
+                    .recordEvent(.materialiseUser, using: self.recording)
                     .map { user in .init(user) }
             }
     }
@@ -242,6 +242,18 @@ extension LoggingMessageRoot {
     fileprivate static var materialiseUser: LoggingMessageRoot<User> {
         return .init({ user in
             LoggingMessage(label: "Materialise User", subject: user)
+        })
+    }
+
+}
+
+// MARK: Recording
+
+extension RecordingEventRoot {
+
+    fileprivate static var materialiseUser: RecordingEventRoot<User> {
+        return .init({ user in
+            RecordingEvent(.LOGINUSER, subject: user)
         })
     }
 
