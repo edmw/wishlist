@@ -39,6 +39,8 @@ public func configure(
 
     // MARK: Server configuration
     var serverConfig = NIOServerConfig.default()
+    serverConfig.hostname = Environment.get(.serverHost) ?? "localhost"
+    serverConfig.port = Environment.get(.serverPort) ?? 8_080
     serverConfig.maxBodySize = 1_000_000
     serverConfig.supportCompression = false
     services.register(serverConfig)
@@ -271,8 +273,13 @@ func makeSessionsConfig(_ container: Container) -> SessionsConfig {
 // MARK: Environment
 
 extension EnvironmentKeys {
+
     static let developmentLogLevel = EnvironmentKey<LogLevel>("DEVELOPMENT_LOG_LEVEL")
     static let releaseLogLevel = EnvironmentKey<LogLevel>("RELEASE_LOG_LEVEL")
+
+    static let serverHost = EnvironmentKey<String>("HOST")
+    static let serverPort = EnvironmentKey<Int>("PORT")
+
 }
 
 extension Environment {
