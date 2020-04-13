@@ -44,7 +44,7 @@
             </td>
             <td class="wl-actions wl-actions-left" data-label="">
                 <div class="btn-group" role="group">
-                    #if(features.receiveItem.enabled && item.receivable == true) {
+                    #if(item.receivable == true) {
                         #ActionButton("receive-item-description", "gift", "/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/receive")
                     }
                 </div>

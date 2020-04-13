@@ -22,20 +22,18 @@
             <td class="wl-owner" data-label="#L10N("list-owner")">#(favorite.list.ownerName)</td>
             <td class="wl-actions wl-actions-right" data-label="">
                 <div class="btn-group" role="group">
-                #if(features.notifyCreateItem.enabled) {
-                #if(favorite.notificationsEnabled) {
-                    #ActionButton("favorite-notify-disable", "bell-off", "/user/#(page.userID)/favorite/notifications#if(location){?p=#(location)}", "DELETE") {
-                        <input type="hidden" name="listID" value="#(favorite.list.id)">
+                    #if(favorite.notificationsEnabled) {
+                        #ActionButton("favorite-notify-disable", "bell-off", "/user/#(page.userID)/favorite/notifications#if(location){?p=#(location)}", "DELETE") {
+                            <input type="hidden" name="listID" value="#(favorite.list.id)">
+                        }
+                        #if(!page.userNotificationsEnabled) {
+                            #IconWarning("favorite-notify-warning")
+                        }
+                    } else {
+                        #ActionButton("favorite-notify-enable", "bell", "/user/#(page.userID)/favorite/notifications#if(location){?p=#(location)}", "POST") {
+                            <input type="hidden" name="listID" value="#(favorite.list.id)">
+                        }
                     }
-                    #if(!page.userNotificationsEnabled) {
-                        #IconWarning("favorite-notify-warning")
-                    }
-                } else {
-                    #ActionButton("favorite-notify-enable", "bell", "/user/#(page.userID)/favorite/notifications#if(location){?p=#(location)}", "POST") {
-                        <input type="hidden" name="listID" value="#(favorite.list.id)">
-                    }
-                }
-                }
                     #ActionButton("favorite-remove", "x-circle", "/user/#(page.userID)/favorites/delete?listid=#(favorite.list.id)#if(location){&p=#(location)}")
                 </div>
             </td>

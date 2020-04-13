@@ -4,9 +4,7 @@
 #set("content") {
 <h2>#(page.userFirstName)</h2>
 #embed("User/Profile-Section")
-#if(features.userSettings.enabled) {
 #embed("User/Settings-Section")
-}
 #if(page.showInvitations) {
 #embed("User/Invitations-Section")
 }

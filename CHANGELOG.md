@@ -10,10 +10,12 @@
 - 🛠️ Refactor event recording
 - 🛠️ Add bootstrap javascript
 - 🛠️ Update bootstrap stylesheet to 4.4.1
+- 🛠️ Add configuration for server host and port
 - 🛠️ Improve logging
 - ☘ Fix functionality to release items for owners
 - ☘ Fix access control to favorite notifications
 - ☘ Fix propagated messaging errors for background notifications
+- ☘ Fix bootstrap btn
 
 ## [1.6.0]
 - 🖌 Add functionality to put items into archive

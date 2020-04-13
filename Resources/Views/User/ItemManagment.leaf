@@ -7,7 +7,7 @@
 </div>
 }
 <h3>#L10N("move-item")</h3>
-#if(features.moveItem.enabled && page.item.movable == true) {
+#if(page.item.movable == true) {
 <form method="POST" action="#(page.actions.move.reference)#if(request.parameter.p){?p=#(request.parameter.p)}" class="wl-form" accept-charset="UTF-8">
 #if(page.actions.form.method != "POST") {<input type="hidden" name="__method" value="#(page.actions.move.method)">}
     <input name="key" type="hidden" value="listID">
