@@ -29,8 +29,7 @@
 <small id="descriptionPushoverKey" class="form-text text-muted">#if(page.form.missingPushoverKey){<span class="text-danger">#L10N("settings-field-pushoverkey-missing") </span>}#if(page.form.invalidPushoverKey){<span class="text-danger">#L10N("settings-field-pushoverkey-invalid") </span>}#L10N("settings-field-pushover-hint")</small>
 </div>
 <div class="form-group form-row mt-4">
-<button type="submit" class="btn btn-primary">#L10N("save")</button>
-<a class="nav-link btn btn-link ml-3" href="#if(request.parameter.p){#(request.parameter.p)}else{/user/#(page.userID)}">#L10N("cancel")</a>
+    #ActionConfirm("save") #ActionCancel("/user/#(page.userID)/")
 </div>
 </form>
 }

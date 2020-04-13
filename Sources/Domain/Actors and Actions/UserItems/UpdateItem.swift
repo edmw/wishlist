@@ -110,7 +110,9 @@ extension DomainUserItemsActor {
         _ specification: UpdateItem.Specification,
         _ boundaries: UpdateItem.Boundaries
     ) throws -> EventLoopFuture<UpdateItem.Result> {
-        return try self.itemRepository
+        let itemRepository = self.itemRepository
+        let logging = self.logging
+        return try itemRepository
             .findAndListAndUser(
                 by: specification.itemID,
                 in: specification.listID,
@@ -122,16 +124,14 @@ extension DomainUserItemsActor {
                 return try UpdateItem(actor: self)
                     .execute(on: item, in: list, updateWith: itemvalues, in: boundaries)
                     .logMessage(
-                        .updateItem(for: user, and: list), for: { $0.1 }, using: self.logging
+                        .updateItem(for: user, and: list), for: { $0.1 }, using: logging
                     )
                     .map { list, item in
                         .init(user, list, item)
                     }
                     .catchMap { error in
                         if let updateError = error as? UpdateItemValidationError {
-                            self.logging.debug(
-                                "Item updating validation error: \(updateError)"
-                            )
+                            logging.debug("Item updating validation error: \(updateError)")
                             throw UserItemsActorError.validationError(
                                 user.representation,
                                 updateError.list.representation,

@@ -53,9 +53,41 @@ extension Page {
             .forUser(user)
             .forList(list)
             .withItem(item)
-            .setAction("move", .patch("user", user.id, "list", list.id, "item", item.id))
-            .setAction("archive", .patch("user", user.id, "list", list.id, "item", item.id))
-            .setAction("delete", .get("user", user.id, "list", list.id, "item", item.id, "delete"))
+            .setAction(
+                "move",
+                .patch(
+                    "user", user.id,
+                    "list", list.id,
+                    "item", item.id
+                )
+            )
+            .setAction(
+                "archive",
+                .patch(
+                    "user", user.id,
+                    "list", list.id,
+                    "item", item.id
+                )
+            )
+            .setAction(
+                "release",
+                .get(
+                    "user", user.id,
+                    "list", list.id,
+                    "item", item.id,
+                    "reservation", item.reservationID,
+                    "delete"
+                )
+            )
+            .setAction(
+                "delete",
+                .get(
+                    "user", user.id,
+                    "list", list.id,
+                    "item", item.id,
+                    "delete"
+                )
+            )
             .build()
         pageContext.userLists = result.lists.map { ListContext($0) }
         return .init(

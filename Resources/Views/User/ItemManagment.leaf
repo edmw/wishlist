@@ -22,11 +22,18 @@
       </select>
     </div>
     <div class="form-group form-row justify-content-center justify-content-md-start">
-        <button type="submit" class="btn btn-primary"#if(count(page.userLists) < 2){ disabled}>#L10N("move-item-confirm")</button>
+        #if(count(page.userLists) < 2) {
+            #ActionConfirmDisabled("move-item-confirm")
+        } else {
+            #ActionConfirm("move-item-confirm")
+        } #ActionCancel("/user/#(page.userID)/list/#(page.listID)/items")
     </div>
 </form>
 } else {
 <p class="text-muted">#L10N("wish-already-reserved") #L10N("move-item-reserved")</p>
+<div class="form-group form-row justify-content-center justify-content-md-start">
+    #ActionConfirmDisabled("move-item-confirm") #ActionCancel("/user/#(page.userID)/list/#(page.listID)/items")
+</div>
 }
 #if(page.item.archival == false) {
 <h3 class="mt-5">#L10N("archive-item")</h3>
@@ -37,11 +44,14 @@
     <input name="key" type="hidden" value="archived">
     <input name="value" type="hidden" value="true">
     <div class="form-group form-row justify-content-center justify-content-md-start">
-        <button type="submit" class="btn btn-primary">#L10N("archive-item-confirm")</button>
+        #ActionConfirm("archive-item-confirm") #ActionCancel("/user/#(page.userID)/list/#(page.listID)/items")
     </div>
 </form>
 } else {
 <p class="text-muted">#L10N("wish-already-reserved") #L10N("archive-item-reserved")</p>
+<div class="form-group form-row justify-content-center justify-content-md-start">
+    #ActionConfirmDisabled("archive-item-confirm") #ActionCancel("/user/#(page.userID)/list/#(page.listID)/items")
+</div>
 }
 } else {
 <h3 class="mt-5">#L10N("unarchive-item")</h3>
@@ -51,24 +61,35 @@
     <input name="key" type="hidden" value="archived">
     <input name="value" type="hidden" value="false">
     <div class="form-group form-row justify-content-center justify-content-md-start">
-        <button type="submit" class="btn btn-primary">#L10N("unarchive-item-confirm")</button>
+        #ActionConfirm("unarchive-item-confirm") #ActionCancel("/user/#(page.userID)/list/#(page.listID)/items")
     </div>
 </form>
 }
+<h3 class="mt-5">#L10N("release-item")</h3>
+<p>#L10N("release-item-hint")</p>
+<form method="GET" action="#(page.actions.release.reference)#if(request.parameter.p){?p=#(request.parameter.p)}" class="wl-form" accept-charset="UTF-8">
+    <div class="form-group form-row justify-content-center justify-content-md-start">
+        #if(page.item.isReserved == true) {
+            #ActionConfirm("release-item-confirm")
+        } else {
+            #ActionConfirmDisabled("release-item-confirm")
+        } #ActionCancel("/user/#(page.userID)/list/#(page.listID)/items")
+    </div>
+</form>
 <h3 class="mt-5">#L10N("delete-item")</h3>
 #if(page.item.deletable == true) {
 <p>#L10N("delete-item-hint")</p>
 <form method="GET" action="#(page.actions.delete.reference)#if(request.parameter.p){?p=#(request.parameter.p)}" class="wl-form" accept-charset="UTF-8">
     <div class="form-group form-row justify-content-center justify-content-md-start">
-        <button type="submit" class="btn btn-danger">#L10N("delete-item-confirm")</button>
+        #ActionConfirmDanger("delete-item-confirm") #ActionCancel("/user/#(page.userID)/list/#(page.listID)/items")
     </div>
 </form>
 } else {
 <p class="text-muted">#L10N("wish-already-reserved") #L10N("delete-item-reserved")</p>
+<div class="form-group form-row justify-content-center justify-content-md-start">
+    #ActionConfirmDisabled("delete-item-confirm") #ActionCancel("/user/#(page.userID)/list/#(page.listID)/items")
+</div>
 }
-<nav class="nav justify-content-center justify-content-md-start">
-    <a class="nav-link btn btn-link mt-5" href="#if(request.parameter.p){#(request.parameter.p)}else{/user/#(page.userID)/list/#(page.listID)/items}">#L10N("cancel")</a>
-</nav>
 }
 #//
 #embed("Wishlist")

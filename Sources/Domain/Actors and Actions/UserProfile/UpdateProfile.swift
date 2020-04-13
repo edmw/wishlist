@@ -81,6 +81,7 @@ extension DomainUserProfileActor {
         _ specification: UpdateProfile.Specification,
         _ boundaries: UpdateProfile.Boundaries
     ) throws -> EventLoopFuture<UpdateProfile.Result> {
+        let userRepository = self.userRepository
         let logging = self.logging
         return userRepository.find(id: specification.userID)
             .unwrap(or: UserListsActorError.invalidUser)

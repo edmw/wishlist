@@ -47,9 +47,10 @@ final class ListController: AuthenticatableController,
                 try Controller.render(page: .listDeletion(with: result), on: request)
                     .encode(for: request)
             }
-            .catchMap(UserListsActorError.self) { _ in
-                // Tries to redirect back to the lists page.
-                Controller.redirect(for: userid, to: "lists", on: request)
+            .catchMap(UserListsActorError.self) { error in
+                request.logger?.technical.warning(String(describing: error))
+                // redirect on error to handle the browsers back button
+                return Controller.redirect(for: userid, to: "lists", on: request)
             }
     }
 

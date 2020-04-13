@@ -146,26 +146,29 @@ extension DomainUserListsActor {
         _ specification: ImportListFromJSON.Specification,
         _ boundaries: ImportListFromJSON.Boundaries
     ) throws -> EventLoopFuture<ImportListFromJSON.Result> {
-        return self.userRepository
+        let userRepository = self.userRepository
+        let logging = self.logging
+        let recording = self.recording
+        return userRepository
             .find(id: specification.userID)
             .unwrap(or: UserListsActorError.invalidUser)
             .flatMap { user in
                 return try ImportListFromJSON(actor: self)
                     .execute(with: specification.json, for: user, in: boundaries)
-                    .logMessage(.importList(for: user), using: self.logging)
-                    .recordEvent(.importList(for: user), using: self.recording)
+                    .logMessage(.importList(for: user), using: logging)
+                    .recordEvent(.importList(for: user), using: recording)
                     .map { list in
                         .init(user, list)
                     }
                     .catchMap { error in
                         if let importError = error as? ImportListFromJSONError {
-                            self.logging.debug("Import error: \(importError)")
+                            logging.debug("Import error: \(importError)")
                             throw UserListsActorError.importErrorForUser(user.representation)
                         }
                         throw error
                     }
             }
-            .logError(.importListError, using: self.logging)
+            .logError(.importListError, using: logging)
     }
 
 }

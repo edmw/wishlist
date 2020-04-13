@@ -52,11 +52,11 @@ final class FavoriteController: AuthenticatableController,
                         try Controller.render(page: .favoriteDeletion(with: result), on: request)
                             .encode(for: request)
                     }
-                    .catchMap(UserFavoritesActorError.self) { _ in
-                        // Tries to redirect back to the start page.
-                        Controller.redirect(to: "/", on: request)
+                    .catchMap(UserFavoritesActorError.self) { error in
+                        request.logger?.technical.warning(String(describing: error))
+                        // redirect to start page on error to handle the browsers back button
+                        return Controller.redirect(to: "/", on: request)
                     }
-                    .handleAuthorizationError(on: request)
             }
     }
 

@@ -49,10 +49,6 @@ extension DomainUserFavoritesActor {
                 return listRepository.find(by: specification.listID)
                     .unwrap(or: UserFavoritesActorError.invalidList)
                     .flatMap { list in
-                        // list must be owned by the user
-                        guard list.userID == user.id else {
-                            throw UserFavoritesActorError.invalidListForUser
-                        }
                         return try favoriteRepository.find(favorite: list, for: user)
                             .unwrap(or: UserFavoritesActorError.favoriteNotExisting)
                             .map { _ in

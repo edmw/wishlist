@@ -8,8 +8,7 @@
     <input type="file" name="file" class="form-control-file" id="fileUpload" aria-describedby="fileUploadLabel">
 </div>
 <div class="form-group form-row mt-4">
-    <button type="submit" class="btn btn-primary">#L10N("import")</button>
-    <a class="nav-link btn btn-link ml-3" href="#if(request.parameter.p){#(request.parameter.p)}else{/user/#(page.userID)/lists}">#L10N("cancel")</a>
+    #ActionConfirm("import") #ActionCancel("/user/#(page.userID)/lists")
 </div>
 </form>
 }

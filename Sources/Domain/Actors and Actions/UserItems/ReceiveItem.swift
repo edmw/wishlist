@@ -104,6 +104,7 @@ extension DomainUserItemsActor {
         let itemid = specification.itemID
         let listid = specification.listID
         let userid = specification.userID
+        let logging = self.logging
         return try self.listRepository
             .findAndUser(by: listid, for: userid)
             .unwrap(or: UserItemsActorError.invalidList)
@@ -121,14 +122,14 @@ extension DomainUserItemsActor {
                             .logMessage(
                                 .receiveItem(for: user, and: list),
                                 for: { $0.0 },
-                                using: self.logging
+                                using: logging
                             )
                             .map { item, reservation in
                                 .init(user, list, item, reservation)
                             }
                             .catchMap { error in
                                 if let receiveError = error as? ReceiveItemInvalidReservationError {
-                                    self.logging.debug("Receive error: \(receiveError)")
+                                    logging.debug("Receive error: \(receiveError)")
                                     throw UserItemsActorError.itemNotReceivable
                                 }
                                 throw error

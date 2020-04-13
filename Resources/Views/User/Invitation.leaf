@@ -17,8 +17,7 @@
         <small id="descriptionSendEmail" class="form-text text-muted">#L10N("invitation-field-sendemail-description")</small>
     </div>
     <div class="form-group form-row mt-4">
-        <button type="submit" class="btn btn-primary">#L10N("invite")</button>
-        <a class="nav-link btn btn-link ml-3" href="#if(request.parameter.p){#(request.parameter.p)}else{/}">#L10N("cancel")</a>
+        #ActionConfirm("invite") #ActionCancel("/user/#(page.userID)/")
     </div>
 </form>
 }

@@ -46,9 +46,10 @@ final class InvitationController: AuthenticatableController,
                 try Controller.render(page: .invitationRevocation(with: result), on: request)
                     .encode(for: request)
             }
-            .catchMap(UserFavoritesActor.self) { _ in
-                // Tries to redirect back to the start page.
-                Controller.redirect(to: "/", on: request)
+            .catchMap(UserInvitationsActorError.self) { error in
+                request.logger?.technical.warning(String(describing: error))
+                // redirect to start page on error to handle the browsers back button
+                return Controller.redirect(to: "/", on: request)
             }
     }
 

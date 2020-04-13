@@ -107,7 +107,9 @@ extension DomainUserListsActor {
     ) throws -> EventLoopFuture<UpdateList.Result> {
         let userid = specification.userID
         let listid = specification.listID
-        return try self.listRepository
+        let listRepository = self.listRepository
+        let logging = self.logging
+        return try listRepository
             .findAndUser(by: listid, for: userid)
             .unwrap(or: UserListsActorError.invalidList)
             .flatMap { list, user in
@@ -115,16 +117,14 @@ extension DomainUserListsActor {
                 return try UpdateList(actor: self)
                     .execute(on: list, for: user, updateWith: listvalues, in: boundaries)
                     .logMessage(
-                        .updateList(for: user), for: { $0.1 }, using: self.logging
+                        .updateList(for: user), for: { $0.1 }, using: logging
                     )
                     .map { user, list in
                         .init(user, list)
                     }
                     .catchMap { error in
                         if let updateError = error as? UpdateListValidationError {
-                            self.logging.debug(
-                                "List updating validation error: \(updateError)"
-                            )
+                            logging.debug("List updating validation error: \(updateError)")
                             throw UserListsActorError.validationError(
                                 updateError.user.representation,
                                 updateError.list.representation,

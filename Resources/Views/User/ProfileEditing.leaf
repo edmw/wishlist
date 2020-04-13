@@ -10,8 +10,7 @@
 <small id="descriptionNickName" class="form-text text-muted">#if(page.form.invalidNickName){<span class="text-danger">#L10N("profile-field-nickname-invalid")</span> }#if(page.form.duplicateNickName){<span class="text-danger">#L10N("profile-field-nickname-duplicate")</span>}#L10N("profile-field-nickname-hint")</small>
 </div>
 <div class="form-group form-row mt-4">
-<button type="submit" class="btn btn-primary">#L10N("save")</button>
-<a class="nav-link btn btn-link ml-3" href="#if(request.parameter.p){#(request.parameter.p)}else{/user/#(page.userID)/}">#L10N("cancel")</a>
+    #ActionConfirm("save") #ActionCancel("/user/#(page.userID)/")
 </div>
 </form>
 }

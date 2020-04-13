@@ -10,6 +10,9 @@ public class MessagingService: Service {
             return try container.make(EmailService.self)
                 .send(html: html, subject: subject, for: addresses, on: container)
                 .transform(to: .success(messaging))
+                .catchMap { error in
+                    return .failure(messaging, error: .underlying(error: error))
+                }
         case let .pushover(simpleHtml, title, users):
             return try container.make(PushoverService.self)
                 .send(text: simpleHtml, title: title, for: users, on: container)
@@ -21,7 +24,7 @@ public class MessagingService: Service {
                     else if let abort = error as? Abort {
                         return .failure(messaging, error: .response(status: abort.status.code))
                     }
-                    throw error
+                    return .failure(messaging, error: .underlying(error: error))
                 }
         }
     }

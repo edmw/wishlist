@@ -117,13 +117,15 @@ public final class DomainUserItemsActor: UserItemsActor,
         logging: MessageLoggingProvider,
         recording: EventRecordingProvider
     ) {
+        let logging = MessageLogging(provider: logging)
+        let recording = EventRecording(provider: recording)
         self.itemRepository = itemRepository
         self.userRepository = userRepository
         self.listRepository = listRepository
         self.reservationRepository = reservationRepository
-        self.logging = MessageLogging(provider: logging)
-        self.recording = EventRecording(provider: recording)
-        self.favoriteService = FavoriteService(favoriteRepository)
+        self.logging = logging
+        self.recording = recording
+        self.favoriteService = FavoriteService(favoriteRepository, listRepository, logging)
         self.itemRepresentationsBuilder = .init(itemRepository)
         self.listRepresentationsBuilder = .init(listRepository, itemRepository)
     }

@@ -1,8 +1,6 @@
-import Vapor
-
 // MARK: SendMessageResult
 
-struct SendMessageResult: JobResult {
+struct SendMessageResult: JobResult, CustomStringConvertible {
 
     // true, if at least one message could be sent
     let success: Bool
@@ -25,6 +23,13 @@ struct SendMessageResult: JobResult {
                 return false
             }
         })
+    }
+
+    // MARK: CustomStringConvertible
+
+    var description: String {
+        let messagingDescription = messaging.map(String.init).joined(separator: ", ")
+        return "SendMessageResult(success: \(success), messaging: \(messagingDescription)"
     }
 
 }

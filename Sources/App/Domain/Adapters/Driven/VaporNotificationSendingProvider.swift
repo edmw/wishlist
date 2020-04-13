@@ -62,10 +62,8 @@ struct VaporNotificationSendingProvider: NotificationSendingProvider {
         // map the app‘s messaging to a communication channel of the domain layer
         let map: (Messaging) -> NotificationSendingChannel? = {
             switch $0 {
-            case .email:
-                return email
-            case .pushover:
-                return pushover
+            case .email: return email
+            case .pushover: return pushover
             }
         }
         // map to sending result
@@ -91,8 +89,10 @@ struct VaporNotificationSendingProvider: NotificationSendingProvider {
                             switch error {
                             case let .response(status):
                                 return result(map(messaging), false, status)
+                            case .underlying:
+                                return result(map(messaging), false, 900)
                             default:
-                                return result(map(messaging), false, 500)
+                                return result(map(messaging), false, 999)
                             }
                         }
                     }

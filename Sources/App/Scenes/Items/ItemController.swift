@@ -50,9 +50,10 @@ final class ItemController: AuthenticatableController,
                 try Controller.render(page: .itemManagement(with: result), on: request)
                     .encode(for: request)
             }
-            .catchFlatMap(UserItemsActorError.self) { _ in
-                // Tries to redirect back to the items page.
-                Controller.redirect(for: userid, and: listid, to: "items", on: request)
+            .catchFlatMap(UserItemsActorError.self) { error in
+                request.logger?.technical.warning(String(describing: error))
+                // redirect on error to handle the browsers back button
+                return Controller.redirect(for: userid, and: listid, to: "items", on: request)
             }
     }
 
@@ -72,9 +73,10 @@ final class ItemController: AuthenticatableController,
                 try Controller.render(page: .itemDeletion(with: result), on: request)
                     .encode(for: request)
             }
-            .catchFlatMap(UserItemsActorError.self) { _ in
-                // Tries to redirect back to the items page.
-                Controller.redirect(for: userid, and: listid, to: "items", on: request)
+            .catchFlatMap(UserItemsActorError.self) { error in
+                request.logger?.technical.warning(String(describing: error))
+                // redirect on error to handle the browsers back button
+                return Controller.redirect(for: userid, and: listid, to: "items", on: request)
             }
     }
 
@@ -93,9 +95,10 @@ final class ItemController: AuthenticatableController,
                 try Controller.render(page: .itemMovement(with: result), on: request)
                     .encode(for: request)
             }
-            .catchFlatMap(UserItemsActorError.self) { _ in
-                // Tries to redirect back to the list page.
-                Controller.redirect(for: userid, and: listid, to: "items", on: request)
+            .catchFlatMap(UserItemsActorError.self) { error in
+                request.logger?.technical.warning(String(describing: error))
+                // redirect on error to handle the browsers back button
+                return Controller.redirect(for: userid, and: listid, to: "items", on: request)
             }
     }
 
@@ -114,9 +117,10 @@ final class ItemController: AuthenticatableController,
                 try Controller.render(page: .itemReceiving(with: result), on: request)
                     .encode(for: request)
             }
-            .catchFlatMap(UserItemsActorError.self) { _ in
-                // Tries to redirect back to the list page.
-                Controller.redirect(for: userid, and: listid, to: "items", on: request)
+            .catchFlatMap(UserItemsActorError.self) { error in
+                request.logger?.technical.warning(String(describing: error))
+                // redirect on error to handle the browsers back button
+                return Controller.redirect(for: userid, and: listid, to: "items", on: request)
             }
     }
 

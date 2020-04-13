@@ -95,20 +95,23 @@ extension DomainUserListsActor {
         _ specification: CreateList.Specification,
         _ boundaries: CreateList.Boundaries
     ) throws -> EventLoopFuture<CreateList.Result> {
-        return self.userRepository
+        let userRepository = self.userRepository
+        let logging = self.logging
+        let recording = self.recording
+        return userRepository
             .find(id: specification.userID)
             .unwrap(or: UserListsActorError.invalidUser)
             .flatMap { user in
                 return try CreateList(actor: self)
                     .execute(for: user, createWith: specification.values, in: boundaries)
-                    .logMessage(.createList(for: user), for: { $0.list }, using: self.logging)
-                    .recordEvent(.createList(for: user), for: { $0.list }, using: self.recording)
+                    .logMessage(.createList(for: user), for: { $0.list }, using: logging)
+                    .recordEvent(.createList(for: user), for: { $0.list }, using: recording)
                     .map { user, list in
                         .init(user, list)
                     }
                     .catchMap { error in
                         if let createError = error as? CreateListValidationError {
-                            self.logging.debug("List creation validation error: \(createError)")
+                            logging.debug("List creation validation error: \(createError)")
                             let user = createError.user.representation
                             let error = createError.error
                             throw UserListsActorError.validationError(user, nil, error)

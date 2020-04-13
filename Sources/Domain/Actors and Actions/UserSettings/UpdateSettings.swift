@@ -81,6 +81,7 @@ extension DomainUserSettingsActor {
         _ specification: UpdateSettings.Specification,
         _ boundaries: UpdateSettings.Boundaries
     ) throws -> EventLoopFuture<UpdateSettings.Result> {
+        let userRepository = self.userRepository
         let logging = self.logging
         return userRepository.find(id: specification.userID)
             .unwrap(or: UserListsActorError.invalidUser)

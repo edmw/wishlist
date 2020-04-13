@@ -45,27 +45,14 @@
             <td class="wl-actions wl-actions-left" data-label="">
                 <div class="btn-group" role="group">
                     #if(features.receiveItem.enabled && item.receivable == true) {
-                    <a class="btn btn-action" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/receive" title="#L10N("receive-item-description")"><svg class="feather"><use xlink:href="/icons/feather.svg#gift"/></svg></a>
+                        #ActionButton("receive-item-description", "gift", "/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/receive")
                     }
                 </div>
             </td>
             <td class="wl-actions wl-actions-right" data-label="">
                 <div class="btn-group" role="group">
-                    #if(features.archiveItem.enabled) {
-                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/edit" title="#L10N("edit-item")"><svg class="feather"><use xlink:href="/icons/feather.svg#edit"/></svg></a>
-                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/manage" title="#L10N("manage-item")"><svg class="feather"><use xlink:href="/icons/feather.svg#more-vertical"/></svg></a>
-                    } else {
-                    #if(features.moveItem.enabled && item.movable == true) {
-                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/move" title="#L10N("item-move-description")"><svg class="feather"><use xlink:href="/icons/feather.svg#log-in"/></svg></a>
-                    }
-                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/edit" title="#L10N("edit-item")"><svg class="feather"><use xlink:href="/icons/feather.svg#edit"/></svg></a>
-                    #if(item.isReserved == true) {
-                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/reservation/#(item.reservationID)/delete" title="#L10N("release-item")"><svg class="feather"><use xlink:href="/icons/feather.svg#x-circle"/></svg></a>
-                    }
-                    #if(item.deletable == true) {
-                    <a class="btn btn-action ml-3" href="/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/delete" title="#L10N("delete-item")"><svg class="feather"><use xlink:href="/icons/feather.svg#delete"/></svg></a>
-                    }
-                    }
+                    #ActionButton("edit-item", "edit", "/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/edit")
+                    #ActionButton("manage-item", "more-vertical", "/user/#(page.userID)/list/#(page.listID)/item/#(item.id)/manage")
                 </div>
             </td>
         </tr>

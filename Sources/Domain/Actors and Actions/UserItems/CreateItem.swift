@@ -106,6 +106,7 @@ extension DomainUserItemsActor {
     ) throws -> EventLoopFuture<CreateItem.Result> {
         let logging = self.logging
         let recording = self.recording
+        let listRepository = self.listRepository
         let favoriteService = self.favoriteService
         let notificationSending = boundaries.notificationSending
         return try listRepository
