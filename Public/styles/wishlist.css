@@ -588,6 +588,10 @@ h2, .h2, h3, h4 {
     margin-left: 0.5ex;
 }
 
+.btn-group > .btn {
+    flex: 0 1 auto;
+}
+
 .navbar .navbar-brand {
     text-transform: uppercase;
 }
