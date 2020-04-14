@@ -30,13 +30,22 @@ public struct AnyEncodable: Encodable {
 
     public init(_ encodable: Encodable) {
         func encode(to encoder: Encoder) throws {
-            try encodable.encode(to: encoder)
+            var container = encoder.singleValueContainer()
+            try encodable.encode(to: &container)
         }
         self.encodeFunc = encode
     }
 
     public func encode(to encoder: Encoder) throws {
         try encodeFunc(encoder)
+    }
+
+}
+
+extension Encodable {
+
+    fileprivate func encode(to container: inout SingleValueEncodingContainer) throws {
+        try container.encode(self)
     }
 
 }

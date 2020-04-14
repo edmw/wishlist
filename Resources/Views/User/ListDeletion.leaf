@@ -6,7 +6,7 @@
 <form method="POST" action="#(page.actions.form.reference)#if(request.parameter.p){?p=#(request.parameter.p)}" accept-charset="UTF-8" class="mt-4">
 #if(page.actions.form.method != "POST") {<input type="hidden" name="__method" value="#(page.actions.form.method)">}
     <div class="form-group form-row">
-        #ActionConfirm("save") #ActionCancel("/user/#(page.userID)/lists")
+        #ActionConfirm() #ActionCancel("/user/#(page.userID)/lists")
     </div>
 </form>
 

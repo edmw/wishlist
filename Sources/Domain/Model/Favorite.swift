@@ -63,13 +63,13 @@ public final class Favorite: FavoriteModel, Representable,
     // MARK: CustomStringConvertible
 
     public var description: String {
-        return "Favorite[\(id ??? "???")](user:\(userID)|list:\(listID))"
+        return "Favorite[\(optional: id)][user:\(userID)|list:\(listID)]"
     }
 
     // MARK: CustomDebugStringConvertible
 
     public var debugDescription: String {
-        return "Favorite[\(id ??? "???")](user:\(userID)|list:\(listID))"
+        return "Favorite[\(optional: id)][user:\(userID)|list:\(listID)]"
     }
 
     // MARK: - Notifications

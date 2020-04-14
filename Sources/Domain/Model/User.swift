@@ -121,13 +121,13 @@ public final class User: UserModel, Representable,
     // MARK: CustomStringConvertible
 
     public var description: String {
-        return "User[\(id ??? "???")][identification: \(identification)]"
+        return "User[\(optional: id)][identification: \(identification)]"
     }
 
     // MARK: CustomDebugStringConvertible
 
     public var debugDescription: String {
-        return "User[\(id ??? "???")][identification: \(identification)]"
+        return "User[\(optional: id)][identification: \(identification)]"
             + "(\(email), \(fullName))"
     }
 

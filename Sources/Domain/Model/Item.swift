@@ -139,13 +139,14 @@ public final class Item: ItemModel, Imageable, Representable,
     // MARK: CustomStringConvertible
 
     public var description: String {
-        return "Item[\(id ??? "???")]"
+        return "Item[\(optional: id)][list:\(listID)]"
     }
 
     // MARK: CustomDebugStringConvertible
 
     public var debugDescription: String {
-        return "Item[\(id ??? "???")](\(title))"
+        return "Item[\(optional: id)][list:\(listID)]"
+            + "(\(title))"
     }
 
     // MARK: - Preference

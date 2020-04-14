@@ -31,6 +31,8 @@ extension Identifier {
 
 }
 
+// MARK: DomainIdentifier
+
 internal protocol DomainIdentifier: Identifier {
 
     var rawValue: UUID { get }
@@ -93,6 +95,14 @@ extension DomainIdentifier {
 public protocol AnyIdentifier: Codable {
 
     var uuid: UUID { get }
+
+}
+
+extension Optional: CustomStringConvertible where Wrapped: AnyIdentifier {
+
+    public var description: String {
+        return wrapped.map(String.init(describing:)) ?? "noid"
+    }
 
 }
 

@@ -92,13 +92,13 @@ public final class Invitation: InvitationModel, Confidental, Representable,
     // MARK: CustomStringConvertible
 
     public var description: String {
-        return "Invitation[\(id ??? "???")]"
+        return "Invitation[\(optional: id)][user:\(userID)|invitee:\(optional: inviteeID)]"
     }
 
     // MARK: CustomDebugStringConvertible
 
     public var debugDescription: String {
-        return "Invitation[\(id ??? "???")]"
+        return "Invitation[\(optional: id)][user:\(userID)|invitee:\(optional: inviteeID)]"
     }
 
     // MARK: - Status

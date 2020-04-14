@@ -31,7 +31,11 @@ struct EventRecording {
         let attributes = event.attributes
 
         var values = [String: [String: AnyEncodable]]()
-        values["event"] = ["kind": AnyEncodable(String(describing: kind))]
+        values["event"] = [
+            "id": AnyEncodable(UUID()),
+            "date": AnyEncodable(Date()),
+            "kind": AnyEncodable(String(describing: kind))
+        ]
         values["subject"] = [String(describing: type(of: subject)): self.encodable(from: subject)]
         values["attributes"] = attributes.mapValues { value in self.encodable(from: value) }
 
@@ -56,8 +60,6 @@ struct EventRecording {
 
     private func encodable(from any: Any) -> AnyEncodable {
         switch any {
-        case let encodable as Encodable:
-            return .init(encodable)
         case let array as [Any]:
             return .init(array.map { any in String(describing: any) })
         default:

@@ -4,6 +4,10 @@
 - 🛠️ flags a technical feature
 - ☘ flags a fix
 
+## [1.7.1]
+- 🛠️ Improve event recording
+- ☘ Fix button text
+
 ## [1.7.0]
 - 🖌 Add functionality to get notifications for new items on favoured wish lists
 - 🛠️ Add template tags to render alert boxes, action buttons, icons

@@ -71,15 +71,13 @@ public final class Reservation: ReservationModel, Representable,
     // MARK: CustomStringConvertible
 
     public var description: String {
-        return "Reservation[\(id ??? "???")]" +
-            "(item:\(itemID)|holder:\(holder))"
+        return "Reservation[\(optional: id)][item:\(itemID)|holder:\(holder)]"
     }
 
     // MARK: CustomDebugStringConvertible
 
     public var debugDescription: String {
-        return "Reservation[\(id ??? "???")]" +
-            "(item:\(itemID))|holder:\(holder))"
+        return "Reservation[\(optional: id)][item:\(itemID))|holder:\(holder)]"
     }
 
     // MARK: - Status

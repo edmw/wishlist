@@ -41,13 +41,13 @@ public struct UserRepresentation: Representation, Encodable, Equatable,
     // MARK: CustomStringConvertible
 
     public var description: String {
-        return "UserRepresentation[\(id ??? "???")]"
+        return "UserRepresentation[\(optional: id)]"
     }
 
     // MARK: CustomDebugStringConvertible
 
     public var debugDescription: String {
-        return "UserRepresentation[\(id ??? "???")]"
+        return "UserRepresentation[\(optional: id)]"
             + "(\(email), \(fullName))"
     }
 

@@ -94,13 +94,14 @@ public final class List: ListModel, Viewable, Representable,
     // MARK: CustomStringConvertible
 
     public var description: String {
-        return "List[\(id ??? "???")]"
+        return "List[\(optional: id)][owner:\(userID)]"
     }
 
     // MARK: CustomDebugStringConvertible
 
     public var debugDescription: String {
-        return "List[\(id ??? "???")](\(title))"
+        return "List[\(optional: id)][owner:\(userID)]"
+            + "(\(title))"
     }
 
     // MARK: - Options
