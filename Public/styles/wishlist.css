@@ -392,6 +392,7 @@ div.wl-item img {
 div.wl-item img.placeholder {
     opacity: 0.1;
 }
+/* MARK: blocks: item inner */
 div.wl-item .inner {
     position: absolute;
     top: 0;
@@ -411,6 +412,7 @@ div.wl-item .inner .btn-group a {
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
 }
+/* MARK: blocks: item back */
 div.wl-item .back {
     position: absolute;
     top: 0;
@@ -423,6 +425,20 @@ div.wl-item .back {
     transform: rotateY(180deg);
     -webkit-transform: rotateY(180deg);
 }
+div.wl-item .back .text {
+    scrollbar-color: var(--dark) var(--light);
+}
+div.wl-item .back .text::-webkit-scrollbar {
+  width: 15px;
+}
+div.wl-item .back .text::-webkit-scrollbar-track {
+    background: var(--dark);
+}
+div.wl-item .back .text::-webkit-scrollbar-thumb {
+    background-color: var(--light);
+    border: 3px solid var(--dark);
+    border-radius: 10px;
+}
 div.wl-item .back > * {
     z-index: 4;
 }
@@ -431,6 +447,7 @@ div.wl-item .back .text {
     overflow-x: hidden;
     overflow-y: scroll;
 }
+/* MARK: blocks: item cover */
 div.wl-item .cover {
     display: block;
     position: absolute;
