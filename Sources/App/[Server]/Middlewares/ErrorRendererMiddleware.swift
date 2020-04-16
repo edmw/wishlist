@@ -20,7 +20,6 @@ final class ErrorRendererMiddleware: Middleware, ServiceType {
         self.template404 = template404
         self.templateServer = templateServer
 
-        // Note: encoding strategies won't work after transforming the values to `AnyEncodable`.
         self.context = context?.mapValues { AnyEncodable($0) } ?? [:]
     }
 
@@ -187,7 +186,7 @@ extension ViewRenderer {
 
 extension HTTPStatus {
 
-    internal init(for error: Error) {
+    fileprivate init(for error: Error) {
         if let abort = error as? AbortError {
             self = abort.status
         }
@@ -204,6 +203,25 @@ extension Dictionary where Key == String, Value == AnyEncodable {
 
     fileprivate func updating(_ other: [String: String]) -> [String: AnyEncodable] {
         return merging(other.mapValues { AnyEncodable($0) }) { _, new in new }
+    }
+
+}
+
+// MARK: AnyEncodable
+
+/// The simplest implementation of an `AnyEncodable`. This is used instead of the better version
+/// provided by Library because Vapors `TemplateDataEncoder` implements an incomplete
+/// `SingleValueEncodingContainer` only. Downside is, this doesn‘t respect any encoding strategies.
+private struct AnyEncodable: Encodable {
+
+    let encodable: Encodable
+
+    init(_ encodable: Encodable) {
+        self.encodable = encodable
+    }
+
+    func encode(to encoder: Encoder) throws {
+        try self.encodable.encode(to: encoder)
     }
 
 }

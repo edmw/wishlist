@@ -6,18 +6,18 @@ import Leaf
 
 // MARK: UserNotification
 
-typealias UserNotificationTemplate = (name: String, context: AnyEncodable)
+private typealias UserNotificationTemplate = (name: String, context: AnyEncodable)
 
 class UserNotification: MultiMessage, CustomStringConvertible {
 
-    let user: UserRepresentation
+    private let user: UserRepresentation
 
-    let title: String?
-    let titleKey: String?
+    private let title: String?
+    private let titleKey: String?
     // text
-    let textTemplate: UserNotificationTemplate
+    private let textTemplate: UserNotificationTemplate
     // html
-    var htmlTemplate: UserNotificationTemplate?
+    private var htmlTemplate: UserNotificationTemplate?
 
     var emailRecipients = [EmailAddress]()
 
@@ -129,6 +129,25 @@ class UserNotification: MultiMessage, CustomStringConvertible {
 
     var description: String {
         return "UserNotification(\(user))"
+    }
+
+}
+
+// MARK: AnyEncodable
+
+/// The simplest implementation of an `AnyEncodable`. This is used instead of the better version
+/// provided by Library because Vapors `TemplateDataEncoder` implements an incomplete
+/// `SingleValueEncodingContainer` only. Downside is, this doesn‘t respect any encoding strategies.
+private struct AnyEncodable: Encodable {
+
+    let encodable: Encodable
+
+    init(_ encodable: Encodable) {
+        self.encodable = encodable
+    }
+
+    func encode(to encoder: Encoder) throws {
+        try self.encodable.encode(to: encoder)
     }
 
 }
